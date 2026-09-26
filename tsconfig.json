@@ -6,5 +6,5 @@
     "allowJs": true,
     "checkJs": false
   },
-  "include": ["src", "tests", "*.config.ts", "eslint.boundaries.js"]
+  "include": ["src", "tests", "*.config.ts", "eslint.boundaries.js", "eslint.config.js"]
 }
