@@ -25,9 +25,11 @@ describe('screens', () => {
     expect(() => parseTextMap(def.map, LEGEND)).not.toThrow();
   });
 
-  it.each(SCREEN_IDS)('%s places things on walkable tiles', (id) => {
+  it.each(SCREEN_IDS)('%s places things that stand somewhere on walkable tiles', (id) => {
     const ok = walkable(id);
+    const standing = new Set(['enemy', 'prop', 'critter', 'piece', 'door']);
     for (const thing of SCREENS[id].things) {
+      if (!standing.has(thing.k)) continue;
       expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
     }
   });

@@ -103,7 +103,7 @@ export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat'] as const;
 export type DialogueId = (typeof DIALOGUES)[number];
 
 /** Cutscenes and interaction scripts. */
-export const SCRIPTS = ['dev_script'] as const;
+export const SCRIPTS = ['dev_script', 'dev_shop'] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
 /** Things that can be lifted, thrown, broken or split. */

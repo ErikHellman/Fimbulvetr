@@ -38,7 +38,7 @@ function indexedDbFactory(): IDBFactory | undefined {
   }
 }
 
-function startGame(services: Services): void {
+function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
   const game = new Phaser.Game({
     type: Phaser.WEBGL,
     parent: 'game',
@@ -49,7 +49,7 @@ function startGame(services: Services): void {
     banner: false,
     scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.NO_CENTER },
     input: { keyboard: false, gamepad: false },
-    scene: [new BootScene(services), new PlayScene()],
+    scene: [new BootScene(services), new PlayScene(), ...extra],
   });
   game.canvas.setAttribute('aria-label', GAME_TITLE);
   attachZoom(game, () => services.settings.scaling);
@@ -89,7 +89,19 @@ async function main(): Promise<void> {
     applyPreset(state, DEV_PRESETS[query.preset]);
   if (query !== null) applyDevQuery(state, query);
   const dev = DEV_TOOLS ? (await import('@shell/dev/index')).createDevTools() : null;
-  startGame({ db: DB, state, settings, saves, dev, muted: query?.mute === true });
+  const gallery = query?.gallery === true ? new (await import('@shell/dev/gallery')).GalleryScene() : null;
+  startGame(
+    {
+      db: DB,
+      state,
+      settings,
+      saves,
+      dev,
+      muted: query?.mute === true,
+      start: gallery === null ? 'play' : 'gallery',
+    },
+    gallery === null ? [] : [gallery],
+  );
 }
 
 void main();

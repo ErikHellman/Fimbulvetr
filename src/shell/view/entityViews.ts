@@ -7,6 +7,7 @@ import type { FrameIndex } from '@shell/gfx/frameIndex';
 /** Mirrors sim entities as sprites. Safe to call every frame: views are derived from state only. */
 export class EntityViews {
   private readonly sprites = new Map<number, Phaser.GameObjects.Sprite>();
+  private readonly shadows = new Map<number, Phaser.GameObjects.Sprite>();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -36,6 +37,7 @@ export class EntityViews {
       const blink =
         e.kind === 'hero' && e.iframes > 0 && e.anim !== 'roll' && Math.floor(e.iframes / 4) % 2 === 0;
       sprite.setAlpha(blink ? 0.35 : 1);
+      this.shadow(e, p);
     }
     for (const [id, sprite] of this.sprites) {
       if (!seen.has(id)) {
@@ -43,5 +45,30 @@ export class EntityViews {
         this.sprites.delete(id);
       }
     }
+    for (const [id, shadow] of this.shadows) {
+      if (!seen.has(id)) {
+        shadow.destroy();
+        this.shadows.delete(id);
+      }
+    }
+  }
+
+  /** A soft shadow on the ground under anything lifted off it (hops, carried and thrown things). */
+  private shadow(e: Entity, p: Vec): void {
+    const z = e.mem['z'] ?? 0;
+    let shadow = this.shadows.get(e.id);
+    if (z <= 0.5) {
+      shadow?.setVisible(false);
+      return;
+    }
+    const ref = this.frames.get('fx_shadow_idle_s_0');
+    if (shadow === undefined) {
+      shadow = this.scene.add.sprite(0, 0, ref.key, ref.frame).setOrigin(ref.ox, ref.oy);
+      this.shadows.set(e.id, shadow);
+    }
+    shadow
+      .setVisible(true)
+      .setPosition(Math.round(p.x), Math.round(p.y))
+      .setDepth(p.y - 0.5);
   }
 }

@@ -27,6 +27,11 @@ export class FrameIndex {
     return fallback;
   }
 
+  /** Every registered frame name, in registration order. */
+  names(): string[] {
+    return [...this.refs.keys()];
+  }
+
   missingNames(): string[] {
     return [...this.missing];
   }

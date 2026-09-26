@@ -15,6 +15,7 @@ import { giveItem } from '../story/effects';
 import type { StoryRun } from '../story/script';
 import { buy } from '../story/shop';
 import { buildCollision, gridSolidAt } from '../world/collision';
+import type { CoverGrid } from '../world/cover';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
@@ -116,6 +117,11 @@ export class Sim implements SimRt {
   /** How black the picture is (door fades and script fades): 0 clear … 1 black. */
   fade(): number {
     return Math.max(fadeLevel(this.transition), this.story?.fade ?? 0);
+  }
+
+  /** A screen's ground cover as it stands now (the live grid for the current screen). */
+  coverOf(id: ScreenId): CoverGrid {
+    return id === this.screen.id ? this.screen.cover : coverFor(this, id);
   }
 
   /** The text box or card the running script shows, if any. */

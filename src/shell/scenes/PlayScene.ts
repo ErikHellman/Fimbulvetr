@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 import { grade } from '@art/grading';
 import { ANIMS } from '@art/sprites';
+import { coverIndices } from '@art/tiles/coverIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
@@ -23,6 +24,9 @@ import { LETTERBOX } from '@shell/scale';
 import type { PlayData } from '@shell/services';
 import { EntityViews } from '@shell/view/entityViews';
 import { ScreenView } from '@shell/view/screenView';
+
+/** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
+const INDOOR_LIGHT = 0.85;
 
 /** Owns the Sim: steps it at 60 Hz, feeds it input, draws its state, plays its sounds, autosaves. */
 export class PlayScene extends Phaser.Scene {
@@ -119,6 +123,7 @@ export class PlayScene extends Phaser.Scene {
 
   private onEvent(ev: SimEvent): void {
     if (ev.t === 'screenTransition') this.showScreen(ev.to);
+    else if (ev.t === 'coverChanged') this.screens.get(ev.screen)?.setCover(this.coverTiles(ev.screen));
     else if (ev.t === 'screenEntered') {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
@@ -146,18 +151,24 @@ export class PlayScene extends Phaser.Scene {
 
   private applyGrade(): void {
     const clock = this.sim.state.clock;
-    const light = daylight(clock, this.services.db.clock);
-    const key = `${clock.season}|${Math.round(light * 200)}`;
+    const indoor = this.services.db.screens[this.sim.screen.id].indoor === true;
+    const light = indoor ? INDOOR_LIGHT : daylight(clock, this.services.db.clock);
+    const season = indoor ? 'autumn' : clock.season;
+    const key = `${season}|${Math.round(light * 200)}`;
     if (key === this.gradeKey) return;
     this.gradeKey = key;
-    this.appliedGrade = grade(clock.season, light, 'clear');
+    this.appliedGrade = grade(season, light, 'clear');
     this.colour.colorMatrix.set([...this.appliedGrade]);
   }
 
   private showScreen(id: ScreenId): void {
     if (this.screens.has(id)) return;
     const indices = tileIndices(this.sim.terrainOf(id), this.services.assets.tileset, fnv1a(id));
-    this.screens.set(id, new ScreenView(this, this.sim.originOf(id), indices));
+    this.screens.set(id, new ScreenView(this, this.sim.originOf(id), indices, this.coverTiles(id)));
+  }
+
+  private coverTiles(id: ScreenId): number[] {
+    return coverIndices(this.sim.coverOf(id), this.services.db.coverOrder, this.services.assets.tileset);
   }
 
   private dropScreensExcept(id: ScreenId): void {

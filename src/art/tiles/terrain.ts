@@ -188,11 +188,11 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 0,
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 0, C.turf, C.ink, C.turfLight, 0.1);
-      for (let y = 0; y < 16; y++)
+      region(p, v.mask, 0, C.turfShade, C.ink, C.turf, 0.12);
+      for (let y = 1; y < 16; y += 3)
         for (let x = 0; x < 16; x++)
-          if (insideBlob(v.mask, x, y, 0) && !onBlobEdge(v.mask, x, y, 0) && (x + y * 3) % 11 === 0)
-            p.px(x, y, C.turfShade);
+          if (insideBlob(v.mask, x, y, 0) && !onBlobEdge(v.mask, x, y, 0) && (x + y) % 4 !== 0)
+            p.px(x, y, C.leafShade);
     },
   },
   wall: {

@@ -17,6 +17,6 @@ export class BootScene extends Phaser.Scene {
     const tileset = buildTileset();
     registerTileset(this.textures, tileset);
     const data: PlayData = { ...this.services, assets: { frames, tileset } };
-    this.scene.start('play', data);
+    this.scene.start(this.services.start, data);
   }
 }
