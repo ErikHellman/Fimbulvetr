@@ -80,6 +80,10 @@ describe('rejecting bad input', () => {
     const bad = { ...save, state: { ...save.state, hero: { ...save.state.hero, screen: 'nowhere' } } };
     expect(expectError(loadSave(bad, known), 'invalid')).toContain('unknown screen');
   });
+
+  it('rejects saves with missing state without crashing', () => {
+    expectError(loadSave({ format: 'fimbulvetr', v: 1, sum: 'deadbeef' }, known), 'invalid');
+  });
 });
 
 describe('migrations', () => {

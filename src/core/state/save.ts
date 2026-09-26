@@ -76,10 +76,14 @@ export function loadSave(
   const v = record['v'];
   if (typeof v !== 'number' || !Number.isInteger(v) || v < 1) return fail('invalid', 'bad version number');
   if (v > SAVE_VERSION) return fail('too-new', `save version ${v} is newer than ${SAVE_VERSION}`);
-  const checksumOk = typeof record['sum'] === 'string' && record['sum'] === checksum(record['state']);
+  const state_raw = record['state'];
+  if (typeof state_raw !== 'object' || state_raw === null) {
+    return fail('invalid', 'missing game state');
+  }
+  const checksumOk = typeof record['sum'] === 'string' && record['sum'] === checksum(state_raw);
   let state: unknown;
   try {
-    state = migrate(record['state'], v, SAVE_VERSION, migrations);
+    state = migrate(state_raw, v, SAVE_VERSION, migrations);
   } catch (e) {
     return fail('invalid', `migration failed: ${String(e)}`);
   }
