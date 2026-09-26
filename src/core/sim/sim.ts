@@ -194,6 +194,7 @@ export class Sim implements SimRt {
       tuning: this.db.tuning,
       rng: this.state.rng,
       hero: this.hero.pos,
+      heroVel: this.hero.vel,
       solidAt: gridSolidAt(this.screen.collision, () => true),
       emit: (ev) => {
         this.emit(ev);

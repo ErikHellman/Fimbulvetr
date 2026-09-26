@@ -50,8 +50,7 @@ test('the stall sells a lantern', async ({ page }) => {
   await walk(page, 'KeyW');
   await tap(page, 'KeyE');
   await expect.poll(() => story(page).then((s) => s?.k)).toBe('text');
-  await tap(page, 'Enter');
-  await tap(page, 'Enter');
+  for (let i = 0; i < 20 && (await story(page))?.k !== 'shop'; i++) await tap(page, 'Enter');
   await expect.poll(() => story(page).then((s) => s?.k)).toBe('shop');
   await tap(page, 'Enter');
   expect(await page.evaluate(() => window.__fimbul?.items().lantern)).toBeUndefined();

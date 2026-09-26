@@ -79,6 +79,7 @@ describe('training dummy', () => {
       tuning: TUNING,
       rng: createRng(1),
       hero: { x: 0, y: 0 },
+      heroVel: { x: 0, y: 0 },
       solidAt: () => false,
       emit: () => undefined,
     };

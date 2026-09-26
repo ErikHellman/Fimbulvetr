@@ -39,6 +39,8 @@ export interface ActorCtx {
   readonly rng: RngState;
   /** The hero's feet position. */
   readonly hero: Readonly<Vec>;
+  /** The hero's intended movement this tick (px per tick). */
+  readonly heroVel: Readonly<Vec>;
   /** Wall lookup for the current screen (off-screen tiles are solid). */
   readonly solidAt: SolidAt;
   emit(event: SimEvent): void;

@@ -68,7 +68,7 @@ export const askFarmyard: ScreenDef = {
       k: 'drop',
       at: { x: 22, y: 13 },
       w: 5,
-      h: 1,
+      h: 2,
       accepts: 'pail',
       do: [{ k: 'set', flag: 'q_water_d1', value: true }],
     },

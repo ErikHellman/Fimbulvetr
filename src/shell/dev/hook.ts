@@ -1,5 +1,5 @@
 import type { UiKey } from '@content/i18n/ui';
-import { isScreenId } from '@content/world/screens';
+import { SCREEN_IDS, isScreenId } from '@content/world/screens';
 import { mem } from '@core/actors/entity';
 import { isSeason, type ClockState } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
@@ -53,6 +53,8 @@ export interface FimbulHook {
   silver(): number;
   items(): Readonly<Record<string, number>>;
   actors(): { kind: string; def: string; x: number; y: number; fsm: string }[];
+  /** Every screen id, for smoke tests. */
+  screens(): string[];
 }
 
 declare global {
@@ -156,6 +158,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     flags: () => ({ ...bridge().sim.state.flags }),
     silver: () => bridge().sim.state.hero.silver,
     items: () => ({ ...bridge().sim.state.inv.items }),
+    screens: () => [...SCREEN_IDS],
     actors: () =>
       bridge().sim.actors.map((a) => ({ kind: a.kind, def: a.def, x: a.pos.x, y: a.pos.y, fsm: a.fsm.s })),
   };

@@ -38,7 +38,7 @@ export const DEV_PRESETS = {
   /** The third evening, by Ask's bed: sleeping now starts the raid. */
   night3: {
     screen: 'ask_int_longhouse',
-    tile: [11, 8],
+    tile: [10, 8],
     facing: 'n',
     weapon: 'handaxe',
     shield: false,

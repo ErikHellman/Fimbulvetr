@@ -60,7 +60,7 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   grimr: npc('grimr', [{ screen: 'ask_gate', at: { x: 20, y: 5 }, facing: 's' }]),
   asa: npc('asa', [{ when: up, screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' }]),
   bjarni: npc('bjarni', [{ when: up, screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' }]),
-  ulf: npc('ulf', [{ when: up, screen: 'ask_pasture', at: { x: 8, y: 17 }, facing: 'n' }]),
+  ulf: npc('ulf', [{ when: up, screen: 'ask_pasture', at: { x: 15, y: 4 }, facing: 's' }]),
   tofa: npc('tofa', [{ when: up, screen: 'ask_field', at: { x: 11, y: 19 }, facing: 'e' }]),
   oddr: npc('oddr', [{ when: up, screen: 'ask_field', at: { x: 26, y: 19 }, facing: 'w' }]),
   hallbera: npc('hallbera', [{ when: up, screen: 'ask_village', at: { x: 31, y: 7 }, facing: 's' }]),
