@@ -1,15 +1,20 @@
 import * as Phaser from 'phaser';
+import { DB } from '@content/index';
 import { GAME_TITLE } from '@content/meta';
+import { NEW_GAME } from '@content/start';
+import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
-import { GAME_H, GAME_W } from '@shell/scale';
+import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { BootScene } from '@shell/scenes/BootScene';
+import { PlayScene } from '@shell/scenes/PlayScene';
+import type { Services } from '@shell/services';
 
-document.title = GAME_TITLE;
+function randomSeed(): number {
+  return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
+}
 
-if (!hasWebGL()) {
-  showMessage('Fimbulvetr needs WebGL, which this browser has turned off or does not support.');
-} else {
+function startGame(services: Services): void {
   const game = new Phaser.Game({
     type: Phaser.WEBGL,
     parent: 'game',
@@ -20,7 +25,14 @@ if (!hasWebGL()) {
     banner: false,
     scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.NO_CENTER },
     input: { keyboard: false, gamepad: false },
-    scene: [BootScene],
+    scene: [new BootScene(services), new PlayScene()],
   });
-  game.canvas.setAttribute('aria-label', GAME_TITLE);
+  attachZoom(game, () => 'integer');
+}
+
+document.title = GAME_TITLE;
+if (!hasWebGL()) {
+  showMessage('Fimbulvetr needs WebGL, which this browser has turned off or does not support.');
+} else {
+  startGame({ db: DB, state: newGame(randomSeed(), NEW_GAME) });
 }
