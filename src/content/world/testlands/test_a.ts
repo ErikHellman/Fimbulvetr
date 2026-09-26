@@ -4,7 +4,7 @@ export const testA: ScreenDef = {
   id: 'test_a',
   region: 'askdalr',
   purpose: 'M0 test field: pond, trees, a path to the east exit, and room to practise the sword.',
-  things: [],
+  things: [{ k: 'enemy', id: 'dummy', at: { x: 24, y: 9 } }],
   map: [
     '########################################',
     '#TTT...................................#',
