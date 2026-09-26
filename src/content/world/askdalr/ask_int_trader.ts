@@ -1,0 +1,35 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const askIntTrader: ScreenDef = {
+  id: 'ask_int_trader',
+  region: 'askdalr',
+  purpose: "Sigrún's trading house: the lantern and Embla's flatbread are sold across the counter.",
+  indoor: true,
+  things: [
+    { k: 'door', at: { x: 19, y: 18 }, dir: 's', to: 'ask_village', arrive: { x: 8, y: 6 }, facing: 's' },
+  ],
+  map: [
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwwwwwwwwwwwwwwwwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwfhffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffttttttttttffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwffffffffffffffwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXwwwwwwwDwwwwwwwwXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  ],
+};

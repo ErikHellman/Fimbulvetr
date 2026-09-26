@@ -12,5 +12,15 @@ export const TEST_START: NewGameInit = {
   dungeons: DUNGEONS,
 };
 
-/** Where a new game begins. */
-export const NEW_GAME: NewGameInit = TEST_START;
+/** A new game: day 1 of the prologue, dawn in Halvar's longhouse, beside Ask's bed. */
+export const NEW_GAME: NewGameInit = {
+  screen: 'ask_int_longhouse',
+  x: 11 * 16 + 8,
+  y: 8 * 16 + 14,
+  facing: 's',
+  weapon: 'handaxe',
+  shield: false,
+  dungeons: DUNGEONS,
+  flags: { st_farm_day: 1 },
+  minute: 6 * 60,
+};

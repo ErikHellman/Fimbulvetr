@@ -72,6 +72,54 @@ describe('world layout', () => {
   });
 });
 
+describe('doors', () => {
+  const doors = SCREEN_IDS.flatMap((id) =>
+    SCREENS[id].things.flatMap((t) => (t.k === 'door' ? [{ from: id, door: t }] : [])),
+  );
+
+  it.each(doors.map((d) => [`${d.from} → ${d.door.to}`, d] as const))(
+    '%s arrives on a walkable tile',
+    (_, { door }) => {
+      expect(walkable(door.to)(door.arrive.x, door.arrive.y)).toBe(true);
+    },
+  );
+
+  it.each(doors.map((d) => [`${d.from} → ${d.door.to}`, d] as const))(
+    '%s has a door back',
+    (_, { from, door }) => {
+      expect(SCREENS[door.to].things.some((t) => t.k === 'door' && t.to === from)).toBe(true);
+    },
+  );
+
+  it('never drops the hero straight onto another door facing its way', () => {
+    for (const { door } of doors) {
+      const back = SCREENS[door.to].things.find(
+        (t) =>
+          t.k === 'door' && t.at.x === door.arrive.x && t.at.y === door.arrive.y && t.dir === door.facing,
+      );
+      expect(back, `${door.to} ${door.arrive.x},${door.arrive.y}`).toBeUndefined();
+    }
+  });
+
+  it('reaches every screen off the world grid', () => {
+    const offGrid = SCREEN_IDS.filter((id) => WORLD_LAYOUT.at[id] === undefined);
+    for (const id of offGrid)
+      expect(
+        doors.some((d) => d.door.to === id),
+        id,
+      ).toBe(true);
+  });
+});
+
+describe('heart pieces', () => {
+  it('have unique ids', () => {
+    const ids = SCREEN_IDS.flatMap((id) =>
+      SCREENS[id].things.flatMap((t) => (t.k === 'piece' ? [t.id] : [])),
+    );
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
 describe('new game', () => {
   it('starts on a walkable tile', () => {
     const ok = walkable(NEW_GAME.screen);
