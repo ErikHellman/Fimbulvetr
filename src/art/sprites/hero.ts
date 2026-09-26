@@ -1,0 +1,228 @@
+import type { Dir4 } from '@core/math/dir';
+import type { AnimDef } from '../anims';
+import { ellipse, line, rect } from '../draw';
+import { outline } from '../outline';
+import { C } from '../palette';
+import { createRaster, flipX, hex, type Raster } from '../raster';
+import type { SpriteFrame } from './types';
+
+const P = {
+  ink: hex(C.ink),
+  skin: hex(C.skin),
+  skinShade: hex(C.skinShade),
+  hair: hex(C.hair),
+  hairShade: hex(C.hairShade),
+  tunic: hex(C.tunic),
+  tunicShade: hex(C.tunicShade),
+  belt: hex(C.belt),
+  pants: hex(C.pants),
+  pantsShade: hex(C.pantsShade),
+  boot: hex(C.boot),
+  steel: hex(C.steel),
+  steelShade: hex(C.steelShade),
+  grip: hex(C.wood),
+  shield: hex(C.shield),
+  shieldShade: hex(C.shieldShade),
+  rim: hex(C.shieldRim),
+} as const;
+
+/** Drawn sides; east is baked by mirroring west. */
+type Side = 's' | 'n' | 'w';
+type ShieldPos = 'none' | 'front' | 'side' | 'back';
+type SwordDir = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
+
+const SMALL = 32;
+const LARGE = 48;
+const HAND: Readonly<Record<Side, readonly [number, number]>> = { s: [23, 22], w: [12, 21], n: [9, 20] };
+const SWORD_VEC: Readonly<Record<SwordDir, readonly [number, number]>> = {
+  n: [0, -1],
+  ne: [1, -1],
+  e: [1, 0],
+  se: [1, 1],
+  s: [0, 1],
+  sw: [-1, 1],
+  w: [-1, 0],
+  nw: [-1, -1],
+};
+const RESTING: Readonly<Record<Side, ShieldPos>> = { s: 'none', w: 'none', n: 'back' };
+const RAISED: Readonly<Record<Side, ShieldPos>> = { s: 'front', w: 'side', n: 'back' };
+const FORWARD: Readonly<Record<Side, SwordDir>> = { s: 's', w: 'w', n: 'n' };
+const ATTACK_ARCS: Readonly<
+  Record<Side, Readonly<Record<'attack1' | 'attack2' | 'attack3', readonly SwordDir[]>>>
+> = {
+  s: { attack1: ['e', 'se', 's'], attack2: ['w', 'sw', 's'], attack3: ['s', 's', 's'] },
+  w: { attack1: ['n', 'nw', 'w'], attack2: ['s', 'sw', 'w'], attack3: ['w', 'w', 'w'] },
+  n: { attack1: ['w', 'nw', 'n'], attack2: ['e', 'ne', 'n'], attack3: ['n', 'n', 'n'] },
+};
+const ROLL_SPOTS: readonly (readonly [number, number])[] = [
+  [0, -4],
+  [4, 0],
+  [0, 4],
+  [-4, 0],
+];
+
+function legs(r: Raster, o: number, side: Side, phase: number): void {
+  if (side === 'w') {
+    const swing = [0, 1, 0, -1][phase] ?? 0;
+    rect(r, o + 16 - swing, o + 24, 3, 4, P.pantsShade);
+    rect(r, o + 16 - swing, o + 28, 4, 2, P.boot);
+    rect(r, o + 13 + swing, o + 24, 3, 4, P.pants);
+    rect(r, o + 12 + swing, o + 28, 4, 2, P.boot);
+    return;
+  }
+  const liftL = phase === 1 ? 1 : 0;
+  const liftR = phase === 3 ? 1 : 0;
+  rect(r, o + 12, o + 24, 3, 4 - liftL, P.pants);
+  rect(r, o + 11, o + 28 - liftL, 4, 2, P.boot);
+  rect(r, o + 17, o + 24, 3, 4 - liftR, P.pantsShade);
+  rect(r, o + 17, o + 28 - liftR, 4, 2, P.boot);
+}
+
+function torso(r: Raster, o: number, b: number, side: Side): void {
+  if (side === 'w') {
+    rect(r, o + 11, b + 15, 10, 9, P.tunic);
+    rect(r, o + 18, b + 15, 3, 9, P.tunicShade);
+    rect(r, o + 11, b + 21, 10, 1, P.belt);
+    rect(r, o + 13, b + 16, 3, 6, P.tunicShade);
+    rect(r, o + 13, b + 22, 3, 2, P.skin);
+    return;
+  }
+  rect(r, o + 10, b + 15, 12, 9, P.tunic);
+  rect(r, o + 19, b + 15, 3, 9, P.tunicShade);
+  rect(r, o + 10, b + 21, 12, 1, P.belt);
+  rect(r, o + 8, b + 16, 2, 6, P.tunic);
+  rect(r, o + 8, b + 22, 2, 2, P.skin);
+  rect(r, o + 22, b + 16, 2, 6, P.tunicShade);
+  rect(r, o + 22, b + 22, 2, 2, P.skinShade);
+}
+
+function head(r: Raster, o: number, b: number, side: Side): void {
+  const cx = o + 16;
+  const cy = b + 8.5;
+  ellipse(r, cx, cy, 6.5, 6.5, (x, y) => {
+    const dx = x + 0.5 - cx;
+    const dy = y + 0.5 - cy;
+    if (side === 'n') return dx > 2.5 ? P.hairShade : P.hair;
+    if (side === 's') {
+      if (dy < -1.5 || Math.abs(dx) > 5) return dx > 3 ? P.hairShade : P.hair;
+      return dx > 2.5 ? P.skinShade : P.skin;
+    }
+    if (dy < -1.5 || dx > 0.5) return dx > 3.5 ? P.hairShade : P.hair;
+    return dy > 3 ? P.skinShade : P.skin;
+  });
+  if (side === 's') {
+    rect(r, o + 13, b + 9, 1, 2, P.ink);
+    rect(r, o + 18, b + 9, 1, 2, P.ink);
+  }
+  if (side === 'w') rect(r, o + 11, b + 9, 1, 2, P.ink);
+}
+
+function shield(r: Raster, o: number, b: number, pos: ShieldPos): void {
+  const disc = (cx: number, cy: number, rx: number, ry: number): void => {
+    ellipse(r, cx, cy, rx, ry, (x, y) => {
+      const dx = (x + 0.5 - cx) / rx;
+      const dy = (y + 0.5 - cy) / ry;
+      if (dx * dx + dy * dy > 0.62) return P.rim;
+      return dx + dy > 0.3 ? P.shieldShade : P.shield;
+    });
+  };
+  if (pos === 'front') disc(o + 16, b + 19.5, 5.5, 5.5);
+  else if (pos === 'side') disc(o + 10, b + 19, 3, 5.5);
+  else if (pos === 'back') disc(o + 16, b + 18.5, 5, 5);
+}
+
+function sword(r: Raster, hx: number, hy: number, dir: SwordDir): void {
+  const [dx, dy] = SWORD_VEC[dir];
+  const len = dx !== 0 && dy !== 0 ? 9 : 12;
+  const px = -dy;
+  const py = dx;
+  line(r, hx - dx * 3, hy - dy * 3, hx, hy, P.grip);
+  line(r, hx - px * 2, hy - py * 2, hx + px * 2, hy + py * 2, P.grip);
+  line(r, hx + dx, hy + dy, hx + dx * len, hy + dy * len, P.steel);
+  line(r, hx + dx + px, hy + dy + py, hx + dx * len + px, hy + dy * len + py, P.steelShade);
+}
+
+interface Pose {
+  readonly side: Side;
+  readonly phase: number;
+  readonly shield: ShieldPos;
+  readonly sword?: SwordDir;
+}
+
+function drawPose(pose: Pose, size: number): Raster {
+  const r = createRaster(size, size);
+  const o = (size - SMALL) / 2;
+  const b = o - (pose.phase === 1 || pose.phase === 3 ? 1 : 0);
+  const [hx, hy] = HAND[pose.side];
+  const behind = pose.side === 'n';
+  if (pose.sword !== undefined && behind) sword(r, o + hx, b + hy, pose.sword);
+  legs(r, o, pose.side, pose.phase);
+  torso(r, o, b, pose.side);
+  head(r, o, b, pose.side);
+  shield(r, o, b, pose.shield);
+  if (pose.sword !== undefined && !behind) sword(r, o + hx, b + hy, pose.sword);
+  return outline(r, P.ink, 2);
+}
+
+function drawRoll(i: number): Raster {
+  const r = createRaster(SMALL, SMALL);
+  ellipse(r, 16, 21, 7, 7, (x, y) => (x + y > 38 ? P.tunicShade : P.tunic));
+  const [sx, sy] = ROLL_SPOTS[i % ROLL_SPOTS.length] ?? [0, -4];
+  ellipse(r, 16 + sx, 21 + sy, 3, 3, P.hair);
+  rect(r, 15 - sx, 20 - sy, 3, 2, P.boot);
+  return outline(r, P.ink, 2);
+}
+
+const frame = (name: string, raster: Raster): SpriteFrame =>
+  raster.w === LARGE ? { name, raster, ox: 24, oy: 38 } : { name, raster, ox: 16, oy: 30 };
+
+export function heroFrames(): SpriteFrame[] {
+  const out: SpriteFrame[] = [];
+  const add = (anim: string, side: Side, i: number, raster: Raster): void => {
+    out.push(frame(`hero_${anim}_${side}_${i}`, raster));
+    if (side === 'w') out.push(frame(`hero_${anim}_e_${i}`, flipX(raster)));
+  };
+  for (const side of ['s', 'n', 'w'] as const) {
+    add('idle', side, 0, drawPose({ side, phase: 0, shield: RESTING[side] }, SMALL));
+    add('hurt', side, 0, drawPose({ side, phase: 0, shield: RESTING[side] }, SMALL));
+    add('shield', side, 0, drawPose({ side, phase: 0, shield: RAISED[side] }, SMALL));
+    for (let i = 0; i < 4; i++) {
+      add('walk', side, i, drawPose({ side, phase: i, shield: RESTING[side] }, SMALL));
+      add('shieldwalk', side, i, drawPose({ side, phase: i, shield: RAISED[side] }, SMALL));
+    }
+    add('charge', side, 0, drawPose({ side, phase: 0, shield: RESTING[side], sword: FORWARD[side] }, LARGE));
+    for (const anim of ['attack1', 'attack2', 'attack3'] as const) {
+      ATTACK_ARCS[side][anim].forEach((dir, i) => {
+        add(anim, side, i, drawPose({ side, phase: 0, shield: RESTING[side], sword: dir }, LARGE));
+      });
+    }
+  }
+  const spin: readonly (readonly [Side, boolean])[] = [
+    ['s', false],
+    ['w', false],
+    ['n', false],
+    ['w', true],
+  ];
+  spin.forEach(([side, mirror], i) => {
+    const r = drawPose({ side, phase: 0, shield: RESTING[side], sword: FORWARD[side] }, LARGE);
+    out.push(frame(`hero_spin_s_${i}`, mirror ? flipX(r) : r));
+  });
+  for (let i = 0; i < 4; i++) out.push(frame(`hero_roll_s_${i}`, drawRoll(i)));
+  return out;
+}
+
+const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
+
+export const HERO_ANIMS = {
+  idle: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  hurt: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  walk: { frames: 4, fps: 8, loop: true, dirs: ALL },
+  shield: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  shieldwalk: { frames: 4, fps: 8, loop: true, dirs: ALL },
+  charge: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  attack1: { frames: 3, fps: 14, loop: false, dirs: ALL },
+  attack2: { frames: 3, fps: 14, loop: false, dirs: ALL },
+  attack3: { frames: 3, fps: 10, loop: false, dirs: ALL },
+  spin: { frames: 4, fps: 10, loop: false, dirs: ['s'] },
+  roll: { frames: 4, fps: 13, loop: false, dirs: ['s'] },
+} satisfies Record<string, AnimDef>;
