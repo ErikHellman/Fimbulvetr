@@ -1,0 +1,38 @@
+import type { Tuning } from '@core/actors/tuning';
+
+export const TUNING: Tuning = {
+  hero: {
+    walkSpeed: 1.5,
+    shieldSpeed: 0.75,
+    chargeSpeed: 0.75,
+    rollSpeed: 3,
+    rollTicks: 18,
+    rollIframes: 12,
+    rollCooldown: 20,
+    attackTicks: 14,
+    finisherTicks: 20,
+    comboWindow: 8,
+    swordActiveFrom: 2,
+    swordActiveTo: 8,
+    chargeTicks: 40,
+    spinTicks: 24,
+    hurtTicks: 12,
+    hurtIframes: 60,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -7, y: -26, w: 14, h: 26 },
+  },
+  sword: {
+    comboDamage: [2, 2, 4],
+    spinDamage: 4,
+    knock: 4,
+    boxes: {
+      e: { x: 2, y: -24, w: 20, h: 20 },
+      w: { x: -22, y: -24, w: 20, h: 20 },
+      n: { x: -10, y: -40, w: 20, h: 22 },
+      s: { x: -10, y: -8, w: 20, h: 20 },
+    },
+    spinBox: { x: -26, y: -36, w: 52, h: 44 },
+  },
+  enemyIframes: 6,
+  knockDecay: 0.8,
+};
