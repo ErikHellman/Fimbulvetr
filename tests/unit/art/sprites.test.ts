@@ -94,3 +94,25 @@ describe('sprites', () => {
     }
   });
 });
+
+describe('content art', () => {
+  it('has animations for every NPC, prop, critter and pickup the content names', async () => {
+    const { NPCS } = await import('@content/ids');
+    const { PROP_DEFS } = await import('@content/props');
+    const { CRITTER_DEFS } = await import('@content/critters');
+    const arts = [
+      ...NPCS.map((id) => `npc_${id}`),
+      ...Object.values(PROP_DEFS).map((d) => d.art),
+      ...Object.values(CRITTER_DEFS).map((d) => d.art),
+      'pickup_heart_piece',
+      'fx_shadow',
+    ];
+    for (const art of arts) expect(ANIMS[art], art).toBeDefined();
+    for (const d of Object.values(PROP_DEFS)) expect(ANIMS[d.art]?.['idle'], d.art).toBeDefined();
+  });
+
+  it('gives the hero every carry animation', () => {
+    for (const anim of ['lift', 'carry', 'carrywalk', 'throw'])
+      expect(ANIMS['hero']?.[anim], anim).toBeDefined();
+  });
+});

@@ -78,11 +78,15 @@ function legs(r: Raster, o: number, side: Side, phase: number): void {
   rect(r, o + 17, o + 28 - liftR, 4, 2, P.boot);
 }
 
-function torso(r: Raster, o: number, b: number, side: Side): void {
+/** Where the arms are: down at the sides, raised overhead (lifting, carrying) or thrust forward (throwing). */
+type Arms = 'down' | 'up' | 'forward';
+
+function torso(r: Raster, o: number, b: number, side: Side, arms: Arms = 'down'): void {
   if (side === 'w') {
     rect(r, o + 11, b + 15, 10, 9, P.tunic);
     rect(r, o + 18, b + 15, 3, 9, P.tunicShade);
     rect(r, o + 11, b + 21, 10, 1, P.belt);
+    if (arms !== 'down') return;
     rect(r, o + 13, b + 16, 3, 6, P.tunicShade);
     rect(r, o + 13, b + 22, 3, 2, P.skin);
     return;
@@ -90,10 +94,36 @@ function torso(r: Raster, o: number, b: number, side: Side): void {
   rect(r, o + 10, b + 15, 12, 9, P.tunic);
   rect(r, o + 19, b + 15, 3, 9, P.tunicShade);
   rect(r, o + 10, b + 21, 12, 1, P.belt);
+  if (arms !== 'down') return;
   rect(r, o + 8, b + 16, 2, 6, P.tunic);
   rect(r, o + 8, b + 22, 2, 2, P.skin);
   rect(r, o + 22, b + 16, 2, 6, P.tunicShade);
   rect(r, o + 22, b + 22, 2, 2, P.skinShade);
+}
+
+/** Raised or thrust arms, drawn over the head (or behind it when facing north). */
+function liftedArms(r: Raster, o: number, b: number, side: Side, arms: Arms): void {
+  if (arms === 'down') return;
+  if (arms === 'up') {
+    if (side === 'w') {
+      rect(r, o + 13, b + 4, 3, 12, P.tunicShade);
+      rect(r, o + 13, b + 2, 3, 2, P.skin);
+      return;
+    }
+    rect(r, o + 8, b + 4, 2, 12, P.tunic);
+    rect(r, o + 8, b + 2, 2, 2, P.skin);
+    rect(r, o + 22, b + 4, 2, 12, P.tunicShade);
+    rect(r, o + 22, b + 2, 2, 2, P.skinShade);
+    return;
+  }
+  if (side === 'w') {
+    rect(r, o + 6, b + 16, 8, 3, P.tunicShade);
+    rect(r, o + 4, b + 16, 2, 3, P.skin);
+    return;
+  }
+  const y = side === 's' ? b + 22 : b + 12;
+  rect(r, o + 11, y, 3, 3, P.skin);
+  rect(r, o + 18, y, 3, 3, P.skinShade);
 }
 
 function head(r: Raster, o: number, b: number, side: Side): void {
@@ -147,6 +177,7 @@ interface Pose {
   readonly phase: number;
   readonly shield: ShieldPos;
   readonly sword?: SwordDir;
+  readonly arms?: Arms;
 }
 
 function drawPose(pose: Pose, size: number): Raster {
@@ -156,9 +187,12 @@ function drawPose(pose: Pose, size: number): Raster {
   const [hx, hy] = HAND[pose.side];
   const behind = pose.side === 'n';
   if (pose.sword !== undefined && behind) sword(r, o + hx, b + hy, pose.sword);
+  const arms = pose.arms ?? 'down';
   legs(r, o, pose.side, pose.phase);
-  torso(r, o, b, pose.side);
+  if (behind) liftedArms(r, o, b, pose.side, arms);
+  torso(r, o, b, pose.side, arms);
   head(r, o, b, pose.side);
+  if (!behind) liftedArms(r, o, b, pose.side, arms);
   shield(r, o, b, pose.shield);
   if (pose.sword !== undefined && !behind) sword(r, o + hx, b + hy, pose.sword);
   return outline(r, P.ink, 2);
@@ -189,7 +223,13 @@ export function heroFrames(): SpriteFrame[] {
     for (let i = 0; i < 4; i++) {
       add('walk', side, i, drawPose({ side, phase: i, shield: RESTING[side] }, SMALL));
       add('shieldwalk', side, i, drawPose({ side, phase: i, shield: RAISED[side] }, SMALL));
+      add('carrywalk', side, i, drawPose({ side, phase: i, shield: 'none', arms: 'up' }, SMALL));
     }
+    add('lift', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL));
+    add('lift', side, 1, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
+    add('carry', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
+    add('throw', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
+    add('throw', side, 1, drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL));
     add('charge', side, 0, drawPose({ side, phase: 0, shield: RESTING[side], sword: FORWARD[side] }, LARGE));
     for (const anim of ['attack1', 'attack2', 'attack3'] as const) {
       ATTACK_ARCS[side][anim].forEach((dir, i) => {
@@ -225,4 +265,8 @@ export const HERO_ANIMS = {
   attack3: { frames: 3, fps: 10, loop: false, dirs: ALL },
   spin: { frames: 4, fps: 10, loop: false, dirs: ['s'] },
   roll: { frames: 4, fps: 13, loop: false, dirs: ['s'] },
+  lift: { frames: 2, fps: 10, loop: false, dirs: ALL },
+  carry: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  carrywalk: { frames: 4, fps: 7, loop: true, dirs: ALL },
+  throw: { frames: 2, fps: 12, loop: false, dirs: ALL },
 } satisfies Record<string, AnimDef>;
