@@ -1,7 +1,10 @@
+import type { ItemId, WeaponId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { setMinute, setSeason } from '../clock/clock';
 import { isSeason, type Season } from '../clock/types';
 import { LANGS, type Lang } from '../i18n/t';
+import type { Dir4 } from '../math/dir';
+import type { Flags } from '../state/flags';
 import type { GameState } from '../state/gameState';
 import { tileFeet } from '../world/screen';
 
@@ -13,6 +16,10 @@ export interface DevQuery {
   readonly minute?: number;
   readonly seed?: number;
   readonly lang?: Lang;
+  /** A named starting kit from content/dev/presets (validated against the known ids). */
+  readonly preset?: string;
+  /** `dev=gallery`: show the texture gallery instead of the game. */
+  readonly gallery: boolean;
   readonly nosave: boolean;
   readonly mute: boolean;
   readonly warnings: readonly string[];
@@ -38,7 +45,11 @@ function decode(text: string, warnings: string[]): string | null {
   }
 }
 
-export function parseDevQuery(search: string, knownScreens: ReadonlySet<string>): DevQuery {
+export function parseDevQuery(
+  search: string,
+  knownScreens: ReadonlySet<string>,
+  knownPresets: ReadonlySet<string> = new Set(),
+): DevQuery {
   const warnings: string[] = [];
   const params = new Map<string, string>();
   for (const part of search.replace(/^\?/, '').split('&')) {
@@ -94,6 +105,16 @@ export function parseDevQuery(search: string, knownScreens: ReadonlySet<string>)
     else lang = found;
   }
 
+  let preset: string | undefined;
+  const pr = params.get('preset');
+  if (pr !== undefined) {
+    if (knownPresets.has(pr)) preset = pr;
+    else warnings.push(`unknown preset '${pr}'`);
+  }
+
+  const dev = params.get('dev');
+  if (dev !== undefined && dev !== 'gallery') warnings.push(`unknown dev view '${dev}'`);
+
   return {
     screen,
     tile,
@@ -101,6 +122,8 @@ export function parseDevQuery(search: string, knownScreens: ReadonlySet<string>)
     minute,
     seed,
     lang,
+    preset,
+    gallery: dev === 'gallery',
     nosave: params.has('nosave'),
     mute: params.has('mute'),
     warnings,
@@ -120,4 +143,36 @@ export function applyDevQuery(state: GameState, q: DevQuery): void {
   }
   if (q.season !== undefined) setSeason(state.clock, q.season);
   if (q.minute !== undefined) setMinute(state.clock, q.minute);
+}
+
+/** A named dev starting point: where the hero stands, what they carry, which story flags are set. */
+export interface DevPreset {
+  readonly screen: ScreenId;
+  readonly tile: readonly [number, number];
+  readonly facing?: Dir4;
+  readonly weapon: WeaponId;
+  readonly shield: boolean;
+  readonly flags?: Flags;
+  readonly minute?: number;
+  readonly silver?: number;
+  readonly items?: Readonly<Partial<Record<ItemId, number>>>;
+}
+
+/** Applies a preset to a fresh state. A dev query's own screen/at/season/time still win afterwards. */
+export function applyPreset(state: GameState, p: DevPreset): void {
+  applyDevQuery(state, {
+    screen: p.screen,
+    tile: p.tile,
+    gallery: false,
+    nosave: false,
+    mute: false,
+    warnings: [],
+  });
+  if (p.facing !== undefined) state.hero.facing = p.facing;
+  state.inv.weapon = p.weapon;
+  state.inv.shield = p.shield;
+  Object.assign(state.flags, p.flags ?? {});
+  if (p.minute !== undefined) setMinute(state.clock, p.minute);
+  if (p.silver !== undefined) state.hero.silver = p.silver;
+  Object.assign(state.inv.items, p.items ?? {});
 }

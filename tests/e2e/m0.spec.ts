@@ -7,7 +7,7 @@ const waitForMove = async (page: import('@playwright/test').Page): Promise<void>
 
 test('M0 exit: move, fight, roll, shield, cross screens, tints, save and import', async ({ page }) => {
   const errors = collectErrors(page);
-  await boot(page, 'screen=test_a&at=13,11');
+  await boot(page, 'preset=m0&screen=test_a&at=13,11');
 
   // Held keys are sampled once per rendered frame, so polling hook state (rather than a fixed
   // wall-clock sleep) is what makes these waits robust under a slow or throttled test browser.
@@ -65,7 +65,7 @@ test('M0 exit: move, fight, roll, shield, cross screens, tints, save and import'
   expect((await clock(page))?.season).toBe('winter');
 
   const json = await page.evaluate(() => window.__fimbul?.exportSaveJson() ?? '');
-  await boot(page, 'nosave&screen=test_c&at=20,5');
+  await boot(page, 'nosave&preset=m0&screen=test_c&at=20,5');
   expect(await page.evaluate((text) => window.__fimbul?.importSaveJson(text), json)).toBe('import_ok');
   await expect.poll(() => screenId(page)).toBe('test_b');
 
