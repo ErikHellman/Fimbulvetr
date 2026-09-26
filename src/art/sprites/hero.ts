@@ -152,7 +152,7 @@ interface Pose {
 function drawPose(pose: Pose, size: number): Raster {
   const r = createRaster(size, size);
   const o = (size - SMALL) / 2;
-  const b = o - (pose.phase === 1 || pose.phase === 3 ? 1 : 0);
+  const b = o + (pose.phase === 1 || pose.phase === 3 ? 1 : 0);
   const [hx, hy] = HAND[pose.side];
   const behind = pose.side === 'n';
   if (pose.sword !== undefined && behind) sword(r, o + hx, b + hy, pose.sword);

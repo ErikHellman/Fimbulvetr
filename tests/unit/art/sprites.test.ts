@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { frameName } from '@art/anims';
-import { countOpaque, flipX, rastersEqual } from '@art/raster';
+import { countOpaque, flipX, getPixel, hex, rastersEqual } from '@art/raster';
+import { C } from '@art/palette';
 import { ANIMS, buildSprites } from '@art/sprites';
 
 const frames = buildSprites();
@@ -62,5 +63,34 @@ describe('sprites', () => {
 
   it('includes the missing-art fallback', () => {
     expect(byName.has('missing')).toBe(true);
+  });
+
+  it('keeps drawn pixels clear of the frame edge so outlines are never clipped', () => {
+    const inkColor = hex(C.ink);
+    for (const f of frames) {
+      const margin = f.name.startsWith('hero_') ? 2 : f.name.startsWith('prop_dummy_') ? 1 : 0;
+      if (margin === 0) continue; // skip missing frame
+      const r = f.raster;
+      for (let y = 0; y < r.h; y++) {
+        for (let x = 0; x < r.w; x++) {
+          const pixel = getPixel(r, x, y);
+          // Check if pixel is opaque and not ink
+          if (
+            pixel[3] > 0 &&
+            !(pixel[0] === inkColor[0] && pixel[1] === inkColor[1] && pixel[2] === inkColor[2])
+          ) {
+            // Non-ink opaque pixel found; verify margin
+            expect(x, `${f.name}: non-ink pixel at x=${x} violates left margin`).toBeGreaterThanOrEqual(
+              margin,
+            );
+            expect(x, `${f.name}: non-ink pixel at x=${x} violates right margin`).toBeLessThan(r.w - margin);
+            expect(y, `${f.name}: non-ink pixel at y=${y} violates top margin`).toBeGreaterThanOrEqual(
+              margin,
+            );
+            expect(y, `${f.name}: non-ink pixel at y=${y} violates bottom margin`).toBeLessThan(r.h - margin);
+          }
+        }
+      }
+    }
   });
 });
