@@ -1,5 +1,15 @@
 import type { FlagId } from '@content/flags';
-import type { CritterId, DialogueId, EnemyId, ItemId, NpcId, PropId, QuestId, ScriptId } from '@content/ids';
+import type {
+  CoverId,
+  CritterId,
+  DialogueId,
+  EnemyId,
+  ItemId,
+  NpcId,
+  PropId,
+  QuestId,
+  ScriptId,
+} from '@content/ids';
 import type { TerrainId } from '@content/terrain';
 import type { ScreenId } from '@content/world/screens';
 import type { CritterDef } from '../actors/critters';
@@ -13,6 +23,7 @@ import type { FlagSpec } from '../state/flags';
 import type { DialogueDef } from '../story/dialogue';
 import type { QuestDef } from '../story/quests';
 import type { ScriptDef } from '../story/script';
+import type { CoverDef } from '../world/cover';
 import type { ScreenDef, WorldLayout } from '../world/screen';
 import type { TerrainDef } from '../world/terrain';
 
@@ -33,4 +44,8 @@ export interface ContentDb {
   readonly npcs: Readonly<Partial<Record<NpcId, NpcDef>>>;
   readonly props: Readonly<Record<PropId, PropDef>>;
   readonly critters: Readonly<Record<CritterId, CritterDef>>;
+  readonly cover: Readonly<Record<CoverId, CoverDef>>;
+  readonly coverLegend: Readonly<Record<string, CoverId>>;
+  /** Cover ids in registry order (a grid stores 1 + index). */
+  readonly coverOrder: readonly CoverId[];
 }

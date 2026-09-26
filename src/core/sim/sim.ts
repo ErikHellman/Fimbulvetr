@@ -21,6 +21,7 @@ import type { SimEvent } from './events';
 import type { LoadedScreen, Mode, SimRt, Transition } from './rt';
 import { tickWorldClock } from './systems/clock';
 import { resolveContact, resolveSword } from './systems/combat';
+import { coverFor, cutCover, refreshCover } from './systems/cover';
 import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
@@ -165,11 +166,18 @@ export class Sim implements SimRt {
       Dir4,
       ScreenId | null
     >;
-    return { id, terrain, collision: buildCollision(terrain, this.db.terrain), neighbours };
+    return {
+      id,
+      terrain,
+      collision: buildCollision(terrain, this.db.terrain),
+      neighbours,
+      cover: coverFor(this, id),
+    };
   }
 
   private stepPlay(input: InputFrame): void {
     tickWorldClock(this, this.ticksPerMinute);
+    refreshCover(this);
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
@@ -191,6 +199,7 @@ export class Sim implements SimRt {
     stepProps(this, input);
     resolveSword(this);
     swordProps(this);
+    cutCover(this);
     resolveContact(this);
     tickTimers(this);
     checkEdges(this);

@@ -5,6 +5,7 @@ import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
 import type { StoryRun } from '../story/script';
 import type { CollisionGrid } from '../world/collision';
+import type { CoverGrid } from '../world/cover';
 import type { TerrainGrid } from '../world/textmap';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
@@ -33,6 +34,7 @@ export interface LoadedScreen {
   readonly terrain: TerrainGrid;
   readonly collision: CollisionGrid;
   readonly neighbours: Readonly<Record<Dir4, ScreenId | null>>;
+  readonly cover: CoverGrid;
 }
 
 /** What systems may read and change. `Sim` implements it; systems are plain functions over it. */

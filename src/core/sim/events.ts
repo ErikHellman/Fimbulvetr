@@ -11,5 +11,7 @@ export type SimEvent =
   | { readonly t: 'screenEntered'; readonly screen: ScreenId }
   | { readonly t: 'clock'; readonly e: ClockEvent }
   | { readonly t: 'itemGet'; readonly item: ItemId }
+  /** Ground cover on the screen was cut or regrew; redraw its layer. */
+  | { readonly t: 'coverChanged'; readonly screen: ScreenId }
   /** A safe moment to autosave: back in play after a screen change or a finished script. */
   | { readonly t: 'autosave' };

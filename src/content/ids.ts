@@ -113,3 +113,7 @@ export type PropId = (typeof PROPS)[number];
 /** Animals with simple behaviours that are not enemies. */
 export const CRITTERS = ['sheep', 'raven'] as const;
 export type CritterId = (typeof CRITTERS)[number];
+
+/** Ground cover layered over terrain. Leaves, snow, drifts and mud join in later milestones. */
+export const COVERS = ['tall_grass'] as const;
+export type CoverId = (typeof COVERS)[number];

@@ -6,6 +6,7 @@ import type { Dir4 } from '../../math/dir';
 import { length, scale } from '../../math/vec';
 import { gridSolidAt, moveBox, speedAt, type SolidAt } from '../../world/collision';
 import type { SimRt } from '../rt';
+import { coverSpeed } from './cover';
 import { critterDef } from './critters';
 
 const KNOCK_EPSILON = 0.1;
@@ -29,7 +30,7 @@ export function moveAll(rt: SimRt): void {
 }
 
 function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[]): void {
-  const f = speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1);
+  const f = speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1) * coverSpeed(rt, e.pos.x, e.pos.y);
   const dx = e.vel.x * f + e.knock.x;
   const dy = e.vel.y * f + e.knock.y;
   if (dx !== 0 || dy !== 0) {

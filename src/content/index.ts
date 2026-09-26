@@ -1,6 +1,8 @@
 import type { ContentDb } from '@core/sim/db';
 import { CLOCK_RULES } from './clock';
+import { COVER_DEFS, COVER_LEGEND } from './cover';
 import { CRITTER_DEFS } from './critters';
+import { COVERS } from './ids';
 import { DIALOGUE } from './dialogue';
 import { ENEMY_DEFS } from './enemies';
 import { FLAGS } from './flags';
@@ -31,4 +33,7 @@ export const DB: ContentDb = {
   npcs: NPC_DEFS,
   props: PROP_DEFS,
   critters: CRITTER_DEFS,
+  cover: COVER_DEFS,
+  coverLegend: COVER_LEGEND,
+  coverOrder: COVERS,
 };
