@@ -1,6 +1,8 @@
 export const SEASONS = ['summer', 'autumn', 'winter', 'spring'] as const;
 export type Season = (typeof SEASONS)[number];
 
+export const isSeason = (s: string): s is Season => (SEASONS as readonly string[]).includes(s);
+
 export const WEATHER_KINDS = ['clear', 'rain', 'wind', 'fog', 'snow'] as const;
 export type WeatherKind = (typeof WEATHER_KINDS)[number];
 

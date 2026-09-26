@@ -6,3 +6,5 @@ export const FLAGS = {
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;
+
+export const isFlagId = (s: string): s is FlagId => Object.hasOwn(FLAGS, s);
