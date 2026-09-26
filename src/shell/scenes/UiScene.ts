@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { FONT_HEIGHT, LINE_HEIGHT, layoutText } from '@art/font';
+import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
 import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
@@ -32,6 +32,24 @@ const MAX_HEARTS_PER_ROW = 10;
 /** Characters between two talk blips. */
 const BLIP_EVERY = 3;
 
+/**
+ * Centres the first `count` characters of a block by padding each line with spaces. BitmapText's own
+ * centring puts lines on fractional pixels, which garbles pixel glyphs.
+ */
+function centred(full: string, count: number): string {
+  const lines = full.split('\n');
+  const widest = Math.max(...lines.map((l) => textWidth(l)));
+  const space = textWidth('  ') - textWidth(' ');
+  let left = count;
+  return lines
+    .map((line) => {
+      const take = Math.max(0, Math.min(line.length, left));
+      left -= line.length + 1;
+      return ' '.repeat(Math.round((widest - textWidth(line)) / 2 / space)) + line.slice(0, take);
+    })
+    .join('\n');
+}
+
 /** The untinted overlay: HUD, text boxes, cards and the shop. Reads the Sim; never changes it. */
 export class UiScene extends Phaser.Scene {
   private link!: UiLink;
@@ -53,6 +71,7 @@ export class UiScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.cameras.main.setRoundPixels(true);
     this.hearts = [];
     this.slotIcons = [];
     const hud = this.add.graphics();
@@ -76,9 +95,7 @@ export class UiScene extends Phaser.Scene {
     this.choices = this.text(0, 0, '', PAPER);
     this.shop = this.text(0, 0, '', PAPER);
     this.card = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000).setOrigin(0, 0).setVisible(false);
-    this.cardText = this.text(GAME_W / 2, GAME_H / 2, '', PAPER)
-      .setOrigin(0.5, 0.5)
-      .setCenterAlign();
+    this.cardText = this.text(0, 0, '', PAPER);
   }
 
   override update(): void {
@@ -157,7 +174,13 @@ export class UiScene extends Phaser.Scene {
     this.blip(full, count);
     if (ui.k === 'card') {
       this.card.setVisible(true);
-      this.cardText.setText(shown);
+      this.cardText.setText(centred(full, count));
+      const lines = full.split('\n');
+      const w = Math.max(...lines.map((l) => textWidth(l)));
+      this.cardText.setPosition(
+        Math.round((GAME_W - w) / 2),
+        Math.round((GAME_H - lines.length * LINE_HEIGHT) / 2),
+      );
       return;
     }
     this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
