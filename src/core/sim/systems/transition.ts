@@ -133,4 +133,5 @@ export function stepTransition(rt: SimRt): void {
   rt.mode = 'play';
   markVisited(rt, tr.to);
   rt.emit({ t: 'screenEntered', screen: tr.to });
+  rt.emit({ t: 'autosave' });
 }

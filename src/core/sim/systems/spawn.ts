@@ -12,6 +12,9 @@ export function spawnActors(rt: SimRt): Entity[] {
         out.push(createEnemy(rt.newId(), rt.db.enemies[thing.id], tileFeet(thing.at)));
         break;
       case 'door':
+      case 'sign':
+      case 'use':
+      case 'trigger':
         break;
       default: {
         const never: never = thing;

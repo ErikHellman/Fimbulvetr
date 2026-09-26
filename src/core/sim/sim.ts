@@ -11,6 +11,7 @@ import { fnv1a } from '../math/hash';
 import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
 import { canonicalJson, cloneState } from '../state/save';
+import type { StoryRun } from '../story/script';
 import { buildCollision, gridSolidAt } from '../world/collision';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -23,6 +24,7 @@ import { resolveContact, resolveSword } from './systems/combat';
 import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { spawnActors } from './systems/spawn';
+import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
 import {
   checkDoors,
@@ -34,6 +36,7 @@ import {
 } from './systems/transition';
 
 export type { LoadedScreen, Mode, Transition } from './rt';
+export type { StoryUi } from './systems/story';
 export { FADE_TICKS, TRANSITION_TICKS, entryPoint } from './systems/transition';
 
 export interface SimOptions {
@@ -49,6 +52,7 @@ export class Sim implements SimRt {
   readonly hero: Entity;
   actors: Entity[];
   transition: Transition | null = null;
+  story: StoryRun | null = null;
   tick = 0;
   private events: SimEvent[] = [];
   private readonly queue: Command[] = [];
@@ -102,9 +106,14 @@ export class Sim implements SimRt {
     return screenOrigin(this.layout, id);
   }
 
-  /** How black the picture is during a door fade: 0 clear … 1 black. */
+  /** How black the picture is (door fades and script fades): 0 clear … 1 black. */
   fade(): number {
-    return fadeLevel(this.transition);
+    return Math.max(fadeLevel(this.transition), this.story?.fade ?? 0);
+  }
+
+  /** The text box or card the running script shows, if any. */
+  storyUi(): StoryUi {
+    return storyUi(this);
   }
 
   snapshot(): GameState {
@@ -119,6 +128,8 @@ export class Sim implements SimRt {
         mode: this.mode,
         tick: this.tick,
         transition: this.transition,
+        story: this.story,
+        nextId: this.nextId,
         entities: this.entities,
       }),
     );
@@ -128,6 +139,7 @@ export class Sim implements SimRt {
     for (const c of this.queue.splice(0)) this.apply(c);
     for (const e of this.entities) e.prev = { ...e.pos };
     if (this.mode === 'transition') stepTransition(this);
+    else if (this.mode === 'story') stepStory(this, input);
     else this.stepPlay(input);
     syncHero(this);
     this.state.playTicks += 1;
@@ -155,6 +167,7 @@ export class Sim implements SimRt {
 
   private stepPlay(input: InputFrame): void {
     tickWorldClock(this, this.ticksPerMinute);
+    if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
     const ctx: ActorCtx = {
@@ -173,6 +186,7 @@ export class Sim implements SimRt {
     tickTimers(this);
     checkEdges(this);
     if (this.mode === 'play') checkDoors(this);
+    if (this.mode === 'play') checkTriggers(this);
   }
 
   private apply(c: Command): void {
@@ -183,6 +197,7 @@ export class Sim implements SimRt {
         enterScreen(this, c.screen, { x: c.x, y: c.y });
         markVisited(this, c.screen);
         this.emit({ t: 'screenEntered', screen: c.screen });
+        if (this.story === null) this.emit({ t: 'autosave' });
         break;
       case 'setMinute':
         setMinute(this.state.clock, c.minute);

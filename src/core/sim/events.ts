@@ -10,4 +10,6 @@ export type SimEvent =
   | { readonly t: 'screenTransition'; readonly from: ScreenId; readonly to: ScreenId; readonly dir: Dir4 }
   | { readonly t: 'screenEntered'; readonly screen: ScreenId }
   | { readonly t: 'clock'; readonly e: ClockEvent }
-  | { readonly t: 'itemGet'; readonly item: ItemId };
+  | { readonly t: 'itemGet'; readonly item: ItemId }
+  /** A safe moment to autosave: back in play after a screen change or a finished script. */
+  | { readonly t: 'autosave' };

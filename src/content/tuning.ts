@@ -36,6 +36,7 @@ export const TUNING: Tuning = {
     },
     spinBox: { x: -26, y: -36, w: 52, h: 44 },
   },
+  textCps: 45,
   enemyIframes: 6,
   knockDecay: 0.8,
 };

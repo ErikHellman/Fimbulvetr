@@ -1,7 +1,9 @@
-import type { EnemyId, RegionId } from '@content/ids';
+import type { EnemyId, RegionId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
+import type { L10n } from '../i18n/t';
 import type { Vec } from '../math/vec';
+import type { Cond } from '../story/cond';
 import { SCREEN_H, SCREEN_W, TILE } from './dims';
 
 export interface TilePos {
@@ -20,7 +22,22 @@ export interface DoorThing {
 }
 
 /** Things placed on a screen. The union grows with each milestone. */
-export type Thing = { readonly k: 'enemy'; readonly id: EnemyId; readonly at: TilePos } | DoorThing;
+export type Thing =
+  | { readonly k: 'enemy'; readonly id: EnemyId; readonly at: TilePos }
+  | DoorThing
+  /** Read with interact while facing its tile. */
+  | { readonly k: 'sign'; readonly at: TilePos; readonly text: L10n }
+  /** Runs a script on interact while facing its tile (a bed, a well). */
+  | { readonly k: 'use'; readonly at: TilePos; readonly script: ScriptId; readonly when?: Cond }
+  /** Runs a script when the hero's feet enter the tile rectangle and `when` holds. */
+  | {
+      readonly k: 'trigger';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly script: ScriptId;
+      readonly when?: Cond;
+    };
 
 export interface ScreenDef {
   readonly id: ScreenId;

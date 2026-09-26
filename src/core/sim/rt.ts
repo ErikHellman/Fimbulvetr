@@ -3,12 +3,13 @@ import type { Entity } from '../actors/entity';
 import type { Dir4 } from '../math/dir';
 import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
+import type { StoryRun } from '../story/script';
 import type { CollisionGrid } from '../world/collision';
 import type { TerrainGrid } from '../world/textmap';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
 
-export type Mode = 'play' | 'transition';
+export type Mode = 'play' | 'transition' | 'story';
 
 /**
  * A screen change. `slide` (edge crossing) loads the new screen at t=0 and scrolls; `fade` (door) swaps
@@ -44,6 +45,7 @@ export interface SimRt {
   /** Everything live on the screen except the hero. */
   actors: Entity[];
   transition: Transition | null;
+  story: StoryRun | null;
   emit(event: SimEvent): void;
   newId(): number;
   load(id: ScreenId): LoadedScreen;

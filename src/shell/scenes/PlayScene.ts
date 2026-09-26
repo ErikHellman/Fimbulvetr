@@ -122,8 +122,7 @@ export class PlayScene extends Phaser.Scene {
     else if (ev.t === 'screenEntered') {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
-      this.services.saves.autosaver.request(this.sim.snapshot());
-    }
+    } else if (ev.t === 'autosave') this.services.saves.autosaver.request(this.sim.snapshot());
   }
 
   private draw(alpha: number): void {

@@ -38,6 +38,8 @@ export interface SwordTuning {
 
 export interface Tuning {
   readonly hero: HeroTuning;
+  /** Typewriter speed, characters per second. */
+  readonly textCps: number;
   readonly sword: SwordTuning;
   readonly enemyIframes: number;
   readonly knockDecay: number;
