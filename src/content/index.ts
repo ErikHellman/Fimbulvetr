@@ -4,6 +4,7 @@ import { DIALOGUE } from './dialogue';
 import { ENEMY_DEFS } from './enemies';
 import { FLAGS } from './flags';
 import { ITEM_DEFS } from './items';
+import { NPC_DEFS } from './npcs';
 import { QUEST_DEFS } from './quests';
 import { SCRIPTS_DEFS } from './scripts';
 import { TERRAIN } from './terrain';
@@ -25,4 +26,5 @@ export const DB: ContentDb = {
   quests: QUEST_DEFS,
   dialogue: DIALOGUE,
   scripts: SCRIPTS_DEFS,
+  npcs: NPC_DEFS,
 };

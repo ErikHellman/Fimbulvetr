@@ -18,6 +18,7 @@ export function resolveSword(rt: SimRt): void {
   const swing = mem(hero, 'swing');
   const spinning = mem(hero, 'spinOn') === 1;
   for (const e of [...rt.actors]) {
+    if (e.kind !== 'enemy') continue;
     if (mem(e, 'hitSwing') === swing || !overlaps(box, at(e.hurt, e.pos))) continue;
     e.mem['hitSwing'] = swing;
     const def = enemyDef(rt, e);

@@ -30,6 +30,7 @@ import {
 } from '../../story/script';
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
+import { placeNpcs } from './npcs';
 import { enterScreen, markVisited } from './transition';
 
 /** What the UI shows for the running script. */
@@ -85,6 +86,7 @@ function endStory(rt: SimRt): void {
   rt.story = null;
   rt.mode = 'play';
   for (const a of rt.actors) if (a.kind === 'npc') a.mem['talking'] = 0;
+  placeNpcs(rt);
   rt.emit({ t: 'autosave' });
 }
 
@@ -274,7 +276,7 @@ export function checkInteract(rt: SimRt, input: InputFrame): boolean {
   for (const a of rt.actors) {
     if (a.kind !== 'npc' || !overlaps(probe, at(a.hurt, a.pos))) continue;
     const id = a.def as NpcId;
-    startStory(rt, [{ k: 'talk', dialogue: id, with: id }], a);
+    startStory(rt, [{ k: 'talk', dialogue: rt.db.npcs[id]?.talk ?? id, with: id }], a);
     return true;
   }
   for (const thing of rt.db.screens[rt.screen.id].things) {

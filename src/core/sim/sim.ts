@@ -23,6 +23,7 @@ import { tickWorldClock } from './systems/clock';
 import { resolveContact, resolveSword } from './systems/combat';
 import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
+import { stepNpcs } from './systems/npcs';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
@@ -179,7 +180,9 @@ export class Sim implements SimRt {
         this.emit(ev);
       },
     };
-    for (const e of this.actors) runFsm(BEHAVIOURS[enemyDef(this, e).behaviour], e, ctx);
+    for (const e of this.actors)
+      if (e.kind === 'enemy') runFsm(BEHAVIOURS[enemyDef(this, e).behaviour], e, ctx);
+    stepNpcs(this);
     moveAll(this);
     resolveSword(this);
     resolveContact(this);

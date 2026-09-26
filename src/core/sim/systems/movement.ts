@@ -11,11 +11,18 @@ const KNOCK_EPSILON = 0.1;
 
 export const enemyDef = (rt: SimRt, e: Entity): EnemyDef => rt.db.enemies[e.def as EnemyId];
 
+/** Whether an actor blocks the hero like a wall. */
+export function blocksHero(rt: SimRt, e: Entity): boolean {
+  if (e.kind === 'npc') return true;
+  return e.kind === 'enemy' && enemyDef(rt, e).solid;
+}
+
 export function moveAll(rt: SimRt): void {
-  const obstacles = rt.actors.filter((e) => enemyDef(rt, e).solid).map((e) => at(e.body, e.pos));
+  const obstacles = rt.actors.filter((e) => blocksHero(rt, e)).map((e) => at(e.body, e.pos));
   moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles);
   const walls = gridSolidAt(rt.screen.collision, () => true);
-  for (const e of rt.actors) moveEntity(rt, e, walls, []);
+  const hero = [at(rt.hero.body, rt.hero.pos)];
+  for (const e of rt.actors) moveEntity(rt, e, walls, e.kind === 'npc' ? hero : []);
 }
 
 function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[]): void {

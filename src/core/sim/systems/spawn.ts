@@ -2,9 +2,16 @@ import type { Entity } from '../../actors/entity';
 import { createEnemy } from '../../actors/enemies';
 import { tileFeet } from '../../world/screen';
 import type { SimRt } from '../rt';
+import { placeNpcs } from './npcs';
 
 /** Builds the live actors of the current screen from its things. */
 export function spawnActors(rt: SimRt): Entity[] {
+  rt.actors = spawnThings(rt);
+  placeNpcs(rt);
+  return rt.actors;
+}
+
+function spawnThings(rt: SimRt): Entity[] {
   const out: Entity[] = [];
   for (const thing of rt.db.screens[rt.screen.id].things) {
     switch (thing.k) {
