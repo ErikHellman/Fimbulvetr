@@ -12,6 +12,7 @@ import type { SimEvent } from '@core/sim/events';
 import { advance, type Accumulator } from '@core/sim/loop';
 import { Sim } from '@core/sim/sim';
 import { SCREEN_H, SCREEN_W } from '@core/world/dims';
+import { AudioDirector } from '@shell/audio/sfx';
 import type { DevBridge } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
 import { readPad } from '@shell/input/gamepad';
@@ -28,6 +29,7 @@ export class PlayScene extends Phaser.Scene {
   private services!: PlayData;
   private sim!: Sim;
   private mapper!: InputMapper;
+  private audio!: AudioDirector;
   private views!: EntityViews;
   private colour!: Phaser.Filters.ColorMatrix;
   private readonly latch = new InputLatch();
@@ -46,8 +48,11 @@ export class PlayScene extends Phaser.Scene {
     this.acc.acc = 0;
     this.gradeKey = '';
     this.screens.clear();
-    this.sim = new Sim(data.db, data.state);
-    this.mapper = new InputMapper(DEFAULT_BINDINGS, this.latch, { holdToggleShield: false });
+    this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay });
+    this.mapper = new InputMapper(DEFAULT_BINDINGS, this.latch, {
+      holdToggleShield: data.settings.holdShield,
+    });
+    this.audio = new AudioDirector(this, () => data.settings.volume, data.muted);
     const detach = attachKeyboard(window, this.keys);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       detach();
@@ -72,6 +77,7 @@ export class PlayScene extends Phaser.Scene {
     this.stats.record(delta, performance.now() - started);
     const events = this.sim.drainEvents();
     for (const ev of events) this.onEvent(ev);
+    this.audio.handle(events);
     this.services.dev?.onEvents(events);
     this.draw(alpha);
   }
@@ -81,6 +87,7 @@ export class PlayScene extends Phaser.Scene {
       sim: this.sim,
       frames: this.services.assets.frames,
       stats: this.stats,
+      settings: this.services.settings,
       appliedGrade: () => this.appliedGrade,
       lightLevel: () => daylight(this.sim.state.clock, this.services.db.clock),
     };

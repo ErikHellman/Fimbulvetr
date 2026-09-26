@@ -2,10 +2,13 @@ import { isFlagId } from '@content/flags';
 import { isScreenId } from '@content/world/screens';
 import { isSeason } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
+import { LANGS } from '@core/i18n/t';
 import { tileFeet } from '@core/world/screen';
+import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { DevBridge } from './bridge';
 
-export const HELP = 'warp <screen> [x y] · time <HH:MM|day|night> · season <name> · flag <id> <value>';
+export const HELP =
+  'warp <screen> [x y] · time <HH:MM|day|night> · season <name> · flag <id> <value> · lang <en|sv> · volume <0..1>';
 
 /** Runs one console line. Returns the reply; `_print` is for replies that arrive later (unused for now). */
 export function runCommand(b: DevBridge, line: string, _print: (text: string) => void): string {
@@ -41,6 +44,20 @@ export function runCommand(b: DevBridge, line: string, _print: (text: string) =>
         return 'value must be true, false or an integer';
       b.sim.command({ t: 'setFlag', flag: id, value });
       return `flag ${id} = ${String(value)}`;
+    }
+    case 'lang': {
+      const lang = LANGS.find((l) => l === args[0]);
+      if (lang === undefined) return `languages: ${LANGS.join(', ')}`;
+      b.settings.lang = lang;
+      saveSettings(browserStorage(), b.settings);
+      return `language ${lang}`;
+    }
+    case 'volume': {
+      const v = Number(args[0]);
+      if (!Number.isFinite(v) || v < 0 || v > 1) return 'usage: volume 0..1';
+      b.settings.volume = v;
+      saveSettings(browserStorage(), b.settings);
+      return `volume ${v}`;
     }
     default:
       return `unknown command '${cmd}' — try help`;

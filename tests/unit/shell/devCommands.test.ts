@@ -3,6 +3,7 @@ import type { DevBridge } from '@shell/dev/bridge';
 import { runCommand } from '@shell/dev/commands';
 import { FrameStats } from '@shell/dev/stats';
 import { FrameIndex } from '@shell/gfx/frameIndex';
+import { DEFAULT_SETTINGS } from '@shell/platform/settings';
 import { Harness } from '../../sim/harness';
 
 function bridge(): { b: DevBridge; h: Harness } {
@@ -11,6 +12,7 @@ function bridge(): { b: DevBridge; h: Harness } {
     sim: h.sim,
     frames: new FrameIndex(),
     stats: new FrameStats(),
+    settings: { ...DEFAULT_SETTINGS },
     appliedGrade: () => [],
     lightLevel: () => 1,
   };
@@ -39,6 +41,13 @@ describe('dev console commands', () => {
     expect(run(b, 'time soon')).toBe('usage: time HH:MM | day | night');
     expect(run(b, 'flag nope 1')).toBe("unknown flag 'nope'");
     expect(run(b, 'dance')).toBe("unknown command 'dance' — try help");
+  });
+
+  it('changes the language', () => {
+    const { b } = bridge();
+    expect(run(b, 'lang sv')).toBe('language sv');
+    expect(b.settings.lang).toBe('sv');
+    expect(run(b, 'lang de')).toBe('languages: en, sv');
   });
 });
 

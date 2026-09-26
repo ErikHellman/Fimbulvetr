@@ -1,12 +1,15 @@
 import * as Phaser from 'phaser';
+import { UI } from '@content/i18n/ui';
 import { DB } from '@content/index';
 import { GAME_TITLE } from '@content/meta';
 import { NEW_GAME } from '@content/start';
 import { SCREEN_IDS } from '@content/world/screens';
 import { applyDevQuery, parseDevQuery } from '@core/dev/query';
+import { t } from '@core/i18n/t';
 import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
+import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { BootScene } from '@shell/scenes/BootScene';
 import { PlayScene } from '@shell/scenes/PlayScene';
@@ -36,21 +39,23 @@ function startGame(services: Services): void {
     scene: [new BootScene(services), new PlayScene()],
   });
   game.canvas.setAttribute('aria-label', GAME_TITLE);
-  attachZoom(game, () => 'integer');
+  attachZoom(game, () => services.settings.scaling);
 }
 
 async function main(): Promise<void> {
   document.title = GAME_TITLE;
   const query = DEV_TOOLS ? parseDevQuery(window.location.search, new Set<string>(SCREEN_IDS)) : null;
   for (const warning of query?.warnings ?? []) console.warn(`[dev] ${warning}`);
+  const settings = loadSettings(browserStorage(), preferredLang(navigator.languages));
+  if (query?.lang !== undefined) settings.lang = query.lang;
   if (!hasWebGL()) {
-    showMessage('Fimbulvetr needs WebGL, which this browser has turned off or does not support.');
+    showMessage(t(UI.webgl_required, settings.lang));
     return;
   }
   const state = newGame(query?.seed ?? randomSeed(), NEW_GAME);
   if (query !== null) applyDevQuery(state, query);
   const dev = DEV_TOOLS ? (await import('@shell/dev/index')).createDevTools() : null;
-  startGame({ db: DB, state, dev });
+  startGame({ db: DB, state, settings, dev, muted: query?.mute === true });
 }
 
 void main();
