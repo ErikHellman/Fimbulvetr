@@ -6,6 +6,7 @@ import type { Dir4 } from '../../math/dir';
 import { length, scale } from '../../math/vec';
 import { gridSolidAt, moveBox, speedAt, type SolidAt } from '../../world/collision';
 import type { SimRt } from '../rt';
+import { critterDef } from './critters';
 
 const KNOCK_EPSILON = 0.1;
 
@@ -15,6 +16,7 @@ export const enemyDef = (rt: SimRt, e: Entity): EnemyDef => rt.db.enemies[e.def 
 export function blocksHero(rt: SimRt, e: Entity): boolean {
   if (e.kind === 'npc') return true;
   if (e.kind === 'prop') return mem(e, 'carried') === 0 && mem(e, 'thrown') === 0;
+  if (e.kind === 'critter') return critterDef(rt, e).solid;
   return e.kind === 'enemy' && enemyDef(rt, e).solid;
 }
 

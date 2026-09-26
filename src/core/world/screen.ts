@@ -1,4 +1,5 @@
-import type { EnemyId, PropId, RegionId, ScriptId } from '@content/ids';
+import type { FlagId } from '@content/flags';
+import type { CritterId, EnemyId, PropId, RegionId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { L10n } from '../i18n/t';
@@ -46,6 +47,31 @@ export type Thing =
       readonly at: TilePos;
       readonly when?: Cond;
       readonly onBreak?: readonly Effect[];
+    }
+  /**
+   * An animal, present while `when` holds. `tag` numbers penned sheep; `onGone` applies when it leaves
+   * for good (a raven scared off).
+   */
+  | {
+      readonly k: 'critter';
+      readonly id: CritterId;
+      readonly at: TilePos;
+      readonly when?: Cond;
+      readonly tag?: number;
+      readonly onGone?: readonly Effect[];
+    }
+  /**
+   * A pen: a tagged critter whose feet enter it stays inside, its tag bit is set in `world.vars[v]`, and
+   * `flag` is set once `count` are in.
+   */
+  | {
+      readonly k: 'pen';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly v: string;
+      readonly flag: FlagId;
+      readonly count: number;
     }
   /** Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up. */
   | {

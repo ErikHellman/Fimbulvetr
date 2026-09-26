@@ -1,5 +1,6 @@
 import type { ContentDb } from '@core/sim/db';
 import { CLOCK_RULES } from './clock';
+import { CRITTER_DEFS } from './critters';
 import { DIALOGUE } from './dialogue';
 import { ENEMY_DEFS } from './enemies';
 import { FLAGS } from './flags';
@@ -29,4 +30,5 @@ export const DB: ContentDb = {
   scripts: SCRIPTS_DEFS,
   npcs: NPC_DEFS,
   props: PROP_DEFS,
+  critters: CRITTER_DEFS,
 };

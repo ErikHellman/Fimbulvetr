@@ -10,6 +10,7 @@ import { DIR_VEC } from '../../math/dir';
 import { boxHitsSolid, gridSolidAt, moveBox } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
+import { critterDef } from './critters';
 import { heroCtx } from './hero';
 import { applyAll, probeBox } from './story';
 
@@ -118,7 +119,9 @@ function flying(rt: SimRt, e: Entity): void {
   e.mem['z'] = rt.db.tuning.hero.carryHeight * Math.max(0, 1 - t / tw.flightTicks);
   const def = propDef(rt, e);
   const target = rt.actors.find(
-    (a) => (a.kind === 'enemy' || a.kind === 'critter') && overlaps(at(e.hurt, e.pos), at(a.hurt, a.pos)),
+    (a) =>
+      (a.kind === 'enemy' || (a.kind === 'critter' && critterDef(rt, a).scaredByThrow)) &&
+      overlaps(at(e.hurt, e.pos), at(a.hurt, a.pos)),
   );
   if (target !== undefined) {
     const res = resolveHit(

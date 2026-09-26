@@ -1,7 +1,8 @@
 import type { FlagId } from '@content/flags';
-import type { DialogueId, EnemyId, ItemId, NpcId, PropId, QuestId, ScriptId } from '@content/ids';
+import type { CritterId, DialogueId, EnemyId, ItemId, NpcId, PropId, QuestId, ScriptId } from '@content/ids';
 import type { TerrainId } from '@content/terrain';
 import type { ScreenId } from '@content/world/screens';
+import type { CritterDef } from '../actors/critters';
 import type { EnemyDef } from '../actors/enemies/defs';
 import type { NpcDef } from '../actors/npc';
 import type { PropDef } from '../actors/prop';
@@ -31,4 +32,5 @@ export interface ContentDb {
   readonly scripts: Readonly<Partial<Record<ScriptId, ScriptDef>>>;
   readonly npcs: Readonly<Partial<Record<NpcId, NpcDef>>>;
   readonly props: Readonly<Record<PropId, PropDef>>;
+  readonly critters: Readonly<Record<CritterId, CritterDef>>;
 }
