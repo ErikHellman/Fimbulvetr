@@ -10,6 +10,7 @@ import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
 import { SaveService } from '@shell/platform/saveService';
+import { registerServiceWorker } from '@shell/platform/pwa';
 import { openSaveStoreSafely } from '@shell/platform/saveStore';
 import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
 import { acquireTabLock } from '@shell/platform/tabLock';
@@ -69,6 +70,7 @@ async function main(): Promise<void> {
     showMessage(t(UI.already_open, lang));
     return;
   }
+  if (!import.meta.env.DEV) registerServiceWorker(lang);
 
   const wantSaves = query?.nosave !== true;
   const store = wantSaves ? await openSaveStoreSafely(indexedDbFactory()) : null;
