@@ -112,4 +112,12 @@ describe('fixtures', () => {
       expect(result.checksumOk).toBe(true);
     }
   });
+
+  it('loads the v1 fixture with the expected game state, not just a valid checksum', () => {
+    const result = parseSaveJson(readFileSync(fixturePath(1), 'utf8'), known);
+    if (!result.ok) throw new Error(result.error.detail);
+    expect(result.state.hero.screen).toBe('test_b');
+    expect(result.state.clock.season).toBe('autumn');
+    expect(result.state.inv.items.lantern).toBe(1);
+  });
 });
