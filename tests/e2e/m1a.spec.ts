@@ -49,9 +49,8 @@ test('the pail is carried to the trough', async ({ page }) => {
   await tap(page, 'KeyE');
   await expect.poll(() => hero(page).then((h) => h?.fsm)).toBe('carry');
   await page.keyboard.down('KeyS');
-  await expect
-    .poll(() => hero(page).then((h) => Math.floor(((h?.y ?? 0) - 1) / 16)))
-    .toBeGreaterThanOrEqual(12);
+  // Polled every animation frame, so the hero stops in front of the trough rather than overshooting.
+  await page.waitForFunction(() => Math.floor(((window.__fimbul?.hero().y ?? 0) - 1) / 16) >= 12);
   await page.keyboard.up('KeyS');
   await page.waitForTimeout(100);
   await tap(page, 'KeyE');
