@@ -59,6 +59,11 @@ describe('moveBox', () => {
     expect(r.y).toBe(12.5);
   });
 
+  it('treats a non-finite delta as zero instead of looping forever', () => {
+    const r = moveBox({ x: 20, y: 20, w: 12, h: 8 }, NaN, NaN, solidFrom(['.....', '.....', '.....']));
+    expect([r.x, r.y, r.blockedX, r.blockedY]).toEqual([20, 20, false, false]);
+  });
+
   it('treats obstacle boxes like walls', () => {
     const r = moveBox({ x: 0, y: 0, w: 10, h: 10 }, 10, 0, solidFrom(['...']), [
       { x: 15, y: 0, w: 5, h: 10 },

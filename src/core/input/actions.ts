@@ -44,6 +44,7 @@ export const wasPressed = (f: InputFrame, a: Action): boolean => (f.pressed & BI
 export const wasReleased = (f: InputFrame, a: Action): boolean => (f.released & BITS[a]) !== 0;
 
 export function quantize(v: number): number {
+  if (!Number.isFinite(v)) return 0;
   const clamped = Math.max(-1, Math.min(1, v));
   return Math.round(clamped * 64) / 64;
 }

@@ -15,10 +15,26 @@ export const DEADZONE = 0.25;
 
 /** Radial dead zone; input outside it is rescaled so movement starts smoothly from zero. */
 export function deadzone(x: number, y: number, dz: number = DEADZONE): [number, number] {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return [0, 0];
   const len = Math.sqrt(x * x + y * y);
   if (len < dz) return [0, 0];
   const k = Math.min(1, (len - dz) / (1 - dz)) / len;
   return [x * k, y * k];
+}
+
+/**
+ * `navigator.getGamepads()`, guarded: some browsers (Firefox) restrict or throw on it for insecure
+ * origins, and it may simply be missing. Never throws; an unavailable pad list is just an empty one.
+ */
+export function connectedPads(
+  nav: { getGamepads?: () => readonly (GamepadLike | null)[] } = navigator,
+): readonly (GamepadLike | null)[] {
+  if (nav.getGamepads === undefined) return [];
+  try {
+    return nav.getGamepads();
+  } catch {
+    return [];
+  }
 }
 
 /** Reads the first connected pad, preferring one with the standard mapping. */

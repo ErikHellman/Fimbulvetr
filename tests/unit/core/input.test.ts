@@ -54,6 +54,14 @@ describe('InputLatch', () => {
   });
 });
 
+describe('quantize', () => {
+  it('treats non-finite input as zero instead of propagating NaN into replays', () => {
+    expect(quantize(NaN)).toBe(0);
+    expect(quantize(Infinity)).toBe(0);
+    expect(quantize(-Infinity)).toBe(0);
+  });
+});
+
 describe('moveVector', () => {
   it('clamps diagonals to length 1', () => {
     const v = moveVector({ held: bitsOf(['right', 'down']), pressed: 0, released: 0, mx: 1, my: 1 });

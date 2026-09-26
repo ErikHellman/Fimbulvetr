@@ -70,12 +70,14 @@ export function moveBox(
 ): MoveResult {
   const free = (x: number, y: number): boolean =>
     !boxHitsSolid({ x, y, w: box.w, h: box.h }, solidAt, obstacles);
+  const safeDx = Number.isFinite(dx) ? dx : 0;
+  const safeDy = Number.isFinite(dy) ? dy : 0;
   let x = box.x;
   let y = box.y;
   let blockedX = false;
   let blockedY = false;
 
-  let rest = dx;
+  let rest = safeDx;
   while (rest !== 0) {
     const step = Math.abs(rest) >= 1 ? Math.sign(rest) : rest;
     if (free(x + step, y)) {
@@ -85,11 +87,11 @@ export function moveBox(
     }
     blockedX = true;
     x += snapToWall(x, step, (to) => free(to, y));
-    if (dy === 0) y += nudge(x, y, Math.sign(step), 0, free, slide);
+    if (safeDy === 0) y += nudge(x, y, Math.sign(step), 0, free, slide);
     break;
   }
 
-  rest = dy;
+  rest = safeDy;
   while (rest !== 0) {
     const step = Math.abs(rest) >= 1 ? Math.sign(rest) : rest;
     if (free(x, y + step)) {
@@ -99,7 +101,7 @@ export function moveBox(
     }
     blockedY = true;
     y += snapToWall(y, step, (to) => free(x, to));
-    if (dx === 0) x += nudge(x, y, 0, Math.sign(step), free, slide);
+    if (safeDx === 0) x += nudge(x, y, 0, Math.sign(step), free, slide);
     break;
   }
 

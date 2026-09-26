@@ -17,10 +17,13 @@ export function isTextInput(target: unknown): boolean {
 /** Physical keys currently held, by KeyboardEvent.code, so WASD works on every keyboard layout. */
 export class KeyboardState {
   private readonly held = new Set<string>();
+  /** Keys pressed since the last `takeCodes()`, so a tap shorter than a frame is never lost. */
+  private readonly tapped = new Set<string>();
 
   down(e: KeyEventLike): void {
     if (isTextInput(e.target)) return;
     this.held.add(e.code);
+    this.tapped.add(e.code);
     if (CAPTURED.has(e.code)) e.preventDefault();
   }
 
@@ -31,10 +34,22 @@ export class KeyboardState {
   /** Call when the window loses focus: key-ups that happen in another window never arrive. */
   clear(): void {
     this.held.clear();
+    this.tapped.clear();
   }
 
   codes(): ReadonlySet<string> {
     return this.held;
+  }
+
+  /**
+   * Held keys plus any tapped (pressed and released) since the last call, then clears the pending
+   * taps. Sampling `codes()` alone once per rendered frame can miss a keydown+keyup pair that both
+   * land between two frames; this never does.
+   */
+  takeCodes(): ReadonlySet<string> {
+    const codes = this.tapped.size === 0 ? this.held : new Set([...this.held, ...this.tapped]);
+    this.tapped.clear();
+    return codes;
   }
 }
 

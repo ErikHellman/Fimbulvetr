@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_BINDINGS } from '@content/bindings';
 import { InputLatch, isHeld, wasPressed, wasReleased } from '@core/input/actions';
-import { deadzone, readPad, type GamepadLike } from '@shell/input/gamepad';
+import { connectedPads, deadzone, readPad, type GamepadLike } from '@shell/input/gamepad';
 import { KeyboardState, isTextInput } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 
@@ -57,6 +57,22 @@ describe('KeyboardState', () => {
     expect(isTextInput({ tagName: 'TEXTAREA' })).toBe(true);
     expect(isTextInput({ tagName: 'CANVAS' })).toBe(false);
   });
+
+  it('keeps a tap that starts and ends between two takeCodes() samples', () => {
+    const keys = new KeyboardState();
+    keys.down(key('KeyJ'));
+    keys.up({ code: 'KeyJ' });
+    expect([...keys.takeCodes()]).toEqual(['KeyJ']);
+    expect([...keys.takeCodes()]).toEqual([]);
+  });
+
+  it('drops pending taps on clear() (blur)', () => {
+    const keys = new KeyboardState();
+    keys.down(key('KeyJ'));
+    keys.up({ code: 'KeyJ' });
+    keys.clear();
+    expect([...keys.takeCodes()]).toEqual([]);
+  });
 });
 
 describe('InputMapper', () => {
@@ -106,6 +122,30 @@ describe('InputMapper', () => {
     latch.consume();
     expect(isHeld(latch.consume(), 'shield')).toBe(false);
   });
+
+  it('never loses a key tap that falls entirely between two once-per-frame samples', () => {
+    const { keys, latch, mapper } = setup();
+    // The keydown and keyup both arrive before the next rendered frame samples the keyboard.
+    keys.down(key('KeyJ'));
+    keys.up({ code: 'KeyJ' });
+    mapper.sample(keys.takeCodes(), null);
+    const first = latch.consume();
+    expect(wasPressed(first, 'sword')).toBe(true);
+
+    mapper.sample(keys.takeCodes(), null);
+    const second = latch.consume();
+    expect(wasReleased(second, 'sword')).toBe(true);
+    expect(second.held).toBe(0);
+  });
+
+  it('toggles hold-to-toggle shield from a tap shorter than a frame', () => {
+    const { keys, latch, mapper } = setup(true);
+    // Both the keydown and keyup arrive before the frame samples the keyboard.
+    keys.down(key('ShiftLeft'));
+    keys.up({ code: 'ShiftLeft' });
+    mapper.sample(keys.takeCodes(), null);
+    expect(isHeld(latch.consume(), 'shield')).toBe(true);
+  });
 });
 
 describe('gamepad', () => {
@@ -119,5 +159,31 @@ describe('gamepad', () => {
     const [x, y] = deadzone(1, 0);
     expect(x).toBeCloseTo(1);
     expect(y).toBe(0);
+  });
+
+  it('treats a non-finite axis as zero instead of freezing the tab', () => {
+    expect(deadzone(NaN, 0)).toEqual([0, 0]);
+    expect(deadzone(0, NaN)).toEqual([0, 0]);
+    expect(deadzone(Infinity, 0)).toEqual([0, 0]);
+  });
+});
+
+describe('connectedPads', () => {
+  it('returns an empty list when getGamepads is missing', () => {
+    expect(connectedPads({})).toEqual([]);
+  });
+
+  it('returns an empty list instead of throwing when getGamepads throws', () => {
+    const nav = {
+      getGamepads(): never {
+        throw new Error('insecure origin');
+      },
+    };
+    expect(connectedPads(nav)).toEqual([]);
+  });
+
+  it('passes through the pads when getGamepads succeeds', () => {
+    const pads = [pad([0])];
+    expect(connectedPads({ getGamepads: () => pads })).toBe(pads);
   });
 });

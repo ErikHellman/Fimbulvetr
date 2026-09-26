@@ -20,16 +20,12 @@ test('M0 exit: move, fight, roll, shield, cross screens, tints, save and import'
     window.__fimbul?.warp('test_a', 23, 9);
   });
   await expect.poll(async () => (await hero(page))?.x).toBe(23 * 16 + 8);
-  // A bare press() dispatches keydown+keyup back to back, which can land between two sampled
-  // frames and be lost entirely; hold the key until the hook confirms the hit landed.
-  await page.keyboard.down('KeyJ');
+  await page.keyboard.press('KeyJ');
   await expect.poll(() => eventCount(page, 'hit')).toBeGreaterThan(0);
-  await page.keyboard.up('KeyJ');
   await waitForMove(page);
 
-  await page.keyboard.down('Space');
+  await page.keyboard.press('Space');
   await expect.poll(() => eventCount(page, 'sfx_roll')).toBe(1);
-  await page.keyboard.up('Space');
   await waitForMove(page);
 
   await page.keyboard.down('ShiftLeft');

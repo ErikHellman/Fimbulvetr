@@ -16,7 +16,7 @@ import { SCREEN_H, SCREEN_W } from '@core/world/dims';
 import { AudioDirector } from '@shell/audio/sfx';
 import type { DevBridge } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
-import { readPad } from '@shell/input/gamepad';
+import { connectedPads, readPad } from '@shell/input/gamepad';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { LETTERBOX } from '@shell/scale';
@@ -83,7 +83,7 @@ export class PlayScene extends Phaser.Scene {
   }
 
   override update(_time: number, delta: number): void {
-    this.mapper.sample(this.keys.codes(), readPad(navigator.getGamepads()));
+    this.mapper.sample(this.keys.takeCodes(), readPad(connectedPads(navigator)));
     const { steps, alpha } = advance(this.acc, delta);
     const started = performance.now();
     for (let i = 0; i < steps; i++) this.sim.step(this.latch.consume());
