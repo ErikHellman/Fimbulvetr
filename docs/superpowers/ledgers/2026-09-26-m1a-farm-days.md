@@ -18,3 +18,12 @@ Plan: `docs/superpowers/plans/2026-09-26-m1a-farm-days.md`. Brief: `docs/briefs/
 | 12 Critters | | Sheep ignore throws. Penned sheep are bits in `world.vars[pen.v]`. |
 | 13 Cover | | `coverOrder` is added to ContentDb, because grids store 1 + index. |
 | 14 Shop, axe, pieces | | Dev `give` command. Heart pieces are `pickup` entities. |
+| 15 Font | | Glyph grids in an 11-row cell with accent rows. Accented letters are composed from a base glyph and a mark. |
+| 16 Sprites | | NPCs are composed from parts. Deferred: a hand-axe art variant for the hero's attack frames (they still show the sword). |
+| 17 Tiles | | 17 new terrains with legend characters, and cover overlay tiles in the tileset. |
+| 18 World view | | Cover layer, shadows, indoor grade, `?dev=gallery`, and the demo corner on test_b/test_int. The golden hash was re-recorded because test_b now spawns props. |
+| 19 UI scene | | The font goes through `BitmapText.ParseXMLBitmapFont` with a generated BMFont XML. The typings omit the texture argument, so the call is cast. |
+| 20 Askdalr | | Maps generated with a scratch Python helper; the committed TS files are the source of truth. NEW_GAME moves to the longhouse. |
+| 21 Prologue | | One `embla_evening` script serves all three evenings (the dialogue picks the scene). Sigrún's shop opens from her counter. |
+| 22 Exit tests | | Herding fixes found by the route test: the pen now fills the west end of the pasture; sheep are pushed along the hero's walking direction and slide along walls (ActorCtx gains `heroVel`); grazing sheep drift home. The pail's drop zone is two rows tall. WebKit is not installed in this container, so e2e ran on Chromium only (21/21, twice). |
+| 23 Docs | | ARCHITECTURE.md, roadmap and handoff updated. Budget 405 KB gz of 730 KB. |

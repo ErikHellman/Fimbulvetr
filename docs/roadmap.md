@@ -31,13 +31,14 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
 ## Later milestones
 - [ ] M1 Vertical slice — brief: `docs/briefs/m1.md`
   - [ ] M1a Farm days — plan: `docs/superpowers/plans/2026-09-26-m1a-farm-days.md`
-    - [ ] Carry-overs: Sim split into systems, ActorCtx, interiors and fades, ledges, presets and gallery
-    - [ ] Story core: Cond/Effect, dialogue, scripts, NPCs, quests
-    - [ ] Lift, carry and throw; critters; tall grass; shop
-    - [ ] Art: font, NPC and prop sprites, farm tiles, SFX
-    - [ ] Shell: world view, UI scene
-    - [ ] Content: Askdalr (8 screens, 3 interiors, 13 NPCs, days 1–3)
-    - [ ] Exit route test, e2e, docs
+    - [x] Carry-overs: Sim split into systems, ActorCtx, interiors and fades, ledges, presets and gallery
+    - [x] Story core: Cond/Effect, dialogue, scripts, NPCs, quests
+    - [x] Lift, carry and throw; critters; tall grass; shop
+    - [x] Art: font, NPC and prop sprites, farm tiles, SFX
+    - [x] Shell: world view, UI scene
+    - [x] Content: Askdalr (8 screens, 3 interiors, 13 NPCs, days 1–3)
+    - [x] Exit route test, e2e, docs
+    - [ ] User playtest and Swedish proofread
   - [ ] M1b Raid + Myrkviðr road
   - [ ] M1c Rótarhellir + Rótvættr
 - [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
