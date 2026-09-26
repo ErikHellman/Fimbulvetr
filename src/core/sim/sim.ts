@@ -24,10 +24,17 @@ import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { spawnActors } from './systems/spawn';
 import { tickTimers } from './systems/timers';
-import { checkEdges, enterScreen, markVisited, stepTransition } from './systems/transition';
+import {
+  checkDoors,
+  checkEdges,
+  enterScreen,
+  fadeLevel,
+  markVisited,
+  stepTransition,
+} from './systems/transition';
 
 export type { LoadedScreen, Mode, Transition } from './rt';
-export { TRANSITION_TICKS, entryPoint } from './systems/transition';
+export { FADE_TICKS, TRANSITION_TICKS, entryPoint } from './systems/transition';
 
 export interface SimOptions {
   /** Accessibility "long day": world time runs at half speed. */
@@ -56,7 +63,7 @@ export class Sim implements SimRt {
     options: SimOptions = { longDay: false },
   ) {
     this.state = state;
-    this.layout = indexLayout(db.layout);
+    this.layout = indexLayout(db.layout, Object.keys(db.screens) as ScreenId[]);
     this.ticksPerMinute = db.clock.ticksPerMinute * (options.longDay ? 2 : 1);
     this.screen = this.load(state.hero.screen);
     this.hero = createHero(this.newId(), state.hero, db.tuning);
@@ -93,6 +100,11 @@ export class Sim implements SimRt {
 
   originOf(id: ScreenId): Vec {
     return screenOrigin(this.layout, id);
+  }
+
+  /** How black the picture is during a door fade: 0 clear … 1 black. */
+  fade(): number {
+    return fadeLevel(this.transition);
   }
 
   snapshot(): GameState {
@@ -160,6 +172,7 @@ export class Sim implements SimRt {
     resolveContact(this);
     tickTimers(this);
     checkEdges(this);
+    if (this.mode === 'play') checkDoors(this);
   }
 
   private apply(c: Command): void {

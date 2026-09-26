@@ -33,6 +33,7 @@ export class PlayScene extends Phaser.Scene {
   private audio!: AudioDirector;
   private views!: EntityViews;
   private colour!: Phaser.Filters.ColorMatrix;
+  private fadeRect!: Phaser.GameObjects.Rectangle;
   private readonly latch = new InputLatch();
   private readonly keys = new KeyboardState();
   private readonly acc: Accumulator = { acc: 0 };
@@ -76,6 +77,12 @@ export class PlayScene extends Phaser.Scene {
     cam.setRoundPixels(true);
     this.colour = cam.filters.internal.addColorMatrix();
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
+    this.fadeRect = this.add
+      .rectangle(0, 0, SCREEN_W, SCREEN_H, 0x000000)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(1e6)
+      .setAlpha(0);
     this.showScreen(this.sim.screen.id);
     this.draw(0);
     data.dev?.attach(this.bridge());
@@ -121,7 +128,8 @@ export class PlayScene extends Phaser.Scene {
 
   private draw(alpha: number): void {
     const tr = this.sim.transition;
-    if (tr !== null) {
+    this.fadeRect.setAlpha(this.sim.fade());
+    if (tr !== null && tr.kind === 'slide') {
       const p = Math.min(1, (tr.t + alpha) / tr.dur);
       const from = this.sim.originOf(tr.from);
       const to = this.sim.originOf(tr.to);

@@ -10,7 +10,12 @@ import type { SimEvent } from './events';
 
 export type Mode = 'play' | 'transition';
 
+/**
+ * A screen change. `slide` (edge crossing) loads the new screen at t=0 and scrolls; `fade` (door) swaps
+ * screen and hero at the midpoint while the picture is black.
+ */
 export interface Transition {
+  readonly kind: 'slide' | 'fade';
   readonly from: ScreenId;
   readonly to: ScreenId;
   readonly dir: Dir4;
@@ -18,6 +23,8 @@ export interface Transition {
   readonly dur: number;
   readonly heroFrom: Vec;
   readonly heroTo: Vec;
+  /** The hero's facing on arrival. */
+  readonly facing: Dir4;
 }
 
 export interface LoadedScreen {

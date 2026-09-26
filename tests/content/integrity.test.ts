@@ -35,7 +35,7 @@ describe('screens', () => {
 
 describe('world layout', () => {
   it('places screens inside the grid without overlaps', () => {
-    expect(() => indexLayout(WORLD_LAYOUT)).not.toThrow();
+    expect(() => indexLayout(WORLD_LAYOUT, SCREEN_IDS)).not.toThrow();
     for (const [id, pos] of Object.entries(WORLD_LAYOUT.at) as Array<
       [ScreenId, readonly [number, number] | undefined]
     >) {
@@ -49,7 +49,7 @@ describe('world layout', () => {
   });
 
   it('has identical walkable seams between neighbouring screens', () => {
-    const index = indexLayout(WORLD_LAYOUT);
+    const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
     for (const id of SCREEN_IDS) {
       const here = walkable(id);
       const east = neighbourOf(index, id, 'e');

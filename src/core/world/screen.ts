@@ -9,8 +9,18 @@ export interface TilePos {
   readonly y: number;
 }
 
-/** Things placed on a screen. The union grows with each milestone (npc, chest, door, secret, trigger…). */
-export type Thing = { readonly k: 'enemy'; readonly id: EnemyId; readonly at: TilePos };
+/** A doorway: walking into tile `at` while facing `dir` fades to screen `to`, arriving on `arrive`. */
+export interface DoorThing {
+  readonly k: 'door';
+  readonly at: TilePos;
+  readonly dir: Dir4;
+  readonly to: ScreenId;
+  readonly arrive: TilePos;
+  readonly facing: Dir4;
+}
+
+/** Things placed on a screen. The union grows with each milestone. */
+export type Thing = { readonly k: 'enemy'; readonly id: EnemyId; readonly at: TilePos } | DoorThing;
 
 export interface ScreenDef {
   readonly id: ScreenId;
@@ -20,6 +30,8 @@ export interface ScreenDef {
   /** 22 rows of 40 legend characters. */
   readonly map: readonly string[];
   readonly things: readonly Thing[];
+  /** Interiors: no weather, a fixed indoor light. */
+  readonly indoor?: boolean;
 }
 
 export interface WorldLayout {
@@ -31,9 +43,12 @@ export interface WorldLayout {
 export interface LayoutIndex {
   pos(id: ScreenId): readonly [number, number] | undefined;
   idAt(gx: number, gy: number): ScreenId | undefined;
+  /** World-pixel origin. Screens off the grid (interiors, dungeon rooms) get pockets below it. */
+  origin(id: ScreenId): Vec;
 }
 
-export function indexLayout(layout: WorldLayout): LayoutIndex {
+/** Indexes the overworld grid; `ids` (all screens, in a stable order) decides the off-grid pockets. */
+export function indexLayout(layout: WorldLayout, ids: readonly ScreenId[]): LayoutIndex {
   const byPos = new Map<string, ScreenId>();
   for (const [id, pos] of Object.entries(layout.at) as [ScreenId, readonly [number, number] | undefined][]) {
     if (pos === undefined) continue;
@@ -42,9 +57,18 @@ export function indexLayout(layout: WorldLayout): LayoutIndex {
     if (taken !== undefined) throw new Error(`layout: ${taken} and ${id} both at ${key}`);
     byPos.set(key, id);
   }
+  const pockets = new Map<ScreenId, number>();
+  for (const id of ids) if (layout.at[id] === undefined) pockets.set(id, pockets.size);
   return {
     pos: (id) => layout.at[id],
     idAt: (gx, gy) => byPos.get(`${gx},${gy}`),
+    origin: (id) => {
+      const pos = layout.at[id];
+      if (pos !== undefined) return { x: pos[0] * SCREEN_W, y: pos[1] * SCREEN_H };
+      const pocket = pockets.get(id);
+      if (pocket === undefined) throw new Error(`screen ${id} is not indexed`);
+      return { x: pocket * SCREEN_W, y: (layout.rows + 1) * SCREEN_H };
+    },
   };
 }
 
@@ -55,11 +79,9 @@ export function neighbourOf(index: LayoutIndex, id: ScreenId, dir: Dir4): Screen
   return index.idAt(pos[0] + d.x, pos[1] + d.y) ?? null;
 }
 
-/** World-pixel origin of a screen on the overworld grid. */
+/** World-pixel origin of any screen. */
 export function screenOrigin(index: LayoutIndex, id: ScreenId): Vec {
-  const pos = index.pos(id);
-  if (pos === undefined) throw new Error(`screen ${id} is not on the world layout`);
-  return { x: pos[0] * SCREEN_W, y: pos[1] * SCREEN_H };
+  return index.origin(id);
 }
 
 /** Where something standing on a tile has its feet: horizontally centred, 2 px above the tile's bottom. */
