@@ -1,8 +1,10 @@
+import type { UiKey } from '@content/i18n/ui';
 import { isScreenId } from '@content/world/screens';
 import { mem } from '@core/actors/entity';
 import { isSeason, type ClockState } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
 import { tileFeet } from '@core/world/screen';
+import { importMessageKey } from '@shell/platform/exportImport';
 import type { DevBridge } from './bridge';
 import type { FrameSummary } from './stats';
 
@@ -33,6 +35,10 @@ export interface FimbulHook {
   setSeason(season: string): boolean;
   missingFrames(): string[];
   stats(): FrameSummary;
+  exportSaveJson(): string;
+  importSaveJson(json: string): UiKey;
+  flushSave(): Promise<void>;
+  downloadSave(): void;
 }
 
 declare global {
@@ -89,5 +95,27 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     },
     missingFrames: () => bridge().frames.missingNames(),
     stats: () => bridge().stats.summary(),
+    exportSaveJson: () => {
+      const b = bridge();
+      return b.saves.exportJson(b.sim.snapshot());
+    },
+    importSaveJson: (json) => {
+      const b = bridge();
+      const result = b.saves.importText(json);
+      if (result.ok) {
+        b.saves.autosaver.request(result.state);
+        b.restart(result.state);
+      }
+      return importMessageKey(result);
+    },
+    flushSave: async () => {
+      const b = bridge();
+      b.saves.autosaver.request(b.sim.snapshot());
+      await b.saves.autosaver.flush();
+    },
+    downloadSave: () => {
+      const b = bridge();
+      b.saves.download(b.sim.snapshot());
+    },
   };
 }

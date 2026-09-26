@@ -11,6 +11,7 @@ import { add, lerp } from '@core/math/vec';
 import type { SimEvent } from '@core/sim/events';
 import { advance, type Accumulator } from '@core/sim/loop';
 import { Sim } from '@core/sim/sim';
+import type { GameState } from '@core/state/gameState';
 import { SCREEN_H, SCREEN_W } from '@core/world/dims';
 import { AudioDirector } from '@shell/audio/sfx';
 import type { DevBridge } from '@shell/dev/bridge';
@@ -23,7 +24,7 @@ import type { PlayData } from '@shell/services';
 import { EntityViews } from '@shell/view/entityViews';
 import { ScreenView } from '@shell/view/screenView';
 
-/** Owns the Sim: steps it at 60 Hz, feeds it input, and draws its state. */
+/** Owns the Sim: steps it at 60 Hz, feeds it input, draws its state, plays its sounds, autosaves. */
 export class PlayScene extends Phaser.Scene {
   private appliedGrade: readonly number[] = [];
   private services!: PlayData;
@@ -53,11 +54,23 @@ export class PlayScene extends Phaser.Scene {
       holdToggleShield: data.settings.holdShield,
     });
     this.audio = new AudioDirector(this, () => data.settings.volume, data.muted);
-    const detach = attachKeyboard(window, this.keys);
+
+    const detachKeys = attachKeyboard(window, this.keys);
+    const flush = (): void => {
+      void data.saves.autosaver.flush();
+    };
+    const onVisibility = (): void => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', flush);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      detach();
+      detachKeys();
       this.keys.clear();
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', flush);
     });
+
     const cam = this.cameras.main;
     cam.setViewport(0, LETTERBOX, SCREEN_W, SCREEN_H);
     cam.setRoundPixels(true);
@@ -88,8 +101,12 @@ export class PlayScene extends Phaser.Scene {
       frames: this.services.assets.frames,
       stats: this.stats,
       settings: this.services.settings,
+      saves: this.services.saves,
       appliedGrade: () => this.appliedGrade,
       lightLevel: () => daylight(this.sim.state.clock, this.services.db.clock),
+      restart: (state: GameState) => {
+        this.scene.restart({ ...this.services, state });
+      },
     };
   }
 
@@ -98,6 +115,7 @@ export class PlayScene extends Phaser.Scene {
     else if (ev.t === 'screenEntered') {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
+      this.services.saves.autosaver.request(this.sim.snapshot());
     }
   }
 

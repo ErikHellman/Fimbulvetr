@@ -9,7 +9,10 @@ import { t } from '@core/i18n/t';
 import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
+import { SaveService } from '@shell/platform/saveService';
+import { openSaveStoreSafely } from '@shell/platform/saveStore';
 import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
+import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { BootScene } from '@shell/scenes/BootScene';
 import { PlayScene } from '@shell/scenes/PlayScene';
@@ -23,6 +26,14 @@ const DEV_TOOLS = import.meta.env.DEV || import.meta.env.MODE === 'test';
 
 function randomSeed(): number {
   return crypto.getRandomValues(new Uint32Array(1))[0] ?? 1;
+}
+
+function indexedDbFactory(): IDBFactory | undefined {
+  try {
+    return window.indexedDB;
+  } catch {
+    return undefined;
+  }
 }
 
 function startGame(services: Services): void {
@@ -48,14 +59,28 @@ async function main(): Promise<void> {
   for (const warning of query?.warnings ?? []) console.warn(`[dev] ${warning}`);
   const settings = loadSettings(browserStorage(), preferredLang(navigator.languages));
   if (query?.lang !== undefined) settings.lang = query.lang;
+  const lang = settings.lang;
+
   if (!hasWebGL()) {
-    showMessage(t(UI.webgl_required, settings.lang));
+    showMessage(t(UI.webgl_required, lang));
     return;
   }
-  const state = newGame(query?.seed ?? randomSeed(), NEW_GAME);
+  if (!(await acquireTabLock(navigator.locks))) {
+    showMessage(t(UI.already_open, lang));
+    return;
+  }
+
+  const wantSaves = query?.nosave !== true;
+  const store = wantSaves ? await openSaveStoreSafely(indexedDbFactory()) : null;
+  if (wantSaves && store === null) {
+    showMessage(t(UI.storage_unavailable, lang), [{ label: t(UI.ok, lang), run: () => undefined }]);
+  }
+  const saves = new SaveService(store, __BUILD_ID__, new Set<string>(SCREEN_IDS));
+  const loaded = query?.screen === undefined ? await saves.loadAuto() : null;
+  const state = loaded ?? newGame(query?.seed ?? randomSeed(), NEW_GAME);
   if (query !== null) applyDevQuery(state, query);
   const dev = DEV_TOOLS ? (await import('@shell/dev/index')).createDevTools() : null;
-  startGame({ db: DB, state, settings, dev, muted: query?.mute === true });
+  startGame({ db: DB, state, settings, saves, dev, muted: query?.mute === true });
 }
 
 void main();

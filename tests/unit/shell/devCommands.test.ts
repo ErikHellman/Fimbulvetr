@@ -3,6 +3,7 @@ import type { DevBridge } from '@shell/dev/bridge';
 import { runCommand } from '@shell/dev/commands';
 import { FrameStats } from '@shell/dev/stats';
 import { FrameIndex } from '@shell/gfx/frameIndex';
+import { SaveService } from '@shell/platform/saveService';
 import { DEFAULT_SETTINGS } from '@shell/platform/settings';
 import { Harness } from '../../sim/harness';
 
@@ -13,8 +14,10 @@ function bridge(): { b: DevBridge; h: Harness } {
     frames: new FrameIndex(),
     stats: new FrameStats(),
     settings: { ...DEFAULT_SETTINGS },
+    saves: new SaveService(null, 'test', new Set()),
     appliedGrade: () => [],
     lightLevel: () => 1,
+    restart: () => undefined,
   };
   return { b, h };
 }
