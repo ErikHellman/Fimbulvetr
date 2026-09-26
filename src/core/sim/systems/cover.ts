@@ -25,7 +25,7 @@ export function refreshCover(rt: SimRt): void {
 
 /** The sword (and the spin) mows standing cover; cut tiles are saved under the season epoch. */
 export function cutCover(rt: SimRt): void {
-  const box = heroSwordBox(rt.hero, rt.db.tuning);
+  const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   const cut = cutBox(rt.screen.cover, box);
   if (cut.length === 0) return;

@@ -7,6 +7,7 @@ export const WEAPON_NAMES = {
   seax: { en: "Halvar's seax", sv: 'Halvars sax' },
   uppvik_sword: { en: 'Uppvík sword', sv: 'Uppvíksvärd' },
   dwarf_blade: { en: 'Dwarf-forged blade', sv: 'Dvärgsmitt svärd' },
+  handaxe: { en: "Halvar's hand-axe", sv: 'Halvars handyxa' },
 } as const satisfies Record<WeaponId, L10n>;
 
 export const ARMOR_NAMES = {

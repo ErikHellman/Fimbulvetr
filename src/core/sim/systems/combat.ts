@@ -1,5 +1,6 @@
 import { mem } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
+import { swordOf } from '../../actors/tuning';
 import { HERO_MACHINE, heroSwordBox, heroSwordDamage } from '../../actors/hero';
 import { resolveHit } from '../../combat/hit';
 import { EMPTY_FRAME } from '../../input/actions';
@@ -13,7 +14,7 @@ import { enemyDef } from './movement';
 /** Applies the hero's live sword box to every actor it touches, once per swing. */
 export function resolveSword(rt: SimRt): void {
   const { hero, db } = rt;
-  const box = heroSwordBox(hero, db.tuning);
+  const box = heroSwordBox(hero, db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   const swing = mem(hero, 'swing');
   const spinning = mem(hero, 'spinOn') === 1;
@@ -27,9 +28,9 @@ export function resolveSword(rt: SimRt): void {
     const result = resolveHit(
       e,
       {
-        amount: heroSwordDamage(hero, db.tuning),
+        amount: heroSwordDamage(hero, db.tuning, rt.state.inv.weapon),
         element: 'none',
-        knock: db.tuning.sword.knock,
+        knock: swordOf(db.tuning, rt.state.inv.weapon).knock,
         dir,
         faction: 'hero',
         tags: 0,

@@ -6,6 +6,7 @@ import type { TilePos } from '../world/screen';
 import type { Cond } from './cond';
 import type { DialogueRun, Speaker } from './dialogue';
 import type { Effect } from './effects';
+import type { BuyResult } from './shop';
 
 /** An actor a script can move or turn: the hero or an NPC on the current screen. */
 export type ActorRef = 'hero' | NpcId;
@@ -51,6 +52,8 @@ export interface StoryRun {
   fade: number;
   /** Entity id of the NPC being talked to, if any. */
   talker: number | null;
+  /** The shop screen, while a `shop` step runs. */
+  shop: { cursor: number; last: BuyResult | null } | null;
 }
 
 export const FADE_STEP_TICKS = 18;
@@ -58,5 +61,5 @@ export const FADE_STEP_TICKS = 18;
 export const MAX_INSTANT_STEPS = 64;
 
 export function newStoryRun(steps: readonly Step[], talker: number | null = null): StoryRun {
-  return { queue: [...steps], cur: null, t: 0, dlg: null, fade: 0, talker };
+  return { queue: [...steps], cur: null, t: 0, dlg: null, fade: 0, talker, shop: null };
 }

@@ -1,3 +1,4 @@
+import type { WeaponId } from '@content/ids';
 import { isHeld, moveVector, wasPressed, type InputFrame } from '../input/actions';
 import { at, type Box } from '../math/box';
 import { DIR_VEC, dirFromVec, type Dir4 } from '../math/dir';
@@ -6,7 +7,7 @@ import type { SimEvent } from '../sim/events';
 import type { HeroState } from '../state/gameState';
 import { createEntity, mem, setAnim, type Entity } from './entity';
 import type { Machine, StateDef } from './fsm';
-import type { Tuning } from './tuning';
+import { swordOf, type Tuning } from './tuning';
 
 export type HeroMode =
   'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop' | 'lift' | 'carry' | 'throw';
@@ -15,6 +16,8 @@ export interface HeroCtx {
   readonly input: InputFrame;
   readonly tuning: Tuning;
   readonly hasShield: boolean;
+  /** Holding a weapon (not bare hands): the sword button swings. */
+  readonly armed: boolean;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -43,7 +46,7 @@ function swing(e: Entity, c: HeroCtx, anim: string, sound: 'sfx_swing' | 'sfx_sp
 const move: HeroDef = {
   tick(e, c) {
     if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'roll';
-    if (wasPressed(c.input, 'sword')) return 'attack';
+    if (wasPressed(c.input, 'sword') && c.armed) return 'attack';
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
     steer(e, c, c.tuning.hero.walkSpeed, true);
     setAnim(e, moving(e) ? 'walk' : 'idle');
@@ -274,15 +277,17 @@ export function createHero(
   });
 }
 
-/** The hero's live sword hitbox in screen pixels, or null when the sword cannot hit. */
-export function heroSwordBox(e: Entity, t: Tuning): Box | null {
-  if (mem(e, 'spinOn') === 1) return at(t.sword.spinBox, e.pos);
-  if (mem(e, 'swordOn') === 1) return at(t.sword.boxes[e.facing], e.pos);
+/** The hero's live weapon hitbox in screen pixels, or null when it cannot hit. */
+export function heroSwordBox(e: Entity, t: Tuning, weapon?: WeaponId): Box | null {
+  const sw = swordOf(t, weapon);
+  if (mem(e, 'spinOn') === 1) return at(sw.spinBox, e.pos);
+  if (mem(e, 'swordOn') === 1) return at(sw.boxes[e.facing], e.pos);
   return null;
 }
 
-export function heroSwordDamage(e: Entity, t: Tuning): number {
-  if (mem(e, 'spinOn') === 1) return t.sword.spinDamage;
+export function heroSwordDamage(e: Entity, t: Tuning, weapon?: WeaponId): number {
+  const sw = swordOf(t, weapon);
+  if (mem(e, 'spinOn') === 1) return sw.spinDamage;
   const combo = Math.min(3, Math.max(1, mem(e, 'combo')));
-  return t.sword.comboDamage[combo - 1] ?? t.sword.comboDamage[0];
+  return sw.comboDamage[combo - 1] ?? sw.comboDamage[0];
 }

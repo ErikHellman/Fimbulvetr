@@ -73,6 +73,8 @@ export type Thing =
       readonly flag: FlagId;
       readonly count: number;
     }
+  /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
+  | { readonly k: 'piece'; readonly id: string; readonly at: TilePos }
   /** Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up. */
   | {
       readonly k: 'drop';

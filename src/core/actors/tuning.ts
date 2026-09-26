@@ -1,3 +1,4 @@
+import type { WeaponId } from '@content/ids';
 import type { Box } from '../math/box';
 import type { Dir4 } from '../math/dir';
 
@@ -51,9 +52,15 @@ export interface ThrowTuning {
 export interface Tuning {
   readonly hero: HeroTuning;
   readonly throw: ThrowTuning;
+  /** Per-weapon swings; weapons not listed swing like `sword`. */
+  readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;
   readonly enemyIframes: number;
   readonly knockDecay: number;
 }
+
+/** The swing of a weapon. */
+export const swordOf = (t: Tuning, weapon?: WeaponId): SwordTuning =>
+  (weapon === undefined ? undefined : t.weapons[weapon]) ?? t.sword;

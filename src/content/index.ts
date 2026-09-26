@@ -11,6 +11,7 @@ import { NPC_DEFS } from './npcs';
 import { PROP_DEFS } from './props';
 import { QUEST_DEFS } from './quests';
 import { SCRIPTS_DEFS } from './scripts';
+import { SHOP_DEFS } from './shops';
 import { TERRAIN } from './terrain';
 import { TUNING } from './tuning';
 import { WORLD_LAYOUT } from './world/layout';
@@ -36,4 +37,5 @@ export const DB: ContentDb = {
   cover: COVER_DEFS,
   coverLegend: COVER_LEGEND,
   coverOrder: COVERS,
+  shops: SHOP_DEFS,
 };

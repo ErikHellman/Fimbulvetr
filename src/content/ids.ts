@@ -41,7 +41,7 @@ export type ItemId = (typeof ITEMS)[number];
 export const GALDR = ['eldr', 'is', 'farvegr', 'hlif', 'skjalfti', 'ljos', 'vindr', 'bragd'] as const;
 export type GaldrId = (typeof GALDR)[number];
 
-export const WEAPONS = ['none', 'pitchfork', 'seax', 'uppvik_sword', 'dwarf_blade'] as const;
+export const WEAPONS = ['none', 'pitchfork', 'seax', 'uppvik_sword', 'dwarf_blade', 'handaxe'] as const;
 export type WeaponId = (typeof WEAPONS)[number];
 
 export const ARMORS = ['wool_tunic', 'byrnie', 'ember_byrnie', 'runeplate'] as const;

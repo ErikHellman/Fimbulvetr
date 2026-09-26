@@ -11,7 +11,9 @@ import { fnv1a } from '../math/hash';
 import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
 import { canonicalJson, cloneState } from '../state/save';
+import { giveItem } from '../story/effects';
 import type { StoryRun } from '../story/script';
+import { buy } from '../story/shop';
 import { buildCollision, gridSolidAt } from '../world/collision';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -26,6 +28,7 @@ import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
 import { stepNpcs } from './systems/npcs';
+import { collectPickups } from './systems/pickups';
 import { stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
@@ -195,6 +198,7 @@ export class Sim implements SimRt {
     runCritters(this, ctx);
     stepNpcs(this);
     moveAll(this);
+    collectPickups(this);
     settleCritters(this);
     stepProps(this, input);
     resolveSword(this);
@@ -225,6 +229,12 @@ export class Sim implements SimRt {
         break;
       case 'setFlag':
         this.state.flags[c.flag] = c.value;
+        break;
+      case 'buy':
+        buy(this, c.shop, c.item);
+        break;
+      case 'give':
+        giveItem(this, c.item, c.n);
         break;
     }
   }

@@ -161,7 +161,7 @@ function settle(rt: SimRt, e: Entity): void {
 
 /** Sword swings split logs (a big log only by the spin). */
 export function swordProps(rt: SimRt): void {
-  const box = heroSwordBox(rt.hero, rt.db.tuning);
+  const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   const swing = mem(rt.hero, 'swing');
   const spinning = mem(rt.hero, 'spinOn') === 1;

@@ -41,6 +41,21 @@ export const TUNING: Tuning = {
     spinBox: { x: -26, y: -36, w: 52, h: 44 },
   },
   throw: { speed: 4, flightTicks: 20 },
+  weapons: {
+    /** The farm hand-axe: short reach, light blows. */
+    handaxe: {
+      comboDamage: [1, 1, 2],
+      spinDamage: 2,
+      knock: 3,
+      boxes: {
+        e: { x: 2, y: -22, w: 16, h: 18 },
+        w: { x: -18, y: -22, w: 16, h: 18 },
+        n: { x: -8, y: -36, w: 16, h: 18 },
+        s: { x: -8, y: -8, w: 16, h: 16 },
+      },
+      spinBox: { x: -22, y: -32, w: 44, h: 40 },
+    },
+  },
   textCps: 45,
   enemyIframes: 6,
   knockDecay: 0.8,

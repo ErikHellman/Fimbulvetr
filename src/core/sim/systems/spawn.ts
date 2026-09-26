@@ -6,6 +6,7 @@ import { evalCond } from '../../story/cond';
 import { tileFeet } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
+import { createPiece } from './pickups';
 import { placeNpcs } from './npcs';
 import { condCtx } from './story';
 
@@ -44,6 +45,10 @@ function spawnThings(rt: SimRt): Entity[] {
         out.push(e);
         break;
       }
+      case 'piece':
+        if (!rt.state.world.pieces.includes(thing.id))
+          out.push(createPiece(rt.newId(), tileFeet(thing.at), index));
+        break;
       case 'door':
       case 'sign':
       case 'use':

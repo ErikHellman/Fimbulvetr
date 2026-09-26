@@ -3,7 +3,7 @@ import type { Dir4 } from '../math/dir';
 import type { Vec } from '../math/vec';
 
 export type Faction = 'hero' | 'enemy' | 'neutral' | 'env';
-export type EntityKind = 'hero' | 'enemy' | 'npc' | 'critter' | 'prop';
+export type EntityKind = 'hero' | 'enemy' | 'npc' | 'critter' | 'prop' | 'pickup';
 
 export interface FsmState {
   s: string;

@@ -1,4 +1,4 @@
-import type { NpcId } from '@content/ids';
+import type { ItemId, NpcId, ShopId } from '@content/ids';
 import { setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE } from '../../actors/hero';
@@ -20,6 +20,7 @@ import {
   type Speaker,
 } from '../../story/dialogue';
 import { applyEffect, type Effect } from '../../story/effects';
+import { buy, visibleStock, type BuyResult } from '../../story/shop';
 import {
   FADE_STEP_TICKS,
   MAX_INSTANT_STEPS,
@@ -35,15 +36,26 @@ import { tryLift } from './props';
 import { enterScreen, markVisited } from './transition';
 
 /** What the UI shows for the running script. */
-export type StoryUi = {
-  readonly k: 'text' | 'card';
-  readonly who: Speaker;
-  readonly text: L10n;
-  /** Share of the text revealed so far, 0…1. */
-  readonly shown: number;
-  readonly choices: readonly L10n[];
-  readonly cursor: number;
-} | null;
+export type StoryUi =
+  | {
+      readonly k: 'text' | 'card';
+      readonly who: Speaker;
+      readonly text: L10n;
+      /** Share of the text revealed so far, 0…1. */
+      readonly shown: number;
+      readonly choices: readonly L10n[];
+      readonly cursor: number;
+    }
+  | {
+      readonly k: 'shop';
+      readonly shop: ShopId;
+      readonly name: L10n;
+      readonly rows: readonly { readonly item: ItemId; readonly price: number }[];
+      /** Rows, then one more for "leave". */
+      readonly cursor: number;
+      readonly last: BuyResult | null;
+    }
+  | null;
 
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
 const advancePressed = (input: InputFrame): boolean => ADVANCE.some((a) => wasPressed(input, a));
@@ -153,12 +165,14 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
       run.queue.unshift(...def.steps);
       return false;
     }
+    case 'shop':
+      run.shop = { cursor: 0, last: null };
+      return true;
     case 'say':
     case 'card':
     case 'move':
     case 'wait':
     case 'fade':
-    case 'shop':
       return true;
   }
 }
@@ -192,7 +206,7 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
       return run.fade !== target;
     }
     case 'shop':
-      return false;
+      return stepShop(rt, run, step.id, input);
     case 'do':
     case 'face':
     case 'warp':
@@ -200,6 +214,28 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
     case 'run':
       return false;
   }
+}
+
+function stepShop(rt: SimRt, run: StoryRun, id: ShopId, input: InputFrame): boolean {
+  const shop = rt.db.shops[id];
+  const ui = run.shop;
+  if (shop === undefined || ui === null) return false;
+  const rows = visibleStock(shop, condCtx(rt));
+  const n = rows.length + 1;
+  if (wasPressed(input, 'up')) ui.cursor = (ui.cursor + n - 1) % n;
+  if (wasPressed(input, 'down')) ui.cursor = (ui.cursor + 1) % n;
+  if (wasPressed(input, 'cancel')) {
+    run.shop = null;
+    return false;
+  }
+  if (!wasPressed(input, 'confirm') && !wasPressed(input, 'interact')) return true;
+  const row = rows[ui.cursor];
+  if (row === undefined) {
+    run.shop = null;
+    return false;
+  }
+  ui.last = buy(rt, id, row.item);
+  return true;
 }
 
 /** Moves toward `to` at `speed` px per tick. Returns true until arrived. */
@@ -236,6 +272,18 @@ export function storyUi(rt: SimRt): StoryUi {
       shown: Math.min(1, (run.t + 1) / revealTicks(step.text, cps)),
       choices: [],
       cursor: 0,
+    };
+  }
+  if (step.k === 'shop' && run.shop !== null) {
+    const shop = rt.db.shops[step.id];
+    if (shop === undefined) return null;
+    return {
+      k: 'shop',
+      shop: step.id,
+      name: shop.name,
+      rows: visibleStock(shop, condCtx(rt)).map((s) => ({ item: s.item, price: s.price })),
+      cursor: run.shop.cursor,
+      last: run.shop.last,
     };
   }
   if (step.k === 'talk' && run.dlg !== null) {
