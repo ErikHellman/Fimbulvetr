@@ -4,7 +4,7 @@ import type { Entity } from '../../actors/entity';
 import { at, type Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
 import { length, scale } from '../../math/vec';
-import { gridSolidAt, moveBox, type SolidAt } from '../../world/collision';
+import { gridSolidAt, moveBox, speedAt, type SolidAt } from '../../world/collision';
 import type { SimRt } from '../rt';
 
 const KNOCK_EPSILON = 0.1;
@@ -19,8 +19,9 @@ export function moveAll(rt: SimRt): void {
 }
 
 function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[]): void {
-  const dx = e.vel.x + e.knock.x;
-  const dy = e.vel.y + e.knock.y;
+  const f = speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1);
+  const dx = e.vel.x * f + e.knock.x;
+  const dy = e.vel.y * f + e.knock.y;
   if (dx !== 0 || dy !== 0) {
     const box = at(e.body, e.pos);
     const r = moveBox(box, dx, dy, solidAt, obstacles);

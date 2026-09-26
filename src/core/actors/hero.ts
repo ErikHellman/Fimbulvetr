@@ -1,6 +1,6 @@
 import { isHeld, moveVector, wasPressed, type InputFrame } from '../input/actions';
 import { at, type Box } from '../math/box';
-import { DIR_VEC, dirFromVec } from '../math/dir';
+import { DIR_VEC, dirFromVec, type Dir4 } from '../math/dir';
 import { normalize, scale } from '../math/vec';
 import type { SimEvent } from '../sim/events';
 import type { HeroState } from '../state/gameState';
@@ -8,12 +8,14 @@ import { createEntity, mem, setAnim, type Entity } from './entity';
 import type { Machine, StateDef } from './fsm';
 import type { Tuning } from './tuning';
 
-export type HeroMode = 'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt';
+export type HeroMode = 'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop';
 
 export interface HeroCtx {
   readonly input: InputFrame;
   readonly tuning: Tuning;
   readonly hasShield: boolean;
+  /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
+  ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
 }
 
@@ -44,7 +46,43 @@ const move: HeroDef = {
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
     steer(e, c, c.tuning.hero.walkSpeed, true);
     setAnim(e, moving(e) ? 'walk' : 'idle');
-    return undefined;
+    return pushingLedge(e, c) ? 'hop' : undefined;
+  },
+};
+
+/** Counts ticks of walking straight into a hoppable ledge. */
+function pushingLedge(e: Entity, c: HeroCtx): boolean {
+  const m = moveVector(c.input);
+  const straight = (m.x === 0) !== (m.y === 0);
+  const ahead = straight && dirFromVec(m, e.facing) === e.facing ? c.ledgeHop(e.facing) : null;
+  const pushed = ahead === null ? 0 : mem(e, 'ledgePush') + 1;
+  if (pushed !== mem(e, 'ledgePush')) e.mem['ledgePush'] = pushed;
+  return pushed >= c.tuning.hero.ledgePushTicks;
+}
+
+/** Hops a ledge along a fixed arc; collision is skipped because the landing was checked up front. */
+const hop: HeroDef = {
+  enter(e, c) {
+    const off = c.ledgeHop(e.facing) ?? { dx: 0, dy: 0 };
+    e.mem['ledgePush'] = 0;
+    e.mem['hopX'] = e.pos.x;
+    e.mem['hopY'] = e.pos.y;
+    e.mem['hopDx'] = off.dx;
+    e.mem['hopDy'] = off.dy;
+    e.knock = { x: 0, y: 0 };
+    still(e);
+    setAnim(e, 'walk');
+  },
+  tick(e, c) {
+    const h = c.tuning.hero;
+    const p = Math.min(1, (e.fsm.t + 1) / h.hopTicks);
+    still(e);
+    e.pos = { x: mem(e, 'hopX') + mem(e, 'hopDx') * p, y: mem(e, 'hopY') + mem(e, 'hopDy') * p };
+    e.mem['z'] = 4 * h.hopHeight * p * (1 - p);
+    return p >= 1 ? 'move' : undefined;
+  },
+  exit(e) {
+    e.mem['z'] = 0;
   },
 };
 
@@ -162,7 +200,16 @@ const hurt: HeroDef = {
   },
 };
 
-export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = { move, attack, charge, spin, roll, shield, hurt };
+export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
+  move,
+  attack,
+  charge,
+  spin,
+  roll,
+  shield,
+  hurt,
+  hop,
+};
 
 /** Per-tick bookkeeping that is independent of the current state. */
 export function heroPreTick(e: Entity): void {

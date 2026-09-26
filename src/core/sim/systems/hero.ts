@@ -1,14 +1,18 @@
 import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE, type HeroCtx } from '../../actors/hero';
 import { EMPTY_FRAME, type InputFrame } from '../../input/actions';
+import { at } from '../../math/box';
 import type { Vec } from '../../math/vec';
+import { ledgeHop } from '../../world/collision';
 import type { SimRt } from '../rt';
+import { heroSolidAt } from './movement';
 
 export function heroCtx(rt: SimRt, input: InputFrame): HeroCtx {
   return {
     input,
     tuning: rt.db.tuning,
     hasShield: rt.state.inv.shield,
+    ledgeHop: (dir) => ledgeHop(rt.screen.collision, at(rt.hero.body, rt.hero.pos), dir, heroSolidAt(rt)),
     emit: (ev) => {
       rt.emit(ev);
     },

@@ -1,10 +1,13 @@
 import type { TerrainId } from '@content/terrain';
 import { overlaps, type Box } from '../math/box';
+import type { Dir4 } from '../math/dir';
 import { TILE } from './dims';
 import type { TerrainDef } from './terrain';
 import type { TerrainGrid } from './textmap';
 
 export const SOLID = 1;
+/** One-way ledge bits, by the direction the hero may hop. A ledge tile is also SOLID. */
+export const LEDGE: Readonly<Record<Dir4, number>> = { n: 2, e: 4, s: 8, w: 16 };
 /** How far (px) a blocked mover is nudged sideways around a corner it only clips. */
 export const CORNER_SLIDE = 6;
 const EPS = 1e-6;
@@ -13,6 +16,8 @@ export interface CollisionGrid {
   readonly cols: number;
   readonly rows: number;
   readonly flags: Uint8Array;
+  /** Speed factor per tile (1 = normal). */
+  readonly speed: Float32Array;
 }
 
 export type SolidAt = (tx: number, ty: number) => boolean;
@@ -22,10 +27,80 @@ export function buildCollision(
   defs: Readonly<Record<TerrainId, TerrainDef>>,
 ): CollisionGrid {
   const flags = new Uint8Array(grid.cols * grid.rows);
+  const speed = new Float32Array(grid.cols * grid.rows).fill(1);
   grid.cells.forEach((terrain, i) => {
-    flags[i] = defs[terrain].solid ? SOLID : 0;
+    const def = defs[terrain];
+    flags[i] = (def.solid || def.ledge !== undefined ? SOLID : 0) | (def.ledge ? LEDGE[def.ledge] : 0);
+    speed[i] = def.slow ?? 1;
   });
-  return { cols: grid.cols, rows: grid.rows, flags };
+  return { cols: grid.cols, rows: grid.rows, flags, speed };
+}
+
+const flagAt = (g: CollisionGrid, tx: number, ty: number): number =>
+  tx < 0 || ty < 0 || tx >= g.cols || ty >= g.rows ? 0 : (g.flags[ty * g.cols + tx] ?? 0);
+
+/** Speed factor at a pixel position (1 outside the grid). */
+export function speedAt(g: CollisionGrid, x: number, y: number): number {
+  const tx = Math.floor(x / TILE);
+  const ty = Math.floor(y / TILE);
+  if (tx < 0 || ty < 0 || tx >= g.cols || ty >= g.rows) return 1;
+  return g.speed[ty * g.cols + tx] ?? 1;
+}
+
+/**
+ * When box `b` is flush against a row (or column) of ledges that face `dir`, the offset that carries it
+ * clear past them, provided the landing spot is free; otherwise null.
+ */
+export function ledgeHop(
+  g: CollisionGrid,
+  b: Box,
+  dir: Dir4,
+  solidAt: SolidAt,
+  obstacles: readonly Box[] = [],
+): { dx: number; dy: number } | null {
+  const x0 = Math.floor(b.x / TILE);
+  const x1 = Math.floor((b.x + b.w - EPS) / TILE);
+  const y0 = Math.floor(b.y / TILE);
+  const y1 = Math.floor((b.y + b.h - EPS) / TILE);
+  let front: [number, number][];
+  let offset: { dx: number; dy: number };
+  switch (dir) {
+    case 's': {
+      const ty = Math.floor((b.y + b.h) / TILE);
+      if (b.y + b.h !== ty * TILE) return null;
+      front = range(x0, x1).map((tx) => [tx, ty]);
+      offset = { dx: 0, dy: (ty + 1) * TILE - b.y };
+      break;
+    }
+    case 'n': {
+      if (b.y !== y0 * TILE) return null;
+      front = range(x0, x1).map((tx) => [tx, y0 - 1]);
+      offset = { dx: 0, dy: (y0 - 1) * TILE - (b.y + b.h) };
+      break;
+    }
+    case 'e': {
+      const tx = Math.floor((b.x + b.w) / TILE);
+      if (b.x + b.w !== tx * TILE) return null;
+      front = range(y0, y1).map((ty) => [tx, ty]);
+      offset = { dx: (tx + 1) * TILE - b.x, dy: 0 };
+      break;
+    }
+    case 'w': {
+      if (b.x !== x0 * TILE) return null;
+      front = range(y0, y1).map((ty) => [x0 - 1, ty]);
+      offset = { dx: (x0 - 1) * TILE - (b.x + b.w), dy: 0 };
+      break;
+    }
+  }
+  if (!front.every(([tx, ty]) => (flagAt(g, tx, ty) & LEDGE[dir]) !== 0)) return null;
+  const landing = { x: b.x + offset.dx, y: b.y + offset.dy, w: b.w, h: b.h };
+  return boxHitsSolid(landing, solidAt, obstacles) ? null : offset;
+}
+
+function range(a: number, b: number): number[] {
+  const out: number[] = [];
+  for (let i = a; i <= b; i++) out.push(i);
+  return out;
 }
 
 /** Solidity lookup for a grid; tiles outside it are answered by `outside`. */

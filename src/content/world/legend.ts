@@ -7,4 +7,5 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '~': 'water',
   '#': 'rock',
   T: 'tree',
+  _: 'ledge',
 };

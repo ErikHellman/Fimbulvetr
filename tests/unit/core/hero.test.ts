@@ -30,7 +30,13 @@ function setup(hasShield = true): {
   const run = (frames: InputFrame[]): void => {
     for (const input of frames) {
       heroPreTick(e);
-      runFsm(HERO_MACHINE, e, { input, tuning: TUNING, hasShield, emit: (ev) => events.push(ev) });
+      runFsm(HERO_MACHINE, e, {
+        input,
+        tuning: TUNING,
+        hasShield,
+        ledgeHop: () => null,
+        emit: (ev) => events.push(ev),
+      });
     }
   };
   const idle = (n: number): void => {

@@ -3,7 +3,8 @@ import type { ScreenDef } from '@core/world/screen';
 export const testC: ScreenDef = {
   id: 'test_c',
   region: 'askdalr',
-  purpose: 'M0 dead end: a lake to walk around, testing north-south transitions and water collision.',
+  purpose:
+    'M0 dead end: a lake to walk around, testing north-south transitions, water collision and a one-way ledge.',
   things: [],
   map: [
     '#################..,...#################',
@@ -14,7 +15,7 @@ export const testC: ScreenDef = {
     '#..................,................T..#',
     '#...........T......,........T..........#',
     '#..................,...................#',
-    '#..................,...................#',
+    '#..................,.....___________...#',
     '#......................................#',
     '#........##...................##.......#',
     '#.........#......~~~~~~~...............#',

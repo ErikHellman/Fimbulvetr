@@ -19,6 +19,11 @@ export interface HeroTuning {
   readonly spinTicks: number;
   readonly hurtTicks: number;
   readonly hurtIframes: number;
+  /** Ticks of walking into a ledge before hopping it. */
+  readonly ledgePushTicks: number;
+  readonly hopTicks: number;
+  /** Peak height (px) of the hop arc, drawn only. */
+  readonly hopHeight: number;
   readonly body: Box;
   readonly hurt: Box;
 }

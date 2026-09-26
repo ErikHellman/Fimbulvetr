@@ -57,6 +57,15 @@ function tree(p: Painter, variant: number): void {
   p.px(hx, 5, C.leafLight);
 }
 
+/** Grass on top, a short earth bank below: reads as "you can drop down here". */
+function ledge(p: Painter): void {
+  grass(p);
+  p.rect(0, 10, 16, 1, C.ink);
+  p.rect(0, 11, 16, 5, C.dirtShade);
+  p.speckle(C.grassShade, 0.02);
+  for (let x = 1; x < 16; x += 4) p.px(x, 13, C.dirt);
+}
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   grass: {
     autotile: false,
@@ -94,6 +103,13 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 2,
     paint: (p, v) => {
       tree(p, v.variant);
+    },
+  },
+  ledge: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      ledge(p);
     },
   },
 };

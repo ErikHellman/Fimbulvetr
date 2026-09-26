@@ -28,7 +28,7 @@ export class EntityViews {
       }
       sprite.setOrigin(ref.ox, ref.oy);
       const p = place(e);
-      sprite.setPosition(Math.round(p.x), Math.round(p.y));
+      sprite.setPosition(Math.round(p.x), Math.round(p.y - (e.mem['z'] ?? 0)));
       sprite.setDepth(p.y);
       if (e.flash > 0 && Math.floor(e.flash / 2) % 2 === 0)
         sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
