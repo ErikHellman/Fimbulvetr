@@ -1,6 +1,9 @@
 import type { ContentDb } from '@core/sim/db';
 import { CLOCK_RULES } from './clock';
 import { ENEMY_DEFS } from './enemies';
+import { FLAGS } from './flags';
+import { ITEM_DEFS } from './items';
+import { QUEST_DEFS } from './quests';
 import { TERRAIN } from './terrain';
 import { TUNING } from './tuning';
 import { WORLD_LAYOUT } from './world/layout';
@@ -15,4 +18,7 @@ export const DB: ContentDb = {
   enemies: ENEMY_DEFS,
   tuning: TUNING,
   clock: CLOCK_RULES,
+  flags: FLAGS,
+  items: ITEM_DEFS,
+  quests: QUEST_DEFS,
 };

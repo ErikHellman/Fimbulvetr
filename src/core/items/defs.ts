@@ -4,3 +4,11 @@ export interface GaldrDef {
   readonly name: L10n;
   readonly cost: number;
 }
+
+export interface ItemDef {
+  readonly name: L10n;
+  /** Usable from an item slot (sub-items). */
+  readonly slot: boolean;
+  /** How many can be carried. */
+  readonly max: number;
+}

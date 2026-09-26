@@ -60,6 +60,19 @@ export function tickClock(
   return advanceMinute(c, rules);
 }
 
+/** Sleeps to minute `until` of the next day, turning the season if the calendar says so. */
+export function sleepUntil(c: ClockState, rules: ClockRules, until: number): ClockEvent[] {
+  const events: ClockEvent[] = [];
+  c.day += 1;
+  events.push({ t: 'newDay', day: c.day });
+  if (c.policy === 'cycling') {
+    c.seasonDay += 1;
+    if (c.seasonDay >= rules.seasonDays) events.push(...setSeason(c, nextSeason(c.season)));
+  }
+  setMinute(c, until);
+  return events;
+}
+
 export function isNight(c: ClockState, rules: ClockRules): boolean {
   const since = mod(c.minute - rules.sunrise[c.season], MINUTES_PER_DAY);
   return since >= rules.daylight[c.season];

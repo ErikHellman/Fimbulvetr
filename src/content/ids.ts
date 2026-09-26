@@ -55,3 +55,36 @@ export type EnemyId = (typeof ENEMIES)[number];
 
 export const SFX = ['sfx_swing', 'sfx_spin', 'sfx_hit', 'sfx_block', 'sfx_roll', 'sfx_charge'] as const;
 export type SfxId = (typeof SFX)[number];
+
+/** Named people. Dialogue for each lives in content/dialogue/<npc>.ts. */
+export const NPCS = [
+  'halvar',
+  'embla',
+  'gyda',
+  'sigrun',
+  'grimr',
+  'asa',
+  'bjarni',
+  'ulf',
+  'tofa',
+  'oddr',
+  'hallbera',
+  'thorkell',
+  'rannveig',
+] as const;
+export type NpcId = (typeof NPCS)[number];
+
+/** Quest log entries; their progress is derived from flags, never saved. */
+export const QUESTS = ['q_chores'] as const;
+export type QuestId = (typeof QUESTS)[number];
+
+export const SHOPS = ['sigrun', 'dev_shop'] as const;
+export type ShopId = (typeof SHOPS)[number];
+
+/** Dialogue graphs: one per NPC plus signs and dev samples. */
+export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat'] as const;
+export type DialogueId = (typeof DIALOGUES)[number];
+
+/** Cutscenes and interaction scripts. */
+export const SCRIPTS = ['dev_script'] as const;
+export type ScriptId = (typeof SCRIPTS)[number];
