@@ -2,7 +2,7 @@ import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
 import { runFsm } from '../actors/fsm';
 import { BEHAVIOURS } from '../actors/enemies';
-import type { EnemyCtx } from '../actors/enemies/defs';
+import type { ActorCtx } from '../actors/enemies/defs';
 import { HERO_MACHINE, createHero, heroPreTick } from '../actors/hero';
 import { setMinute, setSeason } from '../clock/clock';
 import type { InputFrame } from '../input/actions';
@@ -11,7 +11,7 @@ import { fnv1a } from '../math/hash';
 import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
 import { canonicalJson, cloneState } from '../state/save';
-import { buildCollision } from '../world/collision';
+import { buildCollision, gridSolidAt } from '../world/collision';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
@@ -19,7 +19,7 @@ import type { ContentDb } from './db';
 import type { SimEvent } from './events';
 import type { LoadedScreen, Mode, SimRt, Transition } from './rt';
 import { tickWorldClock } from './systems/clock';
-import { resolveSword } from './systems/combat';
+import { resolveContact, resolveSword } from './systems/combat';
 import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { spawnActors } from './systems/spawn';
@@ -145,15 +145,19 @@ export class Sim implements SimRt {
     tickWorldClock(this, this.ticksPerMinute);
     heroPreTick(this.hero);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
-    const enemyCtx: EnemyCtx = {
+    const ctx: ActorCtx = {
       tuning: this.db.tuning,
+      rng: this.state.rng,
+      hero: this.hero.pos,
+      solidAt: gridSolidAt(this.screen.collision, () => true),
       emit: (ev) => {
         this.emit(ev);
       },
     };
-    for (const e of this.actors) runFsm(BEHAVIOURS[enemyDef(this, e).behaviour], e, enemyCtx);
+    for (const e of this.actors) runFsm(BEHAVIOURS[enemyDef(this, e).behaviour], e, ctx);
     moveAll(this);
     resolveSword(this);
+    resolveContact(this);
     tickTimers(this);
     checkEdges(this);
   }

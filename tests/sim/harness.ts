@@ -54,6 +54,11 @@ export class Harness {
     this.sim = new Sim(o.db ?? DB, state);
   }
 
+  /** Shorthand for `frameOf`, for `until` loops. */
+  frame(held: readonly Action[]): InputFrame {
+    return frameOf(held);
+  }
+
   step(frame: InputFrame): this {
     this.sim.step(frame);
     this.events.push(...this.sim.drainEvents());

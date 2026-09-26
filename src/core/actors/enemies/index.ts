@@ -1,13 +1,13 @@
 import type { Vec } from '../../math/vec';
 import { createEntity, type Entity } from '../entity';
 import type { Machine } from '../fsm';
-import type { EnemyCtx, EnemyDef } from './defs';
+import type { ActorCtx, EnemyDef } from './defs';
 import { DUMMY_MACHINE } from './dummy';
 
 /** Behaviour code by id. Content refers to these ids; an unknown id is a compile error. */
 export const BEHAVIOURS = {
   dummy: DUMMY_MACHINE,
-} satisfies Record<string, Machine<string, EnemyCtx>>;
+} satisfies Record<string, Machine<string, ActorCtx>>;
 
 export type BehaviourId = keyof typeof BEHAVIOURS;
 
