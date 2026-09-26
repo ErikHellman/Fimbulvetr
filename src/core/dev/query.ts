@@ -1,4 +1,5 @@
 import type { ScreenId } from '@content/world/screens';
+import { setMinute, setSeason } from '../clock/clock';
 import { isSeason, type Season } from '../clock/types';
 import { LANGS, type Lang } from '../i18n/t';
 import type { GameState } from '../state/gameState';
@@ -117,13 +118,6 @@ export function applyDevQuery(state: GameState, q: DevQuery): void {
     state.hero.x = p.x;
     state.hero.y = p.y;
   }
-  if (q.season !== undefined && q.season !== state.clock.season) {
-    state.clock.season = q.season;
-    state.clock.seasonDay = 0;
-    state.clock.epoch += 1;
-  }
-  if (q.minute !== undefined) {
-    state.clock.minute = q.minute;
-    state.clock.sub = 0;
-  }
+  if (q.season !== undefined) setSeason(state.clock, q.season);
+  if (q.minute !== undefined) setMinute(state.clock, q.minute);
 }

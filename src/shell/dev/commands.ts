@@ -4,6 +4,7 @@ import { isScreenId } from '@content/world/screens';
 import { isSeason } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
 import { LANGS, t } from '@core/i18n/t';
+import { cloneState } from '@core/state/save';
 import { tileFeet } from '@core/world/screen';
 import { importMessageKey, pickSaveFile } from '@shell/platform/exportImport';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
@@ -19,11 +20,14 @@ export function runCommand(b: DevBridge, line: string, print: (text: string) => 
     case 'help':
       return HELP;
     case 'warp': {
-      const [screen = '', x = '20', y = '11'] = args;
+      const [screen = '', xRaw = '20', yRaw = '11'] = args;
       if (!isScreenId(screen)) return `unknown screen '${screen}'`;
-      const p = tileFeet({ x: Number(x), y: Number(y) });
+      const x = Number(xRaw);
+      const y = Number(yRaw);
+      if (!Number.isInteger(x) || !Number.isInteger(y)) return 'usage: warp <screen> [x y]';
+      const p = tileFeet({ x, y });
       b.sim.command({ t: 'warp', screen, x: p.x, y: p.y });
-      return `warped to ${screen} ${x},${y}`;
+      return `warped to ${screen} ${xRaw},${yRaw}`;
     }
     case 'time': {
       const text = args[0] ?? '';
@@ -80,7 +84,7 @@ export function runCommand(b: DevBridge, line: string, print: (text: string) => 
         const detail = result.ok ? '' : result.error.detail;
         print(t(UI[importMessageKey(result)], b.settings.lang, { detail }));
         if (result.ok) {
-          b.saves.autosaver.request(result.state);
+          b.saves.autosaver.request(cloneState(result.state));
           b.restart(result.state);
         }
       });

@@ -3,6 +3,7 @@ import { isScreenId } from '@content/world/screens';
 import { mem } from '@core/actors/entity';
 import { isSeason, type ClockState } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
+import { cloneState } from '@core/state/save';
 import { tileFeet } from '@core/world/screen';
 import { importMessageKey } from '@shell/platform/exportImport';
 import type { DevBridge } from './bridge';
@@ -79,6 +80,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     eventCounts: counts,
     warp: (screen, tx, ty) => {
       if (!isScreenId(screen)) throw new Error(`unknown screen '${screen}'`);
+      if (!Number.isInteger(tx) || !Number.isInteger(ty)) throw new Error('bad tile');
       const p = tileFeet({ x: tx, y: ty });
       bridge().sim.command({ t: 'warp', screen, x: p.x, y: p.y });
     },
@@ -103,7 +105,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       const b = bridge();
       const result = b.saves.importText(json);
       if (result.ok) {
-        b.saves.autosaver.request(result.state);
+        b.saves.autosaver.request(cloneState(result.state));
         b.restart(result.state);
       }
       return importMessageKey(result);

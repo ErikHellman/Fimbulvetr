@@ -30,5 +30,7 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
   - Exit test and ARCHITECTURE.md done; waiting for the user's playtest.
 
 ## Later milestones
-- [ ] M1 Vertical slice · [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
+- [ ] M1 Vertical slice
+  - Carried over from M0: one-way ledges in collision; `?dev=gallery` texture gallery for art review.
+- [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
