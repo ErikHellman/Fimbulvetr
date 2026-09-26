@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1b1522" />
+    <title>Fimbulvetr</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+      }
+      #game {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #game canvas {
+        image-rendering: pixelated;
+      }
+      #msg {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 32rem;
+        padding: 1.25rem 1.5rem;
+        background: #1b1522;
+        color: #f2ead8;
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+        border: 2px solid #d9b34a;
+        border-radius: 6px;
+        text-align: center;
+        z-index: 10;
+      }
+      #msg[hidden] {
+        display: none;
+      }
+      #msg button {
+        margin: 0.75rem 0.25rem 0;
+        padding: 0.4rem 1rem;
+        font: inherit;
+        background: #d9b34a;
+        color: #1b1522;
+        border: 0;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div id="msg" role="status" hidden></div>
+    <script type="module" src="/src/shell/main.ts"></script>
+  </body>
+</html>
