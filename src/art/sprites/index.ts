@@ -5,6 +5,7 @@ import { HERO_ANIMS, heroFrames } from './hero';
 import { missingFrame } from './missing';
 import { PEOPLE_ANIMS, peopleFrames } from './people';
 import type { SpriteFrame } from './types';
+import { UI_ANIMS, uiFrames } from './ui';
 
 export type { SpriteFrame } from './types';
 
@@ -13,8 +14,16 @@ export const ANIMS: AnimTable = {
   prop_dummy: DUMMY_ANIMS,
   ...PEOPLE_ANIMS,
   ...FARM_ANIMS,
+  ...UI_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
-  return [...heroFrames(), ...dummyFrames(), ...peopleFrames(), ...farmFrames(), missingFrame()];
+  return [
+    ...heroFrames(),
+    ...dummyFrames(),
+    ...peopleFrames(),
+    ...farmFrames(),
+    ...uiFrames(),
+    missingFrame(),
+  ];
 }

@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import { SFX_BANK } from '@art/sfx/bank';
 import { synth } from '@art/sfx/synth';
-import { SFX } from '@content/ids';
+import { SFX, type SfxId } from '@content/ids';
 import { fnv1a } from '@core/math/hash';
 import type { SimEvent } from '@core/sim/events';
 
@@ -28,10 +28,11 @@ export class AudioDirector {
   ) {}
 
   handle(events: readonly SimEvent[]): void {
-    if (this.muted) return;
-    for (const ev of events) {
-      if (ev.t === 'sfx' && this.scene.cache.audio.exists(ev.id))
-        this.scene.sound.play(ev.id, { volume: this.volume() });
-    }
+    for (const ev of events) if (ev.t === 'sfx') this.play(ev.id);
+  }
+
+  play(id: SfxId): void {
+    if (this.muted || !this.scene.cache.audio.exists(id)) return;
+    this.scene.sound.play(id, { volume: this.volume() });
   }
 }

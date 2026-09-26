@@ -14,6 +14,13 @@ export const UI = {
     sv: 'Det går inte att spara i det här webbläsarfönstret (privat läge eller blockerad lagring). Framstegen sparas inte.',
   },
   ok: { en: 'OK', sv: 'OK' },
+  speaker_ask: { en: 'Ask', sv: 'Ask' },
+  shop_leave: { en: 'Leave', sv: 'Gå' },
+  shop_ok: { en: 'Thank you kindly.', sv: 'Tack så mycket.' },
+  shop_poor: { en: 'You have too little silver.', sv: 'Du har för lite silver.' },
+  shop_owned: { en: 'You already have one.', sv: 'Du har redan en.' },
+  shop_full: { en: 'You cannot carry more.', sv: 'Du kan inte bära fler.' },
+  shop_unknown: { en: 'That is not for sale.', sv: 'Den är inte till salu.' },
   update_ready: {
     en: 'A new version of the game is ready. Reload now?',
     sv: 'En ny version av spelet finns. Ladda om nu?',

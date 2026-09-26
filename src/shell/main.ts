@@ -18,6 +18,7 @@ import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { BootScene } from '@shell/scenes/BootScene';
 import { PlayScene } from '@shell/scenes/PlayScene';
+import { UiScene } from '@shell/scenes/UiScene';
 import type { Services } from '@shell/services';
 
 /**
@@ -49,7 +50,7 @@ function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
     banner: false,
     scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.NO_CENTER },
     input: { keyboard: false, gamepad: false },
-    scene: [new BootScene(services), new PlayScene(), ...extra],
+    scene: [new BootScene(services), new PlayScene(), new UiScene(), ...extra],
   });
   game.canvas.setAttribute('aria-label', GAME_TITLE);
   attachZoom(game, () => services.settings.scaling);

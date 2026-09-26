@@ -40,6 +40,19 @@ export interface FimbulHook {
   importSaveJson(json: string): UiKey;
   flushSave(): Promise<void>;
   downloadSave(): void;
+  /** What the running script shows ('text', 'card', 'shop'), with its text in English, or null. */
+  story(): {
+    k: string;
+    who: string | null;
+    text: string;
+    shown: number;
+    choices: string[];
+    cursor: number;
+  } | null;
+  flags(): Readonly<Record<string, boolean | number>>;
+  silver(): number;
+  items(): Readonly<Record<string, number>>;
+  actors(): { kind: string; def: string; x: number; y: number; fsm: string }[];
 }
 
 declare global {
@@ -119,5 +132,31 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       const b = bridge();
       b.saves.download(b.sim.snapshot());
     },
+    story: () => {
+      const ui = bridge().sim.storyUi();
+      if (ui === null) return null;
+      if (ui.k === 'shop')
+        return {
+          k: 'shop',
+          who: null,
+          text: ui.name.en,
+          shown: 1,
+          choices: ui.rows.map((r) => r.item),
+          cursor: ui.cursor,
+        };
+      return {
+        k: ui.k,
+        who: ui.who,
+        text: ui.text.en,
+        shown: ui.shown,
+        choices: ui.choices.map((c) => c.en),
+        cursor: ui.cursor,
+      };
+    },
+    flags: () => ({ ...bridge().sim.state.flags }),
+    silver: () => bridge().sim.state.hero.silver,
+    items: () => ({ ...bridge().sim.state.inv.items }),
+    actors: () =>
+      bridge().sim.actors.map((a) => ({ kind: a.kind, def: a.def, x: a.pos.x, y: a.pos.y, fsm: a.fsm.s })),
   };
 }

@@ -22,6 +22,7 @@ import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { LETTERBOX } from '@shell/scale';
 import type { PlayData } from '@shell/services';
+import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { EntityViews } from '@shell/view/entityViews';
 import { ScreenView } from '@shell/view/screenView';
 
@@ -89,6 +90,16 @@ export class PlayScene extends Phaser.Scene {
       .setAlpha(0);
     this.showScreen(this.sim.screen.id);
     this.draw(0);
+    const link: UiLink = {
+      sim: this.sim,
+      frames: data.assets.frames,
+      lang: () => data.settings.lang,
+      sfx: (id) => {
+        this.audio.play(id);
+      },
+    };
+    this.registry.set(UI_LINK, link);
+    if (!this.scene.isActive('ui')) this.scene.launch('ui');
     data.dev?.attach(this.bridge());
     document.body.dataset.ready = 'true';
   }
