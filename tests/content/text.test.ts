@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { unknownChars } from '@art/font';
 import type { L10n } from '@core/i18n/t';
 import { GALDR_DEFS } from '@content/galdr';
 import { ARMOR_NAMES, RING_NAMES, WEAPON_NAMES } from '@content/gear';
@@ -20,6 +21,13 @@ describe('player-facing text', () => {
       for (const [id, text] of Object.entries(entries)) {
         expect(text.en.trim(), `${table}.${id}.en`).not.toBe('');
         expect(text.sv.trim(), `${table}.${id}.sv`).not.toBe('');
+      }
+    });
+
+    it(`${table} uses only characters the game font can draw`, () => {
+      for (const [id, text] of Object.entries(entries)) {
+        expect(unknownChars(text.en), `${table}.${id}.en`).toEqual([]);
+        expect(unknownChars(text.sv), `${table}.${id}.sv`).toEqual([]);
       }
     });
   }
