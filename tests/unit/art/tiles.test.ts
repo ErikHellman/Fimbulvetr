@@ -29,7 +29,7 @@ describe('tileset', () => {
       else expect(e.count).toBeGreaterThan(0);
     }
     const total = TERRAIN_IDS.reduce((n, id) => n + ts.entries[id].count, 0);
-    expect(ts.tiles).toHaveLength(total);
+    expect(ts.tiles).toHaveLength(total + 2 * Object.keys(ts.cover).length);
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 
@@ -56,5 +56,21 @@ describe('tileset', () => {
     const { start, count } = ts.entries.grass;
     expect(grass.every((i) => i >= start && i < start + count)).toBe(true);
     expect(new Set(grass).size).toBeGreaterThan(1);
+  });
+});
+
+describe('cover tiles', () => {
+  it('has a standing and a cut tile for every cover, drawn as overlays', async () => {
+    const { COVERS } = await import('@content/ids');
+    const { countOpaque } = await import('@art/raster');
+    const ts = buildTileset();
+    for (const id of COVERS) {
+      const standing = ts.tiles[ts.cover[id].standing];
+      const cut = ts.tiles[ts.cover[id].cut];
+      if (standing === undefined || cut === undefined) throw new Error(`no tiles for ${id}`);
+      expect(countOpaque(standing)).toBeGreaterThan(30);
+      expect(countOpaque(standing)).toBeLessThan(256);
+      expect(countOpaque(cut)).toBeLessThan(countOpaque(standing));
+    }
   });
 });
