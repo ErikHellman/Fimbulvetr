@@ -26,6 +26,17 @@ describe('SaveService', () => {
     warn.mockRestore();
   });
 
+  it('treats a rejected read as an empty slot instead of crashing startup', async () => {
+    const failing = {
+      get: () => Promise.reject(new Error('IDB read failed')),
+    } as unknown as SaveStore;
+    const service = new SaveService(failing, 'test', known);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    expect(await service.loadAuto()).toBeNull();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   it('works without storage', async () => {
     const service = new SaveService(null, 'test', known);
     expect(service.available).toBe(false);

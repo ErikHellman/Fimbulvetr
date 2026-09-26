@@ -61,6 +61,7 @@ async function main(): Promise<void> {
   const settings = loadSettings(browserStorage(), preferredLang(navigator.languages));
   if (query?.lang !== undefined) settings.lang = query.lang;
   const lang = settings.lang;
+  document.documentElement.lang = lang;
 
   if (!hasWebGL()) {
     showMessage(t(UI.webgl_required, lang));

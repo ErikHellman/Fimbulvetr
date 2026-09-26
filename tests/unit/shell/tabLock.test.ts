@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { acquireTabLock, type LockManagerLike } from '@shell/platform/tabLock';
 
 function fakeLocks(): LockManagerLike {
@@ -21,5 +21,15 @@ describe('acquireTabLock', () => {
 
   it('allows play where the Web Locks API is missing', async () => {
     expect(await acquireTabLock(undefined)).toBe(true);
+  });
+
+  it('allows play instead of hanging forever when the request rejects', async () => {
+    const locks: LockManagerLike = {
+      request: () => Promise.reject(new Error('SecurityError: storage is blocked for this origin')),
+    };
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    expect(await acquireTabLock(locks)).toBe(true);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

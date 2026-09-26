@@ -38,7 +38,13 @@ export class SaveService {
   async loadAuto(): Promise<GameState | null> {
     if (this.store === null) return null;
     for (const slot of ['auto', 'auto_prev'] as const) {
-      const record = await this.store.get(slot);
+      let record;
+      try {
+        record = await this.store.get(slot);
+      } catch (e) {
+        console.warn(`[save] reading ${slot} failed:`, e);
+        continue;
+      }
       if (record === undefined) continue;
       const result = loadSave(record.save, this.knownScreens);
       if (result.ok) return result.state;

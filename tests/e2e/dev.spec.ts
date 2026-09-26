@@ -14,6 +14,11 @@ test('the dev query string places the hero and sets season and time', async ({ p
   expect(errors).toEqual([]);
 });
 
+test('sets <html lang> to match the resolved language', async ({ page }) => {
+  await boot(page, 'nosave&screen=test_a&at=13,11&lang=sv');
+  expect(await page.evaluate(() => document.documentElement.lang)).toBe('sv');
+});
+
 test('F1 toggles the debug overlay', async ({ page }) => {
   await boot(page, 'nosave&screen=test_a&at=13,11');
   await page.keyboard.press('F1');
