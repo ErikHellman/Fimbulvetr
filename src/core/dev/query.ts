@@ -156,6 +156,7 @@ export interface DevPreset {
   readonly minute?: number;
   readonly silver?: number;
   readonly items?: Readonly<Partial<Record<ItemId, number>>>;
+  readonly vars?: Readonly<Record<string, number>>;
 }
 
 /** Applies a preset to a fresh state. A dev query's own screen/at/season/time still win afterwards. */
@@ -175,4 +176,5 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   if (p.minute !== undefined) setMinute(state.clock, p.minute);
   if (p.silver !== undefined) state.hero.silver = p.silver;
   Object.assign(state.inv.items, p.items ?? {});
+  Object.assign(state.world.vars, p.vars ?? {});
 }

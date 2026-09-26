@@ -6,6 +6,7 @@ export const askIntTrader: ScreenDef = {
   purpose: "Sigrún's trading house: the lantern and Embla's flatbread are sold across the counter.",
   indoor: true,
   things: [
+    { k: 'use', at: { x: 19, y: 11 }, script: 'shop_sigrun' },
     { k: 'door', at: { x: 19, y: 18 }, dir: 's', to: 'ask_village', arrive: { x: 8, y: 6 }, facing: 's' },
   ],
   map: [

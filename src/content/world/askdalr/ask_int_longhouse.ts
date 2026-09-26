@@ -1,4 +1,5 @@
 import type { ScreenDef } from '@core/world/screen';
+import { eveningDue } from '../../dialogue/util';
 
 export const askIntLonghouse: ScreenDef = {
   id: 'ask_int_longhouse',
@@ -6,6 +7,15 @@ export const askIntLonghouse: ScreenDef = {
   purpose: "Halvar's longhouse, where Ask sleeps. The prologue starts and ends each day at Ask's bed.",
   indoor: true,
   things: [
+    { k: 'use', at: { x: 10, y: 7 }, script: 'sleep' },
+    {
+      k: 'trigger',
+      at: { x: 16, y: 16 },
+      w: 8,
+      h: 4,
+      script: 'embla_evening',
+      when: { k: 'any', of: [eveningDue(1), eveningDue(2), eveningDue(3)] },
+    },
     { k: 'door', at: { x: 19, y: 20 }, dir: 's', to: 'ask_farmyard', arrive: { x: 9, y: 8 }, facing: 's' },
   ],
   map: [
