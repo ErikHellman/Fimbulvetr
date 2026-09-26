@@ -12,6 +12,14 @@ async function tap(page: Page, key: string): Promise<void> {
   await page.waitForTimeout(80);
 }
 
+/** Walks into whatever is ahead long enough to face it (a quick tap can land in the same tick as E). */
+async function walk(page: Page, key: string): Promise<void> {
+  await page.keyboard.down(key);
+  await page.waitForTimeout(250);
+  await page.keyboard.up(key);
+  await page.waitForTimeout(100);
+}
+
 /** Presses Enter until the running script is over. */
 async function readOn(page: Page): Promise<void> {
   for (let i = 0; i < 40 && (await story(page)) !== null; i++) await tap(page, 'Enter');
@@ -34,7 +42,7 @@ test('a new game wakes in the longhouse, walks out and gets the day’s orders f
     window.__fimbul?.warp('ask_farmyard', 14, 11);
   });
   await page.waitForTimeout(200);
-  await tap(page, 'KeyW');
+  await walk(page, 'KeyW');
   await tap(page, 'KeyE');
   await expect.poll(() => story(page).then((s) => s?.who)).toBe('halvar');
   await readOn(page);
@@ -45,7 +53,7 @@ test('a new game wakes in the longhouse, walks out and gets the day’s orders f
 
 test('the pail is carried to the trough', async ({ page }) => {
   await boot(page, 'nosave&screen=ask_farmyard&at=26,10');
-  await tap(page, 'KeyW');
+  await walk(page, 'KeyW');
   await tap(page, 'KeyE');
   await expect.poll(() => hero(page).then((h) => h?.fsm)).toBe('carry');
   await page.keyboard.down('KeyS');
@@ -59,7 +67,7 @@ test('the pail is carried to the trough', async ({ page }) => {
 
 test('Sigrún sells Embla’s flatbread', async ({ page }) => {
   await boot(page, 'nosave&preset=day3&screen=ask_int_trader&at=19,12');
-  await tap(page, 'KeyW');
+  await walk(page, 'KeyW');
   await tap(page, 'KeyE');
   await expect.poll(() => story(page).then((s) => s?.who)).toBe('sigrun');
   for (let i = 0; i < 20 && (await story(page))?.k !== 'shop'; i++) await tap(page, 'Enter');
