@@ -8,7 +8,8 @@ import { createEntity, mem, setAnim, type Entity } from './entity';
 import type { Machine, StateDef } from './fsm';
 import type { Tuning } from './tuning';
 
-export type HeroMode = 'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop';
+export type HeroMode =
+  'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop' | 'lift' | 'carry' | 'throw';
 
 export interface HeroCtx {
   readonly input: InputFrame;
@@ -200,6 +201,38 @@ const hurt: HeroDef = {
   },
 };
 
+/** Raising a prop overhead; the props system moves the prop, the hero just stands still. */
+const lift: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'lift');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.liftTicks - 1 ? 'carry' : undefined;
+  },
+};
+
+/** Walking with a prop overhead: no sword, roll or shield. The props system throws or sets it down. */
+const carry: HeroDef = {
+  tick(e, c) {
+    steer(e, c, c.tuning.hero.carrySpeed, true);
+    setAnim(e, moving(e) ? 'carrywalk' : 'carry');
+    return undefined;
+  },
+};
+
+const throwing: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'throw');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.throwTicks - 1 ? 'move' : undefined;
+  },
+};
+
 export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   move,
   attack,
@@ -209,6 +242,9 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   shield,
   hurt,
   hop,
+  lift,
+  carry,
+  throw: throwing,
 };
 
 /** Per-tick bookkeeping that is independent of the current state. */

@@ -1,9 +1,10 @@
 import type { FlagId } from '@content/flags';
-import type { DialogueId, EnemyId, ItemId, NpcId, QuestId, ScriptId } from '@content/ids';
+import type { DialogueId, EnemyId, ItemId, NpcId, PropId, QuestId, ScriptId } from '@content/ids';
 import type { TerrainId } from '@content/terrain';
 import type { ScreenId } from '@content/world/screens';
 import type { EnemyDef } from '../actors/enemies/defs';
 import type { NpcDef } from '../actors/npc';
+import type { PropDef } from '../actors/prop';
 import type { Tuning } from '../actors/tuning';
 import type { ClockRules } from '../clock/rules';
 import type { ItemDef } from '../items/defs';
@@ -29,4 +30,5 @@ export interface ContentDb {
   readonly dialogue: Readonly<Partial<Record<DialogueId, DialogueDef>>>;
   readonly scripts: Readonly<Partial<Record<ScriptId, ScriptDef>>>;
   readonly npcs: Readonly<Partial<Record<NpcId, NpcDef>>>;
+  readonly props: Readonly<Record<PropId, PropDef>>;
 }

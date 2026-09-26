@@ -1,6 +1,6 @@
 import type { EnemyId } from '@content/ids';
 import type { EnemyDef } from '../../actors/enemies/defs';
-import type { Entity } from '../../actors/entity';
+import { mem, type Entity } from '../../actors/entity';
 import { at, type Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
 import { length, scale } from '../../math/vec';
@@ -14,6 +14,7 @@ export const enemyDef = (rt: SimRt, e: Entity): EnemyDef => rt.db.enemies[e.def 
 /** Whether an actor blocks the hero like a wall. */
 export function blocksHero(rt: SimRt, e: Entity): boolean {
   if (e.kind === 'npc') return true;
+  if (e.kind === 'prop') return mem(e, 'carried') === 0 && mem(e, 'thrown') === 0;
   return e.kind === 'enemy' && enemyDef(rt, e).solid;
 }
 

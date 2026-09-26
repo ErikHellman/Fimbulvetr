@@ -24,6 +24,7 @@ import { resolveContact, resolveSword } from './systems/combat';
 import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { stepNpcs } from './systems/npcs';
+import { stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
@@ -184,7 +185,9 @@ export class Sim implements SimRt {
       if (e.kind === 'enemy') runFsm(BEHAVIOURS[enemyDef(this, e).behaviour], e, ctx);
     stepNpcs(this);
     moveAll(this);
+    stepProps(this, input);
     resolveSword(this);
+    swordProps(this);
     resolveContact(this);
     tickTimers(this);
     checkEdges(this);

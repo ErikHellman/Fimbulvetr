@@ -53,7 +53,24 @@ export type RingId = (typeof RINGS)[number];
 export const ENEMIES = ['dummy'] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
-export const SFX = ['sfx_swing', 'sfx_spin', 'sfx_hit', 'sfx_block', 'sfx_roll', 'sfx_charge'] as const;
+export const SFX = [
+  'sfx_swing',
+  'sfx_spin',
+  'sfx_hit',
+  'sfx_block',
+  'sfx_roll',
+  'sfx_charge',
+  'sfx_talk',
+  'sfx_lift',
+  'sfx_throw',
+  'sfx_break',
+  'sfx_door',
+  'sfx_buy',
+  'sfx_bleat',
+  'sfx_caw',
+  'sfx_itemget',
+  'sfx_cut',
+] as const;
 export type SfxId = (typeof SFX)[number];
 
 /** Named people. Dialogue for each lives in content/dialogue/<npc>.ts. */
@@ -88,3 +105,7 @@ export type DialogueId = (typeof DIALOGUES)[number];
 /** Cutscenes and interaction scripts. */
 export const SCRIPTS = ['dev_script'] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
+
+/** Things that can be lifted, thrown, broken or split. */
+export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big'] as const;
+export type PropId = (typeof PROPS)[number];

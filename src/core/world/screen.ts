@@ -1,9 +1,10 @@
-import type { EnemyId, RegionId, ScriptId } from '@content/ids';
+import type { EnemyId, PropId, RegionId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { L10n } from '../i18n/t';
 import type { Vec } from '../math/vec';
 import type { Cond } from '../story/cond';
+import type { Effect } from '../story/effects';
 import { SCREEN_H, SCREEN_W, TILE } from './dims';
 
 export interface TilePos {
@@ -37,6 +38,23 @@ export type Thing =
       readonly h: number;
       readonly script: ScriptId;
       readonly when?: Cond;
+    }
+  /** A prop, present while `when` holds; `onBreak` applies when it is broken or split. */
+  | {
+      readonly k: 'prop';
+      readonly id: PropId;
+      readonly at: TilePos;
+      readonly when?: Cond;
+      readonly onBreak?: readonly Effect[];
+    }
+  /** Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up. */
+  | {
+      readonly k: 'drop';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly accepts: PropId;
+      readonly do: readonly Effect[];
     };
 
 export interface ScreenDef {

@@ -7,6 +7,8 @@ export type Element = 'none' | 'fire' | 'ice' | 'wind' | 'force' | 'holy';
 /** Hit tags (bit flags). */
 export const HEAVY = 1;
 export const PIERCE_SHIELD = 2;
+/** A thrown object (ravens only fear these). */
+export const THROWN = 4;
 
 /** One damage path for swords, arrows, galdr, fire spread and traps. */
 export interface HitData {

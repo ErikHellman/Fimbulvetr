@@ -31,6 +31,7 @@ import {
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
 import { placeNpcs } from './npcs';
+import { tryLift } from './props';
 import { enterScreen, markVisited } from './transition';
 
 /** What the UI shows for the running script. */
@@ -279,6 +280,7 @@ export function checkInteract(rt: SimRt, input: InputFrame): boolean {
     startStory(rt, [{ k: 'talk', dialogue: rt.db.npcs[id]?.talk ?? id, with: id }], a);
     return true;
   }
+  if (tryLift(rt)) return true;
   for (const thing of rt.db.screens[rt.screen.id].things) {
     if (thing.k === 'sign' && overlaps(probe, tileBox(thing.at.x, thing.at.y))) {
       startStory(rt, [{ k: 'say', who: null, text: thing.text }]);

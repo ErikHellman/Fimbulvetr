@@ -24,6 +24,11 @@ export interface HeroTuning {
   readonly hopTicks: number;
   /** Peak height (px) of the hop arc, drawn only. */
   readonly hopHeight: number;
+  readonly liftTicks: number;
+  readonly carrySpeed: number;
+  readonly throwTicks: number;
+  /** Height (px) a carried prop is held at. */
+  readonly carryHeight: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -36,8 +41,16 @@ export interface SwordTuning {
   readonly spinBox: Box;
 }
 
+export interface ThrowTuning {
+  /** Horizontal speed, px per tick. */
+  readonly speed: number;
+  /** Ticks in the air before landing. */
+  readonly flightTicks: number;
+}
+
 export interface Tuning {
   readonly hero: HeroTuning;
+  readonly throw: ThrowTuning;
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;
