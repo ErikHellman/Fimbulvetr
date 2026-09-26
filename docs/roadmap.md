@@ -26,11 +26,20 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
 - [x] Browser saves (IndexedDB, autosave, export/import, tab lock)
 - [x] PWA and icons
 - [x] Budget, CI and Pages workflows
-- [ ] M0 exit test, ARCHITECTURE.md, user playtest
-  - Exit test and ARCHITECTURE.md done; waiting for the user's playtest.
+- [x] M0 exit test, ARCHITECTURE.md, user playtest
 
 ## Later milestones
-- [ ] M1 Vertical slice
-  - Carried over from M0: one-way ledges in collision; `?dev=gallery` texture gallery for art review.
+- [ ] M1 Vertical slice — brief: `docs/briefs/m1.md`
+  - [ ] M1a Farm days — plan: `docs/superpowers/plans/2026-09-26-m1a-farm-days.md`
+    - [x] Carry-overs: Sim split into systems, ActorCtx, interiors and fades, ledges, presets and gallery
+    - [x] Story core: Cond/Effect, dialogue, scripts, NPCs, quests
+    - [x] Lift, carry and throw; critters; tall grass; shop
+    - [x] Art: font, NPC and prop sprites, farm tiles, SFX
+    - [x] Shell: world view, UI scene
+    - [x] Content: Askdalr (8 screens, 3 interiors, 13 NPCs, days 1–3)
+    - [x] Exit route test, e2e, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M1b Raid + Myrkviðr road
+  - [ ] M1c Rótarhellir + Rótvættr
 - [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

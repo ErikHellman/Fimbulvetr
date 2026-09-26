@@ -73,6 +73,10 @@ export interface NewGameInit {
   readonly weapon: WeaponId;
   readonly shield: boolean;
   readonly dungeons: readonly DungeonId[];
+  /** Story flags set from the start. */
+  readonly flags?: Flags;
+  /** Clock minute to start at (the default is 08:00). */
+  readonly minute?: number;
 }
 
 export function newGame(seed: number, init: NewGameInit): GameState {
@@ -85,7 +89,7 @@ export function newGame(seed: number, init: NewGameInit): GameState {
   return {
     seed: seed >>> 0,
     rng: createRng(seed),
-    flags: {},
+    flags: { ...init.flags },
     hero: {
       screen: init.screen,
       x: init.x,
@@ -107,7 +111,7 @@ export function newGame(seed: number, init: NewGameInit): GameState {
       ring: null,
       shield: init.shield,
     },
-    clock: newClock(),
+    clock: { ...newClock(), ...(init.minute === undefined ? {} : { minute: init.minute }) },
     world: { opened: [], pieces: [], warps: [], visited: [init.screen], cover: {}, vars: {} },
     dungeons,
     playTicks: 0,

@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { TERRAIN } from '@content/terrain';
+import { TERRAIN, type TerrainId } from '@content/terrain';
 import type { Box } from '@core/math/box';
-import { buildCollision, gridSolidAt, moveBox, type SolidAt } from '@core/world/collision';
+import {
+  buildCollision,
+  gridSolidAt,
+  ledgeHop,
+  moveBox,
+  speedAt,
+  type CollisionGrid,
+  type SolidAt,
+} from '@core/world/collision';
 
 /** '#' is solid; anything outside the strings is solid too. */
 function solidFrom(rows: string[]): SolidAt {
@@ -77,5 +85,48 @@ describe('collision grid', () => {
     const grid = buildCollision({ cols: 2, rows: 1, cells: ['grass', 'rock'] }, TERRAIN);
     const solidAt = gridSolidAt(grid, (tx) => tx >= 2);
     expect([solidAt(0, 0), solidAt(1, 0), solidAt(-1, 0), solidAt(2, 0)]).toEqual([false, true, false, true]);
+  });
+});
+
+describe('ledges and slow ground', () => {
+  const defs = {
+    ...TERRAIN,
+    grass: { solid: false },
+    path: { solid: false, slow: 0.5 },
+    rock: { solid: false, ledge: 's' as const },
+  };
+  /** '.' grass, ',' slow path, '#' a south ledge. */
+  function grid(rows: string[]): CollisionGrid {
+    const cells = rows.flatMap((r) =>
+      Array.from(r, (ch) => (ch === '#' ? 'rock' : ch === ',' ? 'path' : 'grass') as TerrainId),
+    );
+    return buildCollision({ cols: rows[0]?.length ?? 0, rows: rows.length, cells }, defs);
+  }
+  const g = grid(['....', '####', '....', ',,,,']);
+  const walls = gridSolidAt(g, () => true);
+
+  it('is solid from every side', () => {
+    expect(walls(1, 1)).toBe(true);
+  });
+
+  it('hops a box flush above a south ledge clear past it', () => {
+    const b = { x: 18, y: 8, w: 12, h: 8 };
+    expect(ledgeHop(g, b, 's', walls)).toEqual({ dx: 0, dy: 24 });
+  });
+
+  it('does not hop in any other direction or when not flush', () => {
+    expect(ledgeHop(g, { x: 18, y: 32, w: 12, h: 8 }, 'n', walls)).toBeNull();
+    expect(ledgeHop(g, { x: 18, y: 7, w: 12, h: 8 }, 's', walls)).toBeNull();
+  });
+
+  it('does not hop onto a blocked landing', () => {
+    const blocked = { x: 16, y: 32, w: 16, h: 16 };
+    expect(ledgeHop(g, { x: 18, y: 8, w: 12, h: 8 }, 's', walls, [blocked])).toBeNull();
+  });
+
+  it('reports the speed factor under a point', () => {
+    expect(speedAt(g, 5, 5)).toBe(1);
+    expect(speedAt(g, 5, 53)).toBe(0.5);
+    expect(speedAt(g, -5, 5)).toBe(1);
   });
 });

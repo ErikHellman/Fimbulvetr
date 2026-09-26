@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { DEV_PRESETS } from '@content/dev/presets';
 import { NEW_GAME } from '@content/start';
 import { SCREEN_IDS } from '@content/world/screens';
-import { applyDevQuery, parseClockTime, parseDevQuery } from '@core/dev/query';
+import { applyDevQuery, applyPreset, parseClockTime, parseDevQuery } from '@core/dev/query';
 import { newGame } from '@core/state/gameState';
 
 const known = new Set<string>(SCREEN_IDS);
@@ -54,5 +55,42 @@ describe('applyDevQuery', () => {
     expect(s.hero).toMatchObject({ screen: 'test_c', x: 328, y: 94 });
     expect(s.clock).toMatchObject({ season: 'autumn', minute: 0, epoch: 1 });
     expect(s.world.visited).toContain('test_c');
+  });
+});
+
+describe('presets', () => {
+  it('parses a known preset and the gallery view, warns on unknown ones', () => {
+    const q = parseDevQuery('preset=m0&dev=gallery', known, new Set(Object.keys(DEV_PRESETS)));
+    expect(q.preset).toBe('m0');
+    expect(q.gallery).toBe(true);
+    const bad = parseDevQuery('preset=nope&dev=zoo', known, new Set(Object.keys(DEV_PRESETS)));
+    expect(bad.preset).toBeUndefined();
+    expect(bad.gallery).toBe(false);
+    expect(bad.warnings).toHaveLength(2);
+  });
+
+  it('applies the kit, flags and place of a preset', () => {
+    const state = newGame(1, NEW_GAME);
+    applyPreset(state, {
+      screen: 'test_b',
+      tile: [3, 4],
+      weapon: 'pitchfork',
+      shield: false,
+      flags: { st_intro_seen: true },
+      minute: 20 * 60,
+      silver: 7,
+      items: { flatbread: 2 },
+    });
+    expect(state.hero.screen).toBe('test_b');
+    expect(state.inv.weapon).toBe('pitchfork');
+    expect(state.inv.shield).toBe(false);
+    expect(state.flags.st_intro_seen).toBe(true);
+    expect(state.clock.minute).toBe(20 * 60);
+    expect(state.hero.silver).toBe(7);
+    expect(state.inv.items.flatbread).toBe(2);
+  });
+
+  it('every dev preset starts on a known screen', () => {
+    for (const p of Object.values(DEV_PRESETS)) expect(SCREEN_IDS).toContain(p.screen);
   });
 });

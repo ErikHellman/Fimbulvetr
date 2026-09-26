@@ -3,7 +3,7 @@ import { boot, clock, collectErrors, screenId } from './helpers';
 
 test('the dev query string places the hero and sets season and time', async ({ page }) => {
   const errors = collectErrors(page);
-  await boot(page, 'nosave&screen=test_b&at=20,11&season=winter&time=23:00');
+  await boot(page, 'nosave&preset=m0&screen=test_b&at=20,11&season=winter&time=23:00');
   expect(await screenId(page)).toBe('test_b');
   const c = await clock(page);
   expect(c?.season).toBe('winter');
@@ -15,12 +15,12 @@ test('the dev query string places the hero and sets season and time', async ({ p
 });
 
 test('sets <html lang> to match the resolved language', async ({ page }) => {
-  await boot(page, 'nosave&screen=test_a&at=13,11&lang=sv');
+  await boot(page, 'nosave&preset=m0&screen=test_a&at=13,11&lang=sv');
   expect(await page.evaluate(() => document.documentElement.lang)).toBe('sv');
 });
 
 test('F1 toggles the debug overlay', async ({ page }) => {
-  await boot(page, 'nosave&screen=test_a&at=13,11');
+  await boot(page, 'nosave&preset=m0&screen=test_a&at=13,11');
   await page.keyboard.press('F1');
   await expect(page.locator('#dev-overlay')).toBeVisible();
   await expect(page.locator('#dev-overlay')).toContainText('screen test_a');
@@ -29,7 +29,7 @@ test('F1 toggles the debug overlay', async ({ page }) => {
 });
 
 test('the console runs commands', async ({ page }) => {
-  await boot(page, 'nosave&screen=test_a&at=13,11');
+  await boot(page, 'nosave&preset=m0&screen=test_a&at=13,11');
   await page.keyboard.press('Backquote');
   const input = page.locator('#dev-console-input');
   await expect(input).toBeFocused();

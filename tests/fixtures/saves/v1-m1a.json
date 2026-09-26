@@ -1,0 +1,134 @@
+{
+  "format": "fimbulvetr",
+  "v": 1,
+  "build": "fixture",
+  "savedAt": "2026-09-26T18:00:00.000Z",
+  "state": {
+    "seed": 424242,
+    "rng": {
+      "s": 424242
+    },
+    "flags": {
+      "st_farm_day": 2,
+      "st_intro_seen": true,
+      "q_sheep_d1": true,
+      "q_water_d1": true,
+      "q_paid_d1": true,
+      "ev_embla_d1": true,
+      "q_logs": 2
+    },
+    "hero": {
+      "screen": "ask_farmyard",
+      "x": 232,
+      "y": 222,
+      "facing": "n",
+      "hp": 12,
+      "maxHp": 12,
+      "seidr": 10,
+      "maxSeidr": 10,
+      "silver": 10,
+      "purse": 0
+    },
+    "inv": {
+      "items": {},
+      "slots": [null, null],
+      "galdr": [],
+      "weapon": "handaxe",
+      "armor": "wool_tunic",
+      "ring": null,
+      "shield": false
+    },
+    "clock": {
+      "minute": 570,
+      "sub": 0,
+      "day": 2,
+      "season": "summer",
+      "seasonDay": 0,
+      "epoch": 0,
+      "policy": "held"
+    },
+    "world": {
+      "opened": [],
+      "pieces": [],
+      "warps": [],
+      "visited": ["ask_int_longhouse", "ask_farmyard", "ask_pasture"],
+      "cover": {
+        "ask_farmyard": {
+          "epoch": 0,
+          "cleared": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000cf"
+        }
+      },
+      "vars": {
+        "ask_pen": 31
+      }
+    },
+    "dungeons": {
+      "d1": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d2": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d3": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d4": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d5": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d6": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d7": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d8": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      }
+    },
+    "playTicks": 36000
+  },
+  "sum": "9afb5e23"
+}

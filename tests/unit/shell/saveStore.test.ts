@@ -1,6 +1,6 @@
 import { IDBFactory as FakeIDBFactory } from 'fake-indexeddb';
 import { describe, expect, it, vi } from 'vitest';
-import { NEW_GAME } from '@content/start';
+import { TEST_START } from '@content/start';
 import { newGame } from '@core/state/gameState';
 import { makeSave } from '@core/state/save';
 import { SaveStore, openSaveStoreSafely } from '@shell/platform/saveStore';
@@ -8,7 +8,7 @@ import { SaveStore, openSaveStoreSafely } from '@shell/platform/saveStore';
 const factory = (): IDBFactory => new FakeIDBFactory();
 
 const save = (hp: number) => {
-  const s = newGame(1, NEW_GAME);
+  const s = newGame(1, TEST_START);
   s.hero.hp = hp;
   return makeSave(s, 'test', '2026-09-26T00:00:00.000Z');
 };

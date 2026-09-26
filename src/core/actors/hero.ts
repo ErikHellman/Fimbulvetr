@@ -1,19 +1,25 @@
+import type { WeaponId } from '@content/ids';
 import { isHeld, moveVector, wasPressed, type InputFrame } from '../input/actions';
 import { at, type Box } from '../math/box';
-import { DIR_VEC, dirFromVec } from '../math/dir';
+import { DIR_VEC, dirFromVec, type Dir4 } from '../math/dir';
 import { normalize, scale } from '../math/vec';
 import type { SimEvent } from '../sim/events';
 import type { HeroState } from '../state/gameState';
 import { createEntity, mem, setAnim, type Entity } from './entity';
 import type { Machine, StateDef } from './fsm';
-import type { Tuning } from './tuning';
+import { swordOf, type Tuning } from './tuning';
 
-export type HeroMode = 'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt';
+export type HeroMode =
+  'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop' | 'lift' | 'carry' | 'throw';
 
 export interface HeroCtx {
   readonly input: InputFrame;
   readonly tuning: Tuning;
   readonly hasShield: boolean;
+  /** Holding a weapon (not bare hands): the sword button swings. */
+  readonly armed: boolean;
+  /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
+  ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
 }
 
@@ -40,11 +46,47 @@ function swing(e: Entity, c: HeroCtx, anim: string, sound: 'sfx_swing' | 'sfx_sp
 const move: HeroDef = {
   tick(e, c) {
     if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'roll';
-    if (wasPressed(c.input, 'sword')) return 'attack';
+    if (wasPressed(c.input, 'sword') && c.armed) return 'attack';
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
     steer(e, c, c.tuning.hero.walkSpeed, true);
     setAnim(e, moving(e) ? 'walk' : 'idle');
-    return undefined;
+    return pushingLedge(e, c) ? 'hop' : undefined;
+  },
+};
+
+/** Counts ticks of walking straight into a hoppable ledge. */
+function pushingLedge(e: Entity, c: HeroCtx): boolean {
+  const m = moveVector(c.input);
+  const straight = (m.x === 0) !== (m.y === 0);
+  const ahead = straight && dirFromVec(m, e.facing) === e.facing ? c.ledgeHop(e.facing) : null;
+  const pushed = ahead === null ? 0 : mem(e, 'ledgePush') + 1;
+  if (pushed !== mem(e, 'ledgePush')) e.mem['ledgePush'] = pushed;
+  return pushed >= c.tuning.hero.ledgePushTicks;
+}
+
+/** Hops a ledge along a fixed arc; collision is skipped because the landing was checked up front. */
+const hop: HeroDef = {
+  enter(e, c) {
+    const off = c.ledgeHop(e.facing) ?? { dx: 0, dy: 0 };
+    e.mem['ledgePush'] = 0;
+    e.mem['hopX'] = e.pos.x;
+    e.mem['hopY'] = e.pos.y;
+    e.mem['hopDx'] = off.dx;
+    e.mem['hopDy'] = off.dy;
+    e.knock = { x: 0, y: 0 };
+    still(e);
+    setAnim(e, 'walk');
+  },
+  tick(e, c) {
+    const h = c.tuning.hero;
+    const p = Math.min(1, (e.fsm.t + 1) / h.hopTicks);
+    still(e);
+    e.pos = { x: mem(e, 'hopX') + mem(e, 'hopDx') * p, y: mem(e, 'hopY') + mem(e, 'hopDy') * p };
+    e.mem['z'] = 4 * h.hopHeight * p * (1 - p);
+    return p >= 1 ? 'move' : undefined;
+  },
+  exit(e) {
+    e.mem['z'] = 0;
   },
 };
 
@@ -162,7 +204,51 @@ const hurt: HeroDef = {
   },
 };
 
-export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = { move, attack, charge, spin, roll, shield, hurt };
+/** Raising a prop overhead; the props system moves the prop, the hero just stands still. */
+const lift: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'lift');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.liftTicks - 1 ? 'carry' : undefined;
+  },
+};
+
+/** Walking with a prop overhead: no sword, roll or shield. The props system throws or sets it down. */
+const carry: HeroDef = {
+  tick(e, c) {
+    steer(e, c, c.tuning.hero.carrySpeed, true);
+    setAnim(e, moving(e) ? 'carrywalk' : 'carry');
+    return undefined;
+  },
+};
+
+const throwing: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'throw');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.throwTicks - 1 ? 'move' : undefined;
+  },
+};
+
+export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
+  move,
+  attack,
+  charge,
+  spin,
+  roll,
+  shield,
+  hurt,
+  hop,
+  lift,
+  carry,
+  throw: throwing,
+};
 
 /** Per-tick bookkeeping that is independent of the current state. */
 export function heroPreTick(e: Entity): void {
@@ -191,15 +277,17 @@ export function createHero(
   });
 }
 
-/** The hero's live sword hitbox in screen pixels, or null when the sword cannot hit. */
-export function heroSwordBox(e: Entity, t: Tuning): Box | null {
-  if (mem(e, 'spinOn') === 1) return at(t.sword.spinBox, e.pos);
-  if (mem(e, 'swordOn') === 1) return at(t.sword.boxes[e.facing], e.pos);
+/** The hero's live weapon hitbox in screen pixels, or null when it cannot hit. */
+export function heroSwordBox(e: Entity, t: Tuning, weapon?: WeaponId): Box | null {
+  const sw = swordOf(t, weapon);
+  if (mem(e, 'spinOn') === 1) return at(sw.spinBox, e.pos);
+  if (mem(e, 'swordOn') === 1) return at(sw.boxes[e.facing], e.pos);
   return null;
 }
 
-export function heroSwordDamage(e: Entity, t: Tuning): number {
-  if (mem(e, 'spinOn') === 1) return t.sword.spinDamage;
+export function heroSwordDamage(e: Entity, t: Tuning, weapon?: WeaponId): number {
+  const sw = swordOf(t, weapon);
+  if (mem(e, 'spinOn') === 1) return sw.spinDamage;
   const combo = Math.min(3, Math.max(1, mem(e, 'combo')));
-  return t.sword.comboDamage[combo - 1] ?? t.sword.comboDamage[0];
+  return sw.comboDamage[combo - 1] ?? sw.comboDamage[0];
 }

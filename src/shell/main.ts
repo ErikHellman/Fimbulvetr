@@ -2,9 +2,10 @@ import * as Phaser from 'phaser';
 import { UI } from '@content/i18n/ui';
 import { DB } from '@content/index';
 import { GAME_TITLE } from '@content/meta';
+import { DEV_PRESETS, isDevPresetId } from '@content/dev/presets';
 import { NEW_GAME } from '@content/start';
 import { SCREEN_IDS } from '@content/world/screens';
-import { applyDevQuery, parseDevQuery } from '@core/dev/query';
+import { applyDevQuery, applyPreset, parseDevQuery } from '@core/dev/query';
 import { t } from '@core/i18n/t';
 import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
@@ -17,6 +18,7 @@ import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { BootScene } from '@shell/scenes/BootScene';
 import { PlayScene } from '@shell/scenes/PlayScene';
+import { UiScene } from '@shell/scenes/UiScene';
 import type { Services } from '@shell/services';
 
 /**
@@ -37,7 +39,7 @@ function indexedDbFactory(): IDBFactory | undefined {
   }
 }
 
-function startGame(services: Services): void {
+function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
   const game = new Phaser.Game({
     type: Phaser.WEBGL,
     parent: 'game',
@@ -48,7 +50,7 @@ function startGame(services: Services): void {
     banner: false,
     scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.NO_CENTER },
     input: { keyboard: false, gamepad: false },
-    scene: [new BootScene(services), new PlayScene()],
+    scene: [new BootScene(services), new PlayScene(), new UiScene(), ...extra],
   });
   game.canvas.setAttribute('aria-label', GAME_TITLE);
   attachZoom(game, () => services.settings.scaling);
@@ -56,7 +58,9 @@ function startGame(services: Services): void {
 
 async function main(): Promise<void> {
   document.title = GAME_TITLE;
-  const query = DEV_TOOLS ? parseDevQuery(window.location.search, new Set<string>(SCREEN_IDS)) : null;
+  const query = DEV_TOOLS
+    ? parseDevQuery(window.location.search, new Set<string>(SCREEN_IDS), new Set(Object.keys(DEV_PRESETS)))
+    : null;
   for (const warning of query?.warnings ?? []) console.warn(`[dev] ${warning}`);
   const settings = loadSettings(browserStorage(), preferredLang(navigator.languages));
   if (query?.lang !== undefined) settings.lang = query.lang;
@@ -79,11 +83,26 @@ async function main(): Promise<void> {
     showMessage(t(UI.storage_unavailable, lang), [{ label: t(UI.ok, lang), run: () => undefined }]);
   }
   const saves = new SaveService(store, __BUILD_ID__, new Set<string>(SCREEN_IDS));
-  const loaded = query?.screen === undefined ? await saves.loadAuto() : null;
+  const fresh = query?.screen !== undefined || query?.preset !== undefined;
+  const loaded = fresh ? null : await saves.loadAuto();
   const state = loaded ?? newGame(query?.seed ?? randomSeed(), NEW_GAME);
+  if (query?.preset !== undefined && isDevPresetId(query.preset))
+    applyPreset(state, DEV_PRESETS[query.preset]);
   if (query !== null) applyDevQuery(state, query);
   const dev = DEV_TOOLS ? (await import('@shell/dev/index')).createDevTools() : null;
-  startGame({ db: DB, state, settings, saves, dev, muted: query?.mute === true });
+  const gallery = query?.gallery === true ? new (await import('@shell/dev/gallery')).GalleryScene() : null;
+  startGame(
+    {
+      db: DB,
+      state,
+      settings,
+      saves,
+      dev,
+      muted: query?.mute === true,
+      start: gallery === null ? 'play' : 'gallery',
+    },
+    gallery === null ? [] : [gallery],
+  );
 }
 
 void main();

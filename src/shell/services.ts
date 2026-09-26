@@ -14,6 +14,8 @@ export interface Services {
   readonly dev: DevTools | null;
   /** Dev/test `?mute`. */
   readonly muted: boolean;
+  /** The scene Boot hands over to: the game, or the dev texture gallery. */
+  readonly start: 'play' | 'gallery';
 }
 
 export interface RenderAssets {

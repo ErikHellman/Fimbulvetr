@@ -1,5 +1,6 @@
 import type { L10n } from '@core/i18n/t';
-import type { ItemId } from './ids';
+import type { ItemDef } from '@core/items/defs';
+import { ITEMS, SUB_ITEMS, type ItemId } from './ids';
 
 export const ITEM_NAMES = {
   lantern: { en: 'Lantern', sv: 'Lykta' },
@@ -23,3 +24,25 @@ export const ITEM_NAMES = {
   bomb_bag: { en: 'Larger bomb bag', sv: 'Större bombpåse' },
   purse: { en: 'Larger purse', sv: 'Större pung' },
 } as const satisfies Record<ItemId, L10n>;
+
+const MAX: Partial<Record<ItemId, number>> = {
+  flatbread: 9,
+  cheese: 9,
+  mead_red: 4,
+  mead_green: 4,
+  mead_blue: 4,
+  arrows: 70,
+  heart_piece: 36,
+  heart_container: 8,
+  seidr_upgrade: 4,
+  quiver: 2,
+  bomb_bag: 2,
+  purse: 2,
+};
+
+export const ITEM_DEFS = Object.fromEntries(
+  ITEMS.map((id) => [
+    id,
+    { name: ITEM_NAMES[id], slot: (SUB_ITEMS as readonly string[]).includes(id), max: MAX[id] ?? 1 },
+  ]),
+) as Readonly<Record<ItemId, ItemDef>>;

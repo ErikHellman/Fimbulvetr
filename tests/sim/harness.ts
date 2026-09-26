@@ -1,5 +1,5 @@
 import { DB } from '@content/index';
-import { NEW_GAME } from '@content/start';
+import { TEST_START } from '@content/start';
 import type { ScreenId } from '@content/world/screens';
 import type { Season } from '@core/clock/types';
 import { bitsOf, type Action, type InputFrame } from '@core/input/actions';
@@ -7,7 +7,7 @@ import type { Dir4 } from '@core/math/dir';
 import type { ContentDb } from '@core/sim/db';
 import type { SimEvent } from '@core/sim/events';
 import { Sim } from '@core/sim/sim';
-import { newGame } from '@core/state/gameState';
+import { newGame, type NewGameInit } from '@core/state/gameState';
 import { tileFeet } from '@core/world/screen';
 
 export interface HarnessOptions {
@@ -18,6 +18,8 @@ export interface HarnessOptions {
   readonly season?: Season;
   readonly seed?: number;
   readonly db?: ContentDb;
+  /** Starting kit; the M0 test kit by default. */
+  readonly start?: NewGameInit;
 }
 
 export function frameOf(
@@ -41,7 +43,7 @@ export class Harness {
   readonly events: SimEvent[] = [];
 
   constructor(o: HarnessOptions = {}) {
-    const state = newGame(o.seed ?? 1, NEW_GAME);
+    const state = newGame(o.seed ?? 1, o.start ?? TEST_START);
     if (o.screen !== undefined) state.hero.screen = o.screen;
     if (o.tile !== undefined) {
       const p = tileFeet({ x: o.tile[0], y: o.tile[1] });
@@ -52,6 +54,11 @@ export class Harness {
     if (o.minute !== undefined) state.clock.minute = o.minute;
     if (o.season !== undefined) state.clock.season = o.season;
     this.sim = new Sim(o.db ?? DB, state);
+  }
+
+  /** Shorthand for `frameOf`, for `until` loops. */
+  frame(held: readonly Action[]): InputFrame {
+    return frameOf(held);
   }
 
   step(frame: InputFrame): this {

@@ -3,7 +3,9 @@ import { ENEMY_DEFS } from '@content/enemies';
 import { TUNING } from '@content/tuning';
 import { runFsm } from '@core/actors/fsm';
 import { BEHAVIOURS, createEnemy } from '@core/actors/enemies';
-import { HEAVY, resolveHit, type HitData } from '@core/combat/hit';
+import type { ActorCtx } from '@core/actors/enemies/defs';
+import { HEAVY, PIERCE_SHIELD, resolveHit, type HitData } from '@core/combat/hit';
+import { createRng } from '@core/math/rng';
 
 const dummy = () => createEnemy(1, ENEMY_DEFS.dummy, { x: 100, y: 100 });
 const opts = { shielding: false, iframes: 6, knockResist: 0 };
@@ -61,10 +63,26 @@ describe('resolveHit', () => {
   });
 });
 
+describe('PIERCE_SHIELD', () => {
+  it('goes through a frontal shield', () => {
+    const e = dummy();
+    e.facing = 'w';
+    const r = resolveHit(e, hit({ tags: PIERCE_SHIELD }), { ...opts, shielding: true });
+    expect(r.outcome).toBe('damaged');
+  });
+});
+
 describe('training dummy', () => {
   it('wobbles after a hit, then settles', () => {
     const e = dummy();
-    const ctx = { tuning: TUNING, emit: () => undefined };
+    const ctx: ActorCtx = {
+      tuning: TUNING,
+      rng: createRng(1),
+      hero: { x: 0, y: 0 },
+      heroVel: { x: 0, y: 0 },
+      solidAt: () => false,
+      emit: () => undefined,
+    };
     resolveHit(e, hit(), opts);
     runFsm(BEHAVIOURS.dummy, e, ctx);
     expect(e.fsm.s).toBe('hurt');

@@ -1,4 +1,4 @@
-import type { SfxId } from '@content/ids';
+import type { ItemId, SfxId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { ClockEvent } from '../clock/types';
 import type { Dir4 } from '../math/dir';
@@ -9,4 +9,9 @@ export type SimEvent =
   | { readonly t: 'hit'; readonly target: number; readonly blocked: boolean; readonly dealt: number }
   | { readonly t: 'screenTransition'; readonly from: ScreenId; readonly to: ScreenId; readonly dir: Dir4 }
   | { readonly t: 'screenEntered'; readonly screen: ScreenId }
-  | { readonly t: 'clock'; readonly e: ClockEvent };
+  | { readonly t: 'clock'; readonly e: ClockEvent }
+  | { readonly t: 'itemGet'; readonly item: ItemId }
+  /** Ground cover on the screen was cut or regrew; redraw its layer. */
+  | { readonly t: 'coverChanged'; readonly screen: ScreenId }
+  /** A safe moment to autosave: back in play after a screen change or a finished script. */
+  | { readonly t: 'autosave' };

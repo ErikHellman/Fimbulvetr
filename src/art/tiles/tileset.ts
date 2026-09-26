@@ -1,8 +1,10 @@
+import { COVERS, type CoverId } from '@content/ids';
 import { TERRAIN_IDS, type TerrainId } from '@content/terrain';
 import { hashInts } from '@core/math/hash';
 import { BLOB_MASKS } from '@core/world/autotile';
 import { createPainter } from '../painter';
 import type { Raster } from '../raster';
+import { COVER_ART } from './cover';
 import { TERRAIN_ART } from './terrain';
 
 export interface TilesetEntry {
@@ -11,9 +13,17 @@ export interface TilesetEntry {
   readonly autotile: boolean;
 }
 
+export interface CoverEntry {
+  /** Tile index of standing cover, and of what is left once cut. */
+  readonly standing: number;
+  readonly cut: number;
+}
+
 export interface Tileset {
   readonly tiles: readonly Raster[];
   readonly entries: Readonly<Record<TerrainId, TilesetEntry>>;
+  /** Cover tiles are transparent overlays drawn on a layer above the ground. */
+  readonly cover: Readonly<Record<CoverId, CoverEntry>>;
 }
 
 /** Paints every tile variant once, in TERRAIN_IDS order. Auto-tiled terrain gets all 47 blob variants. */
@@ -31,5 +41,15 @@ export function buildTileset(): Tileset {
     }
     entries[id] = { start, count, autotile: art.autotile };
   });
-  return { tiles, entries };
+  const cover = {} as Record<CoverId, CoverEntry>;
+  COVERS.forEach((id, i) => {
+    const art = COVER_ART[id];
+    const standing = createPainter(16, 16, hashInts(0xc0, i, 1));
+    art.standing(standing);
+    const cut = createPainter(16, 16, hashInts(0xc0, i, 2));
+    art.cut(cut);
+    cover[id] = { standing: tiles.length, cut: tiles.length + 1 };
+    tiles.push(standing.r, cut.r);
+  });
+  return { tiles, entries, cover };
 }

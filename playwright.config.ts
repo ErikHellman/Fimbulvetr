@@ -20,6 +20,8 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         launchOptions: {
           args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
+          // Containers with a preinstalled Chromium of another revision point this at it.
+          ...(process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {}),
         },
       },
     },
