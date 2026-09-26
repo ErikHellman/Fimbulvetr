@@ -1,0 +1,61 @@
+{
+  "format": "fimbulvetr",
+  "v": 1,
+  "build": "fixture",
+  "savedAt": "2026-09-26T12:00:00.000Z",
+  "state": {
+    "seed": 12345,
+    "rng": { "s": 12345 },
+    "flags": { "st_intro_seen": true },
+    "hero": {
+      "screen": "test_b",
+      "x": 328,
+      "y": 190,
+      "facing": "e",
+      "hp": 10,
+      "maxHp": 12,
+      "seidr": 10,
+      "maxSeidr": 10,
+      "silver": 25,
+      "purse": 0
+    },
+    "inv": {
+      "items": { "lantern": 1 },
+      "slots": ["lantern", null],
+      "galdr": [],
+      "weapon": "seax",
+      "armor": "wool_tunic",
+      "ring": null,
+      "shield": true
+    },
+    "clock": {
+      "minute": 1215,
+      "sub": 30,
+      "day": 2,
+      "season": "autumn",
+      "seasonDay": 1,
+      "epoch": 1,
+      "policy": "cycling"
+    },
+    "world": {
+      "opened": [],
+      "pieces": [],
+      "warps": [],
+      "visited": ["test_a", "test_b"],
+      "cover": {},
+      "vars": {}
+    },
+    "dungeons": {
+      "d1": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d2": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d3": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d4": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d5": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d6": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d7": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] },
+      "d8": { "keys": 0, "bigKey": false, "map": false, "compass": false, "bossDead": false, "doors": [] }
+    },
+    "playTicks": 54000
+  },
+  "sum": "1098b91e"
+}

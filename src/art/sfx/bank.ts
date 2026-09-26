@@ -1,0 +1,61 @@
+import type { SfxId } from '@content/ids';
+import type { SynthParams } from './synth';
+
+/** Placeholder recipes. Real recordings later replace these by the same SfxId. */
+export const SFX_BANK = {
+  sfx_swing: {
+    wave: 'noise',
+    freq: 4000,
+    freqEnd: 1200,
+    attack: 0.005,
+    sustain: 0.03,
+    release: 0.08,
+    volume: 0.35,
+  },
+  sfx_spin: {
+    wave: 'noise',
+    freq: 2500,
+    freqEnd: 6000,
+    attack: 0.01,
+    sustain: 0.2,
+    release: 0.15,
+    volume: 0.35,
+  },
+  sfx_hit: {
+    wave: 'square',
+    freq: 220,
+    freqEnd: 70,
+    attack: 0,
+    sustain: 0.03,
+    release: 0.09,
+    volume: 0.4,
+    duty: 0.3,
+  },
+  sfx_block: {
+    wave: 'square',
+    freq: 900,
+    freqEnd: 700,
+    attack: 0,
+    sustain: 0.02,
+    release: 0.06,
+    volume: 0.3,
+  },
+  sfx_roll: {
+    wave: 'noise',
+    freq: 900,
+    freqEnd: 300,
+    attack: 0.02,
+    sustain: 0.08,
+    release: 0.12,
+    volume: 0.25,
+  },
+  sfx_charge: {
+    wave: 'triangle',
+    freq: 660,
+    freqEnd: 1320,
+    attack: 0.01,
+    sustain: 0.05,
+    release: 0.12,
+    volume: 0.3,
+  },
+} as const satisfies Record<SfxId, SynthParams>;
