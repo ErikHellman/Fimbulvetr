@@ -25,6 +25,17 @@ function bridge(): { b: DevBridge; h: Harness } {
     saves: new SaveService(null, 'test', new Set()),
     appliedGrade: () => [],
     lightLevel: () => 1,
+    viewStats: () => ({
+      screens: 0,
+      decor: 0,
+      animatedDecor: 0,
+      animatedTiles: 0,
+      emitters: 0,
+      openWater: 0,
+      fishAlive: 0,
+      fishJumps: 0,
+    }),
+    jumpFish: () => undefined,
     restart: () => undefined,
   };
   return { b, h };
@@ -85,6 +96,17 @@ describe('dev console commands', () => {
       saves,
       appliedGrade: () => [],
       lightLevel: () => 1,
+      viewStats: () => ({
+        screens: 0,
+        decor: 0,
+        animatedDecor: 0,
+        animatedTiles: 0,
+        emitters: 0,
+        openWater: 0,
+        fishAlive: 0,
+        fishJumps: 0,
+      }),
+      jumpFish: () => undefined,
       restart: (state) => {
         restarted.push(state);
       },

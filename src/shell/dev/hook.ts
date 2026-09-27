@@ -6,7 +6,7 @@ import { parseClockTime } from '@core/dev/query';
 import { cloneState } from '@core/state/save';
 import { tileFeet } from '@core/world/screen';
 import { importMessageKey } from '@shell/platform/exportImport';
-import type { DevBridge } from './bridge';
+import type { DevBridge, ViewStats } from './bridge';
 import type { FrameSummary } from './stats';
 
 export interface HeroView {
@@ -36,6 +36,9 @@ export interface FimbulHook {
   setSeason(season: string): boolean;
   missingFrames(): string[];
   stats(): FrameSummary;
+  /** Decor, animated tiles, smoke and fish on stage. */
+  view(): ViewStats;
+  jumpFish(): void;
   exportSaveJson(): string;
   importSaveJson(json: string): UiKey;
   flushSave(): Promise<void>;
@@ -112,6 +115,10 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     },
     missingFrames: () => bridge().frames.missingNames(),
     stats: () => bridge().stats.summary(),
+    view: () => bridge().viewStats(),
+    jumpFish: () => {
+      bridge().jumpFish();
+    },
     exportSaveJson: () => {
       const b = bridge();
       return b.saves.exportJson(b.sim.snapshot());

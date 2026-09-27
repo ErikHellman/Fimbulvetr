@@ -11,6 +11,17 @@ import { SaveService } from '@shell/platform/saveService';
 import { DEFAULT_SETTINGS } from '@shell/platform/settings';
 import { Harness } from '../../sim/harness';
 
+const NO_VIEW = {
+  screens: 0,
+  decor: 0,
+  animatedDecor: 0,
+  animatedTiles: 0,
+  emitters: 0,
+  openWater: 0,
+  fishAlive: 0,
+  fishJumps: 0,
+};
+
 /** `installHook` assumes a global `window`; the test provides a minimal one. */
 function ensureWindow(): void {
   if (typeof globalThis.window === 'undefined') {
@@ -36,6 +47,8 @@ describe('installHook importSaveJson', () => {
       saves,
       appliedGrade: () => [],
       lightLevel: () => 1,
+      viewStats: () => NO_VIEW,
+      jumpFish: () => undefined,
       restart: (state) => {
         restarted.push(state);
       },
@@ -63,6 +76,8 @@ describe('installHook warp', () => {
       saves: new SaveService(null, 'test', new Set<string>(SCREEN_IDS)),
       appliedGrade: () => [],
       lightLevel: () => 1,
+      viewStats: () => NO_VIEW,
+      jumpFish: () => undefined,
       restart: () => undefined,
     };
     installHook(() => b, {});

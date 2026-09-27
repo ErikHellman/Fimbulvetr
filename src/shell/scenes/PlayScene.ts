@@ -17,7 +17,7 @@ import type { GameState } from '@core/state/gameState';
 import { decorArt, decorPlacements } from '@core/world/decor';
 import { SCREEN_H, SCREEN_W } from '@core/world/dims';
 import { AudioDirector } from '@shell/audio/sfx';
-import type { DevBridge } from '@shell/dev/bridge';
+import type { DevBridge, ViewStats } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
 import { connectedPads, readPad } from '@shell/input/gamepad';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
@@ -25,11 +25,18 @@ import { InputMapper } from '@shell/input/mapper';
 import { LETTERBOX } from '@shell/scale';
 import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
+import { AmbientView } from '@shell/view/ambientView';
 import { EntityViews } from '@shell/view/entityViews';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
 const INDOOR_LIGHT = 0.85;
+
+/** Everything drawn for one screen: its tiles and decor, and its ambient smoke and fish. */
+interface Stage {
+  readonly view: ScreenView;
+  readonly ambient: AmbientView;
+}
 
 /** Owns the Sim: steps it at 60 Hz, feeds it input, draws its state, plays its sounds, autosaves. */
 export class PlayScene extends Phaser.Scene {
@@ -44,7 +51,7 @@ export class PlayScene extends Phaser.Scene {
   private readonly latch = new InputLatch();
   private readonly keys = new KeyboardState();
   private readonly acc: Accumulator = { acc: 0 };
-  private readonly screens = new Map<ScreenId, ScreenView>();
+  private readonly screens = new Map<ScreenId, Stage>();
   private readonly stats = new FrameStats();
   private gradeKey = '';
   private tileAnims: readonly TileAnim[] = [];
@@ -130,6 +137,8 @@ export class PlayScene extends Phaser.Scene {
       saves: this.services.saves,
       appliedGrade: () => this.appliedGrade,
       lightLevel: () => daylight(this.sim.state.clock, this.services.db.clock),
+      viewStats: () => this.viewStats(),
+      jumpFish: () => this.screens.get(this.sim.screen.id)?.ambient.jump(),
       restart: (state: GameState) => {
         this.scene.restart({ ...this.services, state });
       },
@@ -138,7 +147,7 @@ export class PlayScene extends Phaser.Scene {
 
   private onEvent(ev: SimEvent): void {
     if (ev.t === 'screenTransition') this.showScreen(ev.to);
-    else if (ev.t === 'coverChanged') this.screens.get(ev.screen)?.setCover(this.coverTiles(ev.screen));
+    else if (ev.t === 'coverChanged') this.screens.get(ev.screen)?.view.setCover(this.coverTiles(ev.screen));
     else if (ev.t === 'screenEntered') {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
@@ -162,9 +171,10 @@ export class PlayScene extends Phaser.Scene {
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)));
     }
     const hero = this.views.bounds(this.sim.hero.id);
-    for (const view of this.screens.values()) {
-      view.tick(this.sim.tick);
-      view.fadeBehind(hero);
+    for (const stage of this.screens.values()) {
+      stage.view.tick(this.sim.tick);
+      stage.view.fadeBehind(hero);
+      stage.ambient.tick(this.sim.tick);
     }
     this.applyGrade();
   }
@@ -187,18 +197,52 @@ export class PlayScene extends Phaser.Scene {
     const salt = fnv1a(id);
     const terrain = this.services.db.terrain;
     const decor = decorPlacements(grid, terrain).map((p) => ({ ...p, art: decorArt(p, terrain, salt) }));
-    this.screens.set(
-      id,
-      new ScreenView(this, {
-        origin: this.sim.originOf(id),
-        indices: tileIndices(grid, this.services.assets.tileset, salt),
-        cover: this.coverTiles(id),
-        tileAnims: this.tileAnims,
-        decor,
-        frames: this.services.assets.frames,
-        anims: ANIMS,
-      }),
-    );
+    const { tileset, frames } = this.services.assets;
+    const origin = this.sim.originOf(id);
+    const view = new ScreenView(this, {
+      origin,
+      indices: tileIndices(grid, tileset, salt),
+      cover: this.coverTiles(id),
+      tileAnims: this.tileAnims,
+      decor,
+      frames,
+      anims: ANIMS,
+    });
+    const ambient = new AmbientView(this, {
+      origin,
+      grid,
+      salt,
+      frames,
+      anims: ANIMS,
+      isWater: (t) => tileset.entries[t].group === 'water',
+    });
+    this.screens.set(id, { view, ambient });
+  }
+
+  private viewStats(): ViewStats {
+    const sum: ViewStats = {
+      screens: this.screens.size,
+      decor: 0,
+      animatedDecor: 0,
+      animatedTiles: 0,
+      emitters: 0,
+      openWater: 0,
+      fishAlive: 0,
+      fishJumps: 0,
+    };
+    const out = { ...sum };
+    for (const { view, ambient } of this.screens.values()) {
+      const v = view.stats();
+      const a = ambient.stats();
+      out.decor += v.decor;
+      out.animatedDecor += v.animatedDecor;
+      out.animatedTiles += v.animatedTiles;
+      out.emitters += a.emitters;
+      out.openWater += a.openWater;
+      out.fishAlive += a.fishAlive;
+      out.fishJumps += a.fishJumps;
+    }
+    return out;
   }
 
   private coverTiles(id: ScreenId): number[] {
@@ -206,9 +250,10 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private dropScreensExcept(id: ScreenId): void {
-    for (const [key, view] of this.screens) {
+    for (const [key, stage] of this.screens) {
       if (key === id) continue;
-      view.destroy();
+      stage.view.destroy();
+      stage.ambient.destroy();
       this.screens.delete(key);
     }
   }
