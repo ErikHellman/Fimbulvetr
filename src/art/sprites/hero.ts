@@ -332,6 +332,12 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
     add('carry', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
     add('throw', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
     add('throw', side, 1, drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL));
+    // Leaning on a root block: arms out, feet digging in.
+    add('push', side, 0, drawPose({ side, phase: 1, shield: 'none', arms: 'forward' }, SMALL));
+    add('push', side, 1, drawPose({ side, phase: 3, shield: 'none', arms: 'forward' }, SMALL));
+    // Sending a sub-item off (the boomerang): wind up, let go.
+    add('toss', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
+    add('toss', side, 1, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'forward' }, SMALL));
     add(
       'charge',
       side,
@@ -388,6 +394,8 @@ export const HERO_ANIMS = {
   carry: { frames: 1, fps: 1, loop: true, dirs: ALL },
   carrywalk: { frames: 4, fps: 7, loop: true, dirs: ALL },
   throw: { frames: 2, fps: 12, loop: false, dirs: ALL },
+  push: { frames: 2, fps: 4, loop: true, dirs: ALL },
+  toss: { frames: 2, fps: 12, loop: false, dirs: ALL },
   /** Spins through the four facings and falls; held on the last frame. */
   dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },
 } satisfies Record<string, AnimDef>;

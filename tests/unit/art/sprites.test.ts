@@ -152,9 +152,25 @@ describe('enemies', () => {
       pickup_heart: ['idle'],
       pickup_silver: ['idle'],
       fx_poof: ['idle'],
+      enemy_root_biter: ['buried', 'tell', 'bite', 'idle', 'hurt', 'retract'],
+      enemy_rotvaettr: ['idle', 'open', 'roar'],
+      enemy_rot_bulb: ['idle'],
+      enemy_root_spike: ['tell', 'erupt', 'sink'],
+      fx_boomerang: ['spin'],
+      hero: ['push', 'toss'],
+      item_boomerang: ['idle'],
+      item_small_key: ['idle'],
+      item_big_key: ['idle'],
+      item_dungeon_map: ['idle'],
+      item_compass: ['idle'],
     };
     for (const [art, anims] of Object.entries(used))
       for (const anim of anims) expect(ANIMS[art]?.[anim], `${art} ${anim}`).toBeDefined();
+  });
+
+  it('has art for every enemy the content names', async () => {
+    const { ENEMY_DEFS } = await import('@content/enemies');
+    for (const d of Object.values(ENEMY_DEFS)) expect(ANIMS[d.art], d.art).toBeDefined();
   });
 
   it('shows the draugr rising out of the ground', () => {
