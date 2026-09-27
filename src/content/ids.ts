@@ -168,6 +168,10 @@ export const SCRIPTS = [
   'd1_enter',
   'stone1_light',
   'hof_pray',
+  'meadhall_rest',
+  'upp_knock_in',
+  'upp_knock_out',
+  'uppvik_arrive',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

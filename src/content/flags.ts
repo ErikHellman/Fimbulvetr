@@ -37,6 +37,8 @@ export const FLAGS = {
   st_stone1_lit: { t: 'bool' },
   /** Önundr has sawn through the pine across the road north: Uppvík lies open. */
   st_road_open: { t: 'bool' },
+  /** Ask has come to Uppvík's gate. */
+  st_uppvik_reached: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

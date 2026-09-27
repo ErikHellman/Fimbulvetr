@@ -20,6 +20,15 @@ import { myrCharcoal } from './myrkvidr/myr_charcoal';
 import { myrRoots } from './myrkvidr/myr_roots';
 import { myrIntHut } from './myrkvidr/myr_int_hut';
 import { myrNorth } from './myrkvidr/myr_north';
+import { uppGate } from './uppvik/upp_gate';
+import { uppSquare } from './uppvik/upp_square';
+import { uppHall } from './uppvik/upp_hall';
+import { uppSmiths } from './uppvik/upp_smiths';
+import { uppIntMeadhall } from './uppvik/upp_int_meadhall';
+import { uppIntTrader } from './uppvik/upp_int_trader';
+import { uppIntSmithy } from './uppvik/upp_int_smithy';
+import { uppIntRunehall } from './uppvik/upp_int_runehall';
+import { uppIntHof } from './uppvik/upp_int_hof';
 import { d1R01 } from './rotarhellir/d1_r01';
 import { d1R02 } from './rotarhellir/d1_r02';
 import { d1R03 } from './rotarhellir/d1_r03';
@@ -66,6 +75,15 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   myr_roots: myrRoots,
   myr_int_hut: myrIntHut,
   myr_north: myrNorth,
+  upp_gate: uppGate,
+  upp_square: uppSquare,
+  upp_hall: uppHall,
+  upp_smiths: uppSmiths,
+  upp_int_meadhall: uppIntMeadhall,
+  upp_int_trader: uppIntTrader,
+  upp_int_smithy: uppIntSmithy,
+  upp_int_runehall: uppIntRunehall,
+  upp_int_hof: uppIntHof,
   d1_r01: d1R01,
   d1_r02: d1R02,
   d1_r03: d1R03,
