@@ -30,6 +30,8 @@ export interface DevBridge {
   viewStats(): ViewStats;
   /** Makes a fish jump on the current screen right now, if it has open water. */
   jumpFish(): void;
+  /** The tile index drawn at a cell of the current screen (animated tiles change over time). */
+  tileAt(x: number, y: number): number;
   /** Restarts play from another state (used by import). */
   restart(state: GameState): void;
 }

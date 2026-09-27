@@ -22,6 +22,11 @@ test('the brook runs with open water where a fish can jump', async ({ page }) =>
   const errors = collectErrors(page);
   await boot(page, 'nosave&screen=ask_brook&at=20,11');
   expect((await view(page))?.openWater).toBeGreaterThan(0);
+  // (27,3) is mid-stream: its drawn tile cycles through the water frames.
+  const tile = (page: import('@playwright/test').Page) => page.evaluate(() => window.__fimbul?.tileAt(27, 3));
+  const first = await tile(page);
+  expect(first).toBeGreaterThanOrEqual(0);
+  await expect.poll(() => tile(page), { timeout: 3_000 }).not.toBe(first);
   const before = (await view(page))?.fishJumps ?? 0;
   await page.evaluate(() => {
     window.__fimbul?.jumpFish();

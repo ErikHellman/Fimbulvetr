@@ -36,6 +36,7 @@ function bridge(): { b: DevBridge; h: Harness } {
       fishJumps: 0,
     }),
     jumpFish: () => undefined,
+    tileAt: () => -1,
     restart: () => undefined,
   };
   return { b, h };
@@ -107,6 +108,7 @@ describe('dev console commands', () => {
         fishJumps: 0,
       }),
       jumpFish: () => undefined,
+      tileAt: () => -1,
       restart: (state) => {
         restarted.push(state);
       },

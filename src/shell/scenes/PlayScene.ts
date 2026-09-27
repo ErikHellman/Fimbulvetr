@@ -139,6 +139,7 @@ export class PlayScene extends Phaser.Scene {
       lightLevel: () => daylight(this.sim.state.clock, this.services.db.clock),
       viewStats: () => this.viewStats(),
       jumpFish: () => this.screens.get(this.sim.screen.id)?.ambient.jump(),
+      tileAt: (x, y) => this.screens.get(this.sim.screen.id)?.view.displayedTile(x, y) ?? -1,
       restart: (state: GameState) => {
         this.scene.restart({ ...this.services, state });
       },

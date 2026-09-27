@@ -49,6 +49,7 @@ describe('installHook importSaveJson', () => {
       lightLevel: () => 1,
       viewStats: () => NO_VIEW,
       jumpFish: () => undefined,
+      tileAt: () => -1,
       restart: (state) => {
         restarted.push(state);
       },
@@ -78,6 +79,7 @@ describe('installHook warp', () => {
       lightLevel: () => 1,
       viewStats: () => NO_VIEW,
       jumpFish: () => undefined,
+      tileAt: () => -1,
       restart: () => undefined,
     };
     installHook(() => b, {});

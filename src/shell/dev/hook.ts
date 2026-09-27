@@ -39,6 +39,7 @@ export interface FimbulHook {
   /** Decor, animated tiles, smoke and fish on stage. */
   view(): ViewStats;
   jumpFish(): void;
+  tileAt(x: number, y: number): number;
   exportSaveJson(): string;
   importSaveJson(json: string): UiKey;
   flushSave(): Promise<void>;
@@ -119,6 +120,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     jumpFish: () => {
       bridge().jumpFish();
     },
+    tileAt: (x, y) => bridge().tileAt(x, y),
     exportSaveJson: () => {
       const b = bridge();
       return b.saves.exportJson(b.sim.snapshot());

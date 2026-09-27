@@ -51,6 +51,8 @@ function rowsOf(indices: readonly number[]): number[][] {
  */
 export class ScreenView {
   private readonly map: Phaser.Tilemaps.Tilemap;
+  private readonly tileset: Phaser.Tilemaps.Tileset;
+  private readonly ground: Phaser.Tilemaps.TilemapLayer;
   private readonly cover: Phaser.Tilemaps.TilemapLayer;
   private readonly decor: DecorSprite[] = [];
   private readonly animatedTiles: number;
@@ -75,6 +77,8 @@ export class ScreenView {
     ground.putTilesAt(rowsOf(o.indices), 0, 0);
     ground.setDepth(-2);
     coverLayer.setDepth(-1);
+    this.tileset = tileset;
+    this.ground = ground;
     this.cover = coverLayer;
     this.setCover(o.cover);
     for (const item of o.decor) {
@@ -89,6 +93,16 @@ export class ScreenView {
       const animated = (o.anims[item.art]?.['idle']?.frames ?? 1) > 1;
       this.decor.push({ image, art: item.art, animated, frame });
     }
+  }
+
+  /** The tile index drawn at a cell right now: animated water cycles through its frames. Dev tools only. */
+  displayedTile(x: number, y: number): number {
+    const tile = this.ground.getTileAt(x, y, true);
+    // Phaser 4.2.1 has getAnimatedTileId (the renderer uses it) but the typings omit it.
+    const tileset = this.tileset as unknown as {
+      getAnimatedTileId(index: number, ms: number): number | null;
+    };
+    return tileset.getAnimatedTileId(tile.index, this.ground.timeElapsed) ?? -1;
   }
 
   /** Redraws the cover layer; -1 leaves a cell empty. */
