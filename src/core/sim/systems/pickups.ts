@@ -3,6 +3,8 @@ import type { DropKind } from '../../combat/drops';
 import { at, overlaps } from '../../math/box';
 import type { Vec } from '../../math/vec';
 import { PURSE_CAP } from '../../story/effects';
+import { coverAt } from '../../world/cover';
+import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 
 /** Pieces of heart that make one heart container's worth. */
@@ -30,6 +32,17 @@ export function createPiece(id: number, pos: Vec, thingIndex: number): Entity {
   });
   e.mem['thing'] = thingIndex;
   return e;
+}
+
+/** Whether standing cover that hides things (leaf piles) covers the pickup's tile. */
+function hiddenByCover(rt: SimRt, e: Entity): boolean {
+  const id = coverAt(
+    rt.screen.cover,
+    rt.db.coverOrder,
+    Math.floor(e.pos.x / TILE),
+    Math.floor((e.pos.y - 1) / TILE),
+  );
+  return id !== null && rt.db.cover[id].hides === true;
 }
 
 /** A heart or silver dropped by an enemy. It lasts `DROP_TICKS`. */
@@ -60,6 +73,9 @@ export function collectPickups(rt: SimRt): void {
   const heroBox = at(rt.hero.body, rt.hero.pos);
   for (const e of [...rt.actors]) {
     if (e.kind !== 'pickup') continue;
+    const hidden = hiddenByCover(rt, e) ? 1 : 0;
+    if (mem(e, 'hidden') !== hidden) e.mem['hidden'] = hidden;
+    if (hidden === 1) continue;
     if (!overlaps(heroBox, at(e.body, e.pos))) {
       if (mem(e, 'ttl') > 0) {
         e.mem['ttl'] = mem(e, 'ttl') - 1;

@@ -11,6 +11,10 @@ export interface CoverDef {
   readonly seasons: readonly Season[];
   /** Speed factor while wading through it uncut. */
   readonly slow: number;
+  /** Pickups under it stay hidden (and cannot be taken) until it is cut. */
+  readonly hides?: boolean;
+  /** Blown away by the boomerang (and later Vindr), not only cut. */
+  readonly blown?: boolean;
 }
 
 /** One screen's cover: `kind[i]` is 0 for none or 1 + index into the cover list; `cleared[i]` is 0 or 1. */

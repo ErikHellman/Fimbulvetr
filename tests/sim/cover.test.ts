@@ -50,3 +50,57 @@ describe('tall grass', () => {
     expect(standing(h, 10, 12)).toBe(true);
   });
 });
+
+/** test_a opened up in autumn, with leaf piles on rows 8–12 and a piece of heart under them at (10,10). */
+function leafDb(): ContentDb {
+  const map = Array.from({ length: 22 }, (_, y) =>
+    y === 0 || y === 21 ? '#'.repeat(40) : '#' + (y >= 8 && y <= 12 ? '%' : '.').repeat(38) + '#',
+  );
+  return {
+    ...DB,
+    screens: {
+      ...DB.screens,
+      test_a: {
+        ...DB.screens.test_a,
+        map,
+        things: [{ k: 'piece', id: 'hp_test_leaves', at: { x: 10, y: 10 } }],
+      },
+    },
+  };
+}
+
+describe('leaf piles', () => {
+  it('lie only in autumn and slow the hero to 80%', () => {
+    expect(standing(new Harness({ db: leafDb(), tile: [5, 10], season: 'summer' }), 5, 10)).toBe(false);
+    const wade = new Harness({ db: leafDb(), tile: [5, 9], season: 'autumn' });
+    const open = new Harness({ db: leafDb(), tile: [5, 15], season: 'autumn' });
+    expect(standing(wade, 5, 9)).toBe(true);
+    wade.hold(['right'], 30);
+    open.hold(['right'], 30);
+    const moved = (h: Harness): number => h.sim.hero.pos.x - (5 * 16 + 8);
+    expect(DB.cover.leaves.slow).toBe(0.8);
+    expect(moved(wade)).toBeCloseTo(moved(open) * 0.8);
+  });
+
+  it('hide a piece of heart until they are cut', () => {
+    const h = new Harness({ db: leafDb(), tile: [10, 13], facing: 'n', season: 'autumn' });
+    h.idle(1);
+    const piece = h.sim.actors.find((a) => a.kind === 'pickup');
+    expect(piece?.mem['hidden']).toBe(1);
+    h.hold(['up'], 40);
+    expect(h.sim.state.world.pieces).not.toContain('hp_test_leaves');
+    h.sim.command({ t: 'warp', screen: 'test_a', x: 10 * 16 + 8, y: 12 * 16 + 14 });
+    h.idle(1);
+    h.press(['up']).idle(2);
+    h.press(['sword']).idle(20);
+    h.hold(['up'], 30);
+    expect(h.sim.state.world.pieces).toContain('hp_test_leaves');
+  });
+
+  it('never hide anything in summer, and tall grass hides nothing', () => {
+    const h = new Harness({ db: leafDb(), tile: [10, 13], facing: 'n', season: 'summer' });
+    h.hold(['up'], 40);
+    expect(h.sim.state.world.pieces).toContain('hp_test_leaves');
+    expect(DB.cover.tall_grass.hides).toBeUndefined();
+  });
+});
