@@ -39,6 +39,8 @@ export interface DevBridge {
   tileAt(x: number, y: number): number;
   /** Restarts play from another state (used by import). */
   restart(state: GameState): void;
+  /** The open pause menu's page and cursor, or null in play. */
+  menu(): { readonly tab: string; readonly cursor: number; readonly confirm: boolean } | null;
 }
 
 export interface DevTools {

@@ -142,6 +142,12 @@ export class ScreenView {
     };
   }
 
+  /** The pause menu stops the water flowing (tile animations run on their own clock). */
+  setPaused(paused: boolean): void {
+    this.ground.setTimerPaused(paused);
+    this.cover.setTimerPaused(paused);
+  }
+
   destroy(): void {
     for (const d of this.decor) d.image.destroy();
     this.map.destroy();

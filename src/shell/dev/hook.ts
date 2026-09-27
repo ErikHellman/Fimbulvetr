@@ -61,6 +61,8 @@ export interface FimbulHook {
   screens(): string[];
   /** Dev: sets the hero's health (0 makes them fall next tick). */
   setHp(hp: number): void;
+  /** The open pause menu's page and cursor, or null in play. */
+  menu(): { tab: string; cursor: number; confirm: boolean } | null;
 }
 
 declare global {
@@ -95,6 +97,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       };
     },
     enemies: () => bridge().sim.enemies.map((e) => ({ def: e.def, hp: e.hp, flash: e.flash })),
+    menu: () => bridge().menu(),
     setHp: (hp) => {
       bridge().sim.hero.hp = Math.max(0, Math.min(bridge().sim.hero.maxHp, Math.floor(hp)));
     },

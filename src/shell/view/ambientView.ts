@@ -106,6 +106,11 @@ export class AmbientView {
     };
   }
 
+  /** The pause menu freezes the smoke in the air. */
+  setPaused(paused: boolean): void {
+    for (const e of this.emitters) e.active = !paused;
+  }
+
   destroy(): void {
     for (const e of this.emitters) e.destroy();
     for (const f of this.fish) f.image.destroy();

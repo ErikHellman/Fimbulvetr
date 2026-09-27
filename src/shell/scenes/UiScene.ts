@@ -3,9 +3,14 @@ import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
 import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
+import { REGION_COLOURS, REGION_NAMES } from '@content/regions';
 import type { ItemId } from '@content/ids';
 import { t, type L10n, type Lang } from '@core/i18n/t';
 import { CONTINUE_DELAY } from '@core/sim/systems/death';
+import { condCtx } from '@core/sim/systems/story';
+import { questLog } from '@core/story/quests';
+import { overworldMap } from '@core/world/mapModel';
+import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
 import { FONT_KEY } from '@shell/gfx/font';
@@ -19,7 +24,18 @@ export interface UiLink {
   readonly lang: () => Lang;
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
+  /** The open pause menu and what its items page lists, or null in play. */
+  readonly menu: () => { readonly state: MenuState; readonly items: readonly MenuItem[] } | null;
 }
+
+const TAB_LABEL = {
+  items: UI.menu_items,
+  map: UI.menu_map,
+  quests: UI.menu_quests,
+  system: UI.menu_system,
+} as const;
+const SYSTEM_LABEL = { resume: UI.menu_resume, start_over: UI.menu_start_over } as const;
+const MENU = { x: 16, y: 14, w: GAME_W - 32, h: GAME_H - 28 };
 
 export const UI_LINK = 'uiLink';
 
@@ -66,6 +82,11 @@ export class UiScene extends Phaser.Scene {
   private shop!: Phaser.GameObjects.BitmapText;
   private lastShown = '';
   private lastBlip = 0;
+  private menuBox!: Phaser.GameObjects.Graphics;
+  private menuTabs: Phaser.GameObjects.BitmapText[] = [];
+  private menuBody!: Phaser.GameObjects.BitmapText;
+  private menuHint!: Phaser.GameObjects.BitmapText;
+  private menuIcons: Phaser.GameObjects.Image[] = [];
   private fallen!: Phaser.GameObjects.Rectangle;
   private fallenTitle!: Phaser.GameObjects.BitmapText;
   private fallenPrompt!: Phaser.GameObjects.BitmapText;
@@ -103,6 +124,11 @@ export class UiScene extends Phaser.Scene {
     this.fallen = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000, 0.6).setOrigin(0, 0).setVisible(false);
     this.fallenTitle = this.text(0, 0, '', PAPER);
     this.fallenPrompt = this.text(0, 0, '', GOLD);
+    this.menuBox = this.add.graphics();
+    this.menuTabs = MENU_TABS.map(() => this.text(0, 0, '', DIM));
+    this.menuBody = this.text(0, 0, '', PAPER);
+    this.menuHint = this.text(0, 0, '', DIM);
+    this.menuIcons = [];
   }
 
   override update(): void {
@@ -112,6 +138,117 @@ export class UiScene extends Phaser.Scene {
     this.drawHud();
     this.drawStory(link.sim.storyUi());
     this.drawGameOver();
+    this.drawMenu();
+  }
+
+  /** The pause menu over everything: tab labels, then the page for the open tab. */
+  private drawMenu(): void {
+    const view = this.link.menu();
+    this.menuBox.clear();
+    for (const icon of this.menuIcons) icon.setVisible(false);
+    if (view === null) {
+      for (const tab of this.menuTabs) tab.setText('');
+      this.menuBody.setText('');
+      this.menuHint.setText('');
+      return;
+    }
+    const lang = this.link.lang();
+    const { state } = view;
+    this.menuBox
+      .fillStyle(INK, 0.95)
+      .fillRect(MENU.x, MENU.y, MENU.w, MENU.h)
+      .lineStyle(1, GOLD, 1)
+      .strokeRect(MENU.x + 0.5, MENU.y + 0.5, MENU.w - 1, MENU.h - 1)
+      .lineBetween(MENU.x + 8, MENU.y + 24.5, MENU.x + MENU.w - 8, MENU.y + 24.5);
+    let x = MENU.x + 14;
+    MENU_TABS.forEach((tab, i) => {
+      const label = t(TAB_LABEL[tab], lang);
+      this.menuTabs[i]
+        ?.setText(label)
+        .setPosition(x, MENU.y + 8)
+        .setTint(tab === state.tab ? GOLD : DIM);
+      x += textWidth(label) + 24;
+    });
+    this.menuHint
+      .setText(t(state.tab === 'items' ? UI.menu_items_hint : UI.menu_tabs_hint, lang))
+      .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
+    const top = MENU.y + 36;
+    if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
+    else if (state.tab === 'map') this.menuMap(top, lang);
+    else if (state.tab === 'quests') this.menuQuests(top, lang);
+    else {
+      const lines = SYSTEM_ROWS.map(
+        (r, i) => `${i === state.cursor ? '>' : ' '} ${t(SYSTEM_LABEL[r], lang)}`,
+      );
+      if (state.confirm) lines.push('', t(UI.menu_start_over_confirm, lang));
+      this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+    }
+  }
+
+  private menuItems(items: readonly MenuItem[], state: MenuState, top: number, lang: Lang): void {
+    if (items.length === 0) {
+      this.menuBody.setText(t(UI.menu_no_items, lang)).setPosition(MENU.x + 24, top);
+      return;
+    }
+    const lines = items.map((item, i) => {
+      const slot = item.slot === 0 ? '  [K]' : item.slot === 1 ? '  [L]' : '';
+      const count = item.kind === 'food' ? `  x${String(item.count)}` : '';
+      return `${i === state.cursor ? '>' : ' '}     ${this.itemName(item.id, lang)}${count}${slot}`;
+    });
+    this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+    items.forEach((item, i) => {
+      let icon = this.menuIcons[i];
+      if (icon === undefined) {
+        icon = this.add.image(0, 0, '__MISSING').setOrigin(0.5, 0.5);
+        this.menuIcons.push(icon);
+      }
+      const ref = this.link.frames.get(`item_${item.id}_idle_s_0`);
+      icon
+        .setTexture(ref.key, ref.frame)
+        .setPosition(MENU.x + 48, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
+        .setVisible(true)
+        .setScale(0.5);
+    });
+  }
+
+  /** The overworld as coloured cells: visited screens by region, the hero's cell framed in gold. */
+  private menuMap(top: number, lang: Lang): void {
+    const { sim } = this.link;
+    const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id);
+    const cw = 22;
+    const ch = 13;
+    const cols = m.x1 - m.x0 + 3;
+    const rows = m.y1 - m.y0 + 3;
+    const ox = Math.round(MENU.x + (MENU.w - cols * cw) / 2);
+    const oy = top + 18;
+    for (const c of m.cells) {
+      if (!c.visited && !c.here) continue;
+      const cx = ox + (c.gx - m.x0 + 1) * cw;
+      const cy = oy + (c.gy - m.y0 + 1) * ch;
+      if (cx < MENU.x || cy + ch > MENU.y + MENU.h - 24) continue;
+      this.menuBox.fillStyle(REGION_COLOURS[c.region], 1).fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      if (c.here) this.menuBox.lineStyle(2, GOLD, 1).strokeRect(cx + 1, cy + 1, cw - 2, ch - 2);
+    }
+    this.menuBox.lineStyle(1, DIM, 1).strokeRect(ox + 0.5, oy + 0.5, cols * cw - 1, rows * ch - 1);
+    const here = m.cells.find((c) => c.here);
+    const label =
+      here === undefined ? '' : `${t(REGION_NAMES[here.region], lang)} — ${t(UI.menu_here, lang)}`;
+    this.menuBody.setText(label).setPosition(MENU.x + 24, top);
+  }
+
+  private menuQuests(top: number, lang: Lang): void {
+    const { sim } = this.link;
+    const log = questLog(sim.db.quests, condCtx(sim));
+    if (log.length === 0) {
+      this.menuBody.setText(t(UI.menu_no_quests, lang)).setPosition(MENU.x + 24, top);
+      return;
+    }
+    const lines = log.flatMap((q) => [
+      `${t(q.name, lang)}${q.done ? ` (${t(UI.menu_quest_done, lang)})` : ''}`,
+      ...layoutText(t(q.text, lang), MENU.w - 64).map((l) => `   ${l}`),
+      '',
+    ]);
+    this.menuBody.setText(lines.slice(0, 22).join('\n')).setPosition(MENU.x + 24, top);
   }
 
   /** After the fall: the screen dims and, a moment later, the way to rise again. */

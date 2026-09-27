@@ -9,13 +9,14 @@ import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
 import { daylight } from '@core/clock/clock';
 import type { Entity } from '@core/actors/entity';
-import { InputLatch } from '@core/input/actions';
+import { InputLatch, wasPressed, type InputFrame } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
 import { add, lerp } from '@core/math/vec';
 import type { SimEvent } from '@core/sim/events';
 import { advance, type Accumulator } from '@core/sim/loop';
 import { Sim } from '@core/sim/sim';
-import type { GameState } from '@core/state/gameState';
+import { newGame, type GameState } from '@core/state/gameState';
+import { NEW_GAME } from '@content/start';
 import { decorArt, decorPlacements } from '@core/world/decor';
 import { SCREEN_H, SCREEN_W } from '@core/world/dims';
 import { AudioDirector } from '@shell/audio/sfx';
@@ -28,6 +29,7 @@ import { LETTERBOX } from '@shell/scale';
 import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
+import { menuItems, openMenu, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
 import { EntityViews } from '@shell/view/entityViews';
 import { DarknessView } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
@@ -62,6 +64,7 @@ export class PlayScene extends Phaser.Scene {
   private readonly screens = new Map<ScreenId, Stage>();
   private readonly stats = new FrameStats();
   private gradeKey = '';
+  private menu: MenuState | null = null;
   private tileAnims: readonly TileAnim[] = [];
 
   constructor() {
@@ -72,6 +75,7 @@ export class PlayScene extends Phaser.Scene {
     this.services = data;
     this.acc.acc = 0;
     this.gradeKey = '';
+    this.menu = null;
     this.screens.clear();
     this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay });
     this.tileAnims = tileAnimations(data.assets.tileset);
@@ -124,6 +128,10 @@ export class PlayScene extends Phaser.Scene {
       sfx: (id) => {
         this.audio.play(id);
       },
+      menu: () =>
+        this.menu === null
+          ? null
+          : { state: this.menu, items: menuItems(this.sim.state.inv, this.services.db.items) },
     };
     this.registry.set(UI_LINK, link);
     if (!this.scene.isActive('ui')) this.scene.launch('ui');
@@ -133,9 +141,22 @@ export class PlayScene extends Phaser.Scene {
 
   override update(_time: number, delta: number): void {
     this.mapper.sample(this.keys.takeCodes(), readPad(connectedPads(navigator)));
+    if (this.menu !== null) {
+      this.updateMenu(this.latch.consume());
+      this.acc.acc = 0;
+      this.draw(0);
+      return;
+    }
     const { steps, alpha } = advance(this.acc, delta);
     const started = performance.now();
-    for (let i = 0; i < steps; i++) this.sim.step(this.latch.consume());
+    for (let i = 0; i < steps; i++) {
+      const frame = this.latch.consume();
+      if (this.sim.mode === 'play' && (wasPressed(frame, 'menu') || wasPressed(frame, 'map'))) {
+        this.setMenu(openMenu(wasPressed(frame, 'map') ? 'map' : 'items'));
+        break;
+      }
+      this.sim.step(frame);
+    }
     this.stats.record(delta, performance.now() - started);
     const events = this.sim.drainEvents();
     for (const ev of events) this.onEvent(ev);
@@ -159,6 +180,7 @@ export class PlayScene extends Phaser.Scene {
       restart: (state: GameState) => {
         this.scene.restart({ ...this.services, state });
       },
+      menu: () => (this.menu === null ? null : { ...this.menu }),
     };
   }
 
@@ -174,6 +196,40 @@ export class PlayScene extends Phaser.Scene {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
     } else if (ev.t === 'autosave') this.services.saves.autosaver.request(this.sim.snapshot());
+  }
+
+  /** Opens or closes the pause menu; everything that moves on its own clock stops while it is open. */
+  private setMenu(next: MenuState | null): void {
+    const was = this.menu !== null;
+    this.menu = next;
+    const paused = next !== null;
+    if (paused === was) return;
+    for (const stage of this.screens.values()) {
+      stage.view.setPaused(paused);
+      stage.ambient.setPaused(paused);
+    }
+    this.weather.setPaused(paused);
+    this.audio.play('sfx_talk');
+  }
+
+  private updateMenu(frame: InputFrame): void {
+    const menu = this.menu;
+    if (menu === null) return;
+    const r = stepMenu(menu, frame, menuItems(this.sim.state.inv, this.services.db.items));
+    for (const a of r.actions) {
+      if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
+      else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
+      else if (a.k === 'startOver') {
+        const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
+        this.services.saves.autosaver.request(state);
+        this.scene.restart({ ...this.services, state });
+        return;
+      }
+    }
+    if (r.actions.length > 0) this.sim.flushCommands();
+    if (r.state !== menu && r.state !== null && (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab))
+      this.audio.play('sfx_talk');
+    this.setMenu(r.state);
   }
 
   /** The hero's sprite follows the weapon in hand; everything else draws its own art. */
