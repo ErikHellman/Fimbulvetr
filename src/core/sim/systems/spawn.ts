@@ -6,6 +6,7 @@ import { evalCond } from '../../story/cond';
 import { tileFeet } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
+import { refreshFixtures, spawnFixtures, stampCollision } from './fixtures';
 import { createPiece } from './pickups';
 import { placeNpcs } from './npcs';
 import { condCtx } from './story';
@@ -14,6 +15,8 @@ import { condCtx } from './story';
 export function spawnActors(rt: SimRt): Entity[] {
   rt.actors = spawnThings(rt);
   placeNpcs(rt);
+  refreshFixtures(rt);
+  stampCollision(rt);
   return rt.actors;
 }
 
@@ -53,6 +56,10 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'piece':
         if (!rt.state.world.pieces.includes(thing.id))
           out.push(createPiece(rt.newId(), tileFeet(thing.at), index));
+        break;
+      case 'fire':
+      case 'gate':
+        spawnFixtures(rt, thing, index, out);
         break;
       case 'door':
       case 'sign':

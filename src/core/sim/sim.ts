@@ -29,6 +29,7 @@ import { moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
 import { stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
+import { fixtureHazards, refreshFixtures } from './systems/fixtures';
 import { collectPickups } from './systems/pickups';
 import { stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
@@ -158,8 +159,10 @@ export class Sim implements SimRt {
     for (const c of this.queue.splice(0)) this.apply(c);
     for (const e of this.entities) e.prev = { ...e.pos };
     if (this.mode === 'transition') stepTransition(this);
-    else if (this.mode === 'story') stepStory(this, input);
-    else if (this.mode === 'over') stepOver(this, input);
+    else if (this.mode === 'story') {
+      stepStory(this, input);
+      refreshFixtures(this);
+    } else if (this.mode === 'over') stepOver(this, input);
     else this.stepPlay(input);
     syncHero(this);
     this.state.playTicks += 1;
@@ -182,10 +185,12 @@ export class Sim implements SimRt {
       Dir4,
       ScreenId | null
     >;
+    const base = buildCollision(terrain, this.db.terrain);
     return {
       id,
       terrain,
-      collision: buildCollision(terrain, this.db.terrain),
+      base,
+      collision: { ...base, flags: base.flags.slice() },
       neighbours,
       cover: coverFor(this, id),
     };
@@ -194,6 +199,7 @@ export class Sim implements SimRt {
   private stepPlay(input: InputFrame): void {
     tickWorldClock(this, this.ticksPerMinute);
     refreshCover(this);
+    refreshFixtures(this);
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
@@ -209,6 +215,7 @@ export class Sim implements SimRt {
     swordProps(this);
     cutCover(this);
     resolveAttacks(this);
+    fixtureHazards(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);

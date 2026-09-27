@@ -3,7 +3,8 @@ import type { Dir4 } from '../math/dir';
 import type { Vec } from '../math/vec';
 
 export type Faction = 'hero' | 'enemy' | 'neutral' | 'env';
-export type EntityKind = 'hero' | 'enemy' | 'npc' | 'critter' | 'prop' | 'pickup';
+/** `fixture`: part of the room that changes with conditions (a gate, a fire, a chest, a shutter). */
+export type EntityKind = 'hero' | 'enemy' | 'npc' | 'critter' | 'prop' | 'pickup' | 'fixture';
 
 export interface FsmState {
   s: string;

@@ -40,6 +40,9 @@ export interface Transition {
 export interface LoadedScreen {
   readonly id: ScreenId;
   readonly terrain: TerrainGrid;
+  /** Collision from the terrain alone. */
+  readonly base: CollisionGrid;
+  /** `base` plus the tiles of closed fixtures (gates), restamped whenever one opens or closes. */
   readonly collision: CollisionGrid;
   readonly neighbours: Readonly<Record<Dir4, ScreenId | null>>;
   readonly cover: CoverGrid;

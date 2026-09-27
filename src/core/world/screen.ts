@@ -95,6 +95,17 @@ export type Thing =
     }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
   | { readonly k: 'piece'; readonly id: string; readonly at: TilePos }
+  /** Burning tiles (the raid): they hurt on touch and are not solid; out while `when` fails. */
+  | { readonly k: 'fire'; readonly at: TilePos; readonly w: number; readonly h: number; readonly when?: Cond }
+  /** A barrier of tiles, solid while `closed` holds: a palisade gate, a wall of fire, piled logs. */
+  | {
+      readonly k: 'gate';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly art: GateArt;
+      readonly closed: Cond;
+    }
   /** Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up. */
   | {
       readonly k: 'drop';
@@ -104,6 +115,8 @@ export type Thing =
       readonly accepts: PropId;
       readonly do: readonly Effect[];
     };
+
+export type GateArt = 'palisade' | 'fire' | 'logs';
 
 export interface ScreenDef {
   readonly id: ScreenId;
