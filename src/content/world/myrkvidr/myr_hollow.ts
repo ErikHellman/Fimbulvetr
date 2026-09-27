@@ -16,6 +16,14 @@ export const myrHollow: ScreenDef = {
     { k: 'enemy', id: 'draugr', at: { x: 20, y: 6 }, when: { k: 'phase', is: 'night' } },
     { k: 'enemy', id: 'draugr', at: { x: 27, y: 12 }, when: { k: 'phase', is: 'night' } },
   ],
+  /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
+  spawns: [
+    { x: 8, y: 6 },
+    { x: 30, y: 7 },
+    { x: 12, y: 15 },
+    { x: 32, y: 12 },
+    { x: 6, y: 10 },
+  ],
   map: [
     'TPPPTTPPTPPPPPPTPPPTTPPTPPPPTPTPPTPPPPPP',
     'PPPPPPTTPTPPTPPTPPTTTTPPPPPPPTPPPPTTPPTP',

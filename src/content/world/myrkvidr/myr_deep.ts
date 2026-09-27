@@ -4,7 +4,7 @@ export const myrDeep: ScreenDef = {
   id: 'myr_deep',
   region: 'myrkvidr',
   purpose:
-    'Deep Myrkviðr, old pines: the road north to Uppvík lies under a fallen tree (cleared in M2). Draugr walk here at night.',
+    'Deep Myrkviðr, old pines: the road north to Uppvík lies under a fallen tree (cleared in M2). Draugr walk here at night; in winter, drifts pile west of the road and east by the mound.',
   things: [
     {
       k: 'sign',
@@ -18,6 +18,13 @@ export const myrDeep: ScreenDef = {
     { k: 'enemy', id: 'vargr', at: { x: 10, y: 15 } },
     { k: 'enemy', id: 'draugr', at: { x: 29, y: 8 }, when: { k: 'phase', is: 'night' } },
   ],
+  /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
+  spawns: [
+    { x: 8, y: 12 },
+    { x: 28, y: 11 },
+    { x: 6, y: 7 },
+    { x: 30, y: 14 },
+  ],
   map: [
     'PPPPTPPPPPPPPTTPPP,,,,PTPTPPPPPPTPPPTPPP',
     'PTPTPPPPPPPPPPPPPP,,,,TTTPTPPPTPTTPPPPTP',
@@ -25,8 +32,8 @@ export const myrDeep: ScreenDef = {
     'PPTTTPPPTPTPTPPPPP,,,,TPPPPPPPPPPPTPPPPP',
     'PTTPPPPPPTPPTPPPTT,,,,TPPTPPTPPPTTTPPTPP',
     'PTPP.%.PT..PPT%PT.,,,,PTP..PP%%%..T%PPTT',
-    'PPTPP....P.%......,,,,P..P.P.......%TTTP',
-    'PPTPP.............,,,,%....%.......TPPPP',
+    'PPTPP....P^%^^....,,,,P..P.P.......%TTTP',
+    'PPTPP...^^^^^^^...,,,,%....%.......TPPPP',
     'PPPP.....m........,,,,..............TTTP',
     'PTPT..............,,,,P%......%....PPPPP',
     'PPPPP.............,,,,.P......P.P...TPPP',
@@ -34,8 +41,8 @@ export const myrDeep: ScreenDef = {
     '..............P...,,,,.P%...%PP.........',
     '....%.P........P%.,,,,P%.......%........',
     'PTPPP.%...........,,,,........%P........',
-    'PPPP%...P%....P...,,,,..............TTPP',
-    'TTTP%.............,,,,P.......m....%PPPP',
+    'PPPP%...P%....P...,,,,..^^^^^.......TTPP',
+    'TTTP%.............,,,,P^^^^^^.m....%PPPP',
     'TTPPP.P%...%.%P%..,,,,..%.%P..%...PTPTPP',
     'TPPPPPP.PT.T%%.T.P,,,,.%PP.PPPP.P.%.PPPT',
     'PPPPPPTTTPTPPTTTTP,,,,PTPTPPTTTPTPTPPPPT',

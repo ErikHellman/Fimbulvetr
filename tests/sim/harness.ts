@@ -60,7 +60,9 @@ export class Harness {
     if (o.facing !== undefined) state.hero.facing = o.facing;
     if (o.minute !== undefined) state.clock.minute = o.minute;
     if (o.season !== undefined) state.clock.season = o.season;
-    this.sim = new Sim(o.db ?? DB, state, { longDay: false, rolled: o.rolled ?? false });
+    // FIMBUL_ROLLED=1 turns rolling on everywhere (a one-off check of the older routes, never in CI).
+    const rolled = o.rolled ?? process.env['FIMBUL_ROLLED'] === '1';
+    this.sim = new Sim(o.db ?? DB, state, { longDay: false, rolled });
   }
 
   /** Shorthand for `frameOf`, for `until` loops. */

@@ -101,7 +101,22 @@ export const DEV_PRESETS = {
     ...LANTERN,
     flags: MYR_FLAGS,
     vars: { ask_pen: 31 },
+  } /** A winter night on the Myrkviðr road, half an hour before sunrise: snow, rolled foes and trolls. */,
+  turning: {
+    screen: 'myr_road',
+    tile: [20, 18],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 6 * 60 + 30,
+    season: 'winter',
+    policy: 'cycling',
+    silver: 5,
+    ...LANTERN,
+    flags: MYR_FLAGS,
+    vars: { ask_pen: 31 },
   },
+
   /** At the mouth of Rótarhellir, just inside: seax, shield and the lantern. */
   d1: {
     screen: 'd1_r01',

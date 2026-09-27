@@ -8,6 +8,14 @@ export const myrRoad: ScreenDef = {
     { k: 'enemy', id: 'vargr', at: { x: 8, y: 6 } },
     { k: 'enemy', id: 'vargr', at: { x: 32, y: 15 } },
   ],
+  /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
+  spawns: [
+    { x: 8, y: 10 },
+    { x: 30, y: 8 },
+    { x: 10, y: 15 },
+    { x: 28, y: 13 },
+    { x: 6, y: 6 },
+  ],
   map: [
     'PPPPPTPPTPTPTTTTTP,,,,PPTPTPPPPPPPPPPPPP',
     'TPTTPTPTTTTTPPPTTP,,,,PTPTPPTTTTPPTPTPPP',
