@@ -52,7 +52,16 @@ export type ArmorId = (typeof ARMORS)[number];
 export const RINGS = ['ring_stamina', 'ring_thrift', 'ring_beacon', 'ring_berserker'] as const;
 export type RingId = (typeof RINGS)[number];
 
-export const ENEMIES = ['dummy', 'vargr', 'draugr', 'troll', 'root_biter'] as const;
+export const ENEMIES = [
+  'dummy',
+  'vargr',
+  'draugr',
+  'troll',
+  'root_biter',
+  'rotvaettr',
+  'rot_bulb',
+  'root_spike',
+] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
 export const SFX = [
@@ -88,6 +97,8 @@ export const SFX = [
   'sfx_push',
   'sfx_boomerang',
   'sfx_stun',
+  'sfx_boss_hit',
+  'sfx_boss_roar',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

@@ -26,12 +26,13 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
   const guarded = def?.guard === true || mem(target, 'guard') === 1;
   if (guarded && target.faction !== hit.faction && target.iframes === 0) {
     // A guarded weak point (a closed core): the blow clinks off.
-    target.knock = scale(hit.dir, hit.knock / 2);
+    target.knock = scale(hit.dir, (hit.knock / 2) * (1 - (def?.knockResist ?? 0)));
     rt.emit({ t: 'hit', target: target.id, blocked: true, dealt: 0 });
     return { outcome: 'blocked', dealt: 0 };
   }
   if (def?.stunnable !== undefined && (hit.tags & STUN) !== 0 && target.faction !== hit.faction) {
-    target.mem['stun'] = def.stunnable;
+    // A behaviour may shorten its own stun (`mem.stunFor`), as Rótvættr's bulbs do in later phases.
+    target.mem['stun'] = mem(target, 'stunFor') > 0 ? mem(target, 'stunFor') : def.stunnable;
     target.vel = { x: 0, y: 0 };
   }
   const result = resolveHit(target, hit, {
@@ -95,7 +96,8 @@ export function resolveSword(rt: SimRt): void {
       tags: 0,
     });
     if (result.outcome === 'ignored') continue;
-    rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : 'sfx_hit' });
+    const boss = enemyDef(rt, e).boss !== undefined;
+    rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : boss ? 'sfx_boss_hit' : 'sfx_hit' });
   }
 }
 

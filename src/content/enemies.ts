@@ -1,6 +1,6 @@
 import type { AttackWindow, EnemyDef } from '@core/actors/enemies/defs';
 import type { Box } from '@core/math/box';
-import { HEAVY } from '@core/combat/hit';
+import { HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
 import type { EnemyId } from './ids';
 
 /** The same box for every facing (a body slam). */
@@ -126,5 +126,54 @@ export const ENEMY_DEFS = {
     },
     stunnable: 150,
     drops: { heart: 3, silver: 2, none: 5 },
+  },
+  /** The root-wight of the first stone: its core opens only while all three bulbs are stunned. */
+  rotvaettr: {
+    id: 'rotvaettr',
+    art: 'enemy_rotvaettr',
+    hp: 24,
+    body: { x: -14, y: -10, w: 28, h: 10 },
+    hurt: { x: -16, y: -30, w: 32, h: 30 },
+    behaviour: 'rotvaettr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    touch: { amount: 2, knock: 5, tags: 0 },
+    boss: { name: { en: 'Rótvættr', sv: 'Rótvættr' } },
+  },
+  /** One of Rótvættr's bulbs: it cannot die, only be stunned shut. */
+  rot_bulb: {
+    id: 'rot_bulb',
+    art: 'enemy_rot_bulb',
+    hp: 1,
+    body: { x: -7, y: -8, w: 14, h: 8 },
+    hurt: { x: -8, y: -18, w: 16, h: 18 },
+    behaviour: 'rot_bulb',
+    knockResist: 1,
+    immortal: true,
+    solid: true,
+    stunnable: 400,
+  },
+  /** A spike of root bursting up under Ask after the ground cracks (400 ms); a shield is no help. */
+  root_spike: {
+    id: 'root_spike',
+    art: 'enemy_root_spike',
+    hp: 1,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -6, y: -8, w: 12, h: 8 },
+    behaviour: 'root_spike',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      erupt: {
+        from: 0,
+        to: 8,
+        boxes: around({ x: -8, y: -16, w: 16, h: 16 }),
+        amount: 2,
+        knock: 4,
+        tags: PIERCE_SHIELD,
+      },
+    },
   },
 } as const satisfies Record<EnemyId, EnemyDef>;

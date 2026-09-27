@@ -312,4 +312,25 @@ export const SFX_BANK = {
     release: 0.2,
     volume: 0.3,
   },
+  /** A blow landing on a boss's weak point: deeper and longer than a plain hit. */
+  sfx_boss_hit: {
+    wave: 'square',
+    freq: 160,
+    freqEnd: 50,
+    attack: 0,
+    sustain: 0.06,
+    release: 0.2,
+    volume: 0.45,
+    duty: 0.4,
+  },
+  /** A boss's roar: a long, low, rough bellow. */
+  sfx_boss_roar: {
+    wave: 'saw',
+    freq: 90,
+    freqEnd: 55,
+    attack: 0.05,
+    sustain: 0.6,
+    release: 0.4,
+    volume: 0.45,
+  },
 } as const satisfies Record<SfxId, SynthParams>;
