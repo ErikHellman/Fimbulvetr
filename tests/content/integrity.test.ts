@@ -199,13 +199,29 @@ describe('doors', () => {
     }
   });
 
-  it('reaches every screen off the world grid', () => {
-    const offGrid = SCREEN_IDS.filter((id) => WORLD_LAYOUT.at[id] === undefined);
+  it('reaches every screen off the world grid, and every dungeon grid, through a door', () => {
+    const grids = Object.entries(WORLD_LAYOUT.dungeons ?? {});
+    const inDungeon = new Set(grids.flatMap(([, g]) => Object.keys(g.at)));
+    const offGrid = SCREEN_IDS.filter((id) => WORLD_LAYOUT.at[id] === undefined && !inDungeon.has(id));
     for (const id of offGrid)
       expect(
         doors.some((d) => d.door.to === id),
         id,
       ).toBe(true);
+    for (const [dungeon, g] of grids) {
+      const rooms = new Set(Object.keys(g.at));
+      expect(
+        doors.some((d) => rooms.has(d.door.to) && !rooms.has(d.from)),
+        `${dungeon} has a way in`,
+      ).toBe(true);
+    }
+  });
+
+  it('marks exactly the rooms on a dungeon grid as that dungeon', () => {
+    for (const id of SCREEN_IDS) {
+      const grid = Object.entries(WORLD_LAYOUT.dungeons ?? {}).find(([, g]) => g.at[id] !== undefined)?.[0];
+      expect(SCREENS[id].dungeon, id).toBe(grid);
+    }
   });
 });
 

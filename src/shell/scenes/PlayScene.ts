@@ -38,6 +38,8 @@ import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
 const INDOOR_LIGHT = 0.85;
+/** Dungeons: a fixed, cool cave light. */
+const CAVE_LIGHT = 0.8;
 
 /** Everything drawn for one screen: its tiles and decor, and its ambient smoke and fish. */
 interface Stage {
@@ -280,9 +282,11 @@ export class PlayScene extends Phaser.Scene {
 
   private applyGrade(): void {
     const clock = this.sim.state.clock;
-    const indoor = this.services.db.screens[this.sim.screen.id].indoor === true;
-    const light = indoor ? INDOOR_LIGHT : daylight(clock, this.services.db.clock);
-    const season = indoor ? 'autumn' : clock.season;
+    const def = this.services.db.screens[this.sim.screen.id];
+    const indoor = def.indoor === true;
+    const cave = def.dungeon !== undefined;
+    const light = indoor ? INDOOR_LIGHT : cave ? CAVE_LIGHT : daylight(clock, this.services.db.clock);
+    const season = indoor ? 'autumn' : cave ? 'spring' : clock.season;
     const weather = this.sim.weather();
     const key = `${season}|${Math.round(light * 200)}|${weather}`;
     if (key === this.gradeKey) return;

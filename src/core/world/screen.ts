@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { CritterId, EnemyId, PropId, RegionId, ScriptId } from '@content/ids';
+import type { CritterId, DungeonId, EnemyId, PropId, RegionId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { L10n } from '../i18n/t';
@@ -130,39 +130,78 @@ export interface ScreenDef {
   readonly indoor?: boolean;
   /** No light of its own (a cave): only the lantern and fires show anything. */
   readonly dark?: boolean;
+  /** A dungeon room: its grid in `layout.dungeons`; the clock stops and there is no weather. */
+  readonly dungeon?: DungeonId;
 }
 
-export interface WorldLayout {
+/** A grid of screens: the overworld, or one floor of a dungeon. */
+export interface ScreenGrid {
   readonly cols: number;
   readonly rows: number;
   readonly at: Readonly<Partial<Record<ScreenId, readonly [number, number]>>>;
 }
 
+export interface WorldLayout extends ScreenGrid {
+  /** Dungeon floors: rooms slide into each other like overworld screens, never across grids. */
+  readonly dungeons?: Readonly<Partial<Record<DungeonId, ScreenGrid>>>;
+}
+
 export interface LayoutIndex {
+  /** A screen's cell in its own grid (the overworld or its dungeon). */
   pos(id: ScreenId): readonly [number, number] | undefined;
-  idAt(gx: number, gy: number): ScreenId | undefined;
-  /** World-pixel origin. Screens off the grid (interiors, dungeon rooms) get pockets below it. */
+  /** The screen at a cell of the overworld (`grid` null) or of a dungeon's grid. */
+  idAt(gx: number, gy: number, grid?: DungeonId | null): ScreenId | undefined;
+  /** The dungeon whose grid holds the screen; null for the overworld and for off-grid screens. */
+  gridOf(id: ScreenId): DungeonId | null;
+  /**
+   * World-pixel origin. Screens off every grid (interiors) get pockets in a row below the overworld; each
+   * dungeon grid gets its own block below those.
+   */
   origin(id: ScreenId): Vec;
 }
 
-/** Indexes the overworld grid; `ids` (all screens, in a stable order) decides the off-grid pockets. */
+/** Indexes the overworld and dungeon grids; `ids` (all screens, in a stable order) decides the pockets. */
 export function indexLayout(layout: WorldLayout, ids: readonly ScreenId[]): LayoutIndex {
+  const grids: [DungeonId | null, ScreenGrid][] = [
+    [null, layout],
+    ...(Object.entries(layout.dungeons ?? {}) as [DungeonId, ScreenGrid][]),
+  ];
   const byPos = new Map<string, ScreenId>();
-  for (const [id, pos] of Object.entries(layout.at) as [ScreenId, readonly [number, number] | undefined][]) {
-    if (pos === undefined) continue;
-    const key = `${pos[0]},${pos[1]}`;
-    const taken = byPos.get(key);
-    if (taken !== undefined) throw new Error(`layout: ${taken} and ${id} both at ${key}`);
-    byPos.set(key, id);
+  const cell = new Map<ScreenId, readonly [number, number]>();
+  const gridOf = new Map<ScreenId, DungeonId | null>();
+  for (const [grid, g] of grids) {
+    for (const [id, pos] of Object.entries(g.at) as [ScreenId, readonly [number, number] | undefined][]) {
+      if (pos === undefined) continue;
+      if (cell.has(id)) throw new Error(`layout: ${id} is on two grids`);
+      const key = `${grid ?? 'world'}:${pos[0]},${pos[1]}`;
+      const taken = byPos.get(key);
+      if (taken !== undefined) throw new Error(`layout: ${taken} and ${id} both at ${key}`);
+      byPos.set(key, id);
+      cell.set(id, pos);
+      gridOf.set(id, grid);
+    }
   }
   const pockets = new Map<ScreenId, number>();
-  for (const id of ids) if (layout.at[id] === undefined) pockets.set(id, pockets.size);
+  for (const id of ids) if (!cell.has(id)) pockets.set(id, pockets.size);
+  // Below the overworld: one row of pockets, then each dungeon grid, a screen apart.
+  const top = new Map<DungeonId, number>();
+  let y = layout.rows + 3;
+  for (const [grid, g] of grids) {
+    if (grid === null) continue;
+    top.set(grid, y);
+    y += g.rows + 1;
+  }
   return {
-    pos: (id) => layout.at[id],
-    idAt: (gx, gy) => byPos.get(`${gx},${gy}`),
+    pos: (id) => cell.get(id),
+    idAt: (gx, gy, grid = null) => byPos.get(`${grid ?? 'world'}:${gx},${gy}`),
+    gridOf: (id) => gridOf.get(id) ?? null,
     origin: (id) => {
-      const pos = layout.at[id];
-      if (pos !== undefined) return { x: pos[0] * SCREEN_W, y: pos[1] * SCREEN_H };
+      const pos = cell.get(id);
+      if (pos !== undefined) {
+        const grid = gridOf.get(id) ?? null;
+        const row = grid === null ? 0 : (top.get(grid) ?? 0);
+        return { x: pos[0] * SCREEN_W, y: (row + pos[1]) * SCREEN_H };
+      }
       const pocket = pockets.get(id);
       if (pocket === undefined) throw new Error(`screen ${id} is not indexed`);
       return { x: pocket * SCREEN_W, y: (layout.rows + 1) * SCREEN_H };
@@ -174,7 +213,7 @@ export function neighbourOf(index: LayoutIndex, id: ScreenId, dir: Dir4): Screen
   const pos = index.pos(id);
   if (pos === undefined) return null;
   const d = DIR_VEC[dir];
-  return index.idAt(pos[0] + d.x, pos[1] + d.y) ?? null;
+  return index.idAt(pos[0] + d.x, pos[1] + d.y, index.gridOf(id)) ?? null;
 }
 
 /** World-pixel origin of any screen. */

@@ -151,7 +151,8 @@ export class Sim implements SimRt {
 
   /** The weather on the current screen: story weather outdoors, always clear indoors. */
   weather(): WeatherKind {
-    if (this.db.screens[this.screen.id].indoor === true) return 'clear';
+    const def = this.db.screens[this.screen.id];
+    if (def.indoor === true || def.dungeon !== undefined) return 'clear';
     if (this.weatherOverride !== undefined) return this.weatherOverride;
     const ctx = condCtx(this);
     return this.db.weather.find((r) => evalCond(r.when, ctx))?.kind ?? 'clear';
@@ -161,7 +162,7 @@ export class Sim implements SimRt {
   darkness(): number {
     const def = this.db.screens[this.screen.id];
     return darknessOf(daylight(this.state.clock, this.db.clock), {
-      indoor: def.indoor === true,
+      indoor: def.indoor === true || def.dungeon !== undefined,
       dark: def.dark === true,
       weather: this.weather(),
     });
