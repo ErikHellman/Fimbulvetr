@@ -1,4 +1,4 @@
-import type { EnemyId } from '@content/ids';
+import type { EnemyId, ItemId } from '@content/ids';
 import type { L10n } from '../../i18n/t';
 import type { Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
@@ -38,6 +38,8 @@ export interface EnemyDef {
   readonly stunnable?: number;
   /** A boss: named on the health bar. */
   readonly boss?: { readonly name: L10n };
+  /** Items it cannot be beaten without (the progression solver checks them). */
+  readonly needs?: readonly ItemId[];
 }
 
 export interface AttackWindow {

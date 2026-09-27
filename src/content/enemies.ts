@@ -140,6 +140,7 @@ export const ENEMY_DEFS = {
     solid: true,
     touch: { amount: 2, knock: 5, tags: 0 },
     boss: { name: { en: 'Rótvættr', sv: 'Rótvættr' } },
+    needs: ['boomerang'],
   },
   /** One of Rótvættr's bulbs: it cannot die, only be stunned shut. */
   rot_bulb: {
