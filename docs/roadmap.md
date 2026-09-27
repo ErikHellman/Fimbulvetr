@@ -49,5 +49,12 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Exit route test, e2e, v1-m1b fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M1c Rótarhellir + Rótvættr — plan: `docs/superpowers/plans/2026-09-27-m1b-m1c.md` (Part 2)
+    - [x] Carry-overs: `dungeonOf`, dungeon grids with sliding rooms
+    - [x] Core: chests and heart containers, locks/shutters/switches/braziers, root blocks and vines, the boomerang, the root-biter, the boss framework, Rótvættr, the dungeon map model
+    - [x] Art: cave terrain, fixture sprites, creatures, icons, hero push and toss, SFX
+    - [x] Shell: keys HUD, boss bar, dungeon map tab, stun tint
+    - [x] Content: Rótarhellir (12 rooms), the cave mouth, the runestone and the ending
+    - [x] Progression solver, exit route test, e2e, v1-m1c fixture, balance, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
