@@ -5,6 +5,7 @@ import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
 import type { ItemId } from '@content/ids';
 import { t, type L10n, type Lang } from '@core/i18n/t';
+import { CONTINUE_DELAY } from '@core/sim/systems/death';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
 import { FONT_KEY } from '@shell/gfx/font';
@@ -65,6 +66,9 @@ export class UiScene extends Phaser.Scene {
   private shop!: Phaser.GameObjects.BitmapText;
   private lastShown = '';
   private lastBlip = 0;
+  private fallen!: Phaser.GameObjects.Rectangle;
+  private fallenTitle!: Phaser.GameObjects.BitmapText;
+  private fallenPrompt!: Phaser.GameObjects.BitmapText;
 
   constructor() {
     super('ui');
@@ -96,6 +100,9 @@ export class UiScene extends Phaser.Scene {
     this.shop = this.text(0, 0, '', PAPER);
     this.card = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000).setOrigin(0, 0).setVisible(false);
     this.cardText = this.text(0, 0, '', PAPER);
+    this.fallen = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000, 0.6).setOrigin(0, 0).setVisible(false);
+    this.fallenTitle = this.text(0, 0, '', PAPER);
+    this.fallenPrompt = this.text(0, 0, '', GOLD);
   }
 
   override update(): void {
@@ -104,6 +111,32 @@ export class UiScene extends Phaser.Scene {
     this.link = link;
     this.drawHud();
     this.drawStory(link.sim.storyUi());
+    this.drawGameOver();
+  }
+
+  /** After the fall: the screen dims and, a moment later, the way to rise again. */
+  private drawGameOver(): void {
+    const { sim } = this.link;
+    const t0 = sim.db.tuning.hero.dyingTicks;
+    const age = sim.mode === 'over' ? sim.hero.fsm.t - t0 : -1;
+    this.fallen.setVisible(age >= 0);
+    if (age < 0) {
+      this.fallenTitle.setText('');
+      this.fallenPrompt.setText('');
+      return;
+    }
+    const lang = this.link.lang();
+    const title = t(UI.game_over, lang);
+    const prompt = t(UI.game_over_continue, lang);
+    const w = Math.max(textWidth(title), textWidth(prompt)) + 32;
+    const x = Math.round((GAME_W - w) / 2);
+    const y = 60;
+    this.panel(x, y, w, 44);
+    this.fallenTitle.setText(title).setPosition(Math.round((GAME_W - textWidth(title)) / 2), y + 8);
+    const show = age >= CONTINUE_DELAY && Math.floor(age / 30) % 2 === 0;
+    this.fallenPrompt
+      .setText(show ? prompt : '')
+      .setPosition(Math.round((GAME_W - textWidth(prompt)) / 2), y + 24);
   }
 
   private text(x: number, y: number, value: string, colour: number): Phaser.GameObjects.BitmapText {

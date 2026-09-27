@@ -41,6 +41,8 @@ export const UI = {
     sv: 'Sparfilen kommer från en nyare version av spelet.',
   },
   import_invalid: { en: 'That save file is damaged: {detail}', sv: 'Sparfilen är skadad: {detail}' },
+  game_over: { en: 'You have fallen.', sv: 'Du har fallit.' },
+  game_over_continue: { en: 'Rise again: E or Enter', sv: 'Res dig igen: E eller Enter' },
 } as const satisfies Record<string, L10n>;
 
 export type UiKey = keyof typeof UI;

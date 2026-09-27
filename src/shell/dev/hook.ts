@@ -59,6 +59,8 @@ export interface FimbulHook {
   actors(): { kind: string; def: string; x: number; y: number; fsm: string }[];
   /** Every screen id, for smoke tests. */
   screens(): string[];
+  /** Dev: sets the hero's health (0 makes them fall next tick). */
+  setHp(hp: number): void;
 }
 
 declare global {
@@ -93,6 +95,9 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       };
     },
     enemies: () => bridge().sim.enemies.map((e) => ({ def: e.def, hp: e.hp, flash: e.flash })),
+    setHp: (hp) => {
+      bridge().sim.hero.hp = Math.max(0, Math.min(bridge().sim.hero.maxHp, Math.floor(hp)));
+    },
     clock: () => ({ ...bridge().sim.state.clock }),
     light: () => bridge().lightLevel(),
     appliedGrade: () => [...bridge().appliedGrade()],

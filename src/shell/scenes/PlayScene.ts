@@ -29,6 +29,7 @@ import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { EntityViews } from '@shell/view/entityViews';
+import { FxView } from '@shell/view/fxView';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -48,6 +49,7 @@ export class PlayScene extends Phaser.Scene {
   private mapper!: InputMapper;
   private audio!: AudioDirector;
   private views!: EntityViews;
+  private fx!: FxView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
   private readonly latch = new InputLatch();
@@ -95,6 +97,7 @@ export class PlayScene extends Phaser.Scene {
     cam.setRoundPixels(true);
     this.colour = cam.filters.internal.addColorMatrix();
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
+    this.fx = new FxView(this, data.assets.frames, ANIMS);
     this.fadeRect = this.add
       .rectangle(0, 0, SCREEN_W, SCREEN_H, 0x000000)
       .setOrigin(0, 0)
@@ -149,7 +152,12 @@ export class PlayScene extends Phaser.Scene {
   }
 
   private onEvent(ev: SimEvent): void {
-    if (ev.t === 'screenTransition') this.showScreen(ev.to);
+    if (ev.t === 'killed') {
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fx.poof({ x: origin.x + ev.x, y: origin.y + ev.y - 6 }, this.sim.tick);
+    } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
+      if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
+    } else if (ev.t === 'screenTransition') this.showScreen(ev.to);
     else if (ev.t === 'coverChanged') this.screens.get(ev.screen)?.view.setCover(this.coverTiles(ev.screen));
     else if (ev.t === 'screenEntered') {
       this.showScreen(ev.screen);
@@ -177,6 +185,7 @@ export class PlayScene extends Phaser.Scene {
       this.cameras.main.setScroll(origin.x, origin.y);
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)), this.artOf);
     }
+    this.fx.tick(this.sim.tick);
     const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {
       stage.view.tick(this.sim.tick);

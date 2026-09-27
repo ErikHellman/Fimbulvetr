@@ -42,7 +42,10 @@ export class EntityViews {
       else sprite.clearTint();
       const blink =
         e.kind === 'hero' && e.iframes > 0 && e.anim !== 'roll' && Math.floor(e.iframes / 4) % 2 === 0;
-      sprite.setAlpha(blink ? 0.35 : 1);
+      // A dropped heart or coin blinks for its last two seconds before it vanishes.
+      const ttl = e.mem['ttl'] ?? 0;
+      const fading = e.kind === 'pickup' && ttl > 0 && ttl < 120 && Math.floor(ttl / 6) % 2 === 0;
+      sprite.setAlpha(blink ? 0.35 : fading ? 0.25 : 1);
       sprite.setVisible(e.mem['hidden'] !== 1);
       this.shadow(e, p);
     }
