@@ -14,6 +14,7 @@ import { SCRIPTS_DEFS } from './scripts';
 import { SHOP_DEFS } from './shops';
 import { TERRAIN } from './terrain';
 import { TUNING } from './tuning';
+import { WEATHER_RULES } from './weather';
 import { WORLD_LAYOUT } from './world/layout';
 import { LEGEND } from './world/legend';
 import { SCREENS } from './world/registry';
@@ -38,4 +39,5 @@ export const DB: ContentDb = {
   coverLegend: COVER_LEGEND,
   coverOrder: COVERS,
   shops: SHOP_DEFS,
+  weather: WEATHER_RULES,
 };

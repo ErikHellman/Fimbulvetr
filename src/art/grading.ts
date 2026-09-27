@@ -62,6 +62,7 @@ const WEATHER: Readonly<Record<WeatherKind, Matrix>> = {
   rain: multiply(channels(0.85, 0.87, 0.93), saturation(0.75)),
   fog: multiply(channels(0.85, 0.85, 0.87, 28, 28, 30), saturation(0.6)),
   snow: multiply(channels(1.02, 1.04, 1.08), saturation(0.8)),
+  storm: multiply(channels(0.72, 0.76, 0.88), saturation(0.6)),
 };
 
 /** The world camera's colour matrix for a season, a daylight level (0 night … 1 day) and weather. */

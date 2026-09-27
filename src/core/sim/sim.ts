@@ -2,7 +2,8 @@ import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
 import { runFsm } from '../actors/fsm';
 import { HERO_MACHINE, createHero, heroPreTick } from '../actors/hero';
-import { setMinute, setSeason } from '../clock/clock';
+import { daylight, setMinute, setSeason } from '../clock/clock';
+import type { WeatherKind } from '../clock/types';
 import type { InputFrame } from '../input/actions';
 import { DIRS, type Dir4 } from '../math/dir';
 import { fnv1a } from '../math/hash';
@@ -13,6 +14,8 @@ import { giveItem } from '../story/effects';
 import type { StoryRun } from '../story/script';
 import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
+import { FIRE_RADIUS, LANTERN_RADIUS, darknessOf, type Light } from '../world/light';
+import { evalCond } from '../story/cond';
 import type { CoverGrid } from '../world/cover';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -33,7 +36,7 @@ import { fixtureHazards, refreshFixtures } from './systems/fixtures';
 import { collectPickups } from './systems/pickups';
 import { stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
-import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
+import { checkInteract, checkTriggers, condCtx, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
 import {
   checkDoors,
@@ -133,6 +136,35 @@ export class Sim implements SimRt {
   /** The text box or card the running script shows, if any. */
   storyUi(): StoryUi {
     return storyUi(this);
+  }
+
+  /** The weather on the current screen: story weather outdoors, always clear indoors. */
+  weather(): WeatherKind {
+    if (this.db.screens[this.screen.id].indoor === true) return 'clear';
+    const ctx = condCtx(this);
+    return this.db.weather.find((r) => evalCond(r.when, ctx))?.kind ?? 'clear';
+  }
+
+  /** How much of the picture the dark hides (0 … 1): night outdoors, storms, dark rooms. */
+  darkness(): number {
+    const def = this.db.screens[this.screen.id];
+    return darknessOf(daylight(this.state.clock, this.db.clock), {
+      indoor: def.indoor === true,
+      dark: def.dark === true,
+      weather: this.weather(),
+    });
+  }
+
+  /** What carves the dark, in screen pixels: the lantern (once owned) around the hero, burning fires. */
+  lights(): Light[] {
+    if (this.darkness() === 0) return [];
+    const out: Light[] = [];
+    if ((this.state.inv.items.lantern ?? 0) > 0)
+      out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS });
+    for (const e of this.actors)
+      if (e.kind === 'fixture' && e.def === 'fire' && e.mem['on'] === 1)
+        out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
+    return out;
   }
 
   snapshot(): GameState {

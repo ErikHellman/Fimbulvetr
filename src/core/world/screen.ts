@@ -128,6 +128,8 @@ export interface ScreenDef {
   readonly things: readonly Thing[];
   /** Interiors: no weather, a fixed indoor light. */
   readonly indoor?: boolean;
+  /** No light of its own (a cave): only the lantern and fires show anything. */
+  readonly dark?: boolean;
 }
 
 export interface WorldLayout {

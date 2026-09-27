@@ -24,6 +24,13 @@ describe('colour grading', () => {
     expect(night).toBeLessThan(day * 0.6);
   });
 
+  it('darkens a storm more than rain', () => {
+    const grey = [128, 128, 128] as const;
+    const rain = luminance(applyMatrix(grade('autumn', 0.2, 'rain'), grey));
+    const storm = luminance(applyMatrix(grade('autumn', 0.2, 'storm'), grey));
+    expect(storm).toBeLessThan(rain);
+  });
+
   it('changes smoothly with light', () => {
     for (let l = 0; l < 1; l += 0.05) {
       const a = grade('spring', l, 'clear');
