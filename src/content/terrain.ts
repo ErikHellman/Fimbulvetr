@@ -32,7 +32,7 @@ export const TERRAIN = {
   path: { solid: false },
   water: { solid: true },
   rock: { solid: true },
-  tree: { solid: true },
+  tree: { solid: true, decor: { art: ['decor_tree', 'decor_pine'], w: 1, h: 1 } },
   /** A low bank you can hop down (south) but not climb. */
   ledge: { solid: false, ledge: 's' },
   fence: { solid: true },
@@ -51,13 +51,13 @@ export const TERRAIN = {
   void: { solid: true },
   /** Shallow stream crossing. */
   ford: { solid: false, slow: 0.7 },
-  well: { solid: true },
-  trough: { solid: true },
+  well: { solid: true, decor: { art: ['decor_well'], w: 2, h: 2 } },
+  trough: { solid: true, decor: { art: ['decor_trough'], w: 3, h: 1 } },
   /** The chopping block. */
-  stump: { solid: true },
-  bed: { solid: true },
-  hearth: { solid: true },
-  table: { solid: true },
+  stump: { solid: true, decor: { art: ['decor_stump'], w: 1, h: 1 } },
+  bed: { solid: true, decor: { art: ['decor_bed'], w: 1, h: 2 } },
+  hearth: { solid: true, decor: { art: ['decor_hearth'], w: 2, h: 2 } },
+  table: { solid: true, decor: { art: ['decor_table'], w: 2, h: 1 } },
   /** A standing stone. */
-  menhir: { solid: true },
+  menhir: { solid: true, decor: { art: ['decor_menhir'], w: 1, h: 1 } },
 } as const satisfies Record<TerrainId, TerrainDef>;
