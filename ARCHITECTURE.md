@@ -9,12 +9,14 @@ keyboard/gamepad ─► InputMapper ─► InputLatch ──► Sim.step(frame) 
                                                         ▲                                   │
                         Commands (dev console, menus) ──┘          ┌────────────────────────┤
                                                                     ▼                        ▼
-       PlayScene: EntityViews / ScreenView (ground + cover + decor) / AmbientView (smoke, fish) / ColorMatrix
-                  AudioDirector · autosave · dev hook
-       UiScene (untinted): HUD, text boxes, choices, cards, shop  ◄── sim.storyUi()
+       PlayScene: EntityViews / ScreenView (ground + cover + decor) / AmbientView (smoke, fish) / FxView (puffs)
+                  WeatherView (rain, lightning) / DarknessView (dark with lights cut out) / ColorMatrix
+                  AudioDirector · autosave · pause menu state · dev hook
+       UiScene (untinted): HUD, text boxes, choices, cards, shop, game over, pause menu  ◄── sim.storyUi()
 ```
 
-- **Modes.** `Sim.mode` is `play`, `transition` (a 30-tick slide across an edge, or a 36-tick fade through a door that swaps screens at the midpoint) or `story` (a script is running: play and the clock are frozen).
+- **Modes.** `Sim.mode` is `play`, `transition` (a 30-tick slide across an edge, or a 36-tick fade through a door that swaps screens at the midpoint), `story` (a script is running: play and the clock are frozen) or `over` (the hero fell: only the fall advances; confirm continues at `Sim.entry` with three hearts).
+- **Pause.** The pause menu lives in the shell: while it is open the sim does not step at all, tile timers, smoke and rain pause, and its choices reach the sim as commands (`equip`, `eat`) applied at once with `flushCommands()`.
 - **Autosave** happens on the `autosave` event only: when play resumes after a screen change or a finished script, so a save never catches a cutscene halfway.
 
 - **Fixed step.** `advance()` turns frame time into 0–4 fixed 1/60 s steps plus an interpolation alpha. After a long hitch it drops the backlog.
@@ -39,7 +41,9 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - `movement` (terrain and cover speed) and `combat` (sword, contact damage).
   - `story` (interact probe, triggers, the script runner, `storyUi()`) and `npcs` (placement by condition, patrols).
   - `props` (lift, carry, throw, set down, drop zones, logs) and `critters` (sheep, pens, ravens).
-  - `cover` (mowing, regrowth), `pickups` (heart pieces), `timers` and `clock`.
+  - `cover` (mowing, regrowth), `pickups` (heart pieces, dropped hearts and silver, hidden under leaves), `timers` and `clock` (frozen while `ContentDb.freezeClock` holds).
+  - `enemies` (`actorCtx`, `runEnemies`: stun, summons, the gone-sweep) and `combat` (`damageActor` is the one kill path for sword, throws and later projectiles; `resolveAttacks` hurts the hero by touch or by a blow inside an attack window; `hurtHero`).
+  - `fixtures` (fire and gate tiles re-evaluated every play and story tick; closed gates are stamped into `LoadedScreen.collision` over the terrain-only `base`), `death` (`checkDeath`, `stepOver`, `continueGame`) and `items` (K/L slot uses, `equip`, `eat`).
 - **`src/core/story/*`** — the story rules:
   - `Cond` (flags, items, silver, quests, season, part of the day…) and `Effect` (flags, vars, items, silver, health, kit, clock, sleep).
   - Dialogue graphs, with a typewriter measured on the longest language so replays never depend on the language setting.
@@ -47,7 +51,10 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - Quests derived from flags, and shops.
 - **`src/core/world/collision.ts`** — pixel-stepped AABB against the tile grid, with a 6 px corner slide.
 - **`src/core/world/decor.ts`** — groups object terrain cells (trees, the well, furniture) into footprint blocks; the shell draws one y-sorted sprite per block. `src/core/world/ambient.ts` finds open water and schedules fish jumps statelessly.
-- **`src/core/actors/hero.ts`** — the hero's state machine: move, attack (3-hit combo), charge → spin, roll (12 i-frames), shield, hurt.
+- **`src/core/actors/hero.ts`** — the hero's state machine: move, attack (3-hit combo), charge → spin, roll (12 i-frames), shield, hurt, dying.
+- **`src/core/actors/enemies/*`** — behaviours over shared helpers in `common.ts`: `vargr` (stalk, 24-tick crouch, lunge), `draugr` (rises untouchable, 30-tick raised arms, HEAVY blow), `troll` (armoured raid troll), the training `dummy`. `EnemyDef` holds hp, boxes, drops, `attacks` (per state: blow ticks and boxes by facing; the ticks before are the telegraph, held to 18–30 by a test), `stunnable` and `guard`.
+- **`src/core/world/light.ts`** — `darknessOf` (night outdoors, storms, `dark` rooms); `Sim.darkness()` and `Sim.lights()` (the lantern once owned, fire tiles). **`src/core/world/mapModel.ts`** — the overworld as the pause map shows it.
+- **Weather.** `Sim.weather()` is story weather: the first `ContentDb.weather` rule that holds, outdoors only, else clear (`storm` is set by the story, never rolled). Rolled weather (`weatherAt`) arrives in M2.
 - **`src/core/clock/*`** — the world clock:
   - Hybrid seasons: `held` or `cycling` policy, with `setSeason` for story beats.
   - Daylight ramps and stateless weather.
@@ -57,7 +64,8 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - East frames are baked mirrors of west.
   - The tileset stores animated terrain (water, the ford) frame-major after its variants; `tileAnimations` lists them for Phaser's animated tiles. Terrains in one auto-tile `group` (water/ford/jetty, roof/chimney) join without a bank.
 - **`src/shell/scenes/BootScene.ts`** — packs generated frames into canvas textures, builds the tileset and renders the SFX.
-- **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio and autosave triggers. Each shown screen is a stage: a `ScreenView` (tile layers plus decor sprites, ticked from `sim.tick` and faded when they hide the hero) and an `AmbientView` (a smoke emitter per chimney, fish jumps in open water).
+- **`src/shell/ui/pauseMenu.ts`** — the pause menu as a pure model (tabs Items, Map, Quests, Game; `stepMenu` returns the next state and actions), drawn by `UiScene`.
+- **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio, autosave triggers and the pause menu. The hero's sprite follows the weapon in hand (`heroArtFor`: `hero`, `hero_axe`, `hero_fork`). Each shown screen is a stage: a `ScreenView` (tile layers plus decor sprites, ticked from `sim.tick` and faded when they hide the hero) and an `AmbientView` (a smoke emitter per chimney, fish jumps in open water).
 - **`src/shell/platform/*`**:
   - Settings in `localStorage['fimbulvetr.settings.v1']`.
   - IndexedDB `fimbulvetr` (stores `saves`: auto, auto_prev, s1–s3; and `meta`).
@@ -65,12 +73,14 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 
 ## Content model
 - **Screens** (`src/content/world/<region>/<id>.ts`) are 40×22 text maps plus `things`:
-  - enemy, door, sign, `use` (interact runs a script), trigger (entering runs a script)
+  - enemy (optional `when`, e.g. night-only draugr, and `onDeath` effects), door, sign, `use` (interact runs a script), trigger (entering runs a script)
+  - `fire` (burning tiles: hurt through the shield, not solid, glow in the dark) and `gate` (tiles that are solid while `closed` holds: a palisade, a wall of fire, piled logs)
   - prop (lift/throw/split), drop zone, critter, pen, heart piece
   - Signs and uses may cover a `w`×`h` block (a sign on a 2×2 well).
 - **Decor** terrains (tree, well, trough, stump, bed, hearth, table, menhir) mark solid footprint tiles; the map must draw each object as a whole block (`OO`/`OO` for a well, `b` over `b` for a bed). `tests/content/integrity.test.ts` rejects incomplete blocks.
 - **Buildings** are roof rows over a wall row: `D` open doorway (needs a door thing), `d` shut door, `+` window, `C` chimney inside the roof (the shell smokes it). `J` is a jetty over water.
-- **Cover** grows from map characters listed in `COVER_LEGEND` (for example `"` = tall grass over grass). Cut cells are saved per screen under the season epoch.
+- **Cover** grows from map characters listed in `COVER_LEGEND` (`"` = tall grass in summer, `%` = leaf piles in autumn, which hide pickups until cut). Cut cells are saved per screen under the season epoch.
+- **Story weather and the clock:** `content/weather.ts` (the raid storm) and `DB.freezeClock` (the raid night never dawns).
 - **NPCs** (`content/npcs.ts`) list `places`; the first whose condition holds decides where they stand. Positions are never saved.
 - **Dialogue** (`content/dialogue/<npc>.ts`), **scripts** (`content/scripts/`), **quests** (`content/quests.ts`) and **shops** (`content/shops.ts`) are typed data. Every string is `{ en, sv }`.
 
@@ -82,9 +92,9 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   4. `tests/content/integrity.test.ts` checks the map size, legend, seams and placements.
 - **Add an enemy:**
   1. Add the id to `ENEMIES`.
-  2. Write the behaviour machine in `src/core/actors/enemies/` and register it in `BEHAVIOURS`.
-  3. Add its definition in `src/content/enemies.ts`.
-  4. Add frames and animations in `src/art/sprites/`.
+  2. Write the behaviour machine in `src/core/actors/enemies/` (reuse `common.ts`), register it in `BEHAVIOURS` and its start state in `START`. Every attack needs a state with the anim `tell` before it.
+  3. Add its definition in `src/content/enemies.ts`: `attacks` windows per state, `drops`, `stunnable`, `guard`.
+  4. Add frames and animations in `src/art/sprites/enemies.ts` (`enemy_<id>`, 2 px margin). `tests/sim/enemies_m1b.test.ts` checks the telegraph length for every enemy that attacks.
 - **Add an NPC:**
   1. Add the id to `NPCS` and its name to `NPC_NAMES`.
   2. Add a look in `src/art/sprites/people.ts`, places in `NPC_DEFS` and a dialogue file registered in `content/dialogue/index.ts`.
@@ -100,13 +110,14 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 
 ## Dev and test tools
 - **Query string** (dev and `--mode test` builds): `?screen=&at=x,y&season=&time=HH:MM|day|night&seed=&lang=&preset=&dev=gallery&nosave&mute`.
-  - Presets (`content/dev/presets.ts`): `m0` is the old test kit; `day2`, `day3` and `night3` are prologue checkpoints.
+  - Presets (`content/dev/presets.ts`): `m0` is the old test kit; `day2`, `day3` and `night3` are prologue checkpoints; `raid` (just woken to fire), `morning` (after the raid) and `myr` (Myrkviðr after the legend).
 - **F1:** the overlay.
-- **Backquote:** the console. Commands: warp, time, season, flag, lang, volume, save, export, import, help.
+- **Backquote:** the console. Commands: warp, time, season, flag, give, hp, god, weather, kill, lang, volume, save, export, import, help.
+- **Tab / M:** the pause menu (M opens its map).
 - **`window.__fimbul`:** the Playwright hook.
 - **Tests:**
   - `pnpm test`: Vitest for core, art, content, shell units and headless sim scenarios.
     - `tests/sim/golden.test.ts` pins one run's hash: re-record it only on purpose.
-    - `tests/sim/route_m1a.test.ts` plays the whole prologue with real inputs through the walker in `tests/sim/walk.ts`.
+    - `tests/sim/route_m1a.test.ts` plays the whole prologue with real inputs through the walker in `tests/sim/walk.ts`; `route_m1b.test.ts` plays the raid, the legend and Myrkviðr to the roots, fighting with `walkFighting`/`fightNear`.
   - `pnpm e2e`: Playwright on Chromium and WebKit. `tests/e2e/world.spec.ts` checks decor, animated tiles, smoke and fish through `__fimbul.view()`. In a container with a preinstalled Chromium of another revision, set `PW_CHROMIUM_PATH`.
   - `pnpm budget`: the gzipped JS budget (730 KB).

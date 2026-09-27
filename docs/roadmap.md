@@ -40,7 +40,14 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Exit route test, e2e, docs
     - [x] World polish: decor sprites, animated water, fish and smoke, doors, windows, chimneys, arm swing, nameplate — plan: `docs/superpowers/plans/2026-09-27-world-polish.md`
     - [ ] User playtest and Swedish proofread
-  - [ ] M1b Raid + Myrkviðr road
-  - [ ] M1c Rótarhellir + Rótvættr
+  - [ ] M1b Raid + Myrkviðr road — plan: `docs/superpowers/plans/2026-09-27-m1b-m1c.md` (Part 1)
+    - [x] Carry-overs: presets and walker, one damage and kill path
+    - [x] Core: death and continue, enemy framework, vargr/draugr/troll, fire and gate fixtures, leaf cover, story weather and darkness, item slots, NPC schedules, map model
+    - [x] Art: enemies and fixtures, hero weapon kits, Myrkviðr terrain, SFX
+    - [x] Shell: combat feedback and game over, weather and darkness views, pause menu, dev commands
+    - [x] Content: the raid, the morning and the legend, Myrkviðr (9 screens and a hut), 4 NPCs and Kolbeinn
+    - [x] Exit route test, e2e, v1-m1b fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M1c Rótarhellir + Rótvættr — plan: `docs/superpowers/plans/2026-09-27-m1b-m1c.md` (Part 2)
 - [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
