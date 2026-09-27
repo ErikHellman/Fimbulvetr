@@ -7,6 +7,7 @@ import { applyPreset } from '@core/dev/query';
 import { solve } from '@core/progress/solver';
 import type { ContentDb } from '@core/sim/db';
 import { newGame, type GameState } from '@core/state/gameState';
+import { TILE } from '@core/world/dims';
 
 const d1Rooms = SCREEN_IDS.filter((id) => DB.screens[id].dungeon === 'd1');
 const d1Chests = d1Rooms.flatMap((id) =>
@@ -72,5 +73,71 @@ describe('the progression solver on Rótarhellir', () => {
     const short = solve(db, atTheMouth(), lit);
     expect(short.finishable).toBe(true);
     expect(short.softLocks.some((s) => s.includes('d1_lock_a'))).toBe(true);
+  });
+});
+
+/** Where the M1c route leaves Ask: by Önundr, the first stone lit, the road north still under the pine. */
+function atOnundr(over: (s: GameState) => void = () => undefined): GameState {
+  const s = newGame(1, NEW_GAME);
+  applyPreset(s, DEV_PRESETS.north);
+  over(s);
+  return s;
+}
+
+const uppvik = SCREEN_IDS.filter((id) => id.startsWith('upp_'));
+const nothing = (): boolean => false;
+
+describe('the progression solver on Myrkviðr and Uppvík', () => {
+  it('keeps Uppvík closed until Önundr saws through the pine', () => {
+    const shut = solve(DB, atOnundr(), nothing);
+    for (const id of uppvik) expect(shut.screens, id).not.toContain(id);
+    const open = solve(
+      DB,
+      atOnundr((s) => (s.flags.st_road_open = true)),
+      nothing,
+    );
+    for (const id of uppvik) expect(open.screens, id).toContain(id);
+    for (const id of ['myr_fen', 'myr_int_volva', 'myr_glade', 'myr_trollskog'] as const)
+      expect(open.screens, id).toContain(id);
+  });
+
+  it('reaches every Myrkviðr piece of heart, the fen’s only with Eldr', () => {
+    const road = (s: GameState): void => {
+      s.flags.st_road_open = true;
+    };
+    const blade = solve(DB, atOnundr(road), nothing);
+    expect(blade.pieces).toEqual(
+      expect.arrayContaining(['hp_myr_pines', 'hp_myr_brook', 'hp_myr_trollskog']),
+    );
+    expect(blade.pieces).not.toContain('hp_myr_fen');
+    const eldr = solve(
+      DB,
+      atOnundr((s) => {
+        road(s);
+        s.inv.galdr = ['eldr'];
+      }),
+      nothing,
+    );
+    expect(eldr.pieces).toEqual(
+      expect.arrayContaining(['hp_myr_pines', 'hp_myr_brook', 'hp_myr_trollskog', 'hp_myr_fen']),
+    );
+  });
+
+  it('never shuts Ask in or out at night: the warden opens the gate to a knock', () => {
+    const night = (screen: 'upp_square' | 'myr_north', tile: readonly [number, number]) =>
+      atOnundr((s) => {
+        s.flags.st_road_open = true;
+        s.flags.st_uppvik_reached = true;
+        s.clock.minute = 23 * 60;
+        s.hero.screen = screen;
+        s.hero.x = tile[0] * TILE + TILE / 2;
+        s.hero.y = tile[1] * TILE + TILE - 2;
+      });
+    const inside = solve(DB, night('upp_square', [20, 14]), nothing);
+    expect(inside.screens).toContain('myr_north');
+    expect(inside.stranded).toEqual([]);
+    const outside = solve(DB, night('myr_north', [19, 10]), nothing);
+    for (const id of uppvik) expect(outside.screens, id).toContain(id);
+    expect(outside.stranded).toEqual([]);
   });
 });

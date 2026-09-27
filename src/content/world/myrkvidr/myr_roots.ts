@@ -4,8 +4,12 @@ export const myrRoots: ScreenDef = {
   id: 'myr_roots',
   region: 'myrkvidr',
   purpose:
-    "Yggdrasil's roots and the mouth of Rótarhellir (dungeon 1). Arnbjörg the pilgrim keeps vigil. Paths lead north to the glade and east into the troll wood.",
+    "Yggdrasil's roots and the mouth of Rótarhellir (dungeon 1). Arnbjörg the pilgrim keeps vigil. A path leads east into the troll wood; the one north to the glade lies under brambles.",
   things: [
+    /** Thorns across the old path north to the glade: only fire clears them (a shortcut once Eldr is known). */
+    { k: 'prop', id: 'bramble', at: { x: 32, y: 2 } },
+    { k: 'prop', id: 'bramble', at: { x: 33, y: 2 } },
+    { k: 'prop', id: 'bramble', at: { x: 34, y: 2 } },
     { k: 'door', at: { x: 19, y: 2 }, dir: 'n', to: 'd1_r01', arrive: { x: 19, y: 19 }, facing: 'n' },
     { k: 'door', at: { x: 20, y: 2 }, dir: 'n', to: 'd1_r01', arrive: { x: 20, y: 19 }, facing: 'n' },
     {

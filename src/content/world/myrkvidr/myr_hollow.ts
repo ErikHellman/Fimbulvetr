@@ -6,6 +6,10 @@ export const myrHollow: ScreenDef = {
   purpose:
     'A dark hollow of old grave mounds; at night draugr climb out of them. A path leads north into the fen.',
   things: [
+    /** Thorns across the old path north into the fen: only fire clears them (a shortcut once Eldr is known). */
+    { k: 'prop', id: 'bramble', at: { x: 10, y: 2 } },
+    { k: 'prop', id: 'bramble', at: { x: 11, y: 2 } },
+    { k: 'prop', id: 'bramble', at: { x: 12, y: 2 } },
     {
       k: 'sign',
       at: { x: 22, y: 10 },

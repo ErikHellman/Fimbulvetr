@@ -15,7 +15,9 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * current state, takes everything it can reach (chests, pieces, hearts, bosses, saved shutters, scripts),
  * floods again, and so on until nothing changes. Small keys are the only real choice, so it branches on
  * which reachable lock a key opens and explores every order. Root blocks and vines never block (pushing and
- * cutting are always possible); enemies other than bosses are assumed beaten with the sword.
+ * cutting are always possible), nor do props Ask can lift; brambles block until Eldr is known. A `use`
+ * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask. Enemies
+ * other than bosses are assumed beaten with the sword.
  */
 
 export interface SolveResult {
@@ -211,14 +213,41 @@ function solidThing(
       if (t.opens === 'clear') return false;
       return !(t.opens !== undefined && reach !== null && signal(w, state, id, t.opens, reach));
     }
+    case 'prop':
+      // Only fire clears brambles; everything else is lifted, pushed or cut out of the way.
+      return w.db.props[t.id].burns === true && !state.inv.galdr.includes('eldr') && evalCond(t.when, ctx);
     default:
       return false;
   }
 }
 
+/** Tiles beside a `use` whose script warps, mapped to where the warp puts Ask (knocking at a gate). */
+function warpEdges(w: World, state: GameState): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  const ctx = ctxOf(w, state);
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'use' || !evalCond(t.when, ctx)) continue;
+      const warp = w.db.scripts[t.script]?.steps.find((step) => step.k === 'warp');
+      if (warp?.k !== 'warp') continue;
+      const to = w.tile(warp.screen, warp.at.x, warp.at.y);
+      const tw = t.w ?? 1;
+      const th = t.h ?? 1;
+      for (let dy = -1; dy <= th; dy++)
+        for (let dx = -1; dx <= tw; dx++) {
+          const edge = (dx === -1 || dx === tw) !== (dy === -1 || dy === th);
+          if (!edge) continue;
+          const from = w.tile(id, t.at.x + dx, t.at.y + dy);
+          out.set(from, [...(out.get(from) ?? []), to]);
+        }
+    }
+  return out;
+}
+
 /** Every tile the hero can walk to from `origin`: 4-way steps, screen edges, doors and ledge hops. */
 function flood(w: World, state: GameState, origin: number): Set<number> {
   let reach = new Set<number>();
+  const warps = warpEdges(w, state);
   // Shutters open on signals that depend on what is reachable, so flood until the set stops growing.
   for (let i = 0; i < 20; i++) {
     const blocked = blockedTiles(w, state, reach);
@@ -226,7 +255,7 @@ function flood(w: World, state: GameState, origin: number): Set<number> {
     const queue = [origin];
     while (queue.length > 0) {
       const t = queue.pop() ?? origin;
-      for (const n of steps(w, t, blocked)) {
+      for (const n of [...steps(w, t, blocked), ...(warps.get(t) ?? [])]) {
         if (next.has(n)) continue;
         next.add(n);
         queue.push(n);
@@ -469,9 +498,10 @@ function openableLocks(w: World, node: Node): { id: string; dungeon: DungeonId }
 /** Reachable tiles from which no path leads back to the starting tile. */
 function strandedTiles(w: World, node: Node, origin: number): number[] {
   const blocked = blockedTiles(w, node.state, node.reach);
+  const warps = warpEdges(w, node.state);
   const back = new Map<number, number[]>();
   for (const t of node.reach)
-    for (const n of steps(w, t, blocked)) {
+    for (const n of [...steps(w, t, blocked), ...(warps.get(t) ?? [])]) {
       if (!node.reach.has(n)) continue;
       const list = back.get(n);
       if (list === undefined) back.set(n, [t]);
