@@ -22,6 +22,6 @@ function script(h: Harness): Harness {
 describe('golden hash', () => {
   it('matches the recorded run', () => {
     const h = script(new Harness({ screen: 'test_a', tile: [20, 11] }));
-    expect(h.sim.hash().toString(16)).toBe('b6ab359e');
+    expect(h.sim.hash().toString(16)).toBe('f865b677');
   });
 });

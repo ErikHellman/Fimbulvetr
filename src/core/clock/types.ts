@@ -3,7 +3,8 @@ export type Season = (typeof SEASONS)[number];
 
 export const isSeason = (s: string): s is Season => (SEASONS as readonly string[]).includes(s);
 
-export const WEATHER_KINDS = ['clear', 'rain', 'wind', 'fog', 'snow'] as const;
+/** `storm` (rain, wind and lightning) is set by the story only; it is never rolled. */
+export const WEATHER_KINDS = ['clear', 'rain', 'wind', 'fog', 'snow', 'storm'] as const;
 export type WeatherKind = (typeof WEATHER_KINDS)[number];
 
 export const MINUTES_PER_DAY = 1440;

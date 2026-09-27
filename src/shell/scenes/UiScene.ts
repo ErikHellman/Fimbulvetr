@@ -3,8 +3,15 @@ import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
 import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
-import type { ItemId } from '@content/ids';
+import { DUNGEON_NAMES, REGION_COLOURS, REGION_NAMES } from '@content/regions';
+import type { DungeonId, ItemId } from '@content/ids';
 import { t, type L10n, type Lang } from '@core/i18n/t';
+import { CONTINUE_DELAY } from '@core/sim/systems/death';
+import { condCtx } from '@core/sim/systems/story';
+import { questLog } from '@core/story/quests';
+import { peekDungeon } from '@core/state/dungeons';
+import { dungeonMap, overworldMap } from '@core/world/mapModel';
+import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
 import { FONT_KEY } from '@shell/gfx/font';
@@ -18,12 +25,28 @@ export interface UiLink {
   readonly lang: () => Lang;
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
+  /** The open pause menu and what its items page lists, or null in play. */
+  readonly menu: () => { readonly state: MenuState; readonly items: readonly MenuItem[] } | null;
 }
+
+const TAB_LABEL = {
+  items: UI.menu_items,
+  map: UI.menu_map,
+  quests: UI.menu_quests,
+  system: UI.menu_system,
+} as const;
+const SYSTEM_LABEL = { resume: UI.menu_resume, start_over: UI.menu_start_over } as const;
+const MENU = { x: 16, y: 14, w: GAME_W - 32, h: GAME_H - 28 };
 
 export const UI_LINK = 'uiLink';
 
 const INK = 0x1b1522;
 const GOLD = 0xd9b34a;
+const RED = 0xe0433f;
+const CAVE = 0x6e6258;
+const CAVE_SEEN = 0x9a8a78;
+/** Along the bottom edge, clear of the HUD and of whatever the room keeps at its top. */
+const BOSS_BAR = { w: 160, h: 6, y: GAME_H - 14 };
 const PAPER = 0xf2ead8;
 const DIM = 0x9c9486;
 const BOX = { x: 20, y: GAME_H - 84, w: GAME_W - 40, h: 76 };
@@ -65,6 +88,18 @@ export class UiScene extends Phaser.Scene {
   private shop!: Phaser.GameObjects.BitmapText;
   private lastShown = '';
   private lastBlip = 0;
+  private menuBox!: Phaser.GameObjects.Graphics;
+  private menuTabs: Phaser.GameObjects.BitmapText[] = [];
+  private menuBody!: Phaser.GameObjects.BitmapText;
+  private menuHint!: Phaser.GameObjects.BitmapText;
+  private menuIcons: Phaser.GameObjects.Image[] = [];
+  private fallen!: Phaser.GameObjects.Rectangle;
+  private fallenTitle!: Phaser.GameObjects.BitmapText;
+  private fallenPrompt!: Phaser.GameObjects.BitmapText;
+  private keyIcon!: Phaser.GameObjects.Image;
+  private keyText!: Phaser.GameObjects.BitmapText;
+  private bossBar!: Phaser.GameObjects.Graphics;
+  private bossName!: Phaser.GameObjects.BitmapText;
 
   constructor() {
     super('ui');
@@ -78,6 +113,11 @@ export class UiScene extends Phaser.Scene {
     const silverRef = this.frameRef('ui_silver_idle_s_0');
     this.add.image(6, 30, silverRef.key, silverRef.frame).setOrigin(0, 0);
     this.silver = this.text(16, 29, '', PAPER);
+    const keyRef = this.frameRef('item_small_key_idle_s_0');
+    this.keyIcon = this.add.image(5, 41, keyRef.key, keyRef.frame).setOrigin(0, 0).setVisible(false);
+    this.keyText = this.text(16, 41, '', PAPER);
+    this.bossBar = this.add.graphics();
+    this.bossName = this.text(0, 0, '', PAPER);
     for (let i = 0; i < 2; i++) {
       const x = GAME_W - 56 + i * 26;
       hud
@@ -96,6 +136,14 @@ export class UiScene extends Phaser.Scene {
     this.shop = this.text(0, 0, '', PAPER);
     this.card = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000).setOrigin(0, 0).setVisible(false);
     this.cardText = this.text(0, 0, '', PAPER);
+    this.fallen = this.add.rectangle(0, 0, GAME_W, GAME_H, 0x000000, 0.6).setOrigin(0, 0).setVisible(false);
+    this.fallenTitle = this.text(0, 0, '', PAPER);
+    this.fallenPrompt = this.text(0, 0, '', GOLD);
+    this.menuBox = this.add.graphics();
+    this.menuTabs = MENU_TABS.map(() => this.text(0, 0, '', DIM));
+    this.menuBody = this.text(0, 0, '', PAPER);
+    this.menuHint = this.text(0, 0, '', DIM);
+    this.menuIcons = [];
   }
 
   override update(): void {
@@ -103,7 +151,188 @@ export class UiScene extends Phaser.Scene {
     if (link === undefined) return;
     this.link = link;
     this.drawHud();
+    this.drawBoss();
     this.drawStory(link.sim.storyUi());
+    this.drawGameOver();
+    this.drawMenu();
+  }
+
+  /** The pause menu over everything: tab labels, then the page for the open tab. */
+  private drawMenu(): void {
+    const view = this.link.menu();
+    this.menuBox.clear();
+    for (const icon of this.menuIcons) icon.setVisible(false);
+    if (view === null) {
+      for (const tab of this.menuTabs) tab.setText('');
+      this.menuBody.setText('');
+      this.menuHint.setText('');
+      return;
+    }
+    const lang = this.link.lang();
+    const { state } = view;
+    this.menuBox
+      .fillStyle(INK, 0.95)
+      .fillRect(MENU.x, MENU.y, MENU.w, MENU.h)
+      .lineStyle(1, GOLD, 1)
+      .strokeRect(MENU.x + 0.5, MENU.y + 0.5, MENU.w - 1, MENU.h - 1)
+      .lineBetween(MENU.x + 8, MENU.y + 24.5, MENU.x + MENU.w - 8, MENU.y + 24.5);
+    let x = MENU.x + 14;
+    MENU_TABS.forEach((tab, i) => {
+      const label = t(TAB_LABEL[tab], lang);
+      this.menuTabs[i]
+        ?.setText(label)
+        .setPosition(x, MENU.y + 8)
+        .setTint(tab === state.tab ? GOLD : DIM);
+      x += textWidth(label) + 24;
+    });
+    this.menuHint
+      .setText(t(state.tab === 'items' ? UI.menu_items_hint : UI.menu_tabs_hint, lang))
+      .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
+    const top = MENU.y + 36;
+    if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
+    else if (state.tab === 'map') this.menuMap(top, lang);
+    else if (state.tab === 'quests') this.menuQuests(top, lang);
+    else {
+      const lines = SYSTEM_ROWS.map(
+        (r, i) => `${i === state.cursor ? '>' : ' '} ${t(SYSTEM_LABEL[r], lang)}`,
+      );
+      if (state.confirm) lines.push('', t(UI.menu_start_over_confirm, lang));
+      this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+    }
+  }
+
+  private menuItems(items: readonly MenuItem[], state: MenuState, top: number, lang: Lang): void {
+    if (items.length === 0) {
+      this.menuBody.setText(t(UI.menu_no_items, lang)).setPosition(MENU.x + 24, top);
+      return;
+    }
+    const lines = items.map((item, i) => {
+      const slot = item.slot === 0 ? '  [K]' : item.slot === 1 ? '  [L]' : '';
+      const count = item.kind === 'food' ? `  x${String(item.count)}` : '';
+      return `${i === state.cursor ? '>' : ' '}     ${this.itemName(item.id, lang)}${count}${slot}`;
+    });
+    this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+    items.forEach((item, i) => {
+      let icon = this.menuIcons[i];
+      if (icon === undefined) {
+        icon = this.add.image(0, 0, '__MISSING').setOrigin(0.5, 0.5);
+        this.menuIcons.push(icon);
+      }
+      const ref = this.link.frames.get(`item_${item.id}_idle_s_0`);
+      icon
+        .setTexture(ref.key, ref.frame)
+        .setPosition(MENU.x + 48, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
+        .setVisible(true)
+        .setScale(0.5);
+    });
+  }
+
+  /** The overworld as coloured cells: visited screens by region, the hero's cell framed in gold. */
+  private menuMap(top: number, lang: Lang): void {
+    const { sim } = this.link;
+    const dungeon = sim.db.screens[sim.screen.id].dungeon;
+    if (dungeon !== undefined) {
+      this.menuDungeonMap(dungeon, top, lang);
+      return;
+    }
+    const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id);
+    const cw = 22;
+    const ch = 13;
+    const cols = m.x1 - m.x0 + 3;
+    const rows = m.y1 - m.y0 + 3;
+    const ox = Math.round(MENU.x + (MENU.w - cols * cw) / 2);
+    const oy = top + 18;
+    for (const c of m.cells) {
+      if (!c.visited && !c.here) continue;
+      const cx = ox + (c.gx - m.x0 + 1) * cw;
+      const cy = oy + (c.gy - m.y0 + 1) * ch;
+      if (cx < MENU.x || cy + ch > MENU.y + MENU.h - 24) continue;
+      this.menuBox.fillStyle(REGION_COLOURS[c.region], 1).fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      if (c.here) this.menuBox.lineStyle(2, GOLD, 1).strokeRect(cx + 1, cy + 1, cw - 2, ch - 2);
+    }
+    this.menuBox.lineStyle(1, DIM, 1).strokeRect(ox + 0.5, oy + 0.5, cols * cw - 1, rows * ch - 1);
+    const here = m.cells.find((c) => c.here);
+    const label =
+      here === undefined ? '' : `${t(REGION_NAMES[here.region], lang)} — ${t(UI.menu_here, lang)}`;
+    this.menuBody.setText(label).setPosition(MENU.x + 24, top);
+  }
+
+  /**
+   * A dungeon floor: rooms walked through (every room with the map), the room Ask is in framed in gold, and
+   * with the compass a red mark on the lair and a gold one on each room with a shut chest.
+   */
+  private menuDungeonMap(dungeon: DungeonId, top: number, lang: Lang): void {
+    const { sim } = this.link;
+    const m = dungeonMap(sim.db.layout, sim.db.screens, sim.db.enemies, sim.state, dungeon, sim.screen.id);
+    if (m === null) return;
+    const cw = 30;
+    const ch = 18;
+    const ox = Math.round(MENU.x + (MENU.w - m.cols * cw) / 2);
+    const oy = top + 22;
+    for (const c of m.cells) {
+      if (!c.shown) continue;
+      const cx = ox + c.gx * cw;
+      const cy = oy + c.gy * ch;
+      this.menuBox.fillStyle(c.visited ? CAVE_SEEN : CAVE, 1).fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      if (c.boss) this.menuBox.fillStyle(RED, 1).fillRect(cx + cw / 2 - 3, cy + ch / 2 - 3, 6, 6);
+      if (c.chest) this.menuBox.fillStyle(GOLD, 1).fillRect(cx + 4, cy + 4, 4, 4);
+      if (c.here) this.menuBox.lineStyle(2, GOLD, 1).strokeRect(cx + 1, cy + 1, cw - 2, ch - 2);
+    }
+    this.menuBox.lineStyle(1, DIM, 1).strokeRect(ox - 3.5, oy - 3.5, m.cols * cw + 7, m.rows * ch + 7);
+    const lines = [`${t(DUNGEON_NAMES[dungeon], lang)} — ${t(UI.menu_keys, lang, { detail: m.keys })}`];
+    while (top + lines.length * LINE_HEIGHT < oy + m.rows * ch + 8) lines.push('');
+    if (m.compass) {
+      // The legend: a red mark for the lair, a gold one for chests, each before its word.
+      const y = top + lines.length * LINE_HEIGHT;
+      const lair = `   ${t(UI.menu_lair, lang)}`;
+      const space = textWidth('  ') - textWidth(' ');
+      const gap = Math.max(2, Math.round((96 - textWidth(lair)) / space));
+      this.menuBox.fillStyle(RED, 1).fillRect(MENU.x + 24, y + 2, 6, 6);
+      this.menuBox.fillStyle(GOLD, 1).fillRect(MENU.x + 24 + textWidth(lair) + gap * space, y + 3, 4, 4);
+      lines.push(`${lair}${' '.repeat(gap)}   ${t(UI.menu_chest, lang)}`);
+    }
+    if (!m.map) lines.push(t(UI.menu_no_map, lang));
+    this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+  }
+
+  private menuQuests(top: number, lang: Lang): void {
+    const { sim } = this.link;
+    const log = questLog(sim.db.quests, condCtx(sim));
+    if (log.length === 0) {
+      this.menuBody.setText(t(UI.menu_no_quests, lang)).setPosition(MENU.x + 24, top);
+      return;
+    }
+    const lines = log.flatMap((q) => [
+      `${t(q.name, lang)}${q.done ? ` (${t(UI.menu_quest_done, lang)})` : ''}`,
+      ...layoutText(t(q.text, lang), MENU.w - 64).map((l) => `   ${l}`),
+      '',
+    ]);
+    this.menuBody.setText(lines.slice(0, 22).join('\n')).setPosition(MENU.x + 24, top);
+  }
+
+  /** After the fall: the screen dims and, a moment later, the way to rise again. */
+  private drawGameOver(): void {
+    const { sim } = this.link;
+    const t0 = sim.db.tuning.hero.dyingTicks;
+    const age = sim.mode === 'over' ? sim.hero.fsm.t - t0 : -1;
+    this.fallen.setVisible(age >= 0);
+    if (age < 0) {
+      this.fallenTitle.setText('');
+      this.fallenPrompt.setText('');
+      return;
+    }
+    const lang = this.link.lang();
+    const title = t(UI.game_over, lang);
+    const prompt = t(UI.game_over_continue, lang);
+    const w = Math.max(textWidth(title), textWidth(prompt)) + 32;
+    const x = Math.round((GAME_W - w) / 2);
+    const y = 60;
+    this.panel(x, y, w, 44);
+    this.fallenTitle.setText(title).setPosition(Math.round((GAME_W - textWidth(title)) / 2), y + 8);
+    const show = age >= CONTINUE_DELAY && Math.floor(age / 30) % 2 === 0;
+    this.fallenPrompt
+      .setText(show ? prompt : '')
+      .setPosition(Math.round((GAME_W - textWidth(prompt)) / 2), y + 24);
   }
 
   private text(x: number, y: number, value: string, colour: number): Phaser.GameObjects.BitmapText {
@@ -115,8 +344,34 @@ export class UiScene extends Phaser.Scene {
     return ref ?? { key: '__MISSING', frame: '' };
   }
 
+  /** A boss's name and health along the bottom while one is on screen. */
+  private drawBoss(): void {
+    const b = this.link.sim.boss();
+    this.bossBar.clear();
+    if (b === null) {
+      this.bossName.setText('');
+      return;
+    }
+    const x = Math.round((GAME_W - BOSS_BAR.w) / 2);
+    const fill = Math.round(((BOSS_BAR.w - 2) * Math.max(0, b.hp)) / b.maxHp);
+    this.bossBar
+      .fillStyle(INK, 0.85)
+      .fillRect(x - 1, BOSS_BAR.y - 1, BOSS_BAR.w + 2, BOSS_BAR.h + 2)
+      .fillStyle(RED, 1)
+      .fillRect(x, BOSS_BAR.y, fill, BOSS_BAR.h)
+      .lineStyle(1, GOLD, 1)
+      .strokeRect(x - 0.5, BOSS_BAR.y - 0.5, BOSS_BAR.w + 1, BOSS_BAR.h + 1);
+    const name = t(b.name, this.link.lang());
+    this.bossName
+      .setText(name)
+      .setPosition(Math.round((GAME_W - textWidth(name)) / 2), BOSS_BAR.y - LINE_HEIGHT - 1);
+  }
+
   private drawHud(): void {
     const { sim, frames } = this.link;
+    const dungeon = sim.db.screens[sim.screen.id].dungeon;
+    this.keyIcon.setVisible(dungeon !== undefined);
+    this.keyText.setText(dungeon === undefined ? '' : String(peekDungeon(sim.state, dungeon).keys));
     const hp = sim.hero.hp;
     const hearts = Math.ceil(sim.hero.maxHp / 4);
     while (this.hearts.length < hearts) {

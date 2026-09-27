@@ -3,7 +3,10 @@ import type { CoverId } from '@content/ids';
 import { buildCover, coverAt, cutBox, decodeBits, encodeBits, type CoverDef } from '@core/world/cover';
 
 const ORDER: readonly CoverId[] = ['tall_grass'];
-const DEFS: Record<CoverId, CoverDef> = { tall_grass: { id: 'tall_grass', seasons: ['summer'], slow: 0.6 } };
+const DEFS: Record<CoverId, CoverDef> = {
+  tall_grass: { id: 'tall_grass', seasons: ['summer'], slow: 0.6 },
+  leaves: { id: 'leaves', seasons: ['autumn'], slow: 0.8, hides: true, blown: true },
+};
 const LEGEND = { '"': 'tall_grass' } as const;
 const MAP = ['..""', '""..'];
 

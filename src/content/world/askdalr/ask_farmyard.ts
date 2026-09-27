@@ -1,4 +1,19 @@
 import type { ScreenDef, Thing } from '@core/world/screen';
+import { raidNight } from '../../dialogue/util';
+
+/** The raid night: walls of fire close the yard except the road north to the gate. */
+const RAID: Thing[] = [
+  { k: 'gate', at: { x: 0, y: 9 }, w: 1, h: 4, art: 'fire', closed: raidNight },
+  { k: 'gate', at: { x: 39, y: 9 }, w: 1, h: 4, art: 'fire', closed: raidNight },
+  { k: 'gate', at: { x: 18, y: 21 }, w: 4, h: 1, art: 'fire', closed: raidNight },
+  { k: 'fire', at: { x: 4, y: 8 }, w: 4, h: 1, when: raidNight },
+  { k: 'fire', at: { x: 29, y: 13 }, w: 3, h: 1, when: raidNight },
+  { k: 'fire', at: { x: 12, y: 15 }, w: 2, h: 1, when: raidNight },
+  { k: 'fire', at: { x: 34, y: 10 }, w: 2, h: 1, when: raidNight },
+  { k: 'enemy', id: 'draugr', at: { x: 14, y: 14 }, when: raidNight },
+  { k: 'enemy', id: 'draugr', at: { x: 28, y: 10 }, when: raidNight },
+  { k: 'enemy', id: 'troll', at: { x: 30, y: 15 }, when: raidNight },
+];
 
 /** Day 2: logs by the chopping block, present until enough are split. Each split log counts once. */
 const LOGS: Thing[] = [
@@ -80,6 +95,7 @@ export const askFarmyard: ScreenDef = {
       text: { en: 'The well. Cold, deep and sweet.', sv: 'Brunnen. Kall, djup och söt.' },
     },
     ...LOGS,
+    ...RAID,
   ],
   map: [
     'TTTTTTTTTTTTTTTTTT,,,,TTTTTTTTTTTTTTTTTT',

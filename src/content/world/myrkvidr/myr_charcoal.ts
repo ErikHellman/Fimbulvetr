@@ -1,0 +1,32 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const myrCharcoal: ScreenDef = {
+  id: 'myr_charcoal',
+  region: 'myrkvidr',
+  purpose: "Skeggi the charcoal-burner's clearing: an earth kiln smoking day and night.",
+  things: [],
+  map: [
+    'PPTPTPPPPPTPPTPPTPPPPPTPTTTPPT...PPTTPTT',
+    'PTPPPPPPPPPPPPPTPPTPPTPPTTPPTP...TTPPPPP',
+    'TTPPTPTPPTPPPPPPPPPTTPPPTPPPPP...TTPPPPT',
+    'PPPT...P.PP..P.......P....%P.%...%%.TTPT',
+    'PTTP................................TTPP',
+    'PPPT......%................S.......%PPPP',
+    'PPPP....S%T.......T.................PTPP',
+    'PPPP%.....%........%T%.............%PTPP',
+    'PTPTP..........T....kkk....T........PTPT',
+    'PTTPP...............kkk............PTPPP',
+    'PPPP..............................T.PPPT',
+    'TPPTP%.T%.S........................%TTPT',
+    'PPTTT..%...........................%PPPP',
+    'TPPTP..............................PPPTP',
+    '....%...............................PTPT',
+    '......%T............................PPTP',
+    '.......................%%.....%...%PTPPP',
+    'PPTTT..P.%.....%%T...P.TPT..%.P.PT..PTPP',
+    'PPTTPTPPPPPPPTPPPTTTPTTPPPPTTPPPTPPTTTPP',
+    'TTTTPPPPPTTTTPTTPTTPPTPPPPPTPPPTPPPTPTPP',
+    'PPPTPTPPPPTPPPPPPPTTPPPPTTPPPPPPTPPPPTTP',
+    'PPTPPPPPTPPPPPPTPPPPTPPPPPPTTPPPPPPPPTTP',
+  ],
+};

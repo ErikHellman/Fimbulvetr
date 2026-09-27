@@ -10,7 +10,19 @@ import type { Machine, StateDef } from './fsm';
 import { swordOf, type Tuning } from './tuning';
 
 export type HeroMode =
-  'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop' | 'lift' | 'carry' | 'throw';
+  | 'move'
+  | 'attack'
+  | 'charge'
+  | 'spin'
+  | 'roll'
+  | 'shield'
+  | 'hurt'
+  | 'hop'
+  | 'lift'
+  | 'carry'
+  | 'throw'
+  | 'toss'
+  | 'dying';
 
 export interface HeroCtx {
   readonly input: InputFrame;
@@ -49,7 +61,8 @@ const move: HeroDef = {
     if (wasPressed(c.input, 'sword') && c.armed) return 'attack';
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
     steer(e, c, c.tuning.hero.walkSpeed, true);
-    setAnim(e, moving(e) ? 'walk' : 'idle');
+    // `push` counts ticks of leaning on a block (the props system keeps it).
+    setAnim(e, mem(e, 'push') > 0 ? 'push' : moving(e) ? 'walk' : 'idle');
     return pushingLedge(e, c) ? 'hop' : undefined;
   },
 };
@@ -236,6 +249,32 @@ const throwing: HeroDef = {
   },
 };
 
+/** Throwing a sub-item (the boomerang flies on its own). */
+const toss: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'toss');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.tossTicks - 1 ? 'move' : undefined;
+  },
+};
+
+/** Fallen at 0 hp. The sim is in `over` mode, which advances the clock of this state by hand. */
+const dying: HeroDef = {
+  enter(e) {
+    still(e);
+    e.knock = { x: 0, y: 0 };
+    e.facing = 's';
+    setAnim(e, 'dying');
+  },
+  tick(e) {
+    still(e);
+    return undefined;
+  },
+};
+
 export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   move,
   attack,
@@ -248,6 +287,8 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   lift,
   carry,
   throw: throwing,
+  toss,
+  dying,
 };
 
 /** Per-tick bookkeeping that is independent of the current state. */

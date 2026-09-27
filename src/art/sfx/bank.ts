@@ -150,4 +150,187 @@ export const SFX_BANK = {
     release: 0.05,
     volume: 0.2,
   },
+  /** The hero takes a hit: a short falling grunt. */
+  sfx_hurt: {
+    wave: 'saw',
+    freq: 330,
+    freqEnd: 150,
+    attack: 0,
+    sustain: 0.05,
+    release: 0.12,
+    volume: 0.35,
+  },
+  /** The hero falls: a long slide down. */
+  sfx_die: {
+    wave: 'triangle',
+    freq: 520,
+    freqEnd: 60,
+    attack: 0.01,
+    sustain: 0.5,
+    release: 0.4,
+    volume: 0.4,
+  },
+  /** A beast's warning before it strikes. */
+  sfx_growl: {
+    wave: 'saw',
+    freq: 110,
+    freqEnd: 80,
+    attack: 0.03,
+    sustain: 0.25,
+    release: 0.15,
+    volume: 0.3,
+  },
+  /** A long rumble after the lightning flash. */
+  sfx_thunder: {
+    wave: 'noise',
+    freq: 220,
+    freqEnd: 40,
+    attack: 0.02,
+    sustain: 0.6,
+    release: 0.9,
+    volume: 0.45,
+  },
+  /** Fire flaring up (a burn). */
+  sfx_fire: {
+    wave: 'noise',
+    freq: 1800,
+    freqEnd: 600,
+    attack: 0.01,
+    sustain: 0.12,
+    release: 0.2,
+    volume: 0.3,
+  },
+  /** An enemy vanishing in a puff. */
+  sfx_poof: {
+    wave: 'noise',
+    freq: 700,
+    freqEnd: 2600,
+    attack: 0.005,
+    sustain: 0.05,
+    release: 0.15,
+    volume: 0.3,
+  },
+  /** A heart or a coin picked up. */
+  sfx_pickup: {
+    wave: 'square',
+    freq: 880,
+    freqEnd: 1320,
+    attack: 0,
+    sustain: 0.04,
+    release: 0.06,
+    volume: 0.25,
+    duty: 0.25,
+  },
+  /** A gate or barrier giving way. */
+  sfx_gate: {
+    wave: 'saw',
+    freq: 140,
+    freqEnd: 90,
+    attack: 0.01,
+    sustain: 0.2,
+    release: 0.2,
+    volume: 0.3,
+  },
+  /** A chest lid creaking open. */
+  sfx_chest: {
+    wave: 'saw',
+    freq: 180,
+    freqEnd: 320,
+    attack: 0.02,
+    sustain: 0.14,
+    release: 0.12,
+    volume: 0.25,
+  },
+  /** Something hidden shows itself: a rising chime. */
+  sfx_secret: {
+    wave: 'triangle',
+    freq: 520,
+    freqEnd: 1560,
+    attack: 0.01,
+    sustain: 0.3,
+    release: 0.3,
+    volume: 0.3,
+  },
+  /** A key turning in an old lock. */
+  sfx_unlock: {
+    wave: 'square',
+    freq: 440,
+    freqEnd: 660,
+    attack: 0,
+    sustain: 0.03,
+    release: 0.08,
+    volume: 0.25,
+    duty: 0.4,
+  },
+  /** Bars dropping shut, or grinding open. */
+  sfx_shutter: {
+    wave: 'noise',
+    freq: 400,
+    freqEnd: 120,
+    attack: 0,
+    sustain: 0.1,
+    release: 0.18,
+    volume: 0.4,
+  },
+  /** A switch stone struck alight. */
+  sfx_switch: {
+    wave: 'triangle',
+    freq: 1320,
+    freqEnd: 990,
+    attack: 0,
+    sustain: 0.06,
+    release: 0.15,
+    volume: 0.3,
+  },
+  /** A root block scraping a tile along the floor. */
+  sfx_push: {
+    wave: 'noise',
+    freq: 260,
+    freqEnd: 180,
+    attack: 0.04,
+    sustain: 0.18,
+    release: 0.1,
+    volume: 0.3,
+  },
+  /** The boomerang leaving the hand: a quick whirr. */
+  sfx_boomerang: {
+    wave: 'saw',
+    freq: 700,
+    freqEnd: 900,
+    attack: 0.02,
+    sustain: 0.12,
+    release: 0.1,
+    volume: 0.2,
+  },
+  /** Something dazed: a wobbling ring. */
+  sfx_stun: {
+    wave: 'triangle',
+    freq: 1100,
+    freqEnd: 700,
+    attack: 0,
+    sustain: 0.1,
+    release: 0.2,
+    volume: 0.3,
+  },
+  /** A blow landing on a boss's weak point: deeper and longer than a plain hit. */
+  sfx_boss_hit: {
+    wave: 'square',
+    freq: 160,
+    freqEnd: 50,
+    attack: 0,
+    sustain: 0.06,
+    release: 0.2,
+    volume: 0.45,
+    duty: 0.4,
+  },
+  /** A boss's roar: a long, low, rough bellow. */
+  sfx_boss_roar: {
+    wave: 'saw',
+    freq: 90,
+    freqEnd: 55,
+    attack: 0.05,
+    sustain: 0.6,
+    release: 0.4,
+    volume: 0.45,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

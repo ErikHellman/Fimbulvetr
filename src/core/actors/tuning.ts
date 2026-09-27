@@ -20,6 +20,8 @@ export interface HeroTuning {
   readonly spinTicks: number;
   readonly hurtTicks: number;
   readonly hurtIframes: number;
+  /** Length of the fall at 0 hp before the game-over panel shows. */
+  readonly dyingTicks: number;
   /** Ticks of walking into a ledge before hopping it. */
   readonly ledgePushTicks: number;
   readonly hopTicks: number;
@@ -30,6 +32,8 @@ export interface HeroTuning {
   readonly throwTicks: number;
   /** Height (px) a carried prop is held at. */
   readonly carryHeight: number;
+  /** The throwing pose of a sub-item (the boomerang). */
+  readonly tossTicks: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -49,9 +53,25 @@ export interface ThrowTuning {
   readonly flightTicks: number;
 }
 
+export interface PushTuning {
+  /** Ticks of steady pushing before a block moves. */
+  readonly ticks: number;
+  /** Ticks a block takes to slide one tile. */
+  readonly slideTicks: number;
+}
+
+export interface BoomerangTuning {
+  /** px per tick, out and back. */
+  readonly speed: number;
+  /** px flown before it turns back (sooner at a wall or on a hit). */
+  readonly range: number;
+}
+
 export interface Tuning {
   readonly hero: HeroTuning;
+  readonly boomerang: BoomerangTuning;
   readonly throw: ThrowTuning;
+  readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
   /** Typewriter speed, characters per second. */

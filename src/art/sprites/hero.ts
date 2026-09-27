@@ -1,3 +1,4 @@
+import type { WeaponId } from '@content/ids';
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
@@ -172,11 +173,53 @@ function shield(r: Raster, o: number, b: number, pos: ShieldPos): void {
   else if (pos === 'back') disc(o + 16, b + 18.5, 5, 5);
 }
 
-function sword(r: Raster, hx: number, hy: number, dir: SwordDir): void {
+/** What Ask holds: the seax (a short sword), Halvar's hand-axe or the raid-night pitchfork. */
+export type Blade = 'sword' | 'axe' | 'fork';
+
+function weapon(r: Raster, hx: number, hy: number, dir: SwordDir, blade: Blade): void {
   const [dx, dy] = SWORD_VEC[dir];
-  const len = dx !== 0 && dy !== 0 ? 9 : 12;
+  const diag = dx !== 0 && dy !== 0;
   const px = -dy;
   const py = dx;
+  if (blade === 'axe') {
+    // A short haft and a bearded head on one side.
+    const len = diag ? 6 : 8;
+    line(r, hx - dx * 2, hy - dy * 2, hx + dx * len, hy + dy * len, P.grip);
+    for (let k = 0; k < 3; k++)
+      line(
+        r,
+        hx + dx * (len - k) + px,
+        hy + dy * (len - k) + py,
+        hx + dx * (len - k) + px * 4,
+        hy + dy * (len - k) + py * 4,
+        k === 0 ? P.steelShade : P.steel,
+      );
+    return;
+  }
+  if (blade === 'fork') {
+    // A long haft ending in three tines.
+    const len = diag ? 9 : 12;
+    line(r, hx - dx * 3, hy - dy * 3, hx + dx * len, hy + dy * len, P.grip);
+    line(
+      r,
+      hx + dx * len - px * 2,
+      hy + dy * len - py * 2,
+      hx + dx * len + px * 2,
+      hy + dy * len + py * 2,
+      P.steelShade,
+    );
+    for (const k of [-2, 0, 2])
+      line(
+        r,
+        hx + dx * len + px * k,
+        hy + dy * len + py * k,
+        hx + dx * (len + 2) + px * k,
+        hy + dy * (len + 2) + py * k,
+        P.steel,
+      );
+    return;
+  }
+  const len = diag ? 9 : 12;
   line(r, hx - dx * 3, hy - dy * 3, hx, hy, P.grip);
   line(r, hx - px * 2, hy - py * 2, hx + px * 2, hy + py * 2, P.grip);
   line(r, hx + dx, hy + dy, hx + dx * len, hy + dy * len, P.steel);
@@ -189,6 +232,7 @@ interface Pose {
   readonly shield: ShieldPos;
   readonly sword?: SwordDir;
   readonly arms?: Arms;
+  readonly blade?: Blade;
 }
 
 function drawPose(pose: Pose, size: number): Raster {
@@ -197,7 +241,8 @@ function drawPose(pose: Pose, size: number): Raster {
   const b = o + (pose.phase === 1 || pose.phase === 3 ? 1 : 0);
   const [hx, hy] = HAND[pose.side];
   const behind = pose.side === 'n';
-  if (pose.sword !== undefined && behind) sword(r, o + hx, b + hy, pose.sword);
+  const blade = pose.blade ?? 'sword';
+  if (pose.sword !== undefined && behind) weapon(r, o + hx, b + hy, pose.sword, blade);
   const arms = pose.arms ?? 'down';
   legs(r, o, pose.side, pose.phase);
   if (behind) liftedArms(r, o, b, pose.side, arms);
@@ -205,7 +250,7 @@ function drawPose(pose: Pose, size: number): Raster {
   head(r, o, b, pose.side);
   if (!behind) liftedArms(r, o, b, pose.side, arms);
   shield(r, o, b, pose.shield);
-  if (pose.sword !== undefined && !behind) sword(r, o + hx, b + hy, pose.sword);
+  if (pose.sword !== undefined && !behind) weapon(r, o + hx, b + hy, pose.sword, blade);
   return outline(r, P.ink, 2);
 }
 
@@ -218,22 +263,68 @@ function drawRoll(i: number): Raster {
   return outline(r, P.ink, 2);
 }
 
+/** Ask lying on his side, knocked out: head west, boots east. */
+function drawFallen(): Raster {
+  const r = createRaster(SMALL, SMALL);
+  rect(r, 20, 23, 4, 3, P.pants);
+  rect(r, 20, 26, 4, 2, P.pantsShade);
+  rect(r, 24, 23, 3, 5, P.boot);
+  rect(r, 12, 22, 8, 6, P.tunic);
+  rect(r, 12, 26, 8, 2, P.tunicShade);
+  rect(r, 17, 22, 1, 6, P.belt);
+  ellipse(r, 8, 24, 3.5, 3.5, (x) => (x < 7 ? P.hair : P.skin));
+  return outline(r, P.ink, 2);
+}
+
 const frame = (name: string, raster: Raster): SpriteFrame =>
   raster.w === LARGE ? { name, raster, ox: 24, oy: 38 } : { name, raster, ox: 16, oy: 30 };
 
+/** What the hero sprite shows: the blade in hand, and whether the round shield is carried. */
+export interface HeroKit {
+  readonly blade: Blade;
+  readonly shield: boolean;
+}
+
+/** The hero's art keys, one per kit; every kit draws every hero animation. */
+export const HERO_KITS = {
+  hero: { blade: 'sword', shield: true },
+  hero_axe: { blade: 'axe', shield: false },
+  hero_fork: { blade: 'fork', shield: false },
+} as const satisfies Record<string, HeroKit>;
+
+export type HeroArt = keyof typeof HERO_KITS;
+
+/** The art to draw the hero with, for the weapon in hand (the farm and the raid night have no shield). */
+export function heroArtFor(weapon: WeaponId): HeroArt {
+  if (weapon === 'handaxe') return 'hero_axe';
+  if (weapon === 'pitchfork') return 'hero_fork';
+  return 'hero';
+}
+
 export function heroFrames(): SpriteFrame[] {
+  return Object.entries(HERO_KITS).flatMap(([art, kit]) => kitFrames(art, kit));
+}
+
+function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
   const out: SpriteFrame[] = [];
   const add = (anim: string, side: Side, i: number, raster: Raster): void => {
-    out.push(frame(`hero_${anim}_${side}_${i}`, raster));
-    if (side === 'w') out.push(frame(`hero_${anim}_e_${i}`, flipX(raster)));
+    out.push(frame(`${art}_${anim}_${side}_${i}`, raster));
+    if (side === 'w') out.push(frame(`${art}_${anim}_e_${i}`, flipX(raster)));
   };
+  const RESTING_KIT: Readonly<Record<Side, ShieldPos>> = kit.shield
+    ? RESTING
+    : { s: 'none', w: 'none', n: 'none' };
+  const RAISED_KIT: Readonly<Record<Side, ShieldPos>> = kit.shield
+    ? RAISED
+    : { s: 'none', w: 'none', n: 'none' };
+  const blade = kit.blade;
   for (const side of ['s', 'n', 'w'] as const) {
-    add('idle', side, 0, drawPose({ side, phase: 0, shield: RESTING[side] }, SMALL));
-    add('hurt', side, 0, drawPose({ side, phase: 0, shield: RESTING[side] }, SMALL));
-    add('shield', side, 0, drawPose({ side, phase: 0, shield: RAISED[side] }, SMALL));
+    add('idle', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side] }, SMALL));
+    add('hurt', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side] }, SMALL));
+    add('shield', side, 0, drawPose({ side, phase: 0, shield: RAISED_KIT[side] }, SMALL));
     for (let i = 0; i < 4; i++) {
-      add('walk', side, i, drawPose({ side, phase: i, shield: RESTING[side] }, SMALL));
-      add('shieldwalk', side, i, drawPose({ side, phase: i, shield: RAISED[side] }, SMALL));
+      add('walk', side, i, drawPose({ side, phase: i, shield: RESTING_KIT[side] }, SMALL));
+      add('shieldwalk', side, i, drawPose({ side, phase: i, shield: RAISED_KIT[side] }, SMALL));
       add('carrywalk', side, i, drawPose({ side, phase: i, shield: 'none', arms: 'up' }, SMALL));
     }
     add('lift', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL));
@@ -241,10 +332,21 @@ export function heroFrames(): SpriteFrame[] {
     add('carry', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
     add('throw', side, 0, drawPose({ side, phase: 0, shield: 'none', arms: 'up' }, SMALL));
     add('throw', side, 1, drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL));
-    add('charge', side, 0, drawPose({ side, phase: 0, shield: RESTING[side], sword: FORWARD[side] }, LARGE));
+    // Leaning on a root block: arms out, feet digging in.
+    add('push', side, 0, drawPose({ side, phase: 1, shield: 'none', arms: 'forward' }, SMALL));
+    add('push', side, 1, drawPose({ side, phase: 3, shield: 'none', arms: 'forward' }, SMALL));
+    // Sending a sub-item off (the boomerang): wind up, let go.
+    add('toss', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
+    add('toss', side, 1, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'forward' }, SMALL));
+    add(
+      'charge',
+      side,
+      0,
+      drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: FORWARD[side], blade }, LARGE),
+    );
     for (const anim of ['attack1', 'attack2', 'attack3'] as const) {
       ATTACK_ARCS[side][anim].forEach((dir, i) => {
-        add(anim, side, i, drawPose({ side, phase: 0, shield: RESTING[side], sword: dir }, LARGE));
+        add(anim, side, i, drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: dir, blade }, LARGE));
       });
     }
   }
@@ -255,10 +357,22 @@ export function heroFrames(): SpriteFrame[] {
     ['w', true],
   ];
   spin.forEach(([side, mirror], i) => {
-    const r = drawPose({ side, phase: 0, shield: RESTING[side], sword: FORWARD[side] }, LARGE);
-    out.push(frame(`hero_spin_s_${i}`, mirror ? flipX(r) : r));
+    const r = drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: FORWARD[side], blade }, LARGE);
+    out.push(frame(`${art}_spin_s_${i}`, mirror ? flipX(r) : r));
   });
-  for (let i = 0; i < 4; i++) out.push(frame(`hero_roll_s_${i}`, drawRoll(i)));
+  for (let i = 0; i < 4; i++) out.push(frame(`${art}_roll_s_${i}`, drawRoll(i)));
+  const turn: readonly (readonly [Side, boolean])[] = [
+    ['s', false],
+    ['w', false],
+    ['n', false],
+    ['w', true],
+    ['s', false],
+  ];
+  turn.forEach(([side, mirror], i) => {
+    const r = drawPose({ side, phase: 0, shield: 'none' }, SMALL);
+    out.push(frame(`${art}_dying_s_${i}`, mirror ? flipX(r) : r));
+  });
+  out.push(frame(`${art}_dying_s_5`, drawFallen()));
   return out;
 }
 
@@ -280,4 +394,8 @@ export const HERO_ANIMS = {
   carry: { frames: 1, fps: 1, loop: true, dirs: ALL },
   carrywalk: { frames: 4, fps: 7, loop: true, dirs: ALL },
   throw: { frames: 2, fps: 12, loop: false, dirs: ALL },
+  push: { frames: 2, fps: 4, loop: true, dirs: ALL },
+  toss: { frames: 2, fps: 12, loop: false, dirs: ALL },
+  /** Spins through the four facings and falls; held on the last frame. */
+  dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },
 } satisfies Record<string, AnimDef>;

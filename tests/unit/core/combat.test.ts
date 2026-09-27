@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { ENEMY_DEFS } from '@content/enemies';
-import { TUNING } from '@content/tuning';
 import { runFsm } from '@core/actors/fsm';
 import { BEHAVIOURS, createEnemy } from '@core/actors/enemies';
-import type { ActorCtx } from '@core/actors/enemies/defs';
 import { HEAVY, PIERCE_SHIELD, resolveHit, type HitData } from '@core/combat/hit';
-import { createRng } from '@core/math/rng';
+import { testCtx } from './actorCtx';
 
 const dummy = () => createEnemy(1, ENEMY_DEFS.dummy, { x: 100, y: 100 });
 const opts = { shielding: false, iframes: 6, knockResist: 0 };
@@ -75,14 +73,7 @@ describe('PIERCE_SHIELD', () => {
 describe('training dummy', () => {
   it('wobbles after a hit, then settles', () => {
     const e = dummy();
-    const ctx: ActorCtx = {
-      tuning: TUNING,
-      rng: createRng(1),
-      hero: { x: 0, y: 0 },
-      heroVel: { x: 0, y: 0 },
-      solidAt: () => false,
-      emit: () => undefined,
-    };
+    const ctx = testCtx();
     resolveHit(e, hit(), opts);
     runFsm(BEHAVIOURS.dummy, e, ctx);
     expect(e.fsm.s).toBe('hurt');

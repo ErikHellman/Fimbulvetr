@@ -34,6 +34,20 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
   lantern: ['...ee...', '..e..e..', '.eeeeee.', '.eyyyye.', '.eyYYye.', '.eyYYye.', '.eyyyye.', '.eeeeee.'],
   flatbread: ['..bbbb..', '.bBbbBb.', 'bbbBbbbb', 'bBbbbbBb', 'bbbbBbbb', '.bbBbbb.', '..bbbb..', '........'],
   cheese: ['........', '....yyy.', '..yyyyy.', 'yyyyYyy.', 'yyYyyyy.', 'yyyyyYy.', 'YYYYYYY.', '........'],
+  boomerang: ['wwwwww..', 'wWWWWw..', 'ww......', 'wW......', 'wW......', 'wW......', 'ww......', '........'],
+  small_key: ['.gg.....', 'g..g....', 'g..g....', '.gGgggg.', '.....g.g', '.....g..', '........', '........'],
+  big_key: ['.ggg....', 'g...g...', 'g.e.g...', 'g...g...', '.gggGggg', '.....gGg', '.....g.g', '........'],
+  dungeon_map: [
+    'ssssssss',
+    'sSs.ssSs',
+    'ss.sSsss',
+    'sss.ssrs',
+    'sSsss.ss',
+    'ssSssss.',
+    'ssssSsss',
+    '........',
+  ],
+  compass: ['..iiii..', '.illlli.', 'illrllli', 'illrllli', 'illleeli', 'illleeli', '.illlli.', '..iiii..'],
 };
 
 const ICON_PAL: GridPalette = {
@@ -43,6 +57,15 @@ const ICON_PAL: GridPalette = {
   Y: C.ember,
   b: C.straw,
   B: C.strawShade,
+  w: C.wood,
+  W: C.woodShade,
+  g: C.shieldRim,
+  G: C.strawShade,
+  s: C.sack,
+  S: C.sackShade,
+  r: C.heart,
+  i: C.hoop,
+  l: C.steel,
 };
 
 export function uiFrames(): SpriteFrame[] {

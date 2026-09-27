@@ -16,6 +16,11 @@ export interface ViewStats {
   readonly openWater: number;
   readonly fishAlive: number;
   readonly fishJumps: number;
+  /** Raindrops alive, lightning bolts so far, the darkness drawn and the lights cut out of it. */
+  readonly rain: number;
+  readonly bolts: number;
+  readonly dark: number;
+  readonly lights: number;
 }
 
 /** What the running Play scene exposes to dev tools. */
@@ -34,6 +39,8 @@ export interface DevBridge {
   tileAt(x: number, y: number): number;
   /** Restarts play from another state (used by import). */
   restart(state: GameState): void;
+  /** The open pause menu's page and cursor, or null in play. */
+  menu(): { readonly tab: string; readonly cursor: number; readonly confirm: boolean } | null;
 }
 
 export interface DevTools {

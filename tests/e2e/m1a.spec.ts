@@ -83,8 +83,11 @@ test('sleeping on the third night starts the raid', async ({ page }) => {
   await boot(page, 'nosave&preset=night3');
   await tap(page, 'KeyE');
   await expect.poll(() => story(page).then((s) => s?.k), { timeout: 10_000 }).toBe('card');
-  await readOn(page);
+  for (let i = 0; i < 40 && (await page.evaluate(() => window.__fimbul?.mode())) !== 'play'; i++)
+    await tap(page, 'Enter');
+  await expect.poll(() => page.evaluate(() => window.__fimbul?.mode())).toBe('play');
   expect((await flags(page)).st_raid_begun).toBe(true);
+  expect(await page.evaluate(() => window.__fimbul?.clock().season)).toBe('autumn');
   expect(errors).toEqual([]);
 });
 

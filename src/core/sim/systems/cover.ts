@@ -1,5 +1,6 @@
 import { heroSwordBox } from '../../actors/hero';
 import { buildCover, coverAt, cutBox, encodeBits, type CoverGrid } from '../../world/cover';
+import type { Box } from '../../math/box';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 
@@ -26,8 +27,22 @@ export function refreshCover(rt: SimRt): void {
 /** The sword (and the spin) mows standing cover; cut tiles are saved under the season epoch. */
 export function cutCover(rt: SimRt): void {
   const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
-  if (box === null) return;
-  const cut = cutBox(rt.screen.cover, box);
+  if (box !== null) saveCut(rt, cutBox(rt.screen.cover, box));
+}
+
+/** The boomerang blows away the light cover it passes (leaf piles), not grass. */
+export function blowCover(rt: SimRt, box: Box): void {
+  const order = rt.db.coverOrder;
+  saveCut(
+    rt,
+    cutBox(rt.screen.cover, box, (k) => {
+      const id = order[k - 1];
+      return id !== undefined && rt.db.cover[id].blown === true;
+    }),
+  );
+}
+
+function saveCut(rt: SimRt, cut: readonly number[]): void {
   if (cut.length === 0) return;
   rt.state.world.cover[rt.screen.id] = {
     epoch: rt.screen.cover.epoch,

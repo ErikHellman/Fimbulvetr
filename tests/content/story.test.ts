@@ -36,6 +36,8 @@ const CONTENT = {
   quests: DB.quests,
   shops: DB.shops,
   screens: DB.screens,
+  weather: DB.weather,
+  freezeClock: DB.freezeClock,
 };
 
 describe('story content', () => {

@@ -88,6 +88,13 @@ function ledge(p: Painter): void {
   for (let x = 1; x < 16; x += 4) p.px(x, 13, C.dirt);
 }
 
+/** Rótarhellir's floor: packed dark earth with grit. */
+function caveFloor(p: Painter): void {
+  p.fill(C.caveFloor);
+  p.speckle(C.caveFloorShade, 0.16);
+  p.speckle(C.caveFloorLight, 0.04);
+}
+
 function planks(p: Painter, fill: string, line: string, vertical: boolean): void {
   p.fill(fill);
   p.speckle(line, 0.04);
@@ -353,6 +360,116 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       p.rect(0, 15, 16, 1, C.ink);
       p.rect(1, 1, 2, 2, C.woodShade);
       p.rect(1, 13, 2, 2, C.woodShade);
+    },
+  },
+  pine: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+      p.speckle(C.dirtShade, 0.1);
+    },
+  },
+  log: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+    },
+  },
+  mound: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      grass(p);
+      for (let y = 3; y < 15; y++) {
+        const half = Math.round(7 * Math.sqrt(1 - ((y - 9) / 6.5) ** 2));
+        p.rect(8 - half, y, half * 2, 1, y < 7 ? C.dirt : C.dirtShade);
+      }
+      p.rect(5, 5, 6, 1, C.grassShade);
+      p.speckle(C.rockShade, 0.03);
+    },
+  },
+  kiln: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+      p.speckle(C.ink, 0.06);
+    },
+  },
+  cave_floor: {
+    autotile: false,
+    variants: 4,
+    paint: (p, v) => {
+      caveFloor(p);
+      if (v.variant === 3) {
+        p.rect(9, 6, 3, 2, C.caveFloorShade);
+        p.px(9, 6, C.caveFloorLight);
+      }
+    },
+  },
+  cave_wall: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      caveFloor(p);
+      region(p, v.mask, 0, C.caveWall, C.ink, C.caveWallLight, 0.1);
+    },
+  },
+  sap: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 260,
+    paint: (p, v) => {
+      caveFloor(p);
+      region(p, v.mask, 2, C.sap, C.sapShade, C.sapShade, 0.1);
+      // A bubble rises and pops over four frames at a spot the painter's rng picks per tile.
+      const x = nextInt(p.rng, 5, 11);
+      const y = nextInt(p.rng, 5, 11);
+      if (insideBlob(v.mask, x, y, 3) && v.frame < 3) {
+        p.px(x, y - v.frame, C.sapLight);
+        if (v.frame === 2) p.px(x + 1, y - v.frame, C.sapLight);
+      }
+    },
+  },
+  roots: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      caveFloor(p);
+      region(p, v.mask, 0, C.rootShade, C.ink, C.caveWall, 0.12);
+      for (let k = 0; k < 3; k++) {
+        const x0 = nextInt(p.rng, 0, 16);
+        for (let y = 0; y < 16; y++) {
+          const x = (x0 + Math.floor(y / 3)) % 16;
+          if (insideBlob(v.mask, x, y, 1) && !onBlobEdge(v.mask, x, y, 1)) {
+            p.px(x, y, C.root);
+            if (y % 4 === 0 && insideBlob(v.mask, x + 1, y, 1) && !onBlobEdge(v.mask, x + 1, y, 1))
+              p.px(x + 1, y, C.rootLight);
+          }
+        }
+      }
+    },
+  },
+  runestone: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      caveFloor(p);
+      p.speckle(C.caveFloorShade, 0.25);
+    },
+  },
+  cave_mouth: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.rockShade);
+      p.speckle(C.rock, 0.1);
+      p.rect(3, 1, 10, 15, C.ink);
+      p.rect(2, 4, 12, 12, C.ink);
+      p.rect(4, 0, 8, 1, C.ink);
     },
   },
 };

@@ -38,11 +38,13 @@ export function markVisited(rt: SimRt, id: ScreenId): void {
   if (!rt.state.world.visited.includes(id)) rt.state.world.visited.push(id);
 }
 
-/** Makes `id` the live screen with fresh actors and the hero at `heroAt`. */
-export function enterScreen(rt: SimRt, id: ScreenId, heroAt: Vec): void {
+/** Makes `id` the live screen with fresh actors and the hero at `heroAt`, and records it as the entry. */
+export function enterScreen(rt: SimRt, id: ScreenId, heroAt: Vec, facing: Dir4 = rt.hero.facing): void {
   rt.screen = rt.load(id);
   rt.actors = spawnActors(rt);
   placeHero(rt, heroAt);
+  rt.hero.facing = facing;
+  rt.entry = { x: heroAt.x, y: heroAt.y, facing };
 }
 
 /** Starts a slide when the hero's body leaves the screen toward a neighbour. */
@@ -124,8 +126,7 @@ export function stepTransition(rt: SimRt): void {
   tr.t += 1;
   if (tr.kind === 'slide') rt.hero.animT += 1;
   if (tr.kind === 'fade' && tr.t === tr.dur / 2) {
-    enterScreen(rt, tr.to, tr.heroTo);
-    rt.hero.facing = tr.facing;
+    enterScreen(rt, tr.to, tr.heroTo, tr.facing);
     setAnim(rt.hero, 'idle');
   }
   if (tr.t < tr.dur) return;

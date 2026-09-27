@@ -3,6 +3,7 @@ import { SCREEN_IDS, isScreenId } from '@content/world/screens';
 import { mem } from '@core/actors/entity';
 import { isSeason, type ClockState } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
+import { peekDungeon } from '@core/state/dungeons';
 import { cloneState } from '@core/state/save';
 import { tileFeet } from '@core/world/screen';
 import { importMessageKey } from '@shell/platform/exportImport';
@@ -59,6 +60,23 @@ export interface FimbulHook {
   actors(): { kind: string; def: string; x: number; y: number; fsm: string }[];
   /** Every screen id, for smoke tests. */
   screens(): string[];
+  /** Dev: sets the hero's health (0 makes them fall next tick). */
+  setHp(hp: number): void;
+  /** The open pause menu's page and cursor, or null in play. */
+  menu(): { tab: string; cursor: number; confirm: boolean } | null;
+  /** What sits in item slots K and L. */
+  slots(): (string | null)[];
+  /** The boss bar: its name in English, health and phase; null when no boss is on screen. */
+  boss(): { name: string; hp: number; maxHp: number; phase: number } | null;
+  /** The saved state of the dungeon Ask is in, or null outside dungeons. */
+  dungeon(): {
+    id: string;
+    keys: number;
+    bigKey: boolean;
+    map: boolean;
+    compass: boolean;
+    bossDead: boolean;
+  } | null;
 }
 
 declare global {
@@ -93,6 +111,22 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       };
     },
     enemies: () => bridge().sim.enemies.map((e) => ({ def: e.def, hp: e.hp, flash: e.flash })),
+    menu: () => bridge().menu(),
+    slots: () => [...bridge().sim.state.inv.slots],
+    boss: () => {
+      const b = bridge().sim.boss();
+      return b === null ? null : { name: b.name.en, hp: b.hp, maxHp: b.maxHp, phase: b.phase };
+    },
+    dungeon: () => {
+      const sim = bridge().sim;
+      const id = sim.db.screens[sim.screen.id].dungeon;
+      if (id === undefined) return null;
+      const d = peekDungeon(sim.state, id);
+      return { id, keys: d.keys, bigKey: d.bigKey, map: d.map, compass: d.compass, bossDead: d.bossDead };
+    },
+    setHp: (hp) => {
+      bridge().sim.hero.hp = Math.max(0, Math.min(bridge().sim.hero.maxHp, Math.floor(hp)));
+    },
     clock: () => ({ ...bridge().sim.state.clock }),
     light: () => bridge().lightLevel(),
     appliedGrade: () => [...bridge().appliedGrade()],

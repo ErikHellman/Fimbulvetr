@@ -1,0 +1,37 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R08: ScreenDef = {
+  id: 'd1_r08',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  purpose: 'The compass, between two pillars.',
+  things: [
+    { k: 'chest', id: 'd1_c_compass', at: { x: 20, y: 10 }, gives: { item: 'compass' } },
+    { k: 'enemy', id: 'root_biter', at: { x: 8, y: 10 } },
+    { k: 'enemy', id: 'root_biter', at: { x: 31, y: 10 } },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQrrrrrrrrrrccccccccccccccccrrrrrrrrrrQQ',
+    'QQrrrrrrrrrrccccccccccccccccrrrrrrrrrrQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccQQQccccccQQQccccccccccccQQ',
+    'QQccccccccccccQQQccccccQQQccccccccccccQQ',
+    'QQccccccccccccQQQccccccQQQccccccccccccQQ',
+    'QQccccccccccccQQQccccccQQQccccccccccccQQ',
+    'QQccccccccccccQQQccccccQQQccccccccccccQQ',
+    'QQccccccccccccQQQccccccQQQccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

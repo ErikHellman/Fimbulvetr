@@ -34,6 +34,19 @@ describe('screens', () => {
       expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
     }
   });
+
+  it.each(SCREEN_IDS)('%s lays fires and gates on walkable tiles only', (id) => {
+    const ok = walkable(id);
+    for (const thing of SCREENS[id].things) {
+      if (thing.k !== 'fire' && thing.k !== 'gate') continue;
+      for (let y = 0; y < thing.h; y++)
+        for (let x = 0; x < thing.w; x++)
+          expect(
+            ok(thing.at.x + x, thing.at.y + y),
+            `${id} ${thing.k} at ${thing.at.x + x},${thing.at.y + y}`,
+          ).toBe(true);
+    }
+  });
 });
 
 const WATERSIDE = new Set(['water', 'ford', 'jetty']);
@@ -186,13 +199,29 @@ describe('doors', () => {
     }
   });
 
-  it('reaches every screen off the world grid', () => {
-    const offGrid = SCREEN_IDS.filter((id) => WORLD_LAYOUT.at[id] === undefined);
+  it('reaches every screen off the world grid, and every dungeon grid, through a door', () => {
+    const grids = Object.entries(WORLD_LAYOUT.dungeons ?? {});
+    const inDungeon = new Set(grids.flatMap(([, g]) => Object.keys(g.at)));
+    const offGrid = SCREEN_IDS.filter((id) => WORLD_LAYOUT.at[id] === undefined && !inDungeon.has(id));
     for (const id of offGrid)
       expect(
         doors.some((d) => d.door.to === id),
         id,
       ).toBe(true);
+    for (const [dungeon, g] of grids) {
+      const rooms = new Set(Object.keys(g.at));
+      expect(
+        doors.some((d) => rooms.has(d.door.to) && !rooms.has(d.from)),
+        `${dungeon} has a way in`,
+      ).toBe(true);
+    }
+  });
+
+  it('marks exactly the rooms on a dungeon grid as that dungeon', () => {
+    for (const id of SCREEN_IDS) {
+      const grid = Object.entries(WORLD_LAYOUT.dungeons ?? {}).find(([, g]) => g.at[id] !== undefined)?.[0];
+      expect(SCREENS[id].dungeon, id).toBe(grid);
+    }
   });
 });
 

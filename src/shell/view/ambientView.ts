@@ -106,13 +106,21 @@ export class AmbientView {
     };
   }
 
+  /** The pause menu freezes the smoke in the air. */
+  setPaused(paused: boolean): void {
+    for (const e of this.emitters) e.active = !paused;
+  }
+
   destroy(): void {
     for (const e of this.emitters) e.destroy();
     for (const f of this.fish) f.image.destroy();
     this.fish.length = 0;
   }
 
-  /** One slow grey emitter at the top of every chimney stack, already smoking when the screen appears. */
+  /**
+   * One slow grey emitter at the top of every chimney stack and on every charcoal kiln's vent (the middle
+   * of its top row), already smoking when the screen appears.
+   */
   private addSmoke(): void {
     const { o } = this;
     const refs = [0, 1, 2].map((i) => o.frames.get(`fx_smoke_idle_s_${i}`));
@@ -123,9 +131,13 @@ export class AmbientView {
     if (names.length !== refs.length) console.error('[art] smoke frames span texture pages');
     for (let y = 0; y < o.grid.rows; y++) {
       for (let x = 0; x < o.grid.cols; x++) {
-        if (o.grid.cells[y * o.grid.cols + x] !== 'chimney') continue;
+        const at = (dx: number, dy: number): string | undefined =>
+          o.grid.cells[(y + dy) * o.grid.cols + x + dx];
+        const vent =
+          at(0, 0) === 'kiln' && at(0, -1) !== 'kiln' && at(-1, 0) === 'kiln' && at(1, 0) === 'kiln';
+        if (at(0, 0) !== 'chimney' && !vent) continue;
         const emitter = this.scene.add
-          .particles(o.origin.x + x * TILE + TILE / 2, o.origin.y + y * TILE + 2, first.key, {
+          .particles(o.origin.x + x * TILE + TILE / 2, o.origin.y + y * TILE + (vent ? 4 : 2), first.key, {
             frame: names,
             frequency: 400,
             quantity: 1,

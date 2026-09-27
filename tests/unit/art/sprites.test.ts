@@ -3,6 +3,7 @@ import { frameName } from '@art/anims';
 import { countOpaque, flipX, getPixel, hex, rastersEqual } from '@art/raster';
 import { C } from '@art/palette';
 import { ANIMS, buildSprites } from '@art/sprites';
+import { heroArtFor } from '@art/sprites/hero';
 
 const frames = buildSprites();
 const byName = new Map(frames.map((f) => [f.name, f]));
@@ -68,11 +69,14 @@ describe('sprites', () => {
   it('keeps drawn pixels clear of the frame edge so outlines are never clipped', () => {
     const inkColor = hex(C.ink);
     for (const f of frames) {
-      const margin = f.name.startsWith('hero_')
-        ? 2
-        : f.name.startsWith('prop_dummy_') || f.name.startsWith('decor_') || f.name.startsWith('fx_fish_')
-          ? 1
-          : 0;
+      const margin =
+        f.name.startsWith('hero_') || f.name.startsWith('enemy_')
+          ? 2
+          : ['prop_dummy_', 'decor_', 'fx_fish_', 'fix_', 'fx_poof_', 'pickup_'].some((p) =>
+                f.name.startsWith(p),
+              )
+            ? 1
+            : 0;
       if (margin === 0) continue; // skip missing frame
       const r = f.raster;
       for (let y = 0; y < r.h; y++) {
@@ -96,6 +100,83 @@ describe('sprites', () => {
         }
       }
     }
+  });
+});
+
+describe('hero kits', () => {
+  it('draws the blade in hand: a hand-axe, a pitchfork or the seax', () => {
+    for (const name of ['attack1_s_1', 'attack2_w_1', 'charge_n_0'])
+      expect(rastersEqual(frame(`hero_axe_${name}`).raster, frame(`hero_${name}`).raster), name).toBe(false);
+    expect(rastersEqual(frame('hero_fork_attack1_s_1').raster, frame('hero_axe_attack1_s_1').raster)).toBe(
+      false,
+    );
+  });
+
+  it('shows the shield only once it is carried', () => {
+    expect(rastersEqual(frame('hero_axe_idle_n_0').raster, frame('hero_idle_n_0').raster)).toBe(false);
+    expect(rastersEqual(frame('hero_axe_idle_n_0').raster, frame('hero_fork_idle_n_0').raster)).toBe(true);
+  });
+
+  it('follows the weapon', () => {
+    expect(heroArtFor('handaxe')).toBe('hero_axe');
+    expect(heroArtFor('pitchfork')).toBe('hero_fork');
+    expect(heroArtFor('seax')).toBe('hero');
+    for (const art of ['hero_axe', 'hero_fork']) expect(ANIMS[art]).toBe(ANIMS['hero']);
+  });
+});
+
+describe('enemies', () => {
+  it('draw a telegraph that reads differently from standing still', () => {
+    for (const art of ['enemy_vargr', 'enemy_draugr', 'enemy_troll'])
+      for (const dir of ['s', 'w', 'n'])
+        expect(
+          rastersEqual(frame(`${art}_tell_${dir}_0`).raster, frame(`${art}_idle_${dir}_0`).raster),
+          art,
+        ).toBe(false);
+  });
+
+  it('draw every animation their behaviours use', () => {
+    const used: Readonly<Record<string, readonly string[]>> = {
+      enemy_vargr: ['idle', 'walk', 'tell', 'lunge', 'hurt'],
+      enemy_draugr: ['idle', 'walk', 'rise', 'tell', 'swing', 'hurt'],
+      enemy_troll: ['idle', 'walk', 'tell', 'smash'],
+      fix_fire: ['burn', 'out', 'closed', 'open'],
+      fix_palisade: ['closed', 'open'],
+      fix_logs: ['closed', 'open'],
+      fix_chest: ['closed', 'open'],
+      fix_lock: ['closed', 'open'],
+      fix_shutter: ['closed', 'open'],
+      fix_switch: ['off', 'on'],
+      fix_brazier: ['burn', 'out'],
+      pickup_heart_container: ['idle'],
+      pickup_heart: ['idle'],
+      pickup_silver: ['idle'],
+      fx_poof: ['idle'],
+      enemy_root_biter: ['buried', 'tell', 'bite', 'idle', 'hurt', 'retract'],
+      enemy_rotvaettr: ['idle', 'open', 'roar'],
+      enemy_rot_bulb: ['idle'],
+      enemy_root_spike: ['tell', 'erupt', 'sink'],
+      fx_boomerang: ['spin'],
+      hero: ['push', 'toss'],
+      item_boomerang: ['idle'],
+      item_small_key: ['idle'],
+      item_big_key: ['idle'],
+      item_dungeon_map: ['idle'],
+      item_compass: ['idle'],
+    };
+    for (const [art, anims] of Object.entries(used))
+      for (const anim of anims) expect(ANIMS[art]?.[anim], `${art} ${anim}`).toBeDefined();
+  });
+
+  it('has art for every enemy the content names', async () => {
+    const { ENEMY_DEFS } = await import('@content/enemies');
+    for (const d of Object.values(ENEMY_DEFS)) expect(ANIMS[d.art], d.art).toBeDefined();
+  });
+
+  it('shows the draugr rising out of the ground', () => {
+    const buried = countOpaque(frame('enemy_draugr_rise_s_0').raster);
+    const up = countOpaque(frame('enemy_draugr_rise_s_3').raster);
+    expect(buried).toBeLessThan(up);
   });
 });
 

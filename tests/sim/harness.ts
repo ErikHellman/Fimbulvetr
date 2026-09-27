@@ -1,7 +1,9 @@
 import { DB } from '@content/index';
-import { TEST_START } from '@content/start';
+import { NEW_GAME, TEST_START } from '@content/start';
+import { ANIMS } from '@art/sprites';
 import type { ScreenId } from '@content/world/screens';
 import type { Season } from '@core/clock/types';
+import { applyPreset, type DevPreset } from '@core/dev/query';
 import { bitsOf, type Action, type InputFrame } from '@core/input/actions';
 import type { Dir4 } from '@core/math/dir';
 import type { ContentDb } from '@core/sim/db';
@@ -18,8 +20,10 @@ export interface HarnessOptions {
   readonly season?: Season;
   readonly seed?: number;
   readonly db?: ContentDb;
-  /** Starting kit; the M0 test kit by default. */
+  /** Starting kit; the M0 test kit by default, or the new-game kit when a `preset` is given. */
   readonly start?: NewGameInit;
+  /** A dev preset applied over the starting kit (as `?preset=` does in the browser). */
+  readonly preset?: DevPreset;
 }
 
 export function frameOf(
@@ -43,7 +47,8 @@ export class Harness {
   readonly events: SimEvent[] = [];
 
   constructor(o: HarnessOptions = {}) {
-    const state = newGame(o.seed ?? 1, o.start ?? TEST_START);
+    const state = newGame(o.seed ?? 1, o.start ?? (o.preset === undefined ? TEST_START : NEW_GAME));
+    if (o.preset !== undefined) applyPreset(state, o.preset);
     if (o.screen !== undefined) state.hero.screen = o.screen;
     if (o.tile !== undefined) {
       const p = tileFeet({ x: o.tile[0], y: o.tile[1] });
@@ -93,5 +98,14 @@ export class Harness {
 
   count(t: SimEvent['t']): number {
     return this.events.filter((e) => e.t === t).length;
+  }
+
+  /** Throws if any entity shows an animation that has no drawn frames. */
+  expectAnims(): this {
+    for (const e of this.sim.entities) {
+      if (ANIMS[e.art]?.[e.anim] === undefined)
+        throw new Error(`${e.kind} ${e.def} (${e.art}) has no '${e.anim}' animation`);
+    }
+    return this;
   }
 }

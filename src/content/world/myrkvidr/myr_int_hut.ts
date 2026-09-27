@@ -1,0 +1,35 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const myrIntHut: ScreenDef = {
+  id: 'myr_int_hut',
+  region: 'myrkvidr',
+  purpose: "Önundr the woodcutter's one-room hut: a bed, a hearth, a table. He sleeps here at night.",
+  indoor: true,
+  things: [
+    { k: 'door', at: { x: 19, y: 16 }, dir: 's', to: 'myr_clearing', arrive: { x: 21, y: 9 }, facing: 's' },
+  ],
+  map: [
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwwwwwwwwwwwwwwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwbfffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwbfffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwffffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwfhhffffffttfwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwfhhfffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwffffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwffffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwffffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwffffffffffffwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXwwwwwwDwwwwwwwXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  ],
+};

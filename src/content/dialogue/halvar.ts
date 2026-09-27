@@ -1,12 +1,15 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { all, choresDone, day, evening, flag, not, paid, raid } from './util';
+import { afterRaid, all, choresDone, day, evening, flag, not, paid, raidNight } from './util';
 
 const PAY = 10;
 
 /** Halvar hands out the day's chores and pays for them. */
 export const HALVAR: DialogueDef = {
   entry: [
-    { when: raid, node: 'raid' },
+    { when: raidNight, node: 'raid' },
+    { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
+    { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
+    { when: afterRaid, node: 'after' },
     { when: all(day(1), not(flag('st_intro_seen'))), node: 'intro' },
     { when: all(day(1), choresDone(1), not(flag(paid(1)))), node: 'pay1' },
     { when: all(day(2), choresDone(2), not(flag(paid(2)))), node: 'pay2' },
@@ -135,6 +138,51 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'That horn… Stay behind me, lad.',
         sv: 'Det där hornet… Håll dig bakom mig, pojk.',
+      },
+    },
+    wounded: {
+      text: {
+        en: 'Ask. They took her. They took Embla, and I lay in the mud and watched.',
+        sv: 'Ask. De tog henne. De tog Embla, och jag låg i leran och såg på.',
+      },
+      next: 'wounded2',
+    },
+    wounded2: {
+      text: {
+        en: 'I stood in the shield wall once, against worse than trolls. I never told you. I never told her.',
+        sv: 'Jag stod i sköldborgen en gång, mot värre än troll. Jag berättade aldrig för dig. Aldrig för henne.',
+      },
+      next: 'gift',
+    },
+    gift: {
+      text: {
+        en: 'Take my old seax and my shield from the chest. They have waited long enough.',
+        sv: 'Ta min gamla sax och min sköld ur kistan. De har väntat länge nog.',
+      },
+      do: [
+        { k: 'weapon', id: 'seax' },
+        { k: 'shield', has: true },
+        { k: 'set', flag: 'st_seax_given', value: true },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+      next: 'gift2',
+    },
+    gift2: {
+      text: {
+        en: 'Raise the shield against a blow and it will hold. Go to Gyða. She knows what that sorcerer is.',
+        sv: 'Håll upp skölden mot ett slag så håller den. Gå till Gyða. Hon vet vad den där trollkarlen är.',
+      },
+    },
+    go_gyda: {
+      text: {
+        en: 'Go to the hof. Gyða knows the old stories. I only lived one of them.',
+        sv: 'Gå till hovet. Gyða kan de gamla berättelserna. Jag levde bara en av dem.',
+      },
+    },
+    after: {
+      text: {
+        en: 'Bring them home, Ask. Bring her home. I will mend, and I will be here.',
+        sv: 'För hem dem, Ask. För hem henne. Jag blir bättre, och jag finns här.',
       },
     },
   },

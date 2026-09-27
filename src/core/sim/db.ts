@@ -19,8 +19,10 @@ import type { NpcDef } from '../actors/npc';
 import type { PropDef } from '../actors/prop';
 import type { Tuning } from '../actors/tuning';
 import type { ClockRules } from '../clock/rules';
+import type { WeatherKind } from '../clock/types';
 import type { ItemDef } from '../items/defs';
 import type { FlagSpec } from '../state/flags';
+import type { Cond } from '../story/cond';
 import type { DialogueDef } from '../story/dialogue';
 import type { QuestDef } from '../story/quests';
 import type { ScriptDef } from '../story/script';
@@ -51,4 +53,13 @@ export interface ContentDb {
   /** Cover ids in registry order (a grid stores 1 + index). */
   readonly coverOrder: readonly CoverId[];
   readonly shops: Readonly<Partial<Record<ShopId, ShopDef>>>;
+  /** Story weather: the first rule whose condition holds sets the weather outdoors (else clear). */
+  readonly weather: readonly WeatherRule[];
+  /** While this holds the world clock stands still (the raid night never dawns). */
+  readonly freezeClock?: Cond;
+}
+
+export interface WeatherRule {
+  readonly when: Cond;
+  readonly kind: WeatherKind;
 }

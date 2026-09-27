@@ -1,0 +1,36 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R06: ScreenDef = {
+  id: 'd1_r06',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  purpose: 'The map, in a corner walled with roots.',
+  things: [
+    { k: 'chest', id: 'd1_c_map', at: { x: 32, y: 5 }, gives: { item: 'dungeon_map' } },
+    { k: 'enemy', id: 'root_biter', at: { x: 30, y: 9 } },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQccccccccccccccccccccccccrrrrrrrrrrrrQQ',
+    'QQccccccccccccccccccccccccrrrrrrrrrrrrQQ',
+    'QQccccccccccccccccccccccccrcccccccccccQQ',
+    'QQccccccccccccccccccccccccrcccccccccccQQ',
+    'QQccccccccccccccccccccccccrcccccccccccQQ',
+    'QQccccccccccccccccccccccccrcccccccccccQQ',
+    'QQccccccccccccccccccccccccrcccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'ccccccccccccccccccccccccccccccccccccccQQ',
+    'ccccccccccccccccccccccccccrcccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrrrrrccccccccccccccccccccrrrrrrrrQQ',
+    'QQrrrrrrrrccccccccccccccccccccrrrrrrrrQQ',
+    'QQrrrrrrrrccccccccccccccccccccrrrrrrrrQQ',
+    'QQrrrrrrrrccccccccccccccccccccrrrrrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

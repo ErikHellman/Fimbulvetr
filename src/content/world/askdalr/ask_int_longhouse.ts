@@ -1,5 +1,5 @@
 import type { ScreenDef } from '@core/world/screen';
-import { eveningDue } from '../../dialogue/util';
+import { eveningDue, raidNight } from '../../dialogue/util';
 
 export const askIntLonghouse: ScreenDef = {
   id: 'ask_int_longhouse',
@@ -17,6 +17,12 @@ export const askIntLonghouse: ScreenDef = {
       when: { k: 'any', of: [eveningDue(1), eveningDue(2), eveningDue(3)] },
     },
     { k: 'door', at: { x: 19, y: 20 }, dir: 's', to: 'ask_farmyard', arrive: { x: 9, y: 8 }, facing: 's' },
+    // The raid night: the roof burns down in patches, and one of the dead is already inside.
+    { k: 'fire', at: { x: 8, y: 11 }, w: 9, h: 1, when: raidNight },
+    { k: 'fire', at: { x: 20, y: 15 }, w: 6, h: 1, when: raidNight },
+    { k: 'fire', at: { x: 28, y: 15 }, w: 4, h: 1, when: raidNight },
+    { k: 'fire', at: { x: 14, y: 18 }, w: 3, h: 1, when: raidNight },
+    { k: 'enemy', id: 'draugr', at: { x: 29, y: 9 }, when: raidNight },
   ],
   map: [
     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',

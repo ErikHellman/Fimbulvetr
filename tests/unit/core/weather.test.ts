@@ -17,7 +17,7 @@ describe('weather', () => {
   });
 
   it('follows the season table in the morning', () => {
-    const counts = { clear: 0, rain: 0, wind: 0, fog: 0, snow: 0 };
+    const counts = { clear: 0, rain: 0, wind: 0, fog: 0, snow: 0, storm: 0 };
     const days = 10_000;
     for (let day = 1; day <= days; day++)
       counts[weatherAt(9, day, 480, 'askdalr', 'summer', CLOCK_RULES)] += 1;

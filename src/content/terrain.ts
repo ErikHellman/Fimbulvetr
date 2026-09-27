@@ -28,13 +28,23 @@ export const TERRAIN_IDS = [
   'window',
   'chimney',
   'jetty',
+  'pine',
+  'log',
+  'mound',
+  'kiln',
+  'cave_floor',
+  'cave_wall',
+  'sap',
+  'roots',
+  'runestone',
+  'cave_mouth',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
 export const TERRAIN = {
   grass: { solid: false },
   path: { solid: false },
-  water: { solid: true },
+  water: { solid: true, low: true },
   rock: { solid: true },
   tree: { solid: true, decor: { art: ['decor_tree', 'decor_pine'], w: 1, h: 1 } },
   /** A low bank you can hop down (south) but not climb. */
@@ -72,4 +82,24 @@ export const TERRAIN = {
   chimney: { solid: true },
   /** Planks over water: walkable, water laps right up to its edge. */
   jetty: { solid: false },
+  /** Old pines of Myrkviðr, packed tight. */
+  pine: { solid: true, decor: { art: ['decor_pine', 'decor_pine_old'], w: 1, h: 1 } },
+  /** A fallen trunk across a road, four tiles long. */
+  log: { solid: true, decor: { art: ['decor_log'], w: 4, h: 1 } },
+  /** A grave mound, where draugr climb out at night. */
+  mound: { solid: false },
+  /** A charcoal-burner's earth kiln; the shell smokes its vent. */
+  kiln: { solid: true, decor: { art: ['decor_kiln'], w: 3, h: 2 } },
+  /** Rótarhellir's packed-earth floor. */
+  cave_floor: { solid: false },
+  /** Rock walls of the cave. */
+  cave_wall: { solid: true },
+  /** A pool of sticky sap: no footing, but the boomerang flies over it. */
+  sap: { solid: true, low: true },
+  /** Yggdrasil's own roots, too thick to cut: a wall. */
+  roots: { solid: true },
+  /** The first of the eight runestones. */
+  runestone: { solid: true, decor: { art: ['decor_runestone'], w: 1, h: 1 } },
+  /** A dark opening in the rock; a door thing leads through it. */
+  cave_mouth: { solid: false },
 } as const satisfies Record<TerrainId, TerrainDef>;

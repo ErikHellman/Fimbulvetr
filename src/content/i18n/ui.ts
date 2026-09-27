@@ -41,6 +41,37 @@ export const UI = {
     sv: 'Sparfilen kommer från en nyare version av spelet.',
   },
   import_invalid: { en: 'That save file is damaged: {detail}', sv: 'Sparfilen är skadad: {detail}' },
+  game_over: { en: 'You have fallen.', sv: 'Du har fallit.' },
+  menu_items: { en: 'Items', sv: 'Saker' },
+  menu_map: { en: 'Map', sv: 'Karta' },
+  menu_quests: { en: 'Quests', sv: 'Uppdrag' },
+  menu_system: { en: 'Game', sv: 'Spel' },
+  menu_tabs_hint: {
+    en: 'Left/Right: page   Esc or Tab: back to the game',
+    sv: 'Vänster/Höger: sida   Esc eller Tab: tillbaka till spelet',
+  },
+  menu_items_hint: {
+    en: 'K or E: put in slot K   L: put in slot L   E on food: eat',
+    sv: 'K eller E: lägg i fack K   L: lägg i fack L   E på mat: ät',
+  },
+  menu_no_items: { en: 'You carry nothing you can use yet.', sv: 'Du bär inget du kan använda än.' },
+  menu_no_quests: { en: 'Nothing to do yet.', sv: 'Inget att göra än.' },
+  menu_quest_done: { en: 'done', sv: 'klart' },
+  menu_here: { en: 'You are here', sv: 'Du är här' },
+  menu_keys: { en: 'Keys: {detail}', sv: 'Nycklar: {detail}' },
+  menu_no_map: {
+    en: 'Only the rooms you have walked through. The map would show the rest.',
+    sv: 'Bara rummen du har gått igenom. Kartan skulle visa resten.',
+  },
+  menu_lair: { en: 'Lair', sv: 'Lya' },
+  menu_chest: { en: 'Chest', sv: 'Kista' },
+  menu_resume: { en: 'Back to the game', sv: 'Tillbaka till spelet' },
+  menu_start_over: { en: 'Start a new game', sv: 'Börja ett nytt spel' },
+  menu_start_over_confirm: {
+    en: 'Start over from the first day? Press E again to confirm.',
+    sv: 'Börja om från första dagen? Tryck E igen för att bekräfta.',
+  },
+  game_over_continue: { en: 'Rise again: E or Enter', sv: 'Res dig igen: E eller Enter' },
 } as const satisfies Record<string, L10n>;
 
 export type UiKey = keyof typeof UI;

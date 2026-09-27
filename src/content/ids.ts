@@ -35,7 +35,9 @@ export const UPGRADES = [
   'bomb_bag',
   'purse',
 ] as const;
-export const ITEMS = [...SUB_ITEMS, ...CONSUMABLES, ...UPGRADES] as const;
+/** Found in dungeons; they go into that dungeon's saved state, never into the bag. */
+export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] as const;
+export const ITEMS = [...SUB_ITEMS, ...CONSUMABLES, ...UPGRADES, ...DUNGEON_ITEMS] as const;
 export type ItemId = (typeof ITEMS)[number];
 
 export const GALDR = ['eldr', 'is', 'farvegr', 'hlif', 'skjalfti', 'ljos', 'vindr', 'bragd'] as const;
@@ -50,7 +52,16 @@ export type ArmorId = (typeof ARMORS)[number];
 export const RINGS = ['ring_stamina', 'ring_thrift', 'ring_beacon', 'ring_berserker'] as const;
 export type RingId = (typeof RINGS)[number];
 
-export const ENEMIES = ['dummy'] as const;
+export const ENEMIES = [
+  'dummy',
+  'vargr',
+  'draugr',
+  'troll',
+  'root_biter',
+  'rotvaettr',
+  'rot_bulb',
+  'root_spike',
+] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
 export const SFX = [
@@ -70,6 +81,24 @@ export const SFX = [
   'sfx_caw',
   'sfx_itemget',
   'sfx_cut',
+  'sfx_hurt',
+  'sfx_die',
+  'sfx_growl',
+  'sfx_thunder',
+  'sfx_fire',
+  'sfx_poof',
+  'sfx_pickup',
+  'sfx_gate',
+  'sfx_chest',
+  'sfx_secret',
+  'sfx_unlock',
+  'sfx_shutter',
+  'sfx_switch',
+  'sfx_push',
+  'sfx_boomerang',
+  'sfx_stun',
+  'sfx_boss_hit',
+  'sfx_boss_roar',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -88,11 +117,16 @@ export const NPCS = [
   'hallbera',
   'thorkell',
   'rannveig',
+  'kolbeinn',
+  'onundr',
+  'dagny',
+  'skeggi',
+  'arnbjorg',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
 /** Quest log entries; their progress is derived from flags, never saved. */
-export const QUESTS = ['q_chores'] as const;
+export const QUESTS = ['q_chores', 'q_legend', 'q_runestone_1'] as const;
 export type QuestId = (typeof QUESTS)[number];
 
 export const SHOPS = ['sigrun', 'dev_shop'] as const;
@@ -110,17 +144,20 @@ export const SCRIPTS = [
   'embla_evening',
   'raid_begins',
   'shop_sigrun',
+  'raid_gate',
+  'd1_enter',
+  'stone1_light',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
 /** Things that can be lifted, thrown, broken or split. */
-export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big'] as const;
+export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big', 'root_block', 'vines'] as const;
 export type PropId = (typeof PROPS)[number];
 
 /** Animals with simple behaviours that are not enemies. */
 export const CRITTERS = ['sheep', 'raven'] as const;
 export type CritterId = (typeof CRITTERS)[number];
 
-/** Ground cover layered over terrain. Leaves, snow, drifts and mud join in later milestones. */
-export const COVERS = ['tall_grass'] as const;
+/** Ground cover layered over terrain. Snow, drifts and mud join in later milestones. */
+export const COVERS = ['tall_grass', 'leaves'] as const;
 export type CoverId = (typeof COVERS)[number];

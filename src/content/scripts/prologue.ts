@@ -63,29 +63,6 @@ const sleep: ScriptDef = {
   ],
 };
 
-/** The end of M1a: night falls on the third day and a horn sounds. The raid itself is M1b. */
-const raidBegins: ScriptDef = {
-  steps: [
-    { k: 'fade', out: true },
-    {
-      k: 'do',
-      effects: [
-        { k: 'setMinute', minute: 23 * 60 },
-        { k: 'set', flag: 'st_raid_begun', value: true },
-      ],
-    },
-    {
-      k: 'card',
-      text: {
-        en: 'Night falls on the third day. The wind smells of snow. Somewhere in the dark, a horn sounds.',
-        sv: 'Natten faller över den tredje dagen. Vinden luktar snö. Någonstans i mörkret ljuder ett horn.',
-      },
-    },
-    { k: 'card', text: { en: 'To be continued…', sv: 'Fortsättning följer…' } },
-    { k: 'fade', out: false },
-  ],
-};
-
 const shopSigrun: ScriptDef = {
   steps: [
     { k: 'talk', dialogue: 'sigrun', with: 'sigrun' },
@@ -96,6 +73,5 @@ const shopSigrun: ScriptDef = {
 export const PROLOGUE_SCRIPTS = {
   sleep,
   embla_evening: evening,
-  raid_begins: raidBegins,
   shop_sigrun: shopSigrun,
 } as const satisfies Record<string, ScriptDef>;

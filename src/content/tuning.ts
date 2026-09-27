@@ -18,12 +18,14 @@ export const TUNING: Tuning = {
     spinTicks: 24,
     hurtTicks: 12,
     hurtIframes: 60,
+    dyingTicks: 60,
     ledgePushTicks: 6,
     hopTicks: 20,
     hopHeight: 10,
     liftTicks: 12,
     carrySpeed: 1.2,
     throwTicks: 10,
+    tossTicks: 10,
     carryHeight: 18,
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
@@ -41,7 +43,22 @@ export const TUNING: Tuning = {
     spinBox: { x: -26, y: -36, w: 52, h: 44 },
   },
   throw: { speed: 4, flightTicks: 20 },
+  push: { ticks: 16, slideTicks: 16 },
+  boomerang: { speed: 3, range: 112 },
   weapons: {
+    /** The pitchfork of the raid night: long reach, light blows. */
+    pitchfork: {
+      comboDamage: [1, 1, 2],
+      spinDamage: 2,
+      knock: 5,
+      boxes: {
+        e: { x: 2, y: -20, w: 26, h: 14 },
+        w: { x: -28, y: -20, w: 26, h: 14 },
+        n: { x: -6, y: -44, w: 12, h: 26 },
+        s: { x: -6, y: -8, w: 12, h: 24 },
+      },
+      spinBox: { x: -26, y: -36, w: 52, h: 44 },
+    },
     /** The farm hand-axe: short reach, light blows. */
     handaxe: {
       comboDamage: [1, 1, 2],

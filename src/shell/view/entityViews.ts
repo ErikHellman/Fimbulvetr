@@ -16,11 +16,16 @@ export class EntityViews {
     private readonly anims: AnimTable,
   ) {}
 
-  sync(entities: readonly Entity[], place: (e: Entity) => Vec): void {
+  /** `artOf` may swap an entity's art (the hero's sprite follows the weapon in hand). */
+  sync(
+    entities: readonly Entity[],
+    place: (e: Entity) => Vec,
+    artOf: (e: Entity) => string = (e) => e.art,
+  ): void {
     const seen = new Set<number>();
     for (const e of entities) {
       seen.add(e.id);
-      const ref = this.frames.get(frameFor(this.anims, e.art, e.anim, e.facing, e.animT));
+      const ref = this.frames.get(frameFor(this.anims, artOf(e), e.anim, e.facing, e.animT));
       let sprite = this.sprites.get(e.id);
       if (sprite === undefined) {
         sprite = this.scene.add.sprite(0, 0, ref.key, ref.frame);
@@ -32,12 +37,20 @@ export class EntityViews {
       const p = place(e);
       sprite.setPosition(Math.round(p.x), Math.round(p.y - (e.mem['z'] ?? 0)));
       sprite.setDepth(p.y);
+      const stun = e.mem['stun'] ?? 0;
       if (e.flash > 0 && Math.floor(e.flash / 2) % 2 === 0)
         sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
+      // Stunned: a cold blue cast, flickering off in the last second before it wears off.
+      else if (stun > 0 && (stun > 60 || Math.floor(stun / 6) % 2 === 0))
+        sprite.setTint(0x8fb0ff).setTintMode(Phaser.TintModes.MULTIPLY);
       else sprite.clearTint();
       const blink =
         e.kind === 'hero' && e.iframes > 0 && e.anim !== 'roll' && Math.floor(e.iframes / 4) % 2 === 0;
-      sprite.setAlpha(blink ? 0.35 : 1);
+      // A dropped heart or coin blinks for its last two seconds before it vanishes.
+      const ttl = e.mem['ttl'] ?? 0;
+      const fading = e.kind === 'pickup' && ttl > 0 && ttl < 120 && Math.floor(ttl / 6) % 2 === 0;
+      sprite.setAlpha(blink ? 0.35 : fading ? 0.25 : 1);
+      sprite.setVisible(e.mem['hidden'] !== 1);
       this.shadow(e, p);
     }
     for (const [id, sprite] of this.sprites) {

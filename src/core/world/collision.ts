@@ -8,6 +8,8 @@ import type { TerrainGrid } from './textmap';
 export const SOLID = 1;
 /** One-way ledge bits, by the direction the hero may hop. A ledge tile is also SOLID. */
 export const LEDGE: Readonly<Record<Dir4, number>> = { n: 2, e: 4, s: 8, w: 16 };
+/** A solid tile that is open above (water, sap): things in flight cross it. */
+export const LOW = 32;
 /** How far (px) a blocked mover is nudged sideways around a corner it only clips. */
 export const CORNER_SLIDE = 6;
 const EPS = 1e-6;
@@ -30,7 +32,10 @@ export function buildCollision(
   const speed = new Float32Array(grid.cols * grid.rows).fill(1);
   grid.cells.forEach((terrain, i) => {
     const def = defs[terrain];
-    flags[i] = (def.solid || def.ledge !== undefined ? SOLID : 0) | (def.ledge ? LEDGE[def.ledge] : 0);
+    flags[i] =
+      (def.solid || def.ledge !== undefined ? SOLID : 0) |
+      (def.ledge ? LEDGE[def.ledge] : 0) |
+      (def.low === true ? LOW : 0);
     speed[i] = def.slow ?? 1;
   });
   return { cols: grid.cols, rows: grid.rows, flags, speed };

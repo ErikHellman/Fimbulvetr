@@ -1,7 +1,8 @@
 import { isFlagId } from '@content/flags';
 import { UI } from '@content/i18n/ui';
 import { isScreenId } from '@content/world/screens';
-import { isSeason } from '@core/clock/types';
+import { ITEMS, type ItemId } from '@content/ids';
+import { WEATHER_KINDS, isSeason, type WeatherKind } from '@core/clock/types';
 import { parseClockTime } from '@core/dev/query';
 import { LANGS, t } from '@core/i18n/t';
 import { cloneState } from '@core/state/save';
@@ -11,7 +12,10 @@ import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { DevBridge } from './bridge';
 
 export const HELP =
-  'warp <screen> [x y] · time <HH:MM|day|night> · season <name> · flag <id> <value> · lang <en|sv> · volume <0..1> · save · export · import';
+  'warp <screen> [x y] · time <HH:MM|day|night> · season <name> · flag <id> <value> · give <item> [n] · hp <n> · god [on|off] · weather <kind|off> · kill · lang <en|sv> · volume <0..1> · save · export · import';
+
+const isItem = (s: string): s is ItemId => (ITEMS as readonly string[]).includes(s);
+const isWeather = (s: string): s is WeatherKind => (WEATHER_KINDS as readonly string[]).includes(s);
 
 /** Runs one console line. Returns the reply; `print` is for replies that arrive later (save, import). */
 export function runCommand(b: DevBridge, line: string, print: (text: string) => void): string {
@@ -51,6 +55,38 @@ export function runCommand(b: DevBridge, line: string, print: (text: string) => 
       b.sim.command({ t: 'setFlag', flag: id, value });
       return `flag ${id} = ${String(value)}`;
     }
+    case 'give': {
+      const [item = '', raw = '1'] = args;
+      const n = Number(raw);
+      if (!isItem(item)) return `unknown item '${item}'`;
+      if (!Number.isInteger(n) || n < 1) return 'usage: give <item> [n]';
+      b.sim.command({ t: 'give', item, n });
+      return `gave ${String(n)} ${item}`;
+    }
+    case 'hp': {
+      const n = Number(args[0]);
+      if (!Number.isInteger(n) || n < 0) return 'usage: hp <quarter hearts>';
+      b.sim.command({ t: 'setHp', hp: n });
+      return `hp ${String(n)}`;
+    }
+    case 'god': {
+      const on = args[0] !== 'off';
+      b.sim.command({ t: 'god', on });
+      return `god ${on ? 'on' : 'off'}`;
+    }
+    case 'weather': {
+      const kind = args[0] ?? '';
+      if (kind === 'off') {
+        b.sim.command({ t: 'weather', kind: null });
+        return 'weather follows the story';
+      }
+      if (!isWeather(kind)) return `weather: ${WEATHER_KINDS.join(', ')}, off`;
+      b.sim.command({ t: 'weather', kind });
+      return `weather ${kind}`;
+    }
+    case 'kill':
+      b.sim.command({ t: 'killAll' });
+      return 'killed every enemy here';
     case 'lang': {
       const lang = LANGS.find((l) => l === args[0]);
       if (lang === undefined) return `languages: ${LANGS.join(', ')}`;

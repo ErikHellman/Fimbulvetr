@@ -3,14 +3,17 @@ import { mem, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
 import type { PropDef } from '../../actors/prop';
-import { THROWN, resolveHit } from '../../combat/hit';
+import { THROWN } from '../../combat/hit';
 import { EMPTY_FRAME, moveVector, wasPressed, type InputFrame } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
-import { boxHitsSolid, gridSolidAt, moveBox } from '../../world/collision';
+import { SOLID, boxHitsSolid, gridSolidAt, moveBox } from '../../world/collision';
 import { TILE } from '../../world/dims';
+import { tileFeet } from '../../world/screen';
 import type { SimRt } from '../rt';
+import { damageActor } from './combat';
 import { critterDef } from './critters';
+import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
 import { applyAll, probeBox } from './story';
 
@@ -29,6 +32,7 @@ function remove(rt: SimRt, e: Entity): void {
 function breakProp(rt: SimRt, e: Entity): void {
   const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
   remove(rt, e);
+  if (propDef(rt, e).wall === true) stampCollision(rt);
   rt.emit({ t: 'sfx', id: 'sfx_break' });
   if (thing?.k === 'prop') applyAll(rt, thing.onBreak ?? []);
 }
@@ -124,15 +128,15 @@ function flying(rt: SimRt, e: Entity): void {
       overlaps(at(e.hurt, e.pos), at(a.hurt, a.pos)),
   );
   if (target !== undefined) {
-    const res = resolveHit(
-      target,
-      { amount: def.throwDamage, element: 'none', knock: 3, dir: d, faction: 'hero', tags: THROWN },
-      { shielding: false, iframes: rt.db.tuning.enemyIframes, knockResist: 0 },
-    );
-    if (res.outcome !== 'ignored') {
-      rt.emit({ t: 'hit', target: target.id, blocked: false, dealt: res.dealt });
-      target.mem['hitBy'] = THROWN;
-    }
+    const res = damageActor(rt, target, {
+      amount: def.throwDamage,
+      element: 'none',
+      knock: 3,
+      dir: d,
+      faction: 'hero',
+      tags: THROWN,
+    });
+    if (res.outcome !== 'ignored') target.mem['hitBy'] = THROWN;
   }
   if (target !== undefined || r.blockedX || r.blockedY || t >= tw.flightTicks) land(rt, e);
 }
@@ -172,5 +176,96 @@ export function swordProps(rt: SimRt): void {
     e.mem['hitSwing'] = swing;
     if (by === 'sword' || spinning) breakProp(rt, e);
     else rt.emit({ t: 'sfx', id: 'sfx_block' });
+  }
+}
+
+const tileOf = (e: Entity): { x: number; y: number } => ({
+  x: Math.floor(e.pos.x / TILE),
+  y: Math.floor((e.pos.y - 1) / TILE),
+});
+
+/** The tiles a wall prop fills: its own, and while sliding the one it is sliding into. */
+export function wallTiles(rt: SimRt): { x: number; y: number }[] {
+  const out: { x: number; y: number }[] = [];
+  for (const e of rt.actors) {
+    if (!isResting(e) || propDef(rt, e).wall !== true) continue;
+    if (mem(e, 'slide') > 0)
+      out.push({ x: mem(e, 'fx'), y: mem(e, 'fy') }, { x: mem(e, 'tx'), y: mem(e, 'ty') });
+    else out.push(tileOf(e));
+  }
+  return out;
+}
+
+/** Whether a block can slide into tile (x, y): on screen, not solid, and nobody standing there. */
+function freeTile(rt: SimRt, x: number, y: number): boolean {
+  const g = rt.screen.collision;
+  if (x < 0 || y < 0 || x >= g.cols || y >= g.rows) return false;
+  if (((g.flags[y * g.cols + x] ?? 0) & SOLID) !== 0) return false;
+  const box = { x: x * TILE, y: y * TILE, w: TILE, h: TILE };
+  return ![rt.hero, ...rt.actors].some(
+    (a) => a.kind !== 'fixture' && a.kind !== 'pickup' && overlaps(box, at(a.body, a.pos)),
+  );
+}
+
+/**
+ * Leaning on a pushable block: `push` counts steady ticks of walking straight into it (the hero shows the
+ * push pose meanwhile); at `push.ticks` the block slides a tile if the tile beyond is free.
+ */
+export function pushBlocks(rt: SimRt, input: InputFrame): void {
+  const hero = rt.hero;
+  slideBlocks(rt);
+  let push = 0;
+  const m = moveVector(input);
+  const d = DIR_VEC[hero.facing];
+  if (
+    hero.fsm.s === 'move' &&
+    (m.x === 0) !== (m.y === 0) &&
+    Math.sign(m.x) === d.x &&
+    Math.sign(m.y) === d.y
+  ) {
+    const probe = probeBox(rt);
+    const block = rt.actors.find(
+      (a) => isResting(a) && propDef(rt, a).pushable === true && overlaps(probe, at(a.body, a.pos)),
+    );
+    if (block !== undefined) {
+      push = mem(block, 'slide') > 0 ? 1 : mem(hero, 'push') + 1;
+      if (push >= rt.db.tuning.push.ticks) {
+        startSlide(rt, block, d);
+        push = 1;
+      }
+    }
+  }
+  if (push !== mem(hero, 'push')) hero.mem['push'] = push;
+}
+
+function startSlide(rt: SimRt, e: Entity, d: { x: number; y: number }): void {
+  const from = tileOf(e);
+  const to = { x: from.x + d.x, y: from.y + d.y };
+  if (!freeTile(rt, to.x, to.y)) return;
+  e.mem['slide'] = rt.db.tuning.push.slideTicks;
+  e.mem['fx'] = from.x;
+  e.mem['fy'] = from.y;
+  e.mem['tx'] = to.x;
+  e.mem['ty'] = to.y;
+  rt.emit({ t: 'sfx', id: 'sfx_push' });
+  stampCollision(rt);
+}
+
+/** Sliding blocks move a step; one that arrives snaps to its tile and counts as moved. */
+function slideBlocks(rt: SimRt): void {
+  const ticks = rt.db.tuning.push.slideTicks;
+  for (const e of rt.actors) {
+    const left = mem(e, 'slide');
+    if (e.kind !== 'prop' || left <= 0) continue;
+    const to = { x: mem(e, 'tx'), y: mem(e, 'ty') };
+    const from = tileFeet({ x: mem(e, 'fx'), y: mem(e, 'fy') });
+    const end = tileFeet(to);
+    const p = (ticks - left + 1) / ticks;
+    e.pos = { x: from.x + (end.x - from.x) * p, y: from.y + (end.y - from.y) * p };
+    e.mem['slide'] = left - 1;
+    if (left - 1 > 0) continue;
+    e.pos = end;
+    e.mem['moved'] = 1;
+    stampCollision(rt);
   }
 }

@@ -11,6 +11,10 @@ export interface CoverDef {
   readonly seasons: readonly Season[];
   /** Speed factor while wading through it uncut. */
   readonly slow: number;
+  /** Pickups under it stay hidden (and cannot be taken) until it is cut. */
+  readonly hides?: boolean;
+  /** Blown away by the boomerang (and later Vindr), not only cut. */
+  readonly blown?: boolean;
 }
 
 /** One screen's cover: `kind[i]` is 0 for none or 1 + index into the cover list; `cleared[i]` is 0 or 1. */
@@ -57,8 +61,11 @@ export function coverAt(g: CoverGrid, order: readonly CoverId[], tx: number, ty:
   return order[k - 1] ?? null;
 }
 
-/** Cuts all standing cover whose tile overlaps `box`. Returns the tile indices cut. */
-export function cutBox(g: CoverGrid, box: Box): number[] {
+/**
+ * Cuts the standing cover whose tile overlaps `box`, only the kinds `which` accepts (1 + index into the
+ * cover list) when it is given. Returns the tile indices cut.
+ */
+export function cutBox(g: CoverGrid, box: Box, which?: (kind: number) => boolean): number[] {
   const out: number[] = [];
   const x0 = Math.max(0, Math.floor(box.x / TILE));
   const x1 = Math.min(g.cols - 1, Math.floor((box.x + box.w - 1e-6) / TILE));
@@ -67,7 +74,8 @@ export function cutBox(g: CoverGrid, box: Box): number[] {
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) {
       const i = ty * g.cols + tx;
-      if ((g.kind[i] ?? 0) !== 0 && g.cleared[i] === 0) {
+      const k = g.kind[i] ?? 0;
+      if (k !== 0 && g.cleared[i] === 0 && (which === undefined || which(k))) {
         g.cleared[i] = 1;
         out.push(i);
       }

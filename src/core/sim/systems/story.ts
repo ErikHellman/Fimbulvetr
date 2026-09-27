@@ -30,6 +30,8 @@ import {
   type StoryRun,
 } from '../../story/script';
 import type { SimRt } from '../rt';
+import { openChest } from './chests';
+import { unlockAt } from './fixtures';
 import { heroCtx } from './hero';
 import { placeNpcs } from './npcs';
 import { tryLift } from './props';
@@ -151,8 +153,7 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
       actorOf(rt, step.actor).facing = step.dir;
       return false;
     case 'warp':
-      enterScreen(rt, step.screen, tileFeet(step.at));
-      rt.hero.facing = step.facing;
+      enterScreen(rt, step.screen, tileFeet(step.at), step.facing);
       markVisited(rt, step.screen);
       rt.emit({ t: 'screenEntered', screen: step.screen });
       return false;
@@ -328,6 +329,7 @@ export function checkInteract(rt: SimRt, input: InputFrame): boolean {
     startStory(rt, [{ k: 'talk', dialogue: rt.db.npcs[id]?.talk ?? id, with: id }], a);
     return true;
   }
+  if (openChest(rt, probe) || unlockAt(rt, probe)) return true;
   if (tryLift(rt)) return true;
   for (const thing of rt.db.screens[rt.screen.id].things) {
     if (thing.k === 'sign' && overlaps(probe, tileBox(thing.at.x, thing.at.y, thing.w, thing.h))) {

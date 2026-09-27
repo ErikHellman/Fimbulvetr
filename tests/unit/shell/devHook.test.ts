@@ -20,6 +20,10 @@ const NO_VIEW = {
   openWater: 0,
   fishAlive: 0,
   fishJumps: 0,
+  rain: 0,
+  bolts: 0,
+  dark: 0,
+  lights: 0,
 };
 
 /** `installHook` assumes a global `window`; the test provides a minimal one. */
@@ -50,6 +54,7 @@ describe('installHook importSaveJson', () => {
       viewStats: () => NO_VIEW,
       jumpFish: () => undefined,
       tileAt: () => -1,
+      menu: () => null,
       restart: (state) => {
         restarted.push(state);
       },
@@ -80,6 +85,7 @@ describe('installHook warp', () => {
       viewStats: () => NO_VIEW,
       jumpFish: () => undefined,
       tileAt: () => -1,
+      menu: () => null,
       restart: () => undefined,
     };
     installHook(() => b, {});

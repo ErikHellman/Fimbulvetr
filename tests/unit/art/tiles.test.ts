@@ -50,17 +50,18 @@ describe('tileset', () => {
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 
-  it('animates water and the ford in four frames, everything else in one', () => {
+  it('animates water and the ford in four frames, the sap slower, everything else in one', () => {
     for (const id of TERRAIN_IDS) {
       const e = ts.entries[id];
       if (id === 'water' || id === 'ford') expect(e, id).toMatchObject({ frames: 4, frameMs: 150 });
+      else if (id === 'sap') expect(e, id).toMatchObject({ frames: 4, frameMs: 260 });
       else expect(e.frames, id).toBe(1);
     }
   });
 
-  it('lists one tile animation per water and ford variant, frame-major', () => {
+  it('lists one tile animation per water, ford and sap variant, frame-major', () => {
     const anims = tileAnimations(ts);
-    expect(anims).toHaveLength(94);
+    expect(anims).toHaveLength(3 * 47);
     const s = ts.entries.water.start;
     expect(anims.find((a) => a.tile === s + 46)).toEqual({
       tile: s + 46,
