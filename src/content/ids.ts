@@ -37,7 +37,18 @@ export const UPGRADES = [
 ] as const;
 /** Found in dungeons; they go into that dungeon's saved state, never into the bag. */
 export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] as const;
-export const ITEMS = [...SUB_ITEMS, ...CONSUMABLES, ...UPGRADES, ...DUNGEON_ITEMS] as const;
+/** Kept for good and never used from a slot: mead horns (what mead is carried in) and the winter cloak. */
+export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
+/** Things carried for someone: a quest's token or a brew's ingredients. */
+export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
+export const ITEMS = [
+  ...SUB_ITEMS,
+  ...CONSUMABLES,
+  ...UPGRADES,
+  ...DUNGEON_ITEMS,
+  ...KEEPSAKES,
+  ...QUEST_ITEMS,
+] as const;
 export type ItemId = (typeof ITEMS)[number];
 
 export const GALDR = ['eldr', 'is', 'farvegr', 'hlif', 'skjalfti', 'ljos', 'vindr', 'bragd'] as const;
@@ -158,6 +169,9 @@ export type PropId = (typeof PROPS)[number];
 export const CRITTERS = ['sheep', 'raven'] as const;
 export type CritterId = (typeof CRITTERS)[number];
 
-/** Ground cover layered over terrain. Snow, drifts and mud join in later milestones. */
-export const COVERS = ['tall_grass', 'leaves'] as const;
+/**
+ * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
+ * grow from the terrain beneath by season (see CoverDef.grows).
+ */
+export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice'] as const;
 export type CoverId = (typeof COVERS)[number];

@@ -70,4 +70,6 @@ export interface SimRt {
   emit(event: SimEvent): void;
   newId(): number;
   load(id: ScreenId): LoadedScreen;
+  /** A screen's parsed terrain (cached). */
+  terrainOf(id: ScreenId): TerrainGrid;
 }

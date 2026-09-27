@@ -30,7 +30,7 @@ export function moveAll(rt: SimRt): void {
 }
 
 function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[]): void {
-  const f = speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1) * coverSpeed(rt, e.pos.x, e.pos.y);
+  const f = speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1) * coverSpeed(rt, e, e.pos.x, e.pos.y);
   const dx = e.vel.x * f + e.knock.x;
   const dy = e.vel.y * f + e.knock.y;
   if (dx !== 0 || dy !== 0) {

@@ -6,7 +6,7 @@ import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { dungeonOf } from '../../state/dungeons';
 import { evalCond } from '../../story/cond';
-import { SOLID } from '../../world/collision';
+import { LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import { tileFeet, type Thing, type TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
@@ -14,6 +14,7 @@ import { hurtHero } from './combat';
 import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
 import { outdoors, skyOf } from './weather';
+import { walkTiles } from './cover';
 import { condCtx, probeBox } from './story';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -193,6 +194,8 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
 export function stampCollision(rt: SimRt): void {
   const { base, collision } = rt.screen;
   collision.flags.set(base.flags);
+  // Ice lets Ask walk on water (and blocks nothing in flight).
+  for (const i of walkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;

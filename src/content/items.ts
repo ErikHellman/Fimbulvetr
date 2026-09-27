@@ -27,6 +27,10 @@ export const ITEM_NAMES = {
   big_key: { en: 'Great key', sv: 'Stor nyckel' },
   dungeon_map: { en: 'Map', sv: 'Karta' },
   compass: { en: 'Compass', sv: 'Kompass' },
+  horn: { en: 'Mead horn', sv: 'Mjödhorn' },
+  winter_cloak: { en: 'Winter cloak', sv: 'Vintermantel' },
+  charred_stave: { en: 'Charred stave', sv: 'Förkolnad stav' },
+  fen_moss: { en: 'Fen-moss', sv: 'Kärrmossa' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {
@@ -43,6 +47,8 @@ const MAX: Partial<Record<ItemId, number>> = {
   bomb_bag: 2,
   purse: 2,
   small_key: 9,
+  horn: 4,
+  fen_moss: 9,
 };
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
