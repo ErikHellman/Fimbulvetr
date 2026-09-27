@@ -227,6 +227,7 @@ export class TitleScene extends Phaser.Scene {
 
   private play(state: GameState): void {
     delete document.body.dataset.title;
+    delete document.body.dataset.titleRows;
     this.scene.start('play', { ...this.services, state });
   }
 
@@ -245,6 +246,7 @@ export class TitleScene extends Phaser.Scene {
       return;
     }
     document.body.dataset.title = this.state.page;
+    document.body.dataset.titleRows = titleRows(this.info()).join(',');
     const mark = (i: number): string => (i === this.state.cursor ? '> ' : '  ');
     let lines: string[];
     let hint: string;

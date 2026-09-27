@@ -57,7 +57,13 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Progression solver, exit route test, e2e, v1-m1c fixture, balance, docs
     - [ ] User playtest and Swedish proofread
 - [ ] M2 Uppvík + turning world — brief: `docs/briefs/m2.md`, plan: `docs/superpowers/plans/2026-09-27-m2.md`
-  - [ ] M2a Turning world: weathers, snow/mud/ice, spawn tables, trolls ↔ stone, rest-and-save, title and slots, settings UI
+  - [ ] M2a Turning world
+    - [x] Pinning, rolled sky and wind, fog and rain, snow/drift/mud/ice cover, wind on projectiles
+    - [x] Spawn tables, forest trolls ↔ stone, the save step
+    - [x] Art: cover tiles, weather particles, forest troll and troll stone, SFX
+    - [x] Shell: weather and fog views, settings model and menu with remapping and colour-blind aid, title screen with 3 slots, slot picker, Gyða's hof
+    - [x] Myrkviðr turns (spawn points, drifts, preset `turning`), exit tests, e2e, v1-m2a fixture, docs
+    - [ ] User playtest and Swedish proofread
   - [ ] M2b Uppvík: the road north, the hub, economy, gear, galdr/seiðr/Eldr, fire, mead
   - [ ] M2c Deep Myrkviðr: fen, glade, troll wood, the völva, the huldra, the vargar hunt, +3 enemies
 - [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)

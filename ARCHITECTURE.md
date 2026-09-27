@@ -10,10 +10,12 @@ keyboard/gamepad ─► InputMapper ─► InputLatch ──► Sim.step(frame) 
                         Commands (dev console, menus) ──┘          ┌────────────────────────┤
                                                                     ▼                        ▼
        PlayScene: EntityViews / ScreenView (ground + cover + decor) / AmbientView (smoke, fish) / FxView (puffs)
-                  WeatherView (rain, lightning) / DarknessView (dark with lights cut out) / ColorMatrix
-                  AudioDirector · autosave · pause menu state · dev hook
-       UiScene (untinted): HUD (keys, boss bar), text boxes, choices, cards, shop, game over, pause menu
-                           ◄── sim.storyUi(), sim.boss()
+                  WeatherView (rain, snow, leaves, lightning) / DarknessView ×2 (fog; dark with lights cut out)
+                  ColorMatrix (season × light × weather, colour-blind aid) · AudioDirector · autosave
+                  pause menu, settings menu and save-slot picker state · dev hook
+       UiScene (untinted): HUD (keys, boss bar), text boxes, choices, cards, shop, slot picker, game over,
+                           pause menu with settings ◄── sim.storyUi(), sim.boss()
+       Boot ─► TitleScene (press any key; continue, new, load a slot, import, export, settings) ─► PlayScene
 ```
 
 - **Modes.** `Sim.mode` is `play`, `transition` (a 30-tick slide across an edge, or a 36-tick fade through a door that swaps screens at the midpoint), `story` (a script is running: play and the clock are frozen) or `over` (the hero fell: only the fall advances; confirm continues at `Sim.entry` with three hearts).
@@ -61,7 +63,10 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **`src/core/world/light.ts`** — `darknessOf` (night outdoors, storms, `dark` rooms); `Sim.darkness()` and `Sim.lights()` (the lantern once owned, fire tiles, lit braziers). **`src/core/world/mapModel.ts`** — the overworld and each dungeon floor as the pause map shows them (`dungeonMap`: rooms walked through, all of them with the map, compass marks for the lair and shut chests).
 - **Dungeons.** `WorldLayout.dungeons` gives each dungeon its own grid of rooms (`ScreenDef.dungeon`); `indexLayout` places every grid in its own block below the overworld and `neighbourOf` never crosses grids, so rooms slide into each other. A dungeon's saved state is read only through `dungeonOf` (creates it on first use) or `peekDungeon` (reads without storing); a tooling test forbids indexing `state.dungeons` anywhere else. Dungeon items (`small_key`, `big_key`, `dungeon_map`, `compass`) are ItemIds whose `ItemDef.dungeon` routes them into the current room's dungeon, never the bag.
 - **`src/core/progress/solver.ts`** — progression solver v1: floods tiles (steps, edges, doors, ledge hops) under a state's fixtures, takes everything reachable, repeats, and branches only on which lock a key opens. `tests/content/solver.test.ts` proves D1: finishable without the lantern, not without the boomerang, every chest and piece reachable, no key order soft-locks, the entrance always reachable again.
-- **Weather.** `Sim.weather()` is story weather: the first `ContentDb.weather` rule that holds, outdoors only, else clear (`storm` is set by the story, never rolled). Rolled weather (`weatherAt`) arrives in M2.
+- **Weather** (`sim/systems/weather.ts`). `skyOf` is the sky over the current region: the dev override, then story weather (the first `ContentDb.weather` rule that holds; `storm` is story-only), then — while `SimOptions.rolled` is on — the region's roll for the day (`weatherAt`, by season), else clear. `Sim.weather()` is the sky outdoors and clear indoors and underground; `Sim.sky()` is the sky even indoors (the `weather` condition reads it lazily through `CondCtx.weather`). `windAt` gives one of eight hashed directions per region and day, its strength by kind (`Sim.wind()`): it bends the boomerang's outward flight and the particles. Fog (`fogOf`, `Sim.fog()`) is its own layer: thick outdoors, clear in 80 px around Ask (112 with the lantern). Rain and storms put out braziers in the open. The test harness pins rolling off by default; tests that want it pass `rolled: true`.
+- **Seasonal cover.** Besides the map's own cover, `CoverDef.grows` lets a kind grow by itself outdoors from the terrain beneath: winter snow on open ground (0.7, the sword clears it; the winter cloak halves the slowdown), winter ice on water (walkable: `stampCollision` takes SOLID and LOW off it), spring mud beside water on a wet day (the region's sky at 00:00 was not clear; 0.75, uncuttable). Drifts are drawn with `^` (winter, 0.5, uncuttable). `refreshCover` rebuilds on a new epoch or a change of wet day, keeping the saved cuts.
+- **Spawn tables** (`core/world/spawns.ts`, `content/spawns.ts`). Screens that list `spawns` points get the region's rolled foes on entry: the season's count (×2 at night), from (seed, day, screen, night) alone, never the combat RNG, kept 4 tiles from where Ask arrives, after the screen's own things. Forest trolls (`EnemyDef.petrify`) come only at night; `petrifyAtDawn` turns each into a liftable `troll_stone` at sunrise, whose `PropDef.loot` spills when it breaks.
+- **Saving at hofs and mead halls.** The script step `{k:'save'}` blocks with `storyUi() = {k:'save'}` until the shell answers the `saved` command; the shell's slot picker writes `sim.snapshot()` to slot 1–3.
 - **`src/core/clock/*`** — the world clock:
   - Hybrid seasons: `held` or `cycling` policy, with `setSeason` for story beats.
   - Daylight ramps and stateless weather.
@@ -71,10 +76,10 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - East frames are baked mirrors of west.
   - The tileset stores animated terrain (water, the ford) frame-major after its variants; `tileAnimations` lists them for Phaser's animated tiles. Terrains in one auto-tile `group` (water/ford/jetty, roof/chimney) join without a bank.
 - **`src/shell/scenes/BootScene.ts`** — packs generated frames into canvas textures, builds the tileset and renders the SFX.
-- **`src/shell/ui/pauseMenu.ts`** — the pause menu as a pure model (tabs Items, Map, Quests, Game; `stepMenu` returns the next state and actions), drawn by `UiScene`.
+- **`src/shell/ui/*`** — menus as pure models, drawn by the scenes: `pauseMenu.ts` (tabs Items, Map, Quests, Game; `stepMenu` returns the next state and actions), `settingsMenu.ts` (+ `settingsText.ts`: language, volume, picture, shake, flashes, shield toggle, long days, colour-blind aid, and the controls page that rebinds keys through `shell/input/remap.ts`), `titleMenu.ts` and `slotPicker.ts` (+ `slotText.ts` for slot summaries). Settings changes apply at once (`PlayScene.applySettings`, `InputMapper.configure`, `Sim.setLongDay`) and are stored straight away.
 - **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio, autosave triggers and the pause menu. The hero's sprite follows the weapon in hand (`heroArtFor`: `hero`, `hero_axe`, `hero_fork`). Each shown screen is a stage: a `ScreenView` (tile layers plus decor sprites, ticked from `sim.tick` and faded when they hide the hero) and an `AmbientView` (a smoke emitter per chimney, fish jumps in open water).
 - **`src/shell/platform/*`**:
-  - Settings in `localStorage['fimbulvetr.settings.v1']`.
+  - Settings in `localStorage['fimbulvetr.settings.v1']` (with `colourBlind` and `keys`, the keyboard overrides).
   - IndexedDB `fimbulvetr` (stores `saves`: auto, auto_prev, s1–s3; and `meta`).
   - Export/import as JSON, a Web Locks single-tab guard, and the PWA service worker.
 
@@ -89,7 +94,8 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **Terrain** may be `low` (solid underfoot but open above: water, sap), which the boomerang crosses.
 - **Decor** terrains (tree, well, trough, stump, bed, hearth, table, menhir) mark solid footprint tiles; the map must draw each object as a whole block (`OO`/`OO` for a well, `b` over `b` for a bed). `tests/content/integrity.test.ts` rejects incomplete blocks.
 - **Buildings** are roof rows over a wall row: `D` open doorway (needs a door thing), `d` shut door, `+` window, `C` chimney inside the roof (the shell smokes it). `J` is a jetty over water.
-- **Cover** grows from map characters listed in `COVER_LEGEND` (`"` = tall grass in summer, `%` = leaf piles in autumn, which hide pickups until cut). Cut cells are saved per screen under the season epoch.
+- **Cover** grows from map characters listed in `COVER_LEGEND` (`"` = tall grass in summer, `%` = leaf piles in autumn, which hide pickups until cut, `^` = winter drifts) and, for snow, mud and ice, from the terrain (see Seasonal cover). Cut cells are saved per screen under the season epoch.
+- **Spawn points** (`spawns` on a screen) only outdoors, on walkable tiles, in a region with a table; the integrity test checks them.
 - **Story weather and the clock:** `content/weather.ts` (the raid storm) and `DB.freezeClock` (the raid night never dawns).
 - **NPCs** (`content/npcs.ts`) list `places`; the first whose condition holds decides where they stand. Positions are never saved.
 - **Dialogue** (`content/dialogue/<npc>.ts`), **scripts** (`content/scripts/`), **quests** (`content/quests.ts`) and **shops** (`content/shops.ts`) are typed data. Every string is `{ en, sv }`.
@@ -114,7 +120,8 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   2. Place them on `layout.dungeons.<id>` and give one room a door from the overworld.
   3. Record every chest, lock, saved shutter, piece and heart id in `tests/content/persisted.test.ts`, and prove the dungeon in `tests/content/solver.test.ts`.
 - **Add an interior:** a screen id that is not in `layout.ts`, a door on each side (each door's `arrive` tile must be walkable), and `indoor: true`.
-- **Add a script or cutscene:** add the id to `SCRIPTS` and the steps in `content/scripts/`, then point a `use` or `trigger` thing at it.
+- **Add a script or cutscene:** add the id to `SCRIPTS` and the steps in `content/scripts/`, then point a `use` or `trigger` thing at it. A place to rest and save runs a script with a `{ k: 'save' }` step (see `hof_pray`).
+- **Add rolled foes to a region:** a table in `content/spawns.ts` and `spawns` points on its screens.
 - **Add art:** draw frames named by convention. A real atlas later replaces frames with the same names. `?dev=gallery` shows every frame and tile.
 - **Add a decor object:** a terrain with `decor: { art, w, h }` in `content/terrain.ts`, a base-only tile painter, and `decor_<id>_idle_s_<n>` frames in `src/art/sprites/decor.ts` standing on their bottom centre.
 - **Change the save format:**
@@ -123,8 +130,8 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   3. Commit `tests/fixtures/saves/v<new>.json`.
 
 ## Dev and test tools
-- **Query string** (dev and `--mode test` builds): `?screen=&at=x,y&season=&time=HH:MM|day|night&seed=&lang=&preset=&dev=gallery&nosave&mute`.
-  - Presets (`content/dev/presets.ts`): `m0` is the old test kit; `day2`, `day3` and `night3` are prologue checkpoints; `raid` (just woken to fire), `morning` (after the raid), `myr` (Myrkviðr after the legend), `d1` (just inside Rótarhellir) and `d1boss` (below the lair's door with the boomerang).
+- **Query string** (dev and `--mode test` builds): `?screen=&at=x,y&season=&time=HH:MM|day|night&seed=&lang=&preset=&weather=<kind>&rolled=0|1&title=0|1&dev=gallery&nosave&mute`. The title screen shows unless the query names a screen, a preset or `nosave` (or says `title=0`); `rolled=0` turns rolled weather and spawns off.
+  - Presets (`content/dev/presets.ts`): `m0` is the old test kit; `day2`, `day3` and `night3` are prologue checkpoints; `raid` (just woken to fire), `morning` (after the raid), `myr` (Myrkviðr after the legend), `turning` (a winter night on the Myrkviðr road just before sunrise), `d1` (just inside Rótarhellir) and `d1boss` (below the lair's door with the boomerang).
 - **F1:** the overlay.
 - **Backquote:** the console. Commands: warp, time, season, flag, give, hp, god, weather, kill, lang, volume, save, export, import, help.
 - **Tab / M:** the pause menu (M opens its map).
@@ -132,6 +139,7 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **Tests:**
   - `pnpm test`: Vitest for core, art, content, shell units and headless sim scenarios.
     - `tests/sim/golden.test.ts` pins one run's hash: re-record it only on purpose.
-    - `tests/sim/route_m1a.test.ts` plays the whole prologue with real inputs through the walker in `tests/sim/walk.ts`; `route_m1b.test.ts` plays the raid, the legend and Myrkviðr to the roots, fighting with `walkFighting`/`fightNear`; `route_m1c.test.ts` plays Rótarhellir and Rótvættr to the lit stone. Each logs its length in ticks.
-  - `pnpm e2e`: Playwright on Chromium and WebKit. `tests/e2e/world.spec.ts` checks decor, animated tiles, smoke and fish through `__fimbul.view()`. In a container with a preinstalled Chromium of another revision, set `PW_CHROMIUM_PATH`.
+    - `tests/sim/route_m1a.test.ts` plays the whole prologue with real inputs through the walker in `tests/sim/walk.ts`; `route_m1b.test.ts` plays the raid, the legend and Myrkviðr to the roots, fighting with `walkFighting`/`fightNear`; `route_m1c.test.ts` plays Rótarhellir and Rótvættr to the lit stone. Each logs its length in ticks. They run with rolling off; `FIMBUL_ROLLED=1` turns it on for a one-off look.
+    - `tests/sim/turning.test.ts` (rolling on) is M2a's exit: foes by day and night, trolls to stone at sunrise, weather by day, snow.
+  - `pnpm e2e`: Playwright on Chromium and WebKit. The `boot` helper adds `rolled=0&title=0`; `m2a.spec.ts` walks the title, the settings, a hof save and every weather. `tests/e2e/world.spec.ts` checks decor, animated tiles, smoke and fish through `__fimbul.view()`. In a container with a preinstalled Chromium of another revision, set `PW_CHROMIUM_PATH`.
   - `pnpm budget`: the gzipped JS budget (730 KB).
