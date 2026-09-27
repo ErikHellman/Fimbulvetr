@@ -56,5 +56,9 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: Rótarhellir (12 rooms), the cave mouth, the runestone and the ending
     - [x] Progression solver, exit route test, e2e, v1-m1c fixture, balance, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
+- [ ] M2 Uppvík + turning world — brief: `docs/briefs/m2.md`, plan: `docs/superpowers/plans/2026-09-27-m2.md`
+  - [ ] M2a Turning world: weathers, snow/mud/ice, spawn tables, trolls ↔ stone, rest-and-save, title and slots, settings UI
+  - [ ] M2b Uppvík: the road north, the hub, economy, gear, galdr/seiðr/Eldr, fire, mead
+  - [ ] M2c Deep Myrkviðr: fen, glade, troll wood, the völva, the huldra, the vargar hunt, +3 enemies
+- [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
