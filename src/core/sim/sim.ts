@@ -16,7 +16,15 @@ import { giveItem } from '../story/effects';
 import type { StoryRun } from '../story/script';
 import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
-import { FIRE_RADIUS, LANTERN_RADIUS, darknessOf, type Light } from '../world/light';
+import {
+  FIRE_RADIUS,
+  FOG_RADIUS,
+  LANTERN_FOG_RADIUS,
+  LANTERN_RADIUS,
+  darknessOf,
+  fogOf,
+  type Light,
+} from '../world/light';
 import type { CoverGrid } from '../world/cover';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -191,6 +199,17 @@ export class Sim implements SimRt {
     });
   }
 
+  /**
+   * The fog over the current screen: how thick (0 = none) and the radius of clear air around the hero
+   * (wider with the lantern).
+   */
+  fog(): { readonly amount: number; readonly r: number } {
+    const def = this.db.screens[this.screen.id];
+    const amount = fogOf({ indoor: !outdoors(this), dark: def.dark === true, weather: this.weather() });
+    if (amount === 0) return { amount: 0, r: 0 };
+    return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
+  }
+
   /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
   boss(): BossView | null {
     for (const e of this.actors) {
@@ -202,9 +221,12 @@ export class Sim implements SimRt {
     return null;
   }
 
-  /** What carves the dark, in screen pixels: the lantern (once owned) around the hero, fires and braziers. */
+  /**
+   * What carves the dark (and the fog), in screen pixels: the lantern (once owned) around the hero, fires and
+   * braziers.
+   */
   lights(): Light[] {
-    if (this.darkness() === 0) return [];
+    if (this.darkness() === 0 && this.fog().amount === 0) return [];
     const out: Light[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });

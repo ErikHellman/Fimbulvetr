@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DARK_ROOM, NIGHT_DARK, STORM_DARK, darknessOf } from '@core/world/light';
+import { DARK_ROOM, FOG_THICK, NIGHT_DARK, STORM_DARK, darknessOf, fogOf } from '@core/world/light';
 
 const out = { indoor: false, dark: false, weather: 'clear' } as const;
 
@@ -20,5 +20,18 @@ describe('darkness', () => {
   it('never falls indoors, and always fills a dark room', () => {
     expect(darknessOf(0, { ...out, indoor: true })).toBe(0);
     expect(darknessOf(1, { ...out, dark: true })).toBe(DARK_ROOM);
+  });
+});
+
+describe('fog', () => {
+  it('hangs outdoors in fog, day and night, and nowhere else', () => {
+    expect(fogOf({ ...out, weather: 'fog' })).toBe(FOG_THICK);
+    expect(fogOf(out)).toBe(0);
+    expect(fogOf({ ...out, weather: 'fog', indoor: true })).toBe(0);
+    expect(fogOf({ ...out, weather: 'fog', dark: true })).toBe(0);
+  });
+
+  it('does not darken the day by itself', () => {
+    expect(darknessOf(1, { ...out, weather: 'fog' })).toBe(0);
   });
 });

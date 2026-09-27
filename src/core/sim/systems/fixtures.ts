@@ -13,6 +13,7 @@ import type { SimRt } from '../rt';
 import { hurtHero } from './combat';
 import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
+import { outdoors, skyOf } from './weather';
 import { condCtx, probeBox } from './story';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -165,6 +166,7 @@ function stepShutters(rt: SimRt, arm: boolean): void {
  */
 export function refreshFixtures(rt: SimRt, arm = true): void {
   revealThings(rt);
+  douseBraziers(rt);
   stepShutters(rt, arm);
   let changed = false;
   const sounds = new Set<'sfx_gate' | 'sfx_shutter'>();
@@ -253,8 +255,23 @@ export function strikeSwitch(rt: SimRt, box: Box): boolean {
   return true;
 }
 
-/** Lights the cold brazier under `box` (from the lantern). Returns whether one was lit. */
+/** Rain and storms outdoors: nothing stays lit in the open. */
+function raining(rt: SimRt): boolean {
+  if (!outdoors(rt)) return false;
+  const sky = skyOf(rt);
+  return sky === 'rain' || sky === 'storm';
+}
+
+/** Rain puts out every burning brazier in the open (they stay out until lit again). */
+function douseBraziers(rt: SimRt): void {
+  const lit = rt.actors.filter((e) => e.kind === 'fixture' && e.def === 'brazier' && mem(e, 'lit') === 1);
+  if (lit.length === 0 || !raining(rt)) return;
+  for (const e of lit) e.mem['lit'] = 0;
+}
+
+/** Lights the cold brazier under `box` (from the lantern). Returns whether one was lit; never in the rain. */
 export function lightBrazier(rt: SimRt, box: Box): boolean {
+  if (raining(rt)) return false;
   const e = fixtureAt(rt, 'brazier', box, (f) => mem(f, 'lit') !== 1);
   if (e === null) return false;
   e.mem['lit'] = 1;
