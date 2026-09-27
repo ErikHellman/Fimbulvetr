@@ -218,6 +218,19 @@ function drawRoll(i: number): Raster {
   return outline(r, P.ink, 2);
 }
 
+/** Ask lying on his side, knocked out: head west, boots east. */
+function drawFallen(): Raster {
+  const r = createRaster(SMALL, SMALL);
+  rect(r, 20, 23, 4, 3, P.pants);
+  rect(r, 20, 26, 4, 2, P.pantsShade);
+  rect(r, 24, 23, 3, 5, P.boot);
+  rect(r, 12, 22, 8, 6, P.tunic);
+  rect(r, 12, 26, 8, 2, P.tunicShade);
+  rect(r, 17, 22, 1, 6, P.belt);
+  ellipse(r, 8, 24, 3.5, 3.5, (x) => (x < 7 ? P.hair : P.skin));
+  return outline(r, P.ink, 2);
+}
+
 const frame = (name: string, raster: Raster): SpriteFrame =>
   raster.w === LARGE ? { name, raster, ox: 24, oy: 38 } : { name, raster, ox: 16, oy: 30 };
 
@@ -259,6 +272,18 @@ export function heroFrames(): SpriteFrame[] {
     out.push(frame(`hero_spin_s_${i}`, mirror ? flipX(r) : r));
   });
   for (let i = 0; i < 4; i++) out.push(frame(`hero_roll_s_${i}`, drawRoll(i)));
+  const turn: readonly (readonly [Side, boolean])[] = [
+    ['s', false],
+    ['w', false],
+    ['n', false],
+    ['w', true],
+    ['s', false],
+  ];
+  turn.forEach(([side, mirror], i) => {
+    const r = drawPose({ side, phase: 0, shield: 'none' }, SMALL);
+    out.push(frame(`hero_dying_s_${i}`, mirror ? flipX(r) : r));
+  });
+  out.push(frame('hero_dying_s_5', drawFallen()));
   return out;
 }
 
@@ -280,4 +305,6 @@ export const HERO_ANIMS = {
   carry: { frames: 1, fps: 1, loop: true, dirs: ALL },
   carrywalk: { frames: 4, fps: 7, loop: true, dirs: ALL },
   throw: { frames: 2, fps: 12, loop: false, dirs: ALL },
+  /** Spins through the four facings and falls; held on the last frame. */
+  dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },
 } satisfies Record<string, AnimDef>;

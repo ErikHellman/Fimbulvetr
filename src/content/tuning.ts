@@ -18,6 +18,7 @@ export const TUNING: Tuning = {
     spinTicks: 24,
     hurtTicks: 12,
     hurtIframes: 60,
+    dyingTicks: 60,
     ledgePushTicks: 6,
     hopTicks: 20,
     hopHeight: 10,

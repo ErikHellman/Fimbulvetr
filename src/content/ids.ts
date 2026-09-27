@@ -70,6 +70,8 @@ export const SFX = [
   'sfx_caw',
   'sfx_itemget',
   'sfx_cut',
+  'sfx_hurt',
+  'sfx_die',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

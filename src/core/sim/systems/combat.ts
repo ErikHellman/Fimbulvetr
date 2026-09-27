@@ -94,7 +94,7 @@ export function resolveContact(rt: SimRt): void {
     );
     if (result.outcome === 'ignored') continue;
     rt.emit({ t: 'hit', target: hero.id, blocked: result.outcome === 'blocked', dealt: result.dealt });
-    rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : 'sfx_hit' });
+    rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : 'sfx_hurt' });
     if (result.outcome !== 'blocked') changeState(HERO_MACHINE, hero, 'hurt', heroCtx(rt, EMPTY_FRAME));
     return;
   }

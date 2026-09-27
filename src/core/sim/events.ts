@@ -22,4 +22,6 @@ export type SimEvent =
   /** Ground cover on the screen was cut or regrew; redraw its layer. */
   | { readonly t: 'coverChanged'; readonly screen: ScreenId }
   /** A safe moment to autosave: back in play after a screen change or a finished script. */
-  | { readonly t: 'autosave' };
+  | { readonly t: 'autosave' }
+  /** The hero's fall has ended: show the game-over panel (Continue after `CONTINUE_DELAY`). */
+  | { readonly t: 'gameOver' };

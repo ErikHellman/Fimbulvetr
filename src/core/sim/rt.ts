@@ -10,7 +10,15 @@ import type { TerrainGrid } from '../world/textmap';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
 
-export type Mode = 'play' | 'transition' | 'story';
+/** `over`: the hero has fallen; the game waits for Continue. */
+export type Mode = 'play' | 'transition' | 'story' | 'over';
+
+/** Where and how the hero entered the current screen: Continue puts them back here. */
+export interface Entry {
+  readonly x: number;
+  readonly y: number;
+  readonly facing: Dir4;
+}
 
 /**
  * A screen change. `slide` (edge crossing) loads the new screen at t=0 and scrolls; `fade` (door) swaps
@@ -48,6 +56,7 @@ export interface SimRt {
   actors: Entity[];
   transition: Transition | null;
   story: StoryRun | null;
+  entry: Entry;
   emit(event: SimEvent): void;
   newId(): number;
   load(id: ScreenId): LoadedScreen;

@@ -21,7 +21,7 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
-import type { LoadedScreen, Mode, SimRt, Transition } from './rt';
+import type { Entry, LoadedScreen, Mode, SimRt, Transition } from './rt';
 import { tickWorldClock } from './systems/clock';
 import { resolveContact, resolveSword } from './systems/combat';
 import { coverFor, cutCover, refreshCover } from './systems/cover';
@@ -29,6 +29,7 @@ import { heroCtx, syncHero } from './systems/hero';
 import { enemyDef, moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
 import { stepNpcs } from './systems/npcs';
+import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
 import { collectPickups } from './systems/pickups';
 import { stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
@@ -43,7 +44,7 @@ import {
   stepTransition,
 } from './systems/transition';
 
-export type { LoadedScreen, Mode, Transition } from './rt';
+export type { Entry, LoadedScreen, Mode, Transition } from './rt';
 export type { StoryUi } from './systems/story';
 export { FADE_TICKS, TRANSITION_TICKS, entryPoint } from './systems/transition';
 
@@ -61,6 +62,8 @@ export class Sim implements SimRt {
   actors: Entity[];
   transition: Transition | null = null;
   story: StoryRun | null = null;
+  /** Where the hero entered the current screen (Continue returns here). */
+  entry: Entry;
   tick = 0;
   private events: SimEvent[] = [];
   private readonly queue: Command[] = [];
@@ -75,10 +78,13 @@ export class Sim implements SimRt {
     options: SimOptions = { longDay: false },
   ) {
     this.state = state;
+    // A save taken at 0 hp (it should not happen, but) loads alive, as after a Continue.
+    if (state.hero.hp <= 0) state.hero.hp = Math.min(state.hero.maxHp, CONTINUE_HP);
     this.layout = indexLayout(db.layout, Object.keys(db.screens) as ScreenId[]);
     this.ticksPerMinute = db.clock.ticksPerMinute * (options.longDay ? 2 : 1);
     this.screen = this.load(state.hero.screen);
     this.hero = createHero(this.newId(), state.hero, db.tuning);
+    this.entry = { x: state.hero.x, y: state.hero.y, facing: state.hero.facing };
     this.actors = spawnActors(this);
     markVisited(this, this.screen.id);
   }
@@ -142,6 +148,7 @@ export class Sim implements SimRt {
         tick: this.tick,
         transition: this.transition,
         story: this.story,
+        entry: this.entry,
         nextId: this.nextId,
         entities: this.entities,
       }),
@@ -153,6 +160,7 @@ export class Sim implements SimRt {
     for (const e of this.entities) e.prev = { ...e.pos };
     if (this.mode === 'transition') stepTransition(this);
     else if (this.mode === 'story') stepStory(this, input);
+    else if (this.mode === 'over') stepOver(this, input);
     else this.stepPlay(input);
     syncHero(this);
     this.state.playTicks += 1;
@@ -212,6 +220,8 @@ export class Sim implements SimRt {
     swordProps(this);
     cutCover(this);
     resolveContact(this);
+    checkDeath(this);
+    if (this.mode === 'over') return;
     tickTimers(this);
     checkEdges(this);
     if (this.mode === 'play') checkDoors(this);

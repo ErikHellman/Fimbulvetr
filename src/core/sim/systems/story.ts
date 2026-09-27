@@ -151,8 +151,7 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
       actorOf(rt, step.actor).facing = step.dir;
       return false;
     case 'warp':
-      enterScreen(rt, step.screen, tileFeet(step.at));
-      rt.hero.facing = step.facing;
+      enterScreen(rt, step.screen, tileFeet(step.at), step.facing);
       markVisited(rt, step.screen);
       rt.emit({ t: 'screenEntered', screen: step.screen });
       return false;

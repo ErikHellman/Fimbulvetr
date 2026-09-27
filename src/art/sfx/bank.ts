@@ -150,4 +150,24 @@ export const SFX_BANK = {
     release: 0.05,
     volume: 0.2,
   },
+  /** The hero takes a hit: a short falling grunt. */
+  sfx_hurt: {
+    wave: 'saw',
+    freq: 330,
+    freqEnd: 150,
+    attack: 0,
+    sustain: 0.05,
+    release: 0.12,
+    volume: 0.35,
+  },
+  /** The hero falls: a long slide down. */
+  sfx_die: {
+    wave: 'triangle',
+    freq: 520,
+    freqEnd: 60,
+    attack: 0.01,
+    sustain: 0.5,
+    release: 0.4,
+    volume: 0.4,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

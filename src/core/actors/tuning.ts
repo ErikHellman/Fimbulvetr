@@ -20,6 +20,8 @@ export interface HeroTuning {
   readonly spinTicks: number;
   readonly hurtTicks: number;
   readonly hurtIframes: number;
+  /** Length of the fall at 0 hp before the game-over panel shows. */
+  readonly dyingTicks: number;
   /** Ticks of walking into a ledge before hopping it. */
   readonly ledgePushTicks: number;
   readonly hopTicks: number;

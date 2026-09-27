@@ -10,7 +10,18 @@ import type { Machine, StateDef } from './fsm';
 import { swordOf, type Tuning } from './tuning';
 
 export type HeroMode =
-  'move' | 'attack' | 'charge' | 'spin' | 'roll' | 'shield' | 'hurt' | 'hop' | 'lift' | 'carry' | 'throw';
+  | 'move'
+  | 'attack'
+  | 'charge'
+  | 'spin'
+  | 'roll'
+  | 'shield'
+  | 'hurt'
+  | 'hop'
+  | 'lift'
+  | 'carry'
+  | 'throw'
+  | 'dying';
 
 export interface HeroCtx {
   readonly input: InputFrame;
@@ -236,6 +247,20 @@ const throwing: HeroDef = {
   },
 };
 
+/** Fallen at 0 hp. The sim is in `over` mode, which advances the clock of this state by hand. */
+const dying: HeroDef = {
+  enter(e) {
+    still(e);
+    e.knock = { x: 0, y: 0 };
+    e.facing = 's';
+    setAnim(e, 'dying');
+  },
+  tick(e) {
+    still(e);
+    return undefined;
+  },
+};
+
 export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   move,
   attack,
@@ -248,6 +273,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   lift,
   carry,
   throw: throwing,
+  dying,
 };
 
 /** Per-tick bookkeeping that is independent of the current state. */
