@@ -25,12 +25,19 @@ export function moveAll(rt: SimRt): void {
   const obstacles = rt.actors.filter((e) => blocksHero(rt, e)).map((e) => at(e.body, e.pos));
   moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles);
   const walls = gridSolidAt(rt.screen.collision, () => true);
+  const { cols, rows } = rt.screen.collision;
+  const sky: SolidAt = (tx, ty) => tx < 0 || ty < 0 || tx >= cols || ty >= rows;
   const hero = [at(rt.hero.body, rt.hero.pos)];
-  for (const e of rt.actors) moveEntity(rt, e, walls, e.kind === 'npc' ? hero : []);
+  for (const e of rt.actors) {
+    const flies = e.kind === 'enemy' && enemyDef(rt, e).flies === true;
+    moveEntity(rt, e, flies ? sky : walls, e.kind === 'npc' ? hero : [], flies);
+  }
 }
 
-function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[]): void {
-  const f = speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1) * coverSpeed(rt, e, e.pos.x, e.pos.y);
+function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[], flies = false): void {
+  const f = flies
+    ? 1
+    : speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1) * coverSpeed(rt, e, e.pos.x, e.pos.y);
   const dx = e.vel.x * f + e.knock.x;
   const dy = e.vel.y * f + e.knock.y;
   if (dx !== 0 || dy !== 0) {

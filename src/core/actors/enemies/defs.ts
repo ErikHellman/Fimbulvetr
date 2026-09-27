@@ -45,6 +45,8 @@ export interface EnemyDef {
   readonly petrify?: PropId;
   /** Elements that deal it double damage (a draugr burns). */
   readonly weak?: readonly Element[];
+  /** On the wing: walls, water and ground cover do not stop or slow it (only the screen's edge does). */
+  readonly flies?: boolean;
 }
 
 export interface AttackWindow {

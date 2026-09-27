@@ -413,4 +413,25 @@ export const SFX_BANK = {
     release: 0.12,
     volume: 0.25,
   },
+  /** The pack leader's howl: a long rising, falling moan. */
+  sfx_howl: {
+    wave: 'triangle',
+    freq: 330,
+    freqEnd: 520,
+    attack: 0.12,
+    sustain: 0.35,
+    release: 0.3,
+    volume: 0.3,
+  },
+  /** The rime raven's shriek: harsh and high. */
+  sfx_shriek: {
+    wave: 'square',
+    freq: 1400,
+    freqEnd: 900,
+    attack: 0.01,
+    sustain: 0.18,
+    release: 0.12,
+    volume: 0.2,
+    duty: 0.2,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

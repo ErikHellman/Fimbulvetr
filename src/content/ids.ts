@@ -73,6 +73,8 @@ export const ENEMIES = [
   'rot_bulb',
   'root_spike',
   'forest_troll',
+  'vargr_alpha',
+  'rime_raven',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -119,6 +121,8 @@ export const SFX = [
   'sfx_drink',
   'sfx_eldr',
   'sfx_fizzle',
+  'sfx_howl',
+  'sfx_shriek',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

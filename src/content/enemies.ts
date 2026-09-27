@@ -206,4 +206,61 @@ export const ENEMY_DEFS = {
       },
     },
   },
+  /**
+   * The pack leader on the north road (the vargar hunt): bigger, darker, a white ruff. It howls (400 ms)
+   * and vargr come until two of its own live; its lunge staggers through a shield.
+   */
+  vargr_alpha: {
+    id: 'vargr_alpha',
+    art: 'enemy_vargr_alpha',
+    hp: 14,
+    body: { x: -9, y: -9, w: 18, h: 9 },
+    hurt: { x: -12, y: -20, w: 24, h: 20 },
+    behaviour: 'vargr_alpha',
+    knockResist: 0.5,
+    immortal: false,
+    solid: false,
+    touch: { amount: 2, knock: 3, tags: 0 },
+    attacks: {
+      lunge: {
+        from: 0,
+        to: 15,
+        boxes: around({ x: -11, y: -16, w: 22, h: 16 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 3, silver: 3, seidr: 1, none: 1 },
+  },
+  /**
+   * The Rime King's raven, abroad at night: it circles out of reach, shrieks (400 ms) when it spots Ask —
+   * a vargr answers — and dives. Strike it as it climbs back.
+   */
+  rime_raven: {
+    id: 'rime_raven',
+    art: 'enemy_rime_raven',
+    hp: 4,
+    body: { x: -5, y: -6, w: 10, h: 6 },
+    hurt: { x: -9, y: -18, w: 18, h: 14 },
+    behaviour: 'rime_raven',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    weak: ['fire'],
+    attacks: {
+      dive: {
+        from: 0,
+        to: 25,
+        boxes: around({ x: -8, y: -16, w: 16, h: 14 }),
+        amount: 2,
+        knock: 3,
+        tags: 0,
+      },
+    },
+    stunnable: 120,
+    drops: { heart: 1, silver: 2, seidr: 2, none: 3 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

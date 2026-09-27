@@ -123,7 +123,7 @@ describe('hero kits', () => {
 
 describe('enemies', () => {
   it('draw a telegraph that reads differently from standing still', () => {
-    for (const art of ['enemy_vargr', 'enemy_draugr', 'enemy_troll'])
+    for (const art of ['enemy_vargr', 'enemy_vargr_alpha', 'enemy_draugr', 'enemy_troll'])
       for (const dir of ['s', 'w', 'n'])
         expect(
           rastersEqual(frame(`${art}_tell_${dir}_0`).raster, frame(`${art}_idle_${dir}_0`).raster),
@@ -134,6 +134,8 @@ describe('enemies', () => {
   it('draw every animation their behaviours use', () => {
     const used: Readonly<Record<string, readonly string[]>> = {
       enemy_vargr: ['idle', 'walk', 'tell', 'lunge', 'hurt'],
+      enemy_vargr_alpha: ['idle', 'walk', 'howl', 'tell', 'lunge', 'hurt'],
+      enemy_rime_raven: ['fly', 'tell', 'dive', 'hurt'],
       enemy_draugr: ['idle', 'walk', 'rise', 'tell', 'swing', 'hurt'],
       enemy_troll: ['idle', 'walk', 'tell', 'smash'],
       fix_fire: ['burn', 'out', 'closed', 'open'],

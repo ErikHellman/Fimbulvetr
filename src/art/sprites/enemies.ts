@@ -11,15 +11,35 @@ const INK = hex(C.ink);
 
 // ── Vargr: a grey wolf, 32×32, feet at (16, 30) ──────────────────────────────────────────────────────
 
-const FUR = hex('#7a7470');
-const FUR_SHADE = hex('#524d4a');
-const FUR_LIGHT = hex('#a39d98');
 const WOLF_EYE = hex('#f2d45c');
 const FANG = hex('#f4efe2');
 
-type WolfPose = 'stand' | 'crouch' | 'lunge';
+/** Fur colours: the grey vargr, and the pack leader (near black with a white ruff and red eyes). */
+interface WolfPal {
+  readonly fur: Rgba;
+  readonly shade: Rgba;
+  readonly light: Rgba;
+  readonly eye: Rgba;
+  /** A pale ruff about the neck. */
+  readonly ruff?: Rgba;
+}
+const GREY_WOLF: WolfPal = {
+  fur: hex('#7a7470'),
+  shade: hex('#524d4a'),
+  light: hex('#a39d98'),
+  eye: WOLF_EYE,
+};
+const ALPHA_WOLF: WolfPal = {
+  fur: hex('#3e3a3c'),
+  shade: hex('#262325'),
+  light: hex('#6a6466'),
+  eye: hex('#e0503a'),
+  ruff: hex('#d8d4cc'),
+};
 
-function wolfSide(phase: number, pose: WolfPose): Raster {
+type WolfPose = 'stand' | 'crouch' | 'lunge' | 'howl';
+
+function wolfSide(phase: number, pose: WolfPose, p: WolfPal): Raster {
   const r = createRaster(32, 32);
   const low = pose === 'crouch' ? 2 : 0;
   const stretch = pose === 'lunge' ? 2 : 0;
@@ -27,33 +47,46 @@ function wolfSide(phase: number, pose: WolfPose): Raster {
   // Legs: front pair left (the wolf faces west), hind pair right.
   const legTop = 23 + low;
   if (pose === 'lunge') {
-    line(r, 9, 22, 4, 27, FUR_SHADE);
-    line(r, 10, 22, 5, 27, FUR);
-    line(r, 22, 22, 27, 27, FUR_SHADE);
-    line(r, 23, 22, 28, 27, FUR);
+    line(r, 9, 22, 4, 27, p.shade);
+    line(r, 10, 22, 5, 27, p.fur);
+    line(r, 22, 22, 27, 27, p.shade);
+    line(r, 23, 22, 28, 27, p.fur);
   } else {
-    rect(r, 8 + step, legTop, 2, 29 - legTop, FUR_SHADE);
-    rect(r, 11 - step, legTop, 2, 29 - legTop, FUR);
-    rect(r, 19 - step, legTop, 2, 29 - legTop, FUR_SHADE);
-    rect(r, 22 + step, legTop, 2, 29 - legTop, FUR);
+    rect(r, 8 + step, legTop, 2, 29 - legTop, p.shade);
+    rect(r, 11 - step, legTop, 2, 29 - legTop, p.fur);
+    rect(r, 19 - step, legTop, 2, 29 - legTop, p.shade);
+    rect(r, 22 + step, legTop, 2, 29 - legTop, p.fur);
   }
   // Tail, body, head.
-  line(r, 24 + stretch, 18 + low, 28, 14 + low + (pose === 'crouch' ? 3 : 0), FUR_SHADE);
-  line(r, 24 + stretch, 19 + low, 28, 15 + low + (pose === 'crouch' ? 3 : 0), FUR);
+  line(r, 24 + stretch, 18 + low, 28, 14 + low + (pose === 'crouch' ? 3 : 0), p.shade);
+  line(r, 24 + stretch, 19 + low, 28, 15 + low + (pose === 'crouch' ? 3 : 0), p.fur);
   ellipse(r, 16, 20 + low, 9 + stretch, 5 - (pose === 'lunge' ? 1 : 0), (_x, y) =>
-    y > 21 + low ? FUR_SHADE : FUR,
+    y > 21 + low ? p.shade : p.fur,
   );
-  rect(r, 10, 17 + low, 8, 2, FUR_LIGHT);
+  rect(r, 10, 17 + low, 8, 2, p.light);
+  if (pose === 'howl') {
+    // Head thrown back, muzzle to the sky.
+    const hx = 9;
+    const hy = 13;
+    if (p.ruff !== undefined) ellipse(r, 11, 17, 3.5, 3, () => p.ruff ?? p.light);
+    ellipse(r, hx, hy, 4, 4, (_x, y) => (y > hy + 1 ? p.shade : p.fur));
+    rect(r, hx - 4, hy - 5, 3, 4, p.fur);
+    rect(r, hx - 4, hy - 5, 1, 1, INK);
+    rect(r, hx - 1, hy - 1, 1, 1, p.eye);
+    rect(r, hx + 1, hy - 6, 2, 3, p.shade);
+    return outline(r, INK, 2);
+  }
   const hx = 8 - (pose === 'lunge' ? 1 : 0);
   const hy = 16 + low + (pose === 'crouch' ? 2 : 0);
-  ellipse(r, hx, hy, 4.5, 4, (_x, y) => (y > hy + 1 ? FUR_SHADE : FUR));
-  rect(r, hx - 5, hy, 4, 3, FUR);
-  rect(r, hx - 5, hy + 2, 4, 1, FUR_SHADE);
+  if (p.ruff !== undefined) ellipse(r, hx + 4, hy + 2, 3, 3.5, () => p.ruff ?? p.light);
+  ellipse(r, hx, hy, 4.5, 4, (_x, y) => (y > hy + 1 ? p.shade : p.fur));
+  rect(r, hx - 5, hy, 4, 3, p.fur);
+  rect(r, hx - 5, hy + 2, 4, 1, p.shade);
   rect(r, hx - 5, hy, 1, 1, INK);
-  rect(r, hx - 1, hy - 1, 1, 1, WOLF_EYE);
+  rect(r, hx - 1, hy - 1, 1, 1, p.eye);
   const earBack = pose === 'crouch' ? 1 : 0;
-  rect(r, hx + earBack, hy - 6 + earBack, 2, 3, FUR_SHADE);
-  rect(r, hx + 2 + earBack, hy - 5 + earBack, 2, 2, FUR);
+  rect(r, hx + earBack, hy - 6 + earBack, 2, 3, p.shade);
+  rect(r, hx + 2 + earBack, hy - 5 + earBack, 2, 2, p.fur);
   if (pose !== 'stand') {
     rect(r, hx - 4, hy + 2, 1, 1, FANG);
     rect(r, hx - 2, hy + 2, 1, 1, FANG);
@@ -61,22 +94,31 @@ function wolfSide(phase: number, pose: WolfPose): Raster {
   return outline(r, INK, 2);
 }
 
-function wolfFront(phase: number, pose: WolfPose): Raster {
+function wolfFront(phase: number, pose: WolfPose, p: WolfPal): Raster {
   const r = createRaster(32, 32);
   const low = pose === 'crouch' ? 2 : pose === 'lunge' ? -1 : 0;
   const liftL = phase === 1 ? 1 : 0;
   const liftR = phase === 3 ? 1 : 0;
-  ellipse(r, 16, 23 + low, 7, 4, (x) => (x > 18 ? FUR_SHADE : FUR));
-  rect(r, 12, 24 + low, 2, 5 - low - liftL, FUR);
-  rect(r, 18, 24 + low, 2, 5 - low - liftR, FUR_SHADE);
-  const hy = 16 + low;
-  ellipse(r, 16, hy, 5.5, 5, (x) => (x > 18.5 ? FUR_SHADE : FUR));
-  rect(r, 11, hy - 7, 2, 4, FUR_SHADE);
-  rect(r, 19, hy - 7, 2, 4, FUR_SHADE);
-  rect(r, 14, hy + 2, 5, 3, FUR_LIGHT);
+  ellipse(r, 16, 23 + low, 7, 4, (x) => (x > 18 ? p.shade : p.fur));
+  rect(r, 12, 24 + low, 2, 5 - low - liftL, p.fur);
+  rect(r, 18, 24 + low, 2, 5 - low - liftR, p.shade);
+  const hy = (pose === 'howl' ? 13 : 16) + low;
+  if (p.ruff !== undefined) ellipse(r, 16, hy + 5, 6, 3, () => p.ruff ?? p.light);
+  ellipse(r, 16, hy, 5.5, 5, (x) => (x > 18.5 ? p.shade : p.fur));
+  rect(r, 11, hy - 7, 2, 4, p.shade);
+  rect(r, 19, hy - 7, 2, 4, p.shade);
+  if (pose === 'howl') {
+    // Muzzle raised: the throat shows, the mouth a dark O.
+    rect(r, 14, hy - 3, 5, 3, p.light);
+    rect(r, 15, hy - 3, 3, 1, INK);
+    rect(r, 14, hy, 1, 1, p.eye);
+    rect(r, 18, hy, 1, 1, p.eye);
+    return outline(r, INK, 2);
+  }
+  rect(r, 14, hy + 2, 5, 3, p.light);
   rect(r, 16, hy + 2, 1, 1, INK);
-  rect(r, 14, hy - 1, 1, 1, WOLF_EYE);
-  rect(r, 18, hy - 1, 1, 1, WOLF_EYE);
+  rect(r, 14, hy - 1, 1, 1, p.eye);
+  rect(r, 18, hy - 1, 1, 1, p.eye);
   if (pose !== 'stand') {
     rect(r, 14, hy + 4, 1, 1, FANG);
     rect(r, 18, hy + 4, 1, 1, FANG);
@@ -84,24 +126,75 @@ function wolfFront(phase: number, pose: WolfPose): Raster {
   return outline(r, INK, 2);
 }
 
-function wolfBack(phase: number, pose: WolfPose): Raster {
+function wolfBack(phase: number, pose: WolfPose, p: WolfPal): Raster {
   const r = createRaster(32, 32);
   const low = pose === 'crouch' ? 2 : 0;
+  const up = pose === 'howl' ? 3 : 0;
   const liftL = phase === 1 ? 1 : 0;
   const liftR = phase === 3 ? 1 : 0;
-  rect(r, 11, 24, 2, 5 - liftL, FUR_SHADE);
-  rect(r, 19, 24, 2, 5 - liftR, FUR_SHADE);
-  ellipse(r, 16, 20 + low, 7, 6, (x) => (x > 18 ? FUR_SHADE : FUR));
-  rect(r, 15, 24 + low, 2, 5 - low, FUR_LIGHT);
-  ellipse(r, 16, 13 + low, 4.5, 4, (x) => (x > 18 ? FUR_SHADE : FUR));
-  rect(r, 12, 8 + low, 2, 3, FUR_SHADE);
-  rect(r, 18, 8 + low, 2, 3, FUR_SHADE);
+  rect(r, 11, 24, 2, 5 - liftL, p.shade);
+  rect(r, 19, 24, 2, 5 - liftR, p.shade);
+  ellipse(r, 16, 20 + low, 7, 6, (x) => (x > 18 ? p.shade : p.fur));
+  rect(r, 15, 24 + low, 2, 5 - low, p.light);
+  if (p.ruff !== undefined) ellipse(r, 16, 16 + low, 5, 2.5, () => p.ruff ?? p.light);
+  ellipse(r, 16, 13 + low - up, 4.5, 4, (x) => (x > 18 ? p.shade : p.fur));
+  rect(r, 12, 8 + low - up, 2, 3, p.shade);
+  rect(r, 18, 8 + low - up, 2, 3, p.shade);
   return outline(r, INK, 2);
 }
 
-function wolf(side: Side, phase: number, pose: WolfPose): Raster {
-  if (side === 'w') return wolfSide(phase, pose);
-  return side === 's' ? wolfFront(phase, pose) : wolfBack(phase, pose);
+function wolf(side: Side, phase: number, pose: WolfPose, p: WolfPal = GREY_WOLF): Raster {
+  if (side === 'w') return wolfSide(phase, pose, p);
+  return side === 's' ? wolfFront(phase, pose, p) : wolfBack(phase, pose, p);
+}
+
+// ── Rime raven: a black bird with frosted wing tips, 32×32, feet (its shadow) at (16, 30) ──────────────
+
+const RAVEN = hex('#1e2230');
+const RAVEN_SHADE = hex('#0f1119');
+const RIME = hex('#cfe6f2');
+const RAVEN_EYE = hex('#8fd8ff');
+const BEAK = hex('#3a3a44');
+const SHADOW = hex('#20242c');
+
+type RavenPose = 'up' | 'down' | 'spread' | 'dive' | 'hurt';
+
+/** The bird hangs high in the frame over a small shadow on the ground (the feet). */
+function raven(side: Side, pose: RavenPose): Raster {
+  const r = createRaster(32, 32);
+  ellipse(r, 16, 28, pose === 'dive' ? 5 : 3.5, 1.2, () => SHADOW);
+  const by = pose === 'dive' ? 17 : 12;
+  if (pose === 'dive') {
+    // Wings folded back, beak first.
+    ellipse(r, 16, by, 3, 6, (_x, y) => (y > by + 2 ? RAVEN_SHADE : RAVEN));
+    line(r, 13, by - 4, 10, by + 5, RIME);
+    line(r, 19, by - 4, 22, by + 5, RIME);
+    rect(r, 15, by + 6, 2, 2, BEAK);
+    rect(r, 15, by - 2, 1, 1, RAVEN_EYE);
+    rect(r, 17, by - 2, 1, 1, RAVEN_EYE);
+    return outline(r, INK, 2);
+  }
+  const wy = pose === 'up' ? -5 : pose === 'down' ? 3 : pose === 'hurt' ? 1 : -2;
+  const span = pose === 'spread' ? 12 : 11;
+  // Wings.
+  line(r, 16, by, 16 - span, by + wy, RAVEN);
+  line(r, 16, by + 1, 16 - span, by + wy + 1, RAVEN_SHADE);
+  line(r, 16, by, 16 + span, by + wy, RAVEN);
+  line(r, 16, by + 1, 16 + span, by + wy + 1, RAVEN_SHADE);
+  rect(r, 16 - span, by + wy, 2, 2, RIME);
+  rect(r, 15 + span, by + wy, 2, 2, RIME);
+  // Body and tail.
+  ellipse(r, 16, by + 1, 3.5, 3, (_x, y) => (y > by + 2 ? RAVEN_SHADE : RAVEN));
+  rect(r, 15, by + 4, 3, 3, RAVEN_SHADE);
+  if (side === 'n') return outline(r, INK, 2);
+  // Head, eyes and beak toward the viewer (south) or the west.
+  const hx = side === 'w' ? 12 : 16;
+  ellipse(r, hx, by - 2, 2.5, 2.5, () => RAVEN);
+  rect(r, hx - (side === 'w' ? 4 : 1), by - 2, side === 'w' ? 2 : 2, pose === 'spread' ? 3 : 2, BEAK);
+  if (pose === 'spread') rect(r, hx - (side === 'w' ? 4 : 1), by - 1, 2, 1, INK);
+  rect(r, hx - (side === 'w' ? 1 : 2), by - 3, 1, 1, RAVEN_EYE);
+  if (side === 's') rect(r, hx + 1, by - 3, 1, 1, RAVEN_EYE);
+  return outline(r, INK, 2);
 }
 
 // ── Draugr: a dead man in grave clothes, from the people parts ──────────────────────────────────────
@@ -291,6 +384,29 @@ export function enemyFrames(): SpriteFrame[] {
     v('lunge', 0, wolf(side, 0, 'lunge'));
     v('lunge', 1, wolf(side, 2, 'lunge'));
 
+    const al = (anim: string, i: number, r: Raster): void => {
+      add('enemy_vargr_alpha', anim, side, i, r, 16, 30);
+    };
+    al('idle', 0, wolf(side, 0, 'stand', ALPHA_WOLF));
+    al('hurt', 0, wolf(side, 2, 'stand', ALPHA_WOLF));
+    for (let i = 0; i < 4; i++) al('walk', i, wolf(side, i, 'stand', ALPHA_WOLF));
+    al('tell', 0, wolf(side, 0, 'crouch', ALPHA_WOLF));
+    al('tell', 1, wolf(side, 2, 'crouch', ALPHA_WOLF));
+    al('lunge', 0, wolf(side, 0, 'lunge', ALPHA_WOLF));
+    al('lunge', 1, wolf(side, 2, 'lunge', ALPHA_WOLF));
+    al('howl', 0, wolf(side, 0, 'howl', ALPHA_WOLF));
+    al('howl', 1, wolf(side, 2, 'howl', ALPHA_WOLF));
+
+    const rv = (anim: string, i: number, r: Raster): void => {
+      add('enemy_rime_raven', anim, side, i, r, 16, 30);
+    };
+    rv('fly', 0, raven(side, 'up'));
+    rv('fly', 1, raven(side, 'down'));
+    rv('tell', 0, raven(side, 'spread'));
+    rv('tell', 1, raven(side, 'up'));
+    rv('dive', 0, raven(side, 'dive'));
+    rv('hurt', 0, raven(side, 'hurt'));
+
     const d = (anim: string, i: number, r: Raster): void => {
       add('enemy_draugr', anim, side, i, r, 16, 30);
     };
@@ -336,6 +452,15 @@ const a = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps,
 
 export const ENEMY_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   enemy_vargr: { idle: a(1, 1), hurt: a(1, 1), walk: a(4, 8), tell: a(2, 8), lunge: a(2, 10) },
+  enemy_vargr_alpha: {
+    idle: a(1, 1),
+    hurt: a(1, 1),
+    walk: a(4, 7),
+    tell: a(2, 8),
+    lunge: a(2, 10),
+    howl: a(2, 4),
+  },
+  enemy_rime_raven: { fly: a(2, 6), tell: a(2, 10), dive: a(1, 1), hurt: a(1, 1) },
   enemy_draugr: {
     idle: a(1, 1),
     hurt: a(1, 1),
