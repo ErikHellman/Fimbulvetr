@@ -35,6 +35,20 @@ describe('screens', () => {
   });
 });
 
+describe('interact zones', () => {
+  it.each(SCREEN_IDS)('%s keeps every sign and use rectangle inside the map', (id) => {
+    for (const thing of SCREENS[id].things) {
+      if (thing.k !== 'sign' && thing.k !== 'use') continue;
+      const w = thing.w ?? 1;
+      const h = thing.h ?? 1;
+      expect(w, `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBeGreaterThan(0);
+      expect(h).toBeGreaterThan(0);
+      expect(thing.at.x + w).toBeLessThanOrEqual(SCREEN_COLS);
+      expect(thing.at.y + h).toBeLessThanOrEqual(SCREEN_ROWS);
+    }
+  });
+});
+
 describe('world layout', () => {
   it('places screens inside the grid without overlaps', () => {
     expect(() => indexLayout(WORLD_LAYOUT, SCREEN_IDS)).not.toThrow();

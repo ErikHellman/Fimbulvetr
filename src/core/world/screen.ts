@@ -27,10 +27,23 @@ export interface DoorThing {
 export type Thing =
   | { readonly k: 'enemy'; readonly id: EnemyId; readonly at: TilePos }
   | DoorThing
-  /** Read with interact while facing its tile. */
-  | { readonly k: 'sign'; readonly at: TilePos; readonly text: L10n }
-  /** Runs a script on interact while facing its tile (a bed, a well). */
-  | { readonly k: 'use'; readonly at: TilePos; readonly script: ScriptId; readonly when?: Cond }
+  /** Read with interact while facing its tile, or any tile of its `w`×`h` block (a 2×2 well). */
+  | {
+      readonly k: 'sign';
+      readonly at: TilePos;
+      readonly w?: number;
+      readonly h?: number;
+      readonly text: L10n;
+    }
+  /** Runs a script on interact while facing its tile or block (a bed, a well). */
+  | {
+      readonly k: 'use';
+      readonly at: TilePos;
+      readonly w?: number;
+      readonly h?: number;
+      readonly script: ScriptId;
+      readonly when?: Cond;
+    }
   /** Runs a script when the hero's feet enter the tile rectangle and `when` holds. */
   | {
       readonly k: 'trigger';
