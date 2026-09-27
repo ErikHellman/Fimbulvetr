@@ -5,10 +5,12 @@ export interface Light {
   readonly x: number;
   readonly y: number;
   readonly r: number;
+  /** Carried by the hero: the view keeps it on the drawn hero (screen slides move the hero smoothly). */
+  readonly hero?: boolean;
 }
 
 /** How dark the deepest night gets outdoors (the visibility layer's opacity; the grade darkens too). */
-export const NIGHT_DARK = 0.7;
+export const NIGHT_DARK = 0.5;
 /** A dark room underground. */
 export const DARK_ROOM = 0.94;
 /** Extra dark under storm clouds. */

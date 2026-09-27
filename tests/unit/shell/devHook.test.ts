@@ -20,6 +20,10 @@ const NO_VIEW = {
   openWater: 0,
   fishAlive: 0,
   fishJumps: 0,
+  rain: 0,
+  bolts: 0,
+  dark: 0,
+  lights: 0,
 };
 
 /** `installHook` assumes a global `window`; the test provides a minimal one. */

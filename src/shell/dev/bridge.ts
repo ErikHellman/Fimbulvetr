@@ -16,6 +16,11 @@ export interface ViewStats {
   readonly openWater: number;
   readonly fishAlive: number;
   readonly fishJumps: number;
+  /** Raindrops alive, lightning bolts so far, the darkness drawn and the lights cut out of it. */
+  readonly rain: number;
+  readonly bolts: number;
+  readonly dark: number;
+  readonly lights: number;
 }
 
 /** What the running Play scene exposes to dev tools. */

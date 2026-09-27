@@ -43,11 +43,11 @@ describe('lights', () => {
   it('none by day; at night the lantern lights the hero only once owned', () => {
     expect(new Harness({ minute: 12 * 60 }).sim.lights()).toEqual([]);
     const h = new Harness({ minute: 60 });
-    expect(h.sim.darkness()).toBeGreaterThan(0.5);
+    expect(h.sim.darkness()).toBeGreaterThan(0.4);
     expect(h.sim.lights()).toEqual([]);
     h.sim.state.inv.items.lantern = 1;
     const [lamp] = h.sim.lights();
-    expect(lamp).toMatchObject({ x: h.sim.hero.pos.x, r: 56 });
+    expect(lamp).toMatchObject({ x: h.sim.hero.pos.x, r: 56, hero: true });
   });
 
   it('burning fires glow in the dark', () => {
@@ -57,6 +57,6 @@ describe('lights', () => {
     h.sim.state.flags.st_raid_begun = true;
     h.idle(1);
     expect(h.sim.lights()).toHaveLength(2);
-    expect(h.sim.darkness()).toBeGreaterThan(0.75);
+    expect(h.sim.darkness()).toBeGreaterThan(0.55);
   });
 });

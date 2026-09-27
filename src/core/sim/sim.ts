@@ -167,7 +167,7 @@ export class Sim implements SimRt {
     if (this.darkness() === 0) return [];
     const out: Light[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
-      out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS });
+      out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });
     for (const e of this.actors)
       if (e.kind === 'fixture' && e.def === 'fire' && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });

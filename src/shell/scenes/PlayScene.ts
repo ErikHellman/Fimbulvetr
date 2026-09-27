@@ -29,7 +29,9 @@ import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { EntityViews } from '@shell/view/entityViews';
+import { DarknessView } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
+import { WeatherView } from '@shell/view/weatherView';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -49,6 +51,8 @@ export class PlayScene extends Phaser.Scene {
   private mapper!: InputMapper;
   private audio!: AudioDirector;
   private views!: EntityViews;
+  private weather!: WeatherView;
+  private darkness!: DarknessView;
   private fx!: FxView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
@@ -98,6 +102,13 @@ export class PlayScene extends Phaser.Scene {
     this.colour = cam.filters.internal.addColorMatrix();
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
+    this.weather = new WeatherView(this, data.assets.frames, {
+      sfx: (id) => {
+        this.audio.play(id);
+      },
+      flashes: () => data.settings.flash,
+    });
+    this.darkness = new DarknessView(this, data.assets.frames);
     this.fadeRect = this.add
       .rectangle(0, 0, SCREEN_W, SCREEN_H, 0x000000)
       .setOrigin(0, 0)
@@ -192,7 +203,23 @@ export class PlayScene extends Phaser.Scene {
       stage.view.fadeBehind(hero);
       stage.ambient.tick(this.sim.tick);
     }
+    this.drawSky(hero);
     this.applyGrade();
+  }
+
+  /** Weather over the playfield and the dark with its lights cut out, in camera pixels. */
+  private drawSky(hero: { x: number; y: number; w: number; h: number } | null): void {
+    const cam = this.cameras.main;
+    const origin = this.sim.originOf(this.sim.screen.id);
+    const lights = this.sim
+      .lights()
+      .map((l) =>
+        l.hero === true && hero !== null
+          ? { x: hero.x + hero.w / 2 - cam.scrollX, y: hero.y + hero.h - 12 - cam.scrollY, r: l.r }
+          : { x: origin.x + l.x - cam.scrollX, y: origin.y + l.y - cam.scrollY, r: l.r },
+      );
+    this.darkness.draw(this.sim.darkness(), lights);
+    this.weather.update(this.sim.weather(), this.time.now);
   }
 
   private applyGrade(): void {
@@ -200,10 +227,11 @@ export class PlayScene extends Phaser.Scene {
     const indoor = this.services.db.screens[this.sim.screen.id].indoor === true;
     const light = indoor ? INDOOR_LIGHT : daylight(clock, this.services.db.clock);
     const season = indoor ? 'autumn' : clock.season;
-    const key = `${season}|${Math.round(light * 200)}`;
+    const weather = this.sim.weather();
+    const key = `${season}|${Math.round(light * 200)}|${weather}`;
     if (key === this.gradeKey) return;
     this.gradeKey = key;
-    this.appliedGrade = grade(season, light, 'clear');
+    this.appliedGrade = grade(season, light, weather);
     this.colour.colorMatrix.set([...this.appliedGrade]);
   }
 
@@ -245,6 +273,10 @@ export class PlayScene extends Phaser.Scene {
       openWater: 0,
       fishAlive: 0,
       fishJumps: 0,
+      rain: this.weather.drops,
+      bolts: this.weather.bolts,
+      dark: this.darkness.shown.dark,
+      lights: this.darkness.shown.lights,
     };
     const out = { ...sum };
     for (const { view, ambient } of this.screens.values()) {

@@ -55,6 +55,34 @@ function puff(size: number): Raster {
   return r;
 }
 
+/** A streak of rain, slanting down to the left: the storm blows from the east. */
+function raindrop(): Raster {
+  const r = createRaster(6, 14);
+  for (let i = 0; i < 12; i++) {
+    const x = 4 - Math.floor(i / 3);
+    r.data.set([196, 220, 240, 150 + i * 8], (i * 6 + x) * 4);
+    r.data.set([160, 190, 220, 110 + i * 6], (i * 6 + x + 1) * 4);
+  }
+  return r;
+}
+
+/**
+ * The shape a light cuts out of the dark: a disc in three steps of strength, so the edge reads as pixel
+ * art rather than a smooth gradient. White; only its alpha matters.
+ */
+function light(): Raster {
+  const size = 128;
+  const r = createRaster(size, size);
+  const c = size / 2;
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      const d = Math.sqrt((x + 0.5 - c) ** 2 + (y + 0.5 - c) ** 2) / c;
+      const a = d < 0.62 ? 255 : d < 0.82 ? 170 : d < 1 ? 85 : 0;
+      if (a > 0) r.data.set([255, 255, 255, a], (y * size + x) * 4);
+    }
+  return r;
+}
+
 export function fxFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [];
   for (let f = 0; f < 8; f++) out.push({ name: `fx_fish_idle_s_${f}`, raster: fishJump(f), ox: 12, oy: 16 });
@@ -62,10 +90,14 @@ export function fxFrames(): SpriteFrame[] {
     const half = Math.floor(size / 2);
     out.push({ name: `fx_smoke_idle_s_${i}`, raster: puff(size), ox: half, oy: half });
   });
+  out.push({ name: 'fx_rain_idle_s_0', raster: raindrop(), ox: 3, oy: 7 });
+  out.push({ name: 'fx_light_idle_s_0', raster: light(), ox: 64, oy: 64 });
   return out;
 }
 
 export const FX_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fx_fish: { idle: { frames: 8, fps: 10, loop: false, dirs: ['s'] } },
   fx_smoke: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
+  fx_rain: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
+  fx_light: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
 };
