@@ -79,7 +79,8 @@ export class PlayScene extends Phaser.Scene {
     this.gradeKey = '';
     this.menu = null;
     this.screens.clear();
-    this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay });
+    this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay, rolled: data.rolled });
+    if (data.weather !== undefined) this.sim.weatherOverride = data.weather;
     this.tileAnims = tileAnimations(data.assets.tileset);
     this.mapper = new InputMapper(DEFAULT_BINDINGS, this.latch, {
       holdToggleShield: data.settings.holdShield,

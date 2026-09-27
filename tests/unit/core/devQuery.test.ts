@@ -40,6 +40,17 @@ describe('parseDevQuery', () => {
     expect(q.warnings.length).toBeGreaterThanOrEqual(6);
   });
 
+  it('reads the weather override and the rolled switch', () => {
+    const q = parseDevQuery('weather=fog&rolled=0', known);
+    expect(q.weather).toBe('fog');
+    expect(q.rolled).toBe(false);
+    expect(parseDevQuery('', known).rolled).toBe(true);
+    const bad = parseDevQuery('weather=hail&rolled=maybe', known);
+    expect(bad.weather).toBeUndefined();
+    expect(bad.rolled).toBe(true);
+    expect(bad.warnings).toHaveLength(2);
+  });
+
   it('parses clock times', () => {
     expect(parseClockTime('day')).toBe(720);
     expect(parseClockTime('night')).toBe(0);

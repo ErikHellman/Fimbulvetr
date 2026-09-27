@@ -60,6 +60,8 @@ export interface SimRt {
   transition: Transition | null;
   story: StoryRun | null;
   entry: Entry;
+  /** Rolled weather and spawn tables are on (see `SimOptions.rolled`). */
+  readonly rolled: boolean;
   /** Dev: the hero takes no damage (undefined when off, so it never changes the hash). */
   god?: boolean;
   emit(event: SimEvent): void;

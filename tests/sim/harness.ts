@@ -24,6 +24,8 @@ export interface HarnessOptions {
   readonly start?: NewGameInit;
   /** A dev preset applied over the starting kit (as `?preset=` does in the browser). */
   readonly preset?: DevPreset;
+  /** Rolled weather and spawn tables (off by default, so older tests keep the story-only world). */
+  readonly rolled?: boolean;
 }
 
 export function frameOf(
@@ -58,7 +60,7 @@ export class Harness {
     if (o.facing !== undefined) state.hero.facing = o.facing;
     if (o.minute !== undefined) state.clock.minute = o.minute;
     if (o.season !== undefined) state.clock.season = o.season;
-    this.sim = new Sim(o.db ?? DB, state);
+    this.sim = new Sim(o.db ?? DB, state, { longDay: false, rolled: o.rolled ?? false });
   }
 
   /** Shorthand for `frameOf`, for `until` loops. */

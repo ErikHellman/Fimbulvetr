@@ -1,7 +1,7 @@
 import type { DungeonId, ItemId, WeaponId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { setMinute, setPolicy, setSeason } from '../clock/clock';
-import { isSeason, type ClockState, type Season } from '../clock/types';
+import { WEATHER_KINDS, isSeason, type ClockState, type Season, type WeatherKind } from '../clock/types';
 import { LANGS, type Lang } from '../i18n/t';
 import type { Dir4 } from '../math/dir';
 import type { Flags } from '../state/flags';
@@ -19,6 +19,10 @@ export interface DevQuery {
   readonly lang?: Lang;
   /** A named starting kit from content/dev/presets (validated against the known ids). */
   readonly preset?: string;
+  /** `weather=<kind>`: the dev weather override, as the console's `weather` command. */
+  readonly weather?: WeatherKind;
+  /** `rolled=0`: no rolled weather or spawn tables (the e2e runs pin it off). */
+  readonly rolled: boolean;
   /** `dev=gallery`: show the texture gallery instead of the game. */
   readonly gallery: boolean;
   readonly nosave: boolean;
@@ -113,6 +117,17 @@ export function parseDevQuery(
     else warnings.push(`unknown preset '${pr}'`);
   }
 
+  let weather: WeatherKind | undefined;
+  const we = params.get('weather');
+  if (we !== undefined) {
+    const found = WEATHER_KINDS.find((k) => k === we);
+    if (found === undefined) warnings.push(`unknown weather '${we}'`);
+    else weather = found;
+  }
+
+  const ro = params.get('rolled');
+  if (ro !== undefined && ro !== '0' && ro !== '1') warnings.push(`bad rolled '${ro}' (use 0 or 1)`);
+
   const dev = params.get('dev');
   if (dev !== undefined && dev !== 'gallery') warnings.push(`unknown dev view '${dev}'`);
 
@@ -124,6 +139,8 @@ export function parseDevQuery(
     seed,
     lang,
     preset,
+    weather,
+    rolled: ro !== '0',
     gallery: dev === 'gallery',
     nosave: params.has('nosave'),
     mute: params.has('mute'),
@@ -175,6 +192,7 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   applyDevQuery(state, {
     screen: p.screen,
     tile: p.tile,
+    rolled: true,
     gallery: false,
     nosave: false,
     mute: false,

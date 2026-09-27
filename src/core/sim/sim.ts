@@ -66,6 +66,11 @@ export interface BossView {
 export interface SimOptions {
   /** Accessibility "long day": world time runs at half speed. */
   readonly longDay: boolean;
+  /**
+   * Rolled weather and spawn tables (default on). Off, the world has story weather only and no rolled
+   * spawns: the tests and e2e runs written before M2 pin it off.
+   */
+  readonly rolled?: boolean;
 }
 
 /** The whole game rules engine. Deterministic: same state + same inputs ⇒ same result. */
@@ -83,6 +88,7 @@ export class Sim implements SimRt {
   god?: boolean;
   weatherOverride?: WeatherKind;
   tick = 0;
+  readonly rolled: boolean;
   private events: SimEvent[] = [];
   private readonly queue: Command[] = [];
   private nextId = 1;
@@ -96,6 +102,7 @@ export class Sim implements SimRt {
     options: SimOptions = { longDay: false },
   ) {
     this.state = state;
+    this.rolled = options.rolled ?? true;
     // A save taken at 0 hp (it should not happen, but) loads alive, as after a Continue.
     if (state.hero.hp <= 0) state.hero.hp = Math.min(state.hero.maxHp, CONTINUE_HP);
     this.layout = indexLayout(db.layout, Object.keys(db.screens) as ScreenId[]);

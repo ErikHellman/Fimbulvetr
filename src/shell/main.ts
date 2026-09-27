@@ -99,6 +99,8 @@ async function main(): Promise<void> {
       saves,
       dev,
       muted: query?.mute === true,
+      rolled: query?.rolled ?? true,
+      ...(query?.weather === undefined ? {} : { weather: query.weather }),
       start: gallery === null ? 'play' : 'gallery',
     },
     gallery === null ? [] : [gallery],

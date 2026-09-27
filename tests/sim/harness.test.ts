@@ -11,6 +11,11 @@ describe('harness presets', () => {
     expect(h.sim.state.clock.minute).toBe(21 * 60);
   });
 
+  it('pins rolled weather and spawn tables off unless a test asks for them', () => {
+    expect(new Harness().sim.rolled).toBe(false);
+    expect(new Harness({ rolled: true }).sim.rolled).toBe(true);
+  });
+
   it('checks that every entity shows a drawn animation', () => {
     const h = new Harness({ preset: DEV_PRESETS.day2 });
     h.idle(30).expectAnims();

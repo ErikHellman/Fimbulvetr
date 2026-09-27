@@ -9,9 +9,13 @@ export function collectErrors(page: Page): string[] {
   return errors;
 }
 
-/** Loads the game (optionally with a dev query string) and waits until the Play scene runs. */
+/**
+ * Loads the game (optionally with a dev query string) and waits until the Play scene runs. Rolled weather
+ * and spawn tables are pinned off (`rolled=0`) unless the query names `rolled` itself.
+ */
 export async function boot(page: Page, query = ''): Promise<void> {
-  await page.goto(query === '' ? '/' : `/?${query}`);
+  const q = /(^|&)rolled=/.test(query) ? query : query === '' ? 'rolled=0' : `${query}&rolled=0`;
+  await page.goto(`/?${q}`);
   await page.waitForFunction(() => window.__fimbul?.ready === true, undefined, { timeout: 20_000 });
 }
 
