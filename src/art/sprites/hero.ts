@@ -81,24 +81,35 @@ function legs(r: Raster, o: number, side: Side, phase: number): void {
 /** Where the arms are: down at the sides, raised overhead (lifting, carrying) or thrust forward (throwing). */
 type Arms = 'down' | 'up' | 'forward';
 
-function torso(r: Raster, o: number, b: number, side: Side, arms: Arms = 'down'): void {
+/**
+ * Walk-cycle arm swing per phase, opposite to the lifted leg. Seen from the side the near arm moves
+ * towards the facing and back; from the front or back the arms rise and drop a little.
+ */
+export const ARM_SWING_SIDE: readonly number[] = [0, -2, 0, 2];
+export const ARM_SWING_LEFT: readonly number[] = [0, 1, 0, -2];
+export const ARM_SWING_RIGHT: readonly number[] = [0, -2, 0, 1];
+
+function torso(r: Raster, o: number, b: number, side: Side, phase: number, arms: Arms = 'down'): void {
   if (side === 'w') {
     rect(r, o + 11, b + 15, 10, 9, P.tunic);
     rect(r, o + 18, b + 15, 3, 9, P.tunicShade);
     rect(r, o + 11, b + 21, 10, 1, P.belt);
     if (arms !== 'down') return;
-    rect(r, o + 13, b + 16, 3, 6, P.tunicShade);
-    rect(r, o + 13, b + 22, 3, 2, P.skin);
+    const swing = ARM_SWING_SIDE[phase] ?? 0;
+    rect(r, o + 13 + swing, b + 16, 3, 6, P.tunicShade);
+    rect(r, o + 13 + swing, b + 22, 3, 2, P.skin);
     return;
   }
   rect(r, o + 10, b + 15, 12, 9, P.tunic);
   rect(r, o + 19, b + 15, 3, 9, P.tunicShade);
   rect(r, o + 10, b + 21, 12, 1, P.belt);
   if (arms !== 'down') return;
-  rect(r, o + 8, b + 16, 2, 6, P.tunic);
-  rect(r, o + 8, b + 22, 2, 2, P.skin);
-  rect(r, o + 22, b + 16, 2, 6, P.tunicShade);
-  rect(r, o + 22, b + 22, 2, 2, P.skinShade);
+  const dl = ARM_SWING_LEFT[phase] ?? 0;
+  const dr = ARM_SWING_RIGHT[phase] ?? 0;
+  rect(r, o + 8, b + 16 + dl, 2, 6, P.tunic);
+  rect(r, o + 8, b + 22 + dl, 2, 2, P.skin);
+  rect(r, o + 22, b + 16 + dr, 2, 6, P.tunicShade);
+  rect(r, o + 22, b + 22 + dr, 2, 2, P.skinShade);
 }
 
 /** Raised or thrust arms, drawn over the head (or behind it when facing north). */
@@ -190,7 +201,7 @@ function drawPose(pose: Pose, size: number): Raster {
   const arms = pose.arms ?? 'down';
   legs(r, o, pose.side, pose.phase);
   if (behind) liftedArms(r, o, b, pose.side, arms);
-  torso(r, o, b, pose.side, arms);
+  torso(r, o, b, pose.side, pose.phase, arms);
   head(r, o, b, pose.side);
   if (!behind) liftedArms(r, o, b, pose.side, arms);
   shield(r, o, b, pose.shield);
