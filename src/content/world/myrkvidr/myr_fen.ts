@@ -10,6 +10,10 @@ export const myrFen: ScreenDef = {
     /** Brambles across the only way onto the islet: fire clears them. */
     { k: 'prop', id: 'bramble', at: { x: 30, y: 14 } },
     { k: 'piece', id: 'hp_myr_fen', at: { x: 30, y: 16 } },
+    /** Fen-moss, for the völva's brews: it grows in autumn and comes back every year. */
+    { k: 'herb', id: 'herb_fen_1', item: 'fen_moss', at: { x: 16, y: 9 }, season: 'autumn' },
+    { k: 'herb', id: 'herb_fen_2', item: 'fen_moss', at: { x: 22, y: 15 }, season: 'autumn' },
+    { k: 'herb', id: 'herb_fen_3', item: 'fen_moss', at: { x: 34, y: 5 }, season: 'autumn' },
   ],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
   spawns: [

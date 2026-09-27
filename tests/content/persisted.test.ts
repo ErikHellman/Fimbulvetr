@@ -4,7 +4,7 @@ import { SCREEN_IDS } from '@content/world/screens';
 
 /**
  * Every id a save can hold for a thing on a screen: heart pieces (`world.pieces`), chests and heart
- * containers (`world.opened`), locks and saved shutters (a dungeon's `doors`). Append only: renaming or
+ * containers (`world.opened`), locks and saved shutters (a dungeon's `doors`), herbs (`world.vars`). Append only: renaming or
  * removing one strands old saves unless a migration moves it (CLAUDE.md, "Persisted ids").
  */
 const PERSISTED = [
@@ -33,13 +33,17 @@ const PERSISTED = [
   // M2c
   'hp_myr_fen',
   'hp_myr_trollskog',
+  'herb_fen_1',
+  'herb_fen_2',
+  'herb_fen_3',
 ] as const;
 
 function contentIds(): Set<string> {
   const out = new Set<string>();
   for (const id of SCREEN_IDS)
     for (const t of SCREENS[id].things) {
-      if (t.k === 'piece' || t.k === 'chest' || t.k === 'heart' || t.k === 'lock') out.add(t.id);
+      if (t.k === 'piece' || t.k === 'chest' || t.k === 'heart' || t.k === 'lock' || t.k === 'herb')
+        out.add(t.id);
       if (t.k === 'shutter' && t.id !== undefined) out.add(t.id);
     }
   return out;

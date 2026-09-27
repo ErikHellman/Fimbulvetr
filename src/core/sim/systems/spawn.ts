@@ -14,7 +14,7 @@ import { rollSpawns } from '../../world/spawns';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
 import { refreshFixtures, spawnFixtures, stampCollision } from './fixtures';
-import { createHeart, createPiece } from './pickups';
+import { createHeart, createPiece, herbGrows } from './pickups';
 import { placeNpcs } from './npcs';
 import { holdBack } from './rooms';
 import { condCtx } from './story';
@@ -109,6 +109,10 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'heart':
         if (!rt.state.world.opened.includes(thing.id))
           out.push(createHeart(rt.newId(), tileFeet(thing.at), index));
+        break;
+      case 'herb':
+        if (herbGrows(rt, thing))
+          out.push(createPiece(rt.newId(), tileFeet(thing.at), index, `herb_${thing.item}`));
         break;
       case 'fire':
       case 'gate':
