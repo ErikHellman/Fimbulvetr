@@ -72,5 +72,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Exit route test, e2e, v1-m2b fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M2c Deep Myrkviðr: fen, glade, troll wood, the völva, the huldra, the vargar hunt, +3 enemies
+    - [x] The pack leader and the rime raven (flying), with art and sounds
+    - [x] The fen, the völva's hut, the birch glade and the troll wood; seasonal herbs
+    - [x] Heiðr and her brews, the huldra's bargain, the vargar hunt, trolls in the troll wood
+    - [x] Overworld solver proofs (and brambles barring the bypass round the pine), exit route, e2e, v1-m2c fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
