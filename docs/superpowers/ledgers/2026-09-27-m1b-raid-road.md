@@ -6,3 +6,4 @@ Plan: `docs/superpowers/plans/2026-09-27-m1b-m1c.md` (Part 1). Brief: `docs/brie
 | --- | --- |
 | 1 Docs | Plan saved; the brief gains the M1b and M1c details (raid, Myrkviðr, Rótarhellir draft). |
 | 2 Presets and walker | `DevPreset` gains season, policy, hp, maxHp, slots, pieces, opened and dungeons. The harness takes a `preset` (applied over `NEW_GAME`, as `?preset=` does) and `expectAnims()`. The walker reads any enemy id. |
+| 3 One damage path | `damageActor` in `systems/combat.ts` serves the sword and thrown props; thrown kills now remove the enemy (M1a bug). `killed` event. `EnemyDef.drops` (heart/silver/none weights) rolled with `state.rng`; drops last 600 ticks. Ruling: the dummy keeps no drops, so the golden hash is unchanged. |

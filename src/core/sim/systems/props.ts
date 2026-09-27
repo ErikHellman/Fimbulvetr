@@ -3,13 +3,14 @@ import { mem, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
 import type { PropDef } from '../../actors/prop';
-import { THROWN, resolveHit } from '../../combat/hit';
+import { THROWN } from '../../combat/hit';
 import { EMPTY_FRAME, moveVector, wasPressed, type InputFrame } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { boxHitsSolid, gridSolidAt, moveBox } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
+import { damageActor } from './combat';
 import { critterDef } from './critters';
 import { heroCtx } from './hero';
 import { applyAll, probeBox } from './story';
@@ -124,15 +125,15 @@ function flying(rt: SimRt, e: Entity): void {
       overlaps(at(e.hurt, e.pos), at(a.hurt, a.pos)),
   );
   if (target !== undefined) {
-    const res = resolveHit(
-      target,
-      { amount: def.throwDamage, element: 'none', knock: 3, dir: d, faction: 'hero', tags: THROWN },
-      { shielding: false, iframes: rt.db.tuning.enemyIframes, knockResist: 0 },
-    );
-    if (res.outcome !== 'ignored') {
-      rt.emit({ t: 'hit', target: target.id, blocked: false, dealt: res.dealt });
-      target.mem['hitBy'] = THROWN;
-    }
+    const res = damageActor(rt, target, {
+      amount: def.throwDamage,
+      element: 'none',
+      knock: 3,
+      dir: d,
+      faction: 'hero',
+      tags: THROWN,
+    });
+    if (res.outcome !== 'ignored') target.mem['hitBy'] = THROWN;
   }
   if (target !== undefined || r.blockedX || r.blockedY || t >= tw.flightTicks) land(rt, e);
 }

@@ -22,6 +22,15 @@ export interface EnemyDef {
   readonly solid: boolean;
   /** Damage dealt when the hero's hurt box touches this enemy's hurt box. */
   readonly touch?: ContactDamage;
+  /** What it may leave behind when killed, as relative weights. */
+  readonly drops?: DropTable;
+}
+
+/** Relative weights of what a killed enemy leaves: a heart (heals one heart), one silver, or nothing. */
+export interface DropTable {
+  readonly heart: number;
+  readonly silver: number;
+  readonly none: number;
 }
 
 export interface ContactDamage {

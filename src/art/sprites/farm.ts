@@ -196,6 +196,28 @@ function heartFrames(): SpriteFrame[] {
   });
 }
 
+const SMALL_HEART = ['.hh.hh.', 'hlhhhhH', 'hhhhhhH', '.hhhhH.', '..hHH..', '...H...'];
+const COIN = ['.sss.', 'sSsss', 'sSsss', 'sSsss', '.sss.'];
+const COIN_PAL: GridPalette = { '.': null, s: C.shieldRim, S: C.strawShade, l: C.heartLight };
+
+/** Enemy drops: a small heart and a silver coin that glints. Feet at the bottom centre. */
+function dropFrames(): SpriteFrame[] {
+  const hg = decodeGrid(SMALL_HEART, HEART_PAL);
+  const hr = createRaster(hg.w + 2, hg.h + 2);
+  blit(hr, hg, 1, 1);
+  const hd = outline(hr, INK, 1);
+  const heart = { name: 'pickup_heart_idle_s_0', raster: hd, ox: Math.floor(hd.w / 2), oy: hd.h - 1 };
+  const coins = [0, 1].map((i) => {
+    const g = decodeGrid(COIN, COIN_PAL);
+    const r = createRaster(g.w + 2, g.h + 2);
+    blit(r, g, 1, 1);
+    const done = outline(r, INK, 1);
+    if (i === 1) rect(done, 3, 2, 1, 1, [255, 255, 255, 255]);
+    return { name: `pickup_silver_idle_s_${i}`, raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
+  });
+  return [heart, ...coins];
+}
+
 /** Soft ground shadow drawn under anything lifted off the ground. */
 function shadowFrame(): SpriteFrame {
   const r = createRaster(14, 6);
@@ -238,7 +260,7 @@ export function farmFrames(): SpriteFrame[] {
   out.push(propFrame('prop_pail_idle_s_0', PAIL));
   out.push(propFrame('prop_log_small_idle_s_0', LOG_SMALL));
   out.push(propFrame('prop_log_big_idle_s_0', LOG_BIG));
-  out.push(...heartFrames(), shadowFrame());
+  out.push(...heartFrames(), ...dropFrames(), shadowFrame());
   return out;
 }
 
@@ -263,5 +285,7 @@ export const FARM_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef
   prop_log_small: ONE_S,
   prop_log_big: ONE_S,
   pickup_heart_piece: { idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] } },
+  pickup_heart: ONE_S,
+  pickup_silver: { idle: { frames: 2, fps: 3, loop: true, dirs: ['s'] } },
   fx_shadow: ONE_S,
 };
