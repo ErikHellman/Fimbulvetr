@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { unknownChars } from '@art/font';
+import { textWidth, unknownChars } from '@art/font';
 import type { L10n } from '@core/i18n/t';
 import { GALDR_DEFS } from '@content/galdr';
 import { ARMOR_NAMES, RING_NAMES, WEAPON_NAMES } from '@content/gear';
@@ -33,4 +33,13 @@ describe('player-facing text', () => {
       }
     });
   }
+});
+
+describe('speaker nameplates', () => {
+  it('fit in the tab above the dialogue box, clear of the choices panel', () => {
+    const names = [...Object.values(NPC_NAMES), UI.speaker_ask];
+    for (const name of names)
+      for (const lang of ['en', 'sv'] as const)
+        expect(textWidth(name[lang]) + 16, name[lang]).toBeLessThan(400);
+  });
 });

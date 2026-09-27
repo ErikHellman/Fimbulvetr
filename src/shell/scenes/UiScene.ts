@@ -90,7 +90,7 @@ export class UiScene extends Phaser.Scene {
       this.slotIcons.push(icon);
     }
     this.box = this.add.graphics();
-    this.name = this.text(BOX.x + 10, BOX.y - 14, '', GOLD);
+    this.name = this.text(BOX.x + 12, BOX.y - 14, '', GOLD);
     this.body = this.text(BOX.x + 12, BOX.y + 10, '', PAPER);
     this.choices = this.text(0, 0, '', PAPER);
     this.shop = this.text(0, 0, '', PAPER);
@@ -183,9 +183,14 @@ export class UiScene extends Phaser.Scene {
       );
       return;
     }
-    this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
     const who = this.speaker(ui.who);
-    if (who !== '') this.name.setText(who);
+    // The speaker sits in a tab on the box's top edge, so the name reads on any background. The tab is
+    // drawn first so the box's top stroke lands on the tab's bottom stroke and the two read as one outline.
+    if (who !== '') {
+      this.panel(BOX.x + 4, BOX.y - 17, textWidth(who) + 16, 18);
+      this.name.setText(who);
+    }
+    this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
     this.body.setText(shown);
     if (ui.choices.length > 0) {
       const lines = ui.choices.map((c, i) => `${i === ui.cursor ? '>' : ' '} ${t(c, lang)}`);
