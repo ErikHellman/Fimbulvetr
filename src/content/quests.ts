@@ -71,6 +71,27 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Hitta Rótarhellir, rotgrottan i Myrkviðr, och tänd den första runstenen igen.',
         },
       },
+      {
+        when: flag('st_d1_entered'),
+        text: {
+          en: 'Find a way down through the roots of Rótarhellir to whatever keeps the stone dark.',
+          sv: 'Hitta en väg ner genom Rótarhellirs rötter till det som håller stenen mörk.',
+        },
+      },
+      {
+        when: flag('st_d1_boss_dead'),
+        text: {
+          en: 'Rótvættr is dead. Lay a hand on the runestone behind its lair.',
+          sv: 'Rótvættr är död. Lägg handen på runstenen bakom dess lya.',
+        },
+      },
+      {
+        when: flag('st_stone1_lit'),
+        text: {
+          en: 'The first runestone burns again. Two remain dark.',
+          sv: 'Den första runstenen brinner igen. Två är fortfarande mörka.',
+        },
+      },
     ],
   },
 };

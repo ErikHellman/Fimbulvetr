@@ -31,6 +31,7 @@ const FARM_DAYS: DialogueDef = daily(
 /** Gyða, the goði, keeps the rune-records in the hof. The morning after the raid she tells the legend. */
 export const GYDA: DialogueDef = {
   entry: [
+    { when: flag('st_stone1_lit'), node: 'stone1' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'first_halvar' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'legend' },
     { when: afterRaid, node: 'after' },
@@ -38,6 +39,12 @@ export const GYDA: DialogueDef = {
   ],
   nodes: {
     ...FARM_DAYS.nodes,
+    stone1: {
+      text: {
+        en: 'One stone burns. I felt it in my old bones before the ravens brought the news. Two more, child, and Embla is still out there.',
+        sv: 'En sten brinner. Jag kände det i mina gamla ben innan korparna kom med nyheten. Två till, barn, och Embla är fortfarande där ute.',
+      },
+    },
     first_halvar: {
       text: {
         en: 'You live. Good. Go to Halvar first, child. He has something that should be yours.',

@@ -23,6 +23,18 @@ export const d1R12: ScreenDef = {
       onDeath: [{ k: 'set', flag: 'st_d1_boss_dead', value: true }],
     },
     { k: 'heart', id: 'd1_hc', at: { x: 20, y: 9 }, when: { k: 'flag', id: 'st_d1_boss_dead' } },
+    {
+      k: 'use',
+      at: { x: 20, y: 2 },
+      script: 'stone1_light',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'st_d1_boss_dead' },
+          { k: 'not', c: { k: 'flag', id: 'st_stone1_lit' } },
+        ],
+      },
+    },
   ],
   map: [
     'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
