@@ -35,7 +35,9 @@ export const UPGRADES = [
   'bomb_bag',
   'purse',
 ] as const;
-export const ITEMS = [...SUB_ITEMS, ...CONSUMABLES, ...UPGRADES] as const;
+/** Found in dungeons; they go into that dungeon's saved state, never into the bag. */
+export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] as const;
+export const ITEMS = [...SUB_ITEMS, ...CONSUMABLES, ...UPGRADES, ...DUNGEON_ITEMS] as const;
 export type ItemId = (typeof ITEMS)[number];
 
 export const GALDR = ['eldr', 'is', 'farvegr', 'hlif', 'skjalfti', 'ljos', 'vindr', 'bragd'] as const;
@@ -78,6 +80,8 @@ export const SFX = [
   'sfx_poof',
   'sfx_pickup',
   'sfx_gate',
+  'sfx_chest',
+  'sfx_secret',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

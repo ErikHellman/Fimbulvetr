@@ -2,11 +2,16 @@ import type { FlagId } from '@content/flags';
 import type { ItemId, SfxId, WeaponId } from '@content/ids';
 import { setMinute, setPolicy, setSeason, sleepUntil } from '../clock/clock';
 import type { ClockState, Season } from '../clock/types';
+import { dungeonOf } from '../state/dungeons';
 import type { FlagValue } from '../state/flags';
 import type { SimRt } from '../sim/rt';
 
 /** Silver caps by purse size. */
 export const PURSE_CAP = [100, 300, 999] as const;
+/** Quarter hearts per heart. */
+export const HEART = 4;
+/** Twenty hearts at most. */
+export const MAX_HP = 20 * HEART;
 
 /** A change to the saved state. Dialogue choices, scripts, triggers and pickups all use it. */
 export type Effect =
@@ -90,14 +95,29 @@ export function applyEffect(e: Effect, rt: SimRt): void {
   }
 }
 
-/** Adds items, capped by the item's max; slot items go to the first free slot. */
+/**
+ * Adds items, capped by the item's max; slot items go to the first free slot. Dungeon items count in the
+ * current room's dungeon instead (outside a dungeon they are lost), and a heart container adds a heart.
+ */
 export function giveItem(rt: SimRt, item: ItemId, n: number): void {
   const inv = rt.state.inv;
   const def = rt.db.items[item];
+  rt.emit({ t: 'itemGet', item });
+  if (def.dungeon !== undefined) {
+    const id = rt.db.screens[rt.screen.id].dungeon;
+    if (id === undefined) return;
+    const d = dungeonOf(rt.state, id);
+    if (def.dungeon === 'key') d.keys = Math.min(def.max, d.keys + n);
+    else d[def.dungeon] = true;
+    return;
+  }
+  if (def.hearts !== undefined) {
+    rt.hero.maxHp = Math.min(MAX_HP, rt.hero.maxHp + def.hearts * HEART * n);
+    rt.hero.hp = rt.hero.maxHp;
+  }
   inv.items[item] = Math.min(def.max, (inv.items[item] ?? 0) + n);
   if (def.slot && !inv.slots.includes(item)) {
     if (inv.slots[0] === null) inv.slots = [item, inv.slots[1]];
     else if (inv.slots[1] === null) inv.slots = [inv.slots[0], item];
   }
-  rt.emit({ t: 'itemGet', item });
 }

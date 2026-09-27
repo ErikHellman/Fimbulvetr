@@ -6,6 +6,7 @@ import { SOLID } from '../../world/collision';
 import { tileFeet, type Thing, type TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { hurtHero } from './combat';
+import { revealThings } from './rooms';
 import { condCtx } from './story';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -34,8 +35,17 @@ function fixture(id: number, def: string, art: string, tile: TilePos, index: num
   return e;
 }
 
-/** One fixture per tile of a gate or fire thing (each tile animates and burns on its own). */
+/**
+ * One fixture per tile of a gate or fire thing (each tile animates and burns on its own); one per chest,
+ * open if it was opened before.
+ */
 export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entity[]): void {
+  if (thing.k === 'chest') {
+    const e = fixture(rt.newId(), 'chest', 'fix_chest', thing.at, index);
+    setAnim(e, rt.state.world.opened.includes(thing.id) ? 'open' : 'closed');
+    out.push(e);
+    return;
+  }
   if (thing.k !== 'gate' && thing.k !== 'fire') return;
   const art = thing.k === 'gate' ? `fix_${thing.art}` : 'fix_fire';
   for (let y = 0; y < thing.h; y++)
@@ -43,8 +53,9 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       out.push(fixture(rt.newId(), thing.k, art, { x: thing.at.x + x, y: thing.at.y + y }, index));
 }
 
-/** Whether a fixture is "on": a gate closed, a fire burning. */
+/** Whether a fixture is "on": a gate closed, a fire burning, a chest in sight. */
 function isOn(rt: SimRt, e: Entity): boolean {
+  if (e.def === 'chest') return mem(e, 'wait') !== 1;
   const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
   const ctx = condCtx(rt);
   if (thing?.k === 'gate') return evalCond(thing.closed, ctx);
@@ -57,11 +68,16 @@ const ANIMS: Readonly<Record<string, readonly [string, string]>> = {
   fire: ['burn', 'out'],
 };
 
+/** Fixtures that block the way while on. */
+const SOLID_WHEN_ON: ReadonlySet<string> = new Set(['gate', 'chest']);
+
 /**
- * Re-evaluates every fixture's condition (a gate opens the tick its flag flips) and restamps collision
- * when a solid one changed. Runs in play and in story mode, so a cutscene can open a gate on screen.
+ * Shows chests and hearts whose moment has come, re-evaluates every fixture's condition (a gate opens the
+ * tick its flag flips) and restamps collision when a solid one changed. Runs in play and in story mode, so
+ * a cutscene can open a gate on screen.
  */
 export function refreshFixtures(rt: SimRt): void {
+  revealThings(rt);
   let changed = false;
   let opened = false;
   for (const e of rt.actors) {
@@ -76,17 +92,17 @@ export function refreshFixtures(rt: SimRt): void {
     }
     const names = ANIMS[e.def];
     if (names !== undefined) setAnim(e, on === 1 ? names[0] : names[1]);
-    if (e.def === 'gate') changed = true;
+    if (SOLID_WHEN_ON.has(e.def)) changed = true;
   }
   if (changed) stampCollision(rt);
 }
 
-/** collision = base terrain + the tiles of closed gates. */
+/** collision = base terrain + the tiles of closed gates and chests in sight. */
 export function stampCollision(rt: SimRt): void {
   const { base, collision } = rt.screen;
   collision.flags.set(base.flags);
   for (const e of rt.actors) {
-    if (e.kind !== 'fixture' || e.def !== 'gate' || mem(e, 'on') !== 1) continue;
+    if (e.kind !== 'fixture' || !SOLID_WHEN_ON.has(e.def) || mem(e, 'on') !== 1) continue;
     const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
   }

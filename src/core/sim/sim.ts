@@ -269,7 +269,7 @@ export class Sim implements SimRt {
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);
-    checkEdges(this);
+    if (this.mode === 'play') checkEdges(this);
     if (this.mode === 'play') checkDoors(this);
     if (this.mode === 'play') checkTriggers(this);
   }

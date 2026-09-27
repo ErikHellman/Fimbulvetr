@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { CritterId, DungeonId, EnemyId, PropId, RegionId, ScriptId } from '@content/ids';
+import type { CritterId, DungeonId, EnemyId, ItemId, PropId, RegionId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { L10n } from '../i18n/t';
@@ -22,6 +22,16 @@ export interface DoorThing {
   readonly arrive: TilePos;
   readonly facing: Dir4;
 }
+
+/**
+ * A room-wide condition, worked out from the live actors each tick: `clear` once no mortal enemy is left.
+ * Things that wait on one latch when it first holds, until the room is entered again.
+ */
+export type RoomSignal = 'clear';
+
+/** What a chest holds: an item (dungeon items go into the dungeon's state), or silver with its own line. */
+export type ChestGift =
+  { readonly item: ItemId; readonly n?: number } | { readonly silver: number; readonly text: L10n };
 
 /** Things placed on a screen. The union grows with each milestone. */
 export type Thing =
@@ -92,6 +102,26 @@ export type Thing =
       readonly v: string;
       readonly flag: FlagId;
       readonly count: number;
+    }
+  /**
+   * A chest, opened once ever with interact (`id` is saved in `world.opened`). It is hidden, and not solid,
+   * until `when` holds and the room gives the `appear` signal.
+   */
+  | {
+      readonly k: 'chest';
+      readonly id: string;
+      readonly at: TilePos;
+      readonly gives: ChestGift;
+      readonly appear?: RoomSignal;
+      readonly when?: Cond;
+    }
+  /** A heart container, taken once ever (saved in `world.opened`); hidden until `when` and `appear` hold. */
+  | {
+      readonly k: 'heart';
+      readonly id: string;
+      readonly at: TilePos;
+      readonly appear?: RoomSignal;
+      readonly when?: Cond;
     }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
   | { readonly k: 'piece'; readonly id: string; readonly at: TilePos }

@@ -231,4 +231,24 @@ export const SFX_BANK = {
     release: 0.2,
     volume: 0.3,
   },
+  /** A chest lid creaking open. */
+  sfx_chest: {
+    wave: 'saw',
+    freq: 180,
+    freqEnd: 320,
+    attack: 0.02,
+    sustain: 0.14,
+    release: 0.12,
+    volume: 0.25,
+  },
+  /** Something hidden shows itself: a rising chime. */
+  sfx_secret: {
+    wave: 'triangle',
+    freq: 520,
+    freqEnd: 1560,
+    attack: 0.01,
+    sustain: 0.3,
+    release: 0.3,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

@@ -7,13 +7,15 @@ import { tileFeet } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
 import { refreshFixtures, spawnFixtures, stampCollision } from './fixtures';
-import { createPiece } from './pickups';
+import { createHeart, createPiece } from './pickups';
 import { placeNpcs } from './npcs';
+import { holdBack } from './rooms';
 import { condCtx } from './story';
 
 /** Builds the live actors of the current screen from its things. */
 export function spawnActors(rt: SimRt): Entity[] {
   rt.actors = spawnThings(rt);
+  for (const e of rt.actors) holdBack(rt, e);
   placeNpcs(rt);
   refreshFixtures(rt);
   stampCollision(rt);
@@ -57,8 +59,13 @@ function spawnThings(rt: SimRt): Entity[] {
         if (!rt.state.world.pieces.includes(thing.id))
           out.push(createPiece(rt.newId(), tileFeet(thing.at), index));
         break;
+      case 'heart':
+        if (!rt.state.world.opened.includes(thing.id))
+          out.push(createHeart(rt.newId(), tileFeet(thing.at), index));
+        break;
       case 'fire':
       case 'gate':
+      case 'chest':
         spawnFixtures(rt, thing, index, out);
         break;
       case 'door':
