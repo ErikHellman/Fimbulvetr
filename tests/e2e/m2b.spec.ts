@@ -1,27 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, collectErrors, hero, screenId } from './helpers';
+import { boot, collectErrors, hero, screenId, tap } from './helpers';
 
 /** M2b: Uppvík's shops and mead hall, the mead horn, and Eldr setting the forest alight. */
-
-/** Two rendered frames: a key held across them is seen by the game however slow the machine is. */
-const frames = (page: Page): Promise<void> =>
-  page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-      }),
-  );
-
-const tap = async (page: Page, key: string): Promise<void> => {
-  await page.keyboard.down(key);
-  await frames(page);
-  await page.keyboard.up(key);
-  await frames(page);
-};
 
 const story = (page: Page) => page.evaluate(() => window.__fimbul?.story()?.k ?? null);
 const mode = (page: Page) => page.evaluate(() => window.__fimbul?.mode());

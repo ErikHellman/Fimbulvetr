@@ -1,27 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, collectErrors, screenId } from './helpers';
+import { boot, collectErrors, screenId, tap } from './helpers';
 
 /** M2a: the title screen and slots, the settings menu, the weathers and the turning seasons. */
-
-/** Two rendered frames: a key held across them is seen by the game however slow the machine is. */
-const frames = (page: Page): Promise<void> =>
-  page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            resolve();
-          });
-        });
-      }),
-  );
-
-const tap = async (page: Page, key: string): Promise<void> => {
-  await page.keyboard.down(key);
-  await frames(page);
-  await page.keyboard.up(key);
-  await frames(page);
-};
 
 const story = (page: Page) => page.evaluate(() => window.__fimbul?.story()?.k ?? null);
 const mode = (page: Page) => page.evaluate(() => window.__fimbul?.mode());

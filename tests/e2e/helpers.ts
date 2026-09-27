@@ -38,3 +38,24 @@ export async function walkUntilScreen(page: Page, key: string, screen: string): 
   );
   await page.keyboard.up(key);
 }
+
+/** Two rendered frames: a key held across them is seen by the game however slow the machine is. */
+export const frames = (page: Page): Promise<void> =>
+  page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            resolve();
+          });
+        });
+      }),
+  );
+
+/** Presses and releases a key, each held over two rendered frames (never a fixed number of ms). */
+export async function tap(page: Page, key: string): Promise<void> {
+  await page.keyboard.down(key);
+  await frames(page);
+  await page.keyboard.up(key);
+  await frames(page);
+}

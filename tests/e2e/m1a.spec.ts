@@ -1,16 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, collectErrors, screenId } from './helpers';
+import { boot, collectErrors, screenId, tap } from './helpers';
 
 const flags = (page: Page) => page.evaluate(() => window.__fimbul?.flags() ?? {});
 const story = (page: Page) => page.evaluate(() => window.__fimbul?.story() ?? null);
 const hero = (page: Page) => page.evaluate(() => window.__fimbul?.hero());
-
-async function tap(page: Page, key: string): Promise<void> {
-  await page.keyboard.down(key);
-  await page.waitForTimeout(60);
-  await page.keyboard.up(key);
-  await page.waitForTimeout(80);
-}
 
 /** Walks into whatever is ahead long enough to face it (a quick tap can land in the same tick as E). */
 async function walk(page: Page, key: string): Promise<void> {

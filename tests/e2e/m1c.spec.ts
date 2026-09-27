@@ -1,14 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, collectErrors, screenId, walkUntilScreen } from './helpers';
+import { boot, collectErrors, screenId, tap, walkUntilScreen } from './helpers';
 
 const hook = <T>(page: Page, fn: () => T): Promise<T> => page.evaluate(fn);
-
-async function tap(page: Page, key: string): Promise<void> {
-  await page.keyboard.down(key);
-  await page.waitForTimeout(60);
-  await page.keyboard.up(key);
-  await page.waitForTimeout(60);
-}
 
 test('a chest: the found line, and the key counted in the HUD', async ({ page }) => {
   const errors = collectErrors(page);

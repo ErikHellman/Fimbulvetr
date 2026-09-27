@@ -4,8 +4,8 @@ import { all, evening, flag, not } from './util';
 /** Bersi keeps Uppvík's gate: open by day, barred at night, whatever the weather. */
 export const BERSI: DialogueDef = {
   entry: [
-    { when: not(flag('n_bersi_met')), node: 'meet' },
     { when: all(flag('q_vargar_alpha'), not(flag('q_vargar_done'))), node: 'bounty' },
+    { when: not(flag('n_bersi_met')), node: 'meet' },
     { when: flag('q_vargar_done'), node: 'after' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { when: evening, node: 'evening' },
@@ -35,6 +35,7 @@ export const BERSI: DialogueDef = {
         { k: 'give', item: 'purse' },
         { k: 'silver', n: 60 },
         { k: 'set', flag: 'q_vargar_done', value: true },
+        { k: 'set', flag: 'n_bersi_met', value: true },
       ],
     },
     after: {

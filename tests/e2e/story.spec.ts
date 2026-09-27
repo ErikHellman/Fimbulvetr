@@ -1,15 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { boot, collectErrors, screenId } from './helpers';
+import { boot, collectErrors, screenId, tap } from './helpers';
 
 const story = (page: import('@playwright/test').Page) =>
   page.evaluate(() => window.__fimbul?.story() ?? null);
-
-async function tap(page: import('@playwright/test').Page, key: string): Promise<void> {
-  await page.keyboard.down(key);
-  await page.waitForTimeout(60);
-  await page.keyboard.up(key);
-  await page.waitForTimeout(60);
-}
 
 /** Walks into whatever is ahead long enough to face it. */
 async function walk(page: import('@playwright/test').Page, key: string): Promise<void> {
