@@ -355,4 +355,40 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       p.rect(1, 13, 2, 2, C.woodShade);
     },
   },
+  pine: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+      p.speckle(C.dirtShade, 0.1);
+    },
+  },
+  log: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+    },
+  },
+  mound: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      grass(p);
+      for (let y = 3; y < 15; y++) {
+        const half = Math.round(7 * Math.sqrt(1 - ((y - 9) / 6.5) ** 2));
+        p.rect(8 - half, y, half * 2, 1, y < 7 ? C.dirt : C.dirtShade);
+      }
+      p.rect(5, 5, 6, 1, C.grassShade);
+      p.speckle(C.rockShade, 0.03);
+    },
+  },
+  kiln: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+      p.speckle(C.ink, 0.06);
+    },
+  },
 };

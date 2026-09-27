@@ -168,6 +168,61 @@ function menhir(): Raster {
   return r;
 }
 
+/** An old pine of Myrkviðr: taller, darker and ragged, four tiers. */
+function oldPine(): Raster {
+  const r = createRaster(28, 54);
+  rect(r, 12, 44, 4, 8, P.trunk);
+  rect(r, 15, 44, 1, 8, P.woodShade);
+  for (let tier = 0; tier < 4; tier++) {
+    const top = 2 + tier * 10;
+    const baseHalf = 4 + tier * 2.5;
+    for (let i = 0; i < 12; i++) {
+      const ragged = (i + tier) % 4 === 0 ? 1 : 0;
+      const half = Math.max(1, Math.round(((i + 1) * baseHalf) / 12) - ragged);
+      rect(r, 14 - half, top + i, half * 2, 1, P.leafShade);
+      rect(r, 14 - half, top + i, Math.max(1, half - 1), 1, P.leaf);
+    }
+  }
+  rect(r, 11, 13, 2, 1, P.leafLight);
+  return r;
+}
+
+/** A fallen trunk lying across four tiles, its root plate on the left and a broken end on the right. */
+function fallenLog(): Raster {
+  const r = createRaster(66, 22);
+  rect(r, 6, 8, 56, 10, P.trunk);
+  rect(r, 6, 14, 56, 4, P.woodShade);
+  for (const x of [14, 27, 41, 52]) rect(r, x, 9, 1, 5, P.woodShade);
+  ellipse(r, 7, 12, 5, 9, (x) => (x < 6 ? P.dirtShade : P.dirt));
+  rect(r, 3, 4, 2, 3, P.trunk);
+  rect(r, 9, 2, 2, 4, P.trunk);
+  ellipse(r, 61, 13, 3, 5, P.straw);
+  ellipse(r, 61, 13, 1.5, 2.5, P.strawShade);
+  rect(r, 30, 5, 6, 3, P.leafShade);
+  rect(r, 31, 4, 3, 1, P.leaf);
+  return r;
+}
+
+/** A charcoal kiln: a dome of turf and earth over the stacked wood, a smoking vent on top. */
+function kiln(): Raster {
+  const r = createRaster(50, 36);
+  ellipse(r, 25, 22, 23, 12.5, (x, y) => (x - 25 + (y - 20) > 14 ? P.dirtShade : P.dirt));
+  for (const [x, y] of [
+    [12, 20],
+    [20, 16],
+    [30, 18],
+    [36, 24],
+    [16, 28],
+    [27, 27],
+  ] as const)
+    rect(r, x, y, 4, 2, P.turf);
+  rect(r, 22, 8, 6, 4, P.rockShade);
+  rect(r, 23, 8, 4, 2, P.ink);
+  rect(r, 10, 29, 6, 3, P.ember);
+  rect(r, 11, 30, 3, 1, P.emberLight);
+  return r;
+}
+
 export function decorFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [
     frame('decor_tree_idle_s_0', tree()),
@@ -176,6 +231,9 @@ export function decorFrames(): SpriteFrame[] {
     frame('decor_table_idle_s_0', table()),
     frame('decor_stump_idle_s_0', stump()),
     frame('decor_menhir_idle_s_0', menhir()),
+    frame('decor_pine_old_idle_s_0', oldPine()),
+    frame('decor_log_idle_s_0', fallenLog()),
+    frame('decor_kiln_idle_s_0', kiln()),
   ];
   for (let f = 0; f < 4; f++) {
     out.push(frame(`decor_well_idle_s_${f}`, well(f)));
@@ -194,6 +252,9 @@ export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
   decor_table: STILL,
   decor_stump: STILL,
   decor_menhir: STILL,
+  decor_pine_old: STILL,
+  decor_log: STILL,
+  decor_kiln: STILL,
   decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },

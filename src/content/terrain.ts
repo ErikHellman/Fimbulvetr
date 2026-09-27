@@ -28,6 +28,10 @@ export const TERRAIN_IDS = [
   'window',
   'chimney',
   'jetty',
+  'pine',
+  'log',
+  'mound',
+  'kiln',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -72,4 +76,12 @@ export const TERRAIN = {
   chimney: { solid: true },
   /** Planks over water: walkable, water laps right up to its edge. */
   jetty: { solid: false },
+  /** Old pines of Myrkviðr, packed tight. */
+  pine: { solid: true, decor: { art: ['decor_pine', 'decor_pine_old'], w: 1, h: 1 } },
+  /** A fallen trunk across a road, four tiles long. */
+  log: { solid: true, decor: { art: ['decor_log'], w: 4, h: 1 } },
+  /** A grave mound, where draugr climb out at night. */
+  mound: { solid: false },
+  /** A charcoal-burner's earth kiln; the shell smokes its vent. */
+  kiln: { solid: true, decor: { art: ['decor_kiln'], w: 3, h: 2 } },
 } as const satisfies Record<TerrainId, TerrainDef>;

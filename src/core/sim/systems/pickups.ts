@@ -86,13 +86,13 @@ export function collectPickups(rt: SimRt): void {
     rt.actors = rt.actors.filter((a) => a !== e);
     if (e.def === 'heart') {
       rt.hero.hp = Math.min(rt.hero.maxHp, rt.hero.hp + HEART);
-      rt.emit({ t: 'sfx', id: 'sfx_itemget' });
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;
     }
     if (e.def === 'silver') {
       const hero = rt.state.hero;
       hero.silver = Math.min(PURSE_CAP[hero.purse], hero.silver + 1);
-      rt.emit({ t: 'sfx', id: 'sfx_buy' });
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;
     }
     const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];

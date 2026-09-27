@@ -29,6 +29,10 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '+': 'window',
   C: 'chimney',
   J: 'jetty',
+  P: 'pine',
+  L: 'log',
+  m: 'mound',
+  k: 'kiln',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

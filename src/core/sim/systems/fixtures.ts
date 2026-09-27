@@ -63,12 +63,17 @@ const ANIMS: Readonly<Record<string, readonly [string, string]>> = {
  */
 export function refreshFixtures(rt: SimRt): void {
   let changed = false;
+  let opened = false;
   for (const e of rt.actors) {
     if (e.kind !== 'fixture') continue;
     const on = isOn(rt, e) ? 1 : 0;
     const was = e.mem['on'];
     if (was === on) continue;
     e.mem['on'] = on;
+    if (was === 1 && e.def === 'gate' && !opened) {
+      opened = true;
+      rt.emit({ t: 'sfx', id: 'sfx_gate' });
+    }
     const names = ANIMS[e.def];
     if (names !== undefined) setAnim(e, on === 1 ? names[0] : names[1]);
     if (e.def === 'gate') changed = true;
@@ -93,6 +98,9 @@ export function fixtureHazards(rt: SimRt): void {
   for (const e of rt.actors) {
     if (e.kind !== 'fixture' || e.def !== 'fire' || mem(e, 'on') !== 1) continue;
     if (!overlaps(heroBox, at(FLAME_BOX, e.pos))) continue;
-    if (hurtHero(rt, e, FIRE.amount, FIRE.knock, PIERCE_SHIELD)) return;
+    if (hurtHero(rt, e, FIRE.amount, FIRE.knock, PIERCE_SHIELD)) {
+      rt.emit({ t: 'sfx', id: 'sfx_fire' });
+      return;
+    }
   }
 }

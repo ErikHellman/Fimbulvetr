@@ -51,6 +51,7 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
 export function killEnemy(rt: SimRt, e: Entity, def: EnemyDef): void {
   rt.actors = rt.actors.filter((a) => a !== e);
   rt.emit({ t: 'killed', id: e.id, def: e.def as EnemyId, x: e.pos.x, y: e.pos.y });
+  rt.emit({ t: 'sfx', id: 'sfx_poof' });
   if (mem(e, 'summoned') === 0 && e.mem['thing'] !== undefined) {
     const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
     if (thing?.k === 'enemy' && thing.onDeath !== undefined) applyAll(rt, thing.onDeath);

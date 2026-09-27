@@ -180,4 +180,55 @@ export const SFX_BANK = {
     release: 0.15,
     volume: 0.3,
   },
+  /** A long rumble after the lightning flash. */
+  sfx_thunder: {
+    wave: 'noise',
+    freq: 220,
+    freqEnd: 40,
+    attack: 0.02,
+    sustain: 0.6,
+    release: 0.9,
+    volume: 0.45,
+  },
+  /** Fire flaring up (a burn). */
+  sfx_fire: {
+    wave: 'noise',
+    freq: 1800,
+    freqEnd: 600,
+    attack: 0.01,
+    sustain: 0.12,
+    release: 0.2,
+    volume: 0.3,
+  },
+  /** An enemy vanishing in a puff. */
+  sfx_poof: {
+    wave: 'noise',
+    freq: 700,
+    freqEnd: 2600,
+    attack: 0.005,
+    sustain: 0.05,
+    release: 0.15,
+    volume: 0.3,
+  },
+  /** A heart or a coin picked up. */
+  sfx_pickup: {
+    wave: 'square',
+    freq: 880,
+    freqEnd: 1320,
+    attack: 0,
+    sustain: 0.04,
+    release: 0.06,
+    volume: 0.25,
+    duty: 0.25,
+  },
+  /** A gate or barrier giving way. */
+  sfx_gate: {
+    wave: 'saw',
+    freq: 140,
+    freqEnd: 90,
+    attack: 0.01,
+    sustain: 0.2,
+    release: 0.2,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;
