@@ -9,7 +9,8 @@ keyboard/gamepad ─► InputMapper ─► InputLatch ──► Sim.step(frame) 
                                                         ▲                                   │
                         Commands (dev console, menus) ──┘          ┌────────────────────────┤
                                                                     ▼                        ▼
-       PlayScene: EntityViews / ScreenView (ground + cover) / ColorMatrix     AudioDirector · autosave · dev hook
+       PlayScene: EntityViews / ScreenView (ground + cover + decor) / AmbientView (smoke, fish) / ColorMatrix
+                  AudioDirector · autosave · dev hook
        UiScene (untinted): HUD, text boxes, choices, cards, shop  ◄── sim.storyUi()
 ```
 
@@ -45,6 +46,7 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - Scripts: plain step lists copied into a JSON `StoryRun`.
   - Quests derived from flags, and shops.
 - **`src/core/world/collision.ts`** — pixel-stepped AABB against the tile grid, with a 6 px corner slide.
+- **`src/core/world/decor.ts`** — groups object terrain cells (trees, the well, furniture) into footprint blocks; the shell draws one y-sorted sprite per block. `src/core/world/ambient.ts` finds open water and schedules fish jumps statelessly.
 - **`src/core/actors/hero.ts`** — the hero's state machine: move, attack (3-hit combo), charge → spin, roll (12 i-frames), shield, hurt.
 - **`src/core/clock/*`** — the world clock:
   - Hybrid seasons: `held` or `cycling` policy, with `setSeason` for story beats.
@@ -53,8 +55,9 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **`src/art/*`** — all placeholder pixels and sounds, as pure functions:
   - Frame names follow `<art>_<anim>_<dir>_<n>`.
   - East frames are baked mirrors of west.
+  - The tileset stores animated terrain (water, the ford) frame-major after its variants; `tileAnimations` lists them for Phaser's animated tiles. Terrains in one auto-tile `group` (water/ford/jetty, roof/chimney) join without a bank.
 - **`src/shell/scenes/BootScene.ts`** — packs generated frames into canvas textures, builds the tileset and renders the SFX.
-- **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio and autosave triggers.
+- **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio and autosave triggers. Each shown screen is a stage: a `ScreenView` (tile layers plus decor sprites, ticked from `sim.tick` and faded when they hide the hero) and an `AmbientView` (a smoke emitter per chimney, fish jumps in open water).
 - **`src/shell/platform/*`**:
   - Settings in `localStorage['fimbulvetr.settings.v1']`.
   - IndexedDB `fimbulvetr` (stores `saves`: auto, auto_prev, s1–s3; and `meta`).
@@ -64,6 +67,9 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **Screens** (`src/content/world/<region>/<id>.ts`) are 40×22 text maps plus `things`:
   - enemy, door, sign, `use` (interact runs a script), trigger (entering runs a script)
   - prop (lift/throw/split), drop zone, critter, pen, heart piece
+  - Signs and uses may cover a `w`×`h` block (a sign on a 2×2 well).
+- **Decor** terrains (tree, well, trough, stump, bed, hearth, table, menhir) mark solid footprint tiles; the map must draw each object as a whole block (`OO`/`OO` for a well, `b` over `b` for a bed). `tests/content/integrity.test.ts` rejects incomplete blocks.
+- **Buildings** are roof rows over a wall row: `D` open doorway (needs a door thing), `d` shut door, `+` window, `C` chimney inside the roof (the shell smokes it). `J` is a jetty over water.
 - **Cover** grows from map characters listed in `COVER_LEGEND` (for example `"` = tall grass over grass). Cut cells are saved per screen under the season epoch.
 - **NPCs** (`content/npcs.ts`) list `places`; the first whose condition holds decides where they stand. Positions are never saved.
 - **Dialogue** (`content/dialogue/<npc>.ts`), **scripts** (`content/scripts/`), **quests** (`content/quests.ts`) and **shops** (`content/shops.ts`) are typed data. Every string is `{ en, sv }`.
@@ -86,6 +92,7 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **Add an interior:** a screen id that is not in `layout.ts`, a door on each side (each door's `arrive` tile must be walkable), and `indoor: true`.
 - **Add a script or cutscene:** add the id to `SCRIPTS` and the steps in `content/scripts/`, then point a `use` or `trigger` thing at it.
 - **Add art:** draw frames named by convention. A real atlas later replaces frames with the same names. `?dev=gallery` shows every frame and tile.
+- **Add a decor object:** a terrain with `decor: { art, w, h }` in `content/terrain.ts`, a base-only tile painter, and `decor_<id>_idle_s_<n>` frames in `src/art/sprites/decor.ts` standing on their bottom centre.
 - **Change the save format:**
   1. Bump `SAVE_VERSION`.
   2. Add `MIGRATIONS[old]`.
@@ -101,5 +108,5 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - `pnpm test`: Vitest for core, art, content, shell units and headless sim scenarios.
     - `tests/sim/golden.test.ts` pins one run's hash: re-record it only on purpose.
     - `tests/sim/route_m1a.test.ts` plays the whole prologue with real inputs through the walker in `tests/sim/walk.ts`.
-  - `pnpm e2e`: Playwright on Chromium and WebKit. In a container with a preinstalled Chromium of another revision, set `PW_CHROMIUM_PATH`.
+  - `pnpm e2e`: Playwright on Chromium and WebKit. `tests/e2e/world.spec.ts` checks decor, animated tiles, smoke and fish through `__fimbul.view()`. In a container with a preinstalled Chromium of another revision, set `PW_CHROMIUM_PATH`.
   - `pnpm budget`: the gzipped JS budget (730 KB).
