@@ -1,4 +1,4 @@
-import type { WeaponId } from '@content/ids';
+import type { ArmorId, WeaponId } from '@content/ids';
 import type { Box } from '../math/box';
 import type { Dir4 } from '../math/dir';
 
@@ -74,6 +74,8 @@ export interface Tuning {
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
+  /** Share of each blow an armour takes off (rounded; a blow always deals at least 1). */
+  readonly armor: Readonly<Record<ArmorId, { readonly reduce: number }>>;
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;

@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { ItemId, SfxId, WeaponId } from '@content/ids';
+import type { ArmorId, GaldrId, ItemId, SfxId, WeaponId } from '@content/ids';
 import { setMinute, setPolicy, setSeason, sleepUntil } from '../clock/clock';
 import type { ClockState, Season } from '../clock/types';
 import { dungeonOf } from '../state/dungeons';
@@ -28,6 +28,9 @@ export type Effect =
   /** Seiðr points; 0 or less fills the bar. */
   | { readonly k: 'seidr'; readonly n: number }
   | { readonly k: 'weapon'; readonly id: WeaponId }
+  | { readonly k: 'armor'; readonly id: ArmorId }
+  /** Teaches a galdr (once). */
+  | { readonly k: 'learn'; readonly galdr: GaldrId }
   | { readonly k: 'shield'; readonly has: boolean }
   | { readonly k: 'setSeason'; readonly season: Season }
   | { readonly k: 'setMinute'; readonly minute: number }
@@ -80,6 +83,12 @@ export function applyEffect(e: Effect, rt: SimRt): void {
       break;
     case 'weapon':
       s.inv.weapon = e.id;
+      break;
+    case 'armor':
+      s.inv.armor = e.id;
+      break;
+    case 'learn':
+      if (!s.inv.galdr.includes(e.galdr)) s.inv.galdr.push(e.galdr);
       break;
     case 'shield':
       s.inv.shield = e.has;

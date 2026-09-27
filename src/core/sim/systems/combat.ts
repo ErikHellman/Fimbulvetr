@@ -128,9 +128,12 @@ export function hurtHero(rt: SimRt, source: Entity, amount: number, knock: numbe
   if (rt.god === true) return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
+  // Armour takes its share off every blow, but a blow always lands at least a quarter heart.
+  const reduce = db.tuning.armor[rt.state.inv.armor].reduce;
+  const dealt = amount <= 0 ? amount : Math.max(1, amount - Math.round(amount * reduce));
   const result = resolveHit(
     hero,
-    { amount, element: 'none', knock, dir, faction: source.faction, tags },
+    { amount: dealt, element: 'none', knock, dir, faction: source.faction, tags },
     { shielding: mem(hero, 'shielding') === 1, iframes: db.tuning.hero.hurtIframes, knockResist: 0 },
   );
   if (result.outcome === 'ignored') return false;
