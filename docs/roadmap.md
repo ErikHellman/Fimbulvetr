@@ -65,6 +65,12 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Myrkviðr turns (spawn points, drifts, preset `turning`), exit tests, e2e, v1-m2a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M2b Uppvík: the road north, the hub, economy, gear, galdr/seiðr/Eldr, fire, mead
+    - [x] Seiðr, mead in horns and the purse; armour and the Uppvík sword; shops selling weapons, armour and galdr
+    - [x] Fire spreading with the wind; galdr casting and Eldr (burns, melts, lights)
+    - [x] Art and shell: the cast pose, Eldr and flames, town terrain and decor, the Gear tab, the seiðr bar
+    - [x] Content: the road north, Uppvík (4 screens, 5 interiors), 12 townsfolk, Hrafnkell's and Ketill's shops, the Eldr quest
+    - [x] Exit route test, e2e, v1-m2b fixture, docs
+    - [ ] User playtest and Swedish proofread
   - [ ] M2c Deep Myrkviðr: fen, glade, troll wood, the völva, the huldra, the vargar hunt, +3 enemies
 - [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
