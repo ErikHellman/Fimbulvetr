@@ -13,6 +13,7 @@ import { damageActor } from './combat';
 import { blowCover } from './cover';
 import { strikeSwitch } from './fixtures';
 import { heroCtx } from './hero';
+import { windOf } from './weather';
 import { enemyDef } from './movement';
 
 /** The boomerang's box around its ground point; it is drawn `FLY_Z` px up, at hand height. */
@@ -66,40 +67,47 @@ function wallAt(rt: SimRt, p: Vec): boolean {
   return (f & SOLID) !== 0 && (f & LOW) === 0;
 }
 
-/**
- * Boomerangs in flight: out along their line until the range runs out or they meet a wall, an enemy, a
- * switch or a pickup, then back to Ask's hand through anything. On the way they stun what they strike,
- * light switches, blow leaves away and bring back what they caught.
- */
+/** Moves everything in flight, each by its own rules. The wind is read once per tick. */
 export function stepProjectiles(rt: SimRt): void {
-  const b = rt.db.tuning.boomerang;
-  for (const e of [...rt.actors]) {
-    if (e.kind !== 'projectile') continue;
-    const back = e.fsm.s === 'back';
-    let step: Vec;
-    if (back) {
-      const hand = { x: rt.hero.pos.x + HAND.x, y: rt.hero.pos.y + HAND.y };
-      const to = sub(hand, e.pos);
-      if (length(to) <= b.speed + 2) {
-        catchBoomerang(rt, e);
-        continue;
-      }
-      const n = normalize(to);
-      step = { x: n.x * b.speed, y: n.y * b.speed };
-    } else {
-      step = { x: mem(e, 'dx') * b.speed, y: mem(e, 'dy') * b.speed };
-      const next = { x: e.pos.x + step.x, y: e.pos.y + step.y - 5 };
-      if (wallAt(rt, next) || mem(e, 'flown') + b.speed > b.range) {
-        turnBack(e);
-        continue;
-      }
-      e.mem['flown'] = mem(e, 'flown') + b.speed;
-    }
-    e.pos = { x: e.pos.x + step.x, y: e.pos.y + step.y };
-    e.fsm.t += 1;
-    strike(rt, e, back);
-    carry(rt, e);
+  const flying = rt.actors.filter((a) => a.kind === 'projectile');
+  if (flying.length === 0) return;
+  const wind = windOf(rt);
+  for (const e of flying) {
+    if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
   }
+}
+
+/**
+ * A boomerang in flight: out along its line (the wind pushing it aside) until the range runs out or it
+ * meets a wall, an enemy, a switch or a pickup, then back to Ask's hand through anything. On the way it
+ * stuns what it strikes, lights switches, blows leaves away and brings back what it caught.
+ */
+function stepBoomerang(rt: SimRt, e: Entity, wind: Vec): void {
+  const b = rt.db.tuning.boomerang;
+  const back = e.fsm.s === 'back';
+  let step: Vec;
+  if (back) {
+    const hand = { x: rt.hero.pos.x + HAND.x, y: rt.hero.pos.y + HAND.y };
+    const to = sub(hand, e.pos);
+    if (length(to) <= b.speed + 2) {
+      catchBoomerang(rt, e);
+      return;
+    }
+    const n = normalize(to);
+    step = { x: n.x * b.speed, y: n.y * b.speed };
+  } else {
+    step = { x: mem(e, 'dx') * b.speed + wind.x, y: mem(e, 'dy') * b.speed + wind.y };
+    const next = { x: e.pos.x + step.x, y: e.pos.y + step.y - 5 };
+    if (wallAt(rt, next) || mem(e, 'flown') + b.speed > b.range) {
+      turnBack(e);
+      return;
+    }
+    e.mem['flown'] = mem(e, 'flown') + b.speed;
+  }
+  e.pos = { x: e.pos.x + step.x, y: e.pos.y + step.y };
+  e.fsm.t += 1;
+  strike(rt, e, back);
+  carry(rt, e);
 }
 
 function turnBack(e: Entity): void {
