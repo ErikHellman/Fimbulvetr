@@ -36,6 +36,7 @@ import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
 import { bumpLocks, fixtureHazards, refreshFixtures, swordSwitches } from './systems/fixtures';
 import { eat, equip, useItems } from './systems/items';
 import { collectPickups } from './systems/pickups';
+import { stepProjectiles } from './systems/projectiles';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, condCtx, stepStory, storyUi, type StoryUi } from './systems/story';
@@ -260,6 +261,7 @@ export class Sim implements SimRt {
     moveAll(this);
     bumpLocks(this, input);
     pushBlocks(this, input);
+    stepProjectiles(this);
     collectPickups(this);
     settleCritters(this);
     stepProps(this, input);

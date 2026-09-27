@@ -38,7 +38,7 @@ export type TerrainId = (typeof TERRAIN_IDS)[number];
 export const TERRAIN = {
   grass: { solid: false },
   path: { solid: false },
-  water: { solid: true },
+  water: { solid: true, low: true },
   rock: { solid: true },
   tree: { solid: true, decor: { art: ['decor_tree', 'decor_pine'], w: 1, h: 1 } },
   /** A low bank you can hop down (south) but not climb. */

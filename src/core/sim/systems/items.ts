@@ -3,14 +3,16 @@ import { wasPressed, type InputFrame } from '../../input/actions';
 import { applyEffect } from '../../story/effects';
 import type { SimRt } from '../rt';
 import { lightBrazier } from './fixtures';
+import { throwBoomerang } from './projectiles';
 import { probeBox } from './story';
 
 /** What an item does when its slot button is pressed in play; returns whether it was used. */
-export type ItemUse = (rt: SimRt) => boolean;
+export type ItemUse = (rt: SimRt, input: InputFrame) => boolean;
 
 /** Slot items by id. The lantern shines by itself once owned; from a slot it lights braziers. */
 const USES: Partial<Record<ItemId, ItemUse>> = {
   lantern: (rt) => lightBrazier(rt, probeBox(rt)),
+  boomerang: throwBoomerang,
 };
 
 /** Item slot buttons in play: K uses slot 0, L slot 1. Only a hero standing free can use an item. */
@@ -20,7 +22,7 @@ export function useItems(rt: SimRt, input: InputFrame): void {
   const slots = rt.state.inv.slots;
   const item = wasPressed(input, 'item1') ? slots[0] : wasPressed(input, 'item2') ? slots[1] : null;
   if (item === null) return;
-  USES[item]?.(rt);
+  USES[item]?.(rt, input);
 }
 
 /** Owned sub-items only; an item already in the other slot swaps places. */

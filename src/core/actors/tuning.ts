@@ -32,6 +32,8 @@ export interface HeroTuning {
   readonly throwTicks: number;
   /** Height (px) a carried prop is held at. */
   readonly carryHeight: number;
+  /** The throwing pose of a sub-item (the boomerang). */
+  readonly tossTicks: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -58,8 +60,16 @@ export interface PushTuning {
   readonly slideTicks: number;
 }
 
+export interface BoomerangTuning {
+  /** px per tick, out and back. */
+  readonly speed: number;
+  /** px flown before it turns back (sooner at a wall or on a hit). */
+  readonly range: number;
+}
+
 export interface Tuning {
   readonly hero: HeroTuning;
+  readonly boomerang: BoomerangTuning;
   readonly throw: ThrowTuning;
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */

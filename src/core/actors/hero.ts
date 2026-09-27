@@ -21,6 +21,7 @@ export type HeroMode =
   | 'lift'
   | 'carry'
   | 'throw'
+  | 'toss'
   | 'dying';
 
 export interface HeroCtx {
@@ -248,6 +249,18 @@ const throwing: HeroDef = {
   },
 };
 
+/** Throwing a sub-item (the boomerang flies on its own). */
+const toss: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'toss');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.tossTicks - 1 ? 'move' : undefined;
+  },
+};
+
 /** Fallen at 0 hp. The sim is in `over` mode, which advances the clock of this state by hand. */
 const dying: HeroDef = {
   enter(e) {
@@ -274,6 +287,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   lift,
   carry,
   throw: throwing,
+  toss,
   dying,
 };
 

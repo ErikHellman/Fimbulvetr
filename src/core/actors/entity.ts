@@ -4,7 +4,7 @@ import type { Vec } from '../math/vec';
 
 export type Faction = 'hero' | 'enemy' | 'neutral' | 'env';
 /** `fixture`: part of the room that changes with conditions (a gate, a fire, a chest, a shutter). */
-export type EntityKind = 'hero' | 'enemy' | 'npc' | 'critter' | 'prop' | 'pickup' | 'fixture';
+export type EntityKind = 'hero' | 'enemy' | 'npc' | 'critter' | 'prop' | 'pickup' | 'fixture' | 'projectile';
 
 export interface FsmState {
   s: string;

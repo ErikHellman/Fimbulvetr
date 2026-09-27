@@ -25,6 +25,7 @@ export const TUNING: Tuning = {
     liftTicks: 12,
     carrySpeed: 1.2,
     throwTicks: 10,
+    tossTicks: 10,
     carryHeight: 18,
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
@@ -43,6 +44,7 @@ export const TUNING: Tuning = {
   },
   throw: { speed: 4, flightTicks: 20 },
   push: { ticks: 16, slideTicks: 16 },
+  boomerang: { speed: 3, range: 112 },
   weapons: {
     /** The pitchfork of the raid night: long reach, light blows. */
     pitchfork: {

@@ -292,4 +292,24 @@ export const SFX_BANK = {
     release: 0.1,
     volume: 0.3,
   },
+  /** The boomerang leaving the hand: a quick whirr. */
+  sfx_boomerang: {
+    wave: 'saw',
+    freq: 700,
+    freqEnd: 900,
+    attack: 0.02,
+    sustain: 0.12,
+    release: 0.1,
+    volume: 0.2,
+  },
+  /** Something dazed: a wobbling ring. */
+  sfx_stun: {
+    wave: 'triangle',
+    freq: 1100,
+    freqEnd: 700,
+    attack: 0,
+    sustain: 0.1,
+    release: 0.2,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

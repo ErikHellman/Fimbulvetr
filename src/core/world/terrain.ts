@@ -19,4 +19,6 @@ export interface TerrainDef {
   readonly ledge?: Dir4;
   /** Speed factor for anything standing on it (1 = normal). */
   readonly slow?: number;
+  /** Solid underfoot but open above (water, sap): the boomerang flies over it. */
+  readonly low?: boolean;
 }
