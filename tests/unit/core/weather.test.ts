@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLOCK_RULES } from '@content/clock';
-import { weatherAt } from '@core/clock/weather';
+import { WIND_DIRS, windAt, weatherAt } from '@core/clock/weather';
 
 describe('weather', () => {
   it('is a pure function of seed, day, minute and region', () => {
@@ -24,5 +24,27 @@ describe('weather', () => {
     expect(counts.clear / days).toBeCloseTo(0.6, 1);
     expect(counts.rain / days).toBeCloseTo(0.25, 1);
     expect(counts.wind / days).toBeCloseTo(0.15, 1);
+  });
+});
+
+describe('wind', () => {
+  it('blows one of eight ways, the same all day, and is still in clear air and fog', () => {
+    const seen = new Set<string>();
+    for (let day = 1; day <= 200; day++) {
+      const w = windAt(3, day, 'myrkvidr', 'wind');
+      expect(w).toEqual(windAt(3, day, 'myrkvidr', 'wind'));
+      expect(Math.hypot(w.x, w.y)).toBeCloseTo(0.5, 5);
+      seen.add(`${w.x.toFixed(3)},${w.y.toFixed(3)}`);
+      expect(windAt(3, day, 'myrkvidr', 'clear')).toEqual({ x: 0, y: 0 });
+      expect(windAt(3, day, 'myrkvidr', 'fog')).toEqual({ x: 0, y: 0 });
+    }
+    expect(seen.size).toBe(WIND_DIRS.length);
+  });
+
+  it('is stronger in a storm and gentle in snow', () => {
+    const storm = windAt(1, 4, 'askdalr', 'storm');
+    const snow = windAt(1, 4, 'askdalr', 'snow');
+    expect(Math.hypot(storm.x, storm.y)).toBeGreaterThan(Math.hypot(snow.x, snow.y));
+    expect(Math.hypot(snow.x, snow.y)).toBeGreaterThan(0);
   });
 });

@@ -1,5 +1,6 @@
 import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
+import type { WeatherKind } from '../clock/types';
 import type { Dir4 } from '../math/dir';
 import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
@@ -62,6 +63,8 @@ export interface SimRt {
   entry: Entry;
   /** Rolled weather and spawn tables are on (see `SimOptions.rolled`). */
   readonly rolled: boolean;
+  /** Dev: the weather everywhere outdoors (undefined when off, so it never changes the hash). */
+  weatherOverride?: WeatherKind;
   /** Dev: the hero takes no damage (undefined when off, so it never changes the hash). */
   god?: boolean;
   emit(event: SimEvent): void;

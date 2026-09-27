@@ -17,7 +17,6 @@ import type { StoryRun } from '../story/script';
 import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
 import { FIRE_RADIUS, LANTERN_RADIUS, darknessOf, type Light } from '../world/light';
-import { evalCond } from '../story/cond';
 import type { CoverGrid } from '../world/cover';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -40,8 +39,9 @@ import { collectPickups } from './systems/pickups';
 import { stepProjectiles } from './systems/projectiles';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
-import { checkInteract, checkTriggers, condCtx, stepStory, storyUi, type StoryUi } from './systems/story';
+import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
+import { outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
   checkEdges,
@@ -166,13 +166,19 @@ export class Sim implements SimRt {
     return storyUi(this);
   }
 
-  /** The weather on the current screen: story weather outdoors, always clear indoors. */
+  /** The weather on the current screen: the region's sky outdoors, always clear indoors and underground. */
   weather(): WeatherKind {
-    const def = this.db.screens[this.screen.id];
-    if (def.indoor === true || def.dungeon !== undefined) return 'clear';
-    if (this.weatherOverride !== undefined) return this.weatherOverride;
-    const ctx = condCtx(this);
-    return this.db.weather.find((r) => evalCond(r.when, ctx))?.kind ?? 'clear';
+    return outdoors(this) ? skyOf(this) : 'clear';
+  }
+
+  /** The sky over the current region, indoors too (what conditions and NPC places read). */
+  sky(): WeatherKind {
+    return skyOf(this);
+  }
+
+  /** The wind on the current screen, in px per tick; still indoors and underground. */
+  wind(): Vec {
+    return windOf(this);
   }
 
   /** How much of the picture the dark hides (0 … 1): night outdoors, storms, dark rooms. */

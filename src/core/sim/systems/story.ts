@@ -35,6 +35,7 @@ import { unlockAt } from './fixtures';
 import { heroCtx } from './hero';
 import { placeNpcs } from './npcs';
 import { tryLift } from './props';
+import { skyOf } from './weather';
 import { enterScreen, markVisited } from './transition';
 
 /** What the UI shows for the running script. */
@@ -62,7 +63,11 @@ export type StoryUi =
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
 const advancePressed = (input: InputFrame): boolean => ADVANCE.some((a) => wasPressed(input, a));
 
-export const condCtx = (rt: SimRt): CondCtx => ({ state: rt.state, quests: rt.db.quests });
+export const condCtx = (rt: SimRt): CondCtx => ({
+  state: rt.state,
+  quests: rt.db.quests,
+  weather: () => skyOf(rt),
+});
 
 function dialogueEnv(rt: SimRt, id: keyof SimRt['db']['dialogue']): DialogueEnv {
   const def = rt.db.dialogue[id];
