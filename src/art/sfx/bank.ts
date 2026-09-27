@@ -343,4 +343,44 @@ export const SFX_BANK = {
     release: 0.3,
     volume: 0.4,
   },
+  /** A gust through the trees. */
+  sfx_wind: {
+    wave: 'noise',
+    freq: 500,
+    freqEnd: 900,
+    attack: 0.4,
+    sustain: 0.8,
+    release: 0.8,
+    volume: 0.2,
+  },
+  /** The menu cursor moving. */
+  sfx_menu_move: {
+    wave: 'square',
+    freq: 880,
+    freqEnd: 880,
+    attack: 0,
+    sustain: 0.015,
+    release: 0.02,
+    volume: 0.15,
+  },
+  /** A menu choice taken. */
+  sfx_menu_ok: {
+    wave: 'square',
+    freq: 660,
+    freqEnd: 1320,
+    attack: 0,
+    sustain: 0.04,
+    release: 0.05,
+    volume: 0.2,
+  },
+  /** A save written to a slot: a rising chime. */
+  sfx_save: {
+    wave: 'sine',
+    freq: 520,
+    freqEnd: 1040,
+    attack: 0.01,
+    sustain: 0.25,
+    release: 0.35,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

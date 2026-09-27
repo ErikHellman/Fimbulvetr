@@ -112,6 +112,10 @@ export const SFX = [
   'sfx_boss_hit',
   'sfx_boss_roar',
   'sfx_stone',
+  'sfx_wind',
+  'sfx_menu_move',
+  'sfx_menu_ok',
+  'sfx_save',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
