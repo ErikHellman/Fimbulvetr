@@ -17,10 +17,13 @@ export const heroTile = (sim: Sim): readonly [number, number] => [
   Math.floor((sim.hero.pos.y - 1) / TILE),
 ];
 
-/** Tiles that block walking: solid terrain plus anything solid standing on the tile. */
+/** Tiles that block walking: solid terrain, anything solid standing on the tile, and burning tiles. */
 function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   const g = sim.screen.collision;
   const occupied = new Set<string>();
+  for (const a of sim.actors)
+    if (a.kind === 'fixture' && a.def === 'fire' && a.mem['on'] === 1)
+      occupied.add(`${String(a.mem['tx'])},${String(a.mem['ty'])}`);
   for (const a of sim.actors) {
     const solidActor =
       a.kind === 'npc' ||
@@ -164,4 +167,72 @@ export function interactNorth(h: Harness, tx: number, ty: number): Harness {
   walkTo(h, tx, ty + 1);
   face(h, 'n');
   return h.step(frameOf([], ['interact']));
+}
+
+/** The nearest live enemy and its distance in px, or null. Raid trolls (armoured) are never fought. */
+function nearestFoe(sim: Sim): { e: Sim['actors'][number]; d: number } | null {
+  let best: { e: Sim['actors'][number]; d: number } | null = null;
+  for (const e of sim.actors) {
+    if (e.kind !== 'enemy' || sim.db.enemies[e.def as EnemyId].guard === true) continue;
+    if (e.fsm.s === 'rise') continue;
+    const d = Math.sqrt((e.pos.x - sim.hero.pos.x) ** 2 + (e.pos.y - sim.hero.pos.y) ** 2);
+    if (best === null || d < best.d) best = { e, d };
+  }
+  return best;
+}
+
+/**
+ * Fights whatever comes within `radius` px: turns to it, steps in to sword reach and swings, backing off
+ * while it winds up a blow. Returns once nothing is near. Deterministic like everything else.
+ */
+export function fightNear(h: Harness, radius = 56, budget = 1500): Harness {
+  for (let spent = 0; spent < budget; spent++) {
+    if (h.sim.mode !== 'play') return h;
+    const foe = nearestFoe(h.sim);
+    if (foe === null || foe.d > radius) return h;
+    const dx = foe.e.pos.x - h.sim.hero.pos.x;
+    const dy = foe.e.pos.y - h.sim.hero.pos.y;
+    const dir: Action = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+    const away: Action = { right: 'left', left: 'right', down: 'up', up: 'down' }[dir] as Action;
+    const s = h.sim.hero.fsm.s;
+    if (s !== 'move') {
+      h.idle(1);
+      continue;
+    }
+    if (foe.e.anim === 'tell' && foe.d < 40) {
+      h.step(frameOf([away]));
+      continue;
+    }
+    const want = Math.abs(dx) > Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
+    const side = Math.abs(dx) > Math.abs(dy) ? Math.abs(dy) : Math.abs(dx);
+    if (want > 22 || side > 10) {
+      const held: Action[] = [dir];
+      if (side > 10)
+        held.push(Math.abs(dx) > Math.abs(dy) ? (dy > 0 ? 'down' : 'up') : dx > 0 ? 'right' : 'left');
+      h.step(frameOf(held));
+      continue;
+    }
+    h.step(frameOf([dir], [dir]));
+    h.step(frameOf([], ['sword']));
+  }
+  return h;
+}
+
+/** Walks to a tile, stopping to fight anything that comes close on the way. */
+export function walkFighting(h: Harness, tx: number, ty: number, budget = 4000): Harness {
+  for (let round = 0; round < 40; round++) {
+    fightNear(h);
+    try {
+      return walkTo(h, tx, ty, Math.min(budget, 240));
+    } catch (e) {
+      if (!(e instanceof Error) || !e.message.startsWith('could not reach')) throw e;
+    }
+  }
+  return walkTo(h, tx, ty, budget);
+}
+
+/** Holds a direction until on `screen`, fighting first if something is close. */
+export function crossFighting(h: Harness, dir: Dir4, screen: ScreenId): Harness {
+  fightNear(h);
+  return crossTo(h, dir, screen);
 }

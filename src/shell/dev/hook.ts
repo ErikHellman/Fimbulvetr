@@ -63,6 +63,8 @@ export interface FimbulHook {
   setHp(hp: number): void;
   /** The open pause menu's page and cursor, or null in play. */
   menu(): { tab: string; cursor: number; confirm: boolean } | null;
+  /** What sits in item slots K and L. */
+  slots(): (string | null)[];
 }
 
 declare global {
@@ -98,6 +100,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     },
     enemies: () => bridge().sim.enemies.map((e) => ({ def: e.def, hp: e.hp, flash: e.flash })),
     menu: () => bridge().menu(),
+    slots: () => [...bridge().sim.state.inv.slots],
     setHp: (hp) => {
       bridge().sim.hero.hp = Math.max(0, Math.min(bridge().sim.hero.maxHp, Math.floor(hp)));
     },

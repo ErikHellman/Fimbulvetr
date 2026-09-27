@@ -22,7 +22,7 @@ export const askIntLonghouse: ScreenDef = {
     { k: 'fire', at: { x: 20, y: 15 }, w: 6, h: 1, when: raidNight },
     { k: 'fire', at: { x: 28, y: 15 }, w: 4, h: 1, when: raidNight },
     { k: 'fire', at: { x: 14, y: 18 }, w: 3, h: 1, when: raidNight },
-    { k: 'enemy', id: 'draugr', at: { x: 24, y: 18 }, when: raidNight },
+    { k: 'enemy', id: 'draugr', at: { x: 29, y: 9 }, when: raidNight },
   ],
   map: [
     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
