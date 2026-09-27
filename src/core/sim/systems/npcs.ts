@@ -1,6 +1,7 @@
 import type { NpcId } from '@content/ids';
 import { mem, setAnim, type Entity } from '../../actors/entity';
-import { NPC_PAUSE, NPC_SPEED, createNpc, type NpcDef, type NpcPlace } from '../../actors/npc';
+import { NPC_BODY, NPC_PAUSE, NPC_SPEED, createNpc, type NpcDef, type NpcPlace } from '../../actors/npc';
+import { at, overlaps } from '../../math/box';
 import { dirFromVec } from '../../math/dir';
 import { length, sub } from '../../math/vec';
 import { evalCond } from '../../story/cond';
@@ -16,11 +17,16 @@ export function placeOf(rt: SimRt, def: NpcDef): { place: NpcPlace; index: numbe
   return place === undefined ? null : { place, index };
 }
 
+/** How often (ticks of play) NPCs check their schedule while the hero is on their screen. */
+export const SCHEDULE_TICKS = 60;
+
 /**
  * Brings the NPCs on the current screen in line with their places: adds arrivals, removes leavers and
- * keeps everyone whose place did not change where they are.
+ * keeps everyone whose place did not change where they are. With `guard`, an arrival waits while the hero
+ * stands on its spot.
  */
-export function placeNpcs(rt: SimRt): void {
+export function placeNpcs(rt: SimRt, guard = false): void {
+  const hero = at(rt.hero.body, rt.hero.pos);
   const keep: Entity[] = [];
   const present = new Set<string>();
   for (const a of rt.actors) {
@@ -29,18 +35,25 @@ export function placeNpcs(rt: SimRt): void {
       continue;
     }
     const def = rt.db.npcs[a.def as NpcId];
-    const at = def === undefined ? null : placeOf(rt, def);
-    if (at !== null && at.place.screen === rt.screen.id && at.index === mem(a, 'place')) {
+    const place = def === undefined ? null : placeOf(rt, def);
+    if (place !== null && place.place.screen === rt.screen.id && place.index === mem(a, 'place')) {
       keep.push(a);
       present.add(a.def);
     }
   }
   for (const def of Object.values(rt.db.npcs)) {
     if (present.has(def.id)) continue;
-    const at = placeOf(rt, def);
-    if (at?.place.screen === rt.screen.id) keep.push(createNpc(rt.newId(), def, at.place, at.index));
+    const place = placeOf(rt, def);
+    if (place?.place.screen !== rt.screen.id) continue;
+    if (guard && overlaps(hero, at(NPC_BODY, tileFeet(place.place.at)))) continue;
+    keep.push(createNpc(rt.newId(), def, place.place, place.index));
   }
   rt.actors = keep;
+}
+
+/** Schedules: every second of play, NPCs on this screen follow their places (home at dusk, out at dawn). */
+export function scheduleNpcs(rt: SimRt): void {
+  if (rt.state.playTicks % SCHEDULE_TICKS === 0) placeNpcs(rt, true);
 }
 
 /** Patrols: walk to the next point, pause, repeat. Talking NPCs stand still. */

@@ -99,3 +99,39 @@ describe('NPCs', () => {
     expect(npc(h, 'embla')?.anim).toBe('idle');
   });
 });
+
+describe('schedules', () => {
+  /** Out on test_a by day, home (elsewhere) from 18:00. */
+  const GYDA: NpcDef = {
+    id: 'gyda',
+    name: { en: 'Gyða', sv: 'Gyða' },
+    art: 'npc_gyda',
+    places: [
+      { when: { k: 'phase', is: ['evening', 'night'] }, screen: 'test_b', at: { x: 5, y: 5 }, facing: 's' },
+      { screen: 'test_a', at: { x: 20, y: 8 }, facing: 's' },
+    ],
+  };
+  const db = (): ContentDb => ({ ...npcDb(), npcs: { gyda: GYDA } });
+
+  it('send an NPC home when the evening comes while the hero watches', () => {
+    const h = new Harness({ db: db(), tile: [12, 11], minute: 17 * 60 + 59 });
+    expect(npc(h, 'gyda')).toBeDefined();
+    h.idle(60);
+    expect(h.sim.state.clock.minute).toBe(18 * 60);
+    h.idle(60);
+    expect(npc(h, 'gyda')).toBeUndefined();
+  });
+
+  it('bring an NPC out in the morning, but not onto the hero', () => {
+    const h = new Harness({ db: db(), tile: [20, 8], minute: 9 * 60 + 59 });
+    h.sim.state.clock.minute = 21 * 60;
+    h.idle(60);
+    expect(npc(h, 'gyda')).toBeUndefined();
+    h.sim.state.clock.minute = 12 * 60;
+    h.idle(120);
+    expect(npc(h, 'gyda')).toBeUndefined();
+    h.hold(['down'], 30);
+    h.idle(60);
+    expect(npc(h, 'gyda')?.pos).toEqual({ x: 20 * 16 + 8, y: 8 * 16 + 14 });
+  });
+});

@@ -30,7 +30,7 @@ import { actorCtx, runEnemies } from './systems/enemies';
 import { heroCtx, syncHero } from './systems/hero';
 import { moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
-import { stepNpcs } from './systems/npcs';
+import { scheduleNpcs, stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
 import { fixtureHazards, refreshFixtures } from './systems/fixtures';
 import { eat, equip, useItems } from './systems/items';
@@ -246,6 +246,7 @@ export class Sim implements SimRt {
     const ctx = actorCtx(this);
     runEnemies(this, ctx);
     runCritters(this, ctx);
+    scheduleNpcs(this);
     stepNpcs(this);
     moveAll(this);
     collectPickups(this);
