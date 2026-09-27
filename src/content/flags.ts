@@ -54,6 +54,10 @@ export const FLAGS = {
   n_steinn_met: { t: 'bool' },
   /** Þórdís gave Ask the first mead horn. */
   w_horn_thordis: { t: 'bool' },
+  /** Sölvi asked for a stave charred in Skeggi's kiln, to carve the fire-song's lesson on. */
+  q_eldr_asked: { t: 'bool' },
+  /** Sölvi taught Ask Eldr, the first galdr. */
+  st_eldr_learned: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

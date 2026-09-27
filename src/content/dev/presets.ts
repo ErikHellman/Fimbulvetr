@@ -101,7 +101,7 @@ export const DEV_PRESETS = {
     ...LANTERN,
     flags: MYR_FLAGS,
     vars: { ask_pen: 31 },
-  } /** A winter night on the Myrkviðr road, half an hour before sunrise: snow, rolled foes and trolls. */,
+  },
   /** Myrkviðr in autumn with Eldr learned and a full seiðr bar: burn the leaf piles. */
   eldr: {
     screen: 'myr_pines',
@@ -145,6 +145,7 @@ export const DEV_PRESETS = {
     opened: ['d1_hc'],
     dungeons: { d1: { bossDead: true } },
   },
+  /** A winter night on the Myrkviðr road, half an hour before sunrise: snow, rolled foes and trolls. */
   turning: {
     screen: 'myr_road',
     tile: [20, 18],
@@ -158,6 +159,36 @@ export const DEV_PRESETS = {
     ...LANTERN,
     flags: MYR_FLAGS,
     vars: { ask_pen: 31 },
+  },
+
+  /** Uppvík's square at noon, newly arrived: the road open, silver for the smith, no horn yet. */
+  uppvik: {
+    screen: 'upp_square',
+    tile: [20, 14],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 12 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 100,
+    items: { lantern: 1, boomerang: 1 },
+    slots: ['lantern', 'boomerang'],
+    flags: {
+      ...MYR_FLAGS,
+      n_onundr_met: true,
+      st_d1_entered: true,
+      st_d1_boss_dead: true,
+      st_stone1_lit: true,
+      st_road_open: true,
+      st_uppvik_reached: true,
+    },
+    vars: { ask_pen: 31 },
+    maxHp: 16,
+    hp: 16,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc'],
+    dungeons: { d1: { bossDead: true } },
   },
 
   /** At the mouth of Rótarhellir, just inside: seax, shield and the lantern. */

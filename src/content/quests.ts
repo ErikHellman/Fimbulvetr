@@ -94,4 +94,65 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_uppvik: {
+    id: 'q_uppvik',
+    name: { en: 'The road north', sv: 'Vägen norrut' },
+    stages: [
+      {
+        when: flag('st_stone1_lit'),
+        text: {
+          en: 'A fallen pine blocks the road north. Önundr the woodcutter might clear it.',
+          sv: 'En fallen tall spärrar vägen norrut. Önundr vedhuggaren kan kanske röja den.',
+        },
+      },
+      {
+        when: flag('st_road_open'),
+        text: {
+          en: 'The road north is open. Follow it past the deep pines to Uppvík, the trading town.',
+          sv: 'Vägen norrut är öppen. Följ den förbi de djupa tallarna till Uppvík, handelsstaden.',
+        },
+      },
+      {
+        when: flag('st_uppvik_reached'),
+        text: {
+          en: 'Uppvík at last. Find the mead hall and its keeper.',
+          sv: 'Äntligen Uppvík. Leta upp mjödhallen och den som håller den.',
+        },
+      },
+      {
+        when: flag('w_horn_thordis'),
+        text: {
+          en: 'Þórdís gave you a mead horn. The traders and craftsmen keep shop by day.',
+          sv: 'Þórdís gav dig ett mjödhorn. Handlarna och hantverkarna håller öppet om dagen.',
+        },
+      },
+    ],
+  },
+  q_eldr: {
+    id: 'q_eldr',
+    name: { en: 'Sölvi’s lesson', sv: 'Sölvis lektion' },
+    stages: [
+      {
+        when: flag('q_eldr_asked'),
+        text: {
+          en: 'Sölvi the rune-carver needs a stave charred in Skeggi’s kiln, in Myrkviðr.',
+          sv: 'Runristaren Sölvi behöver en stav som förkolnat i Skeggis mila i Myrkviðr.',
+        },
+      },
+      {
+        when: { k: 'item', id: 'charred_stave' },
+        text: {
+          en: 'Bring the charred stave back to Sölvi in Uppvík.',
+          sv: 'Ta med den förkolnade staven tillbaka till Sölvi i Uppvík.',
+        },
+      },
+      {
+        when: flag('st_eldr_learned'),
+        text: {
+          en: 'You know Eldr, the fire-song. Seiðr feeds it; green mead and a hof’s stone fill it again.',
+          sv: 'Du kan Eldr, eldsången. Seiðr när den; grönt mjöd och ett hovs sten fyller på igen.',
+        },
+      },
+    ],
+  },
 };

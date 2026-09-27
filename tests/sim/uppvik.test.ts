@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEV_PRESETS } from '@content/dev/presets';
+import { DB } from '@content/index';
+import { questLog } from '@core/story/quests';
 import { SOLID } from '@core/world/collision';
 import { Harness } from './harness';
 import { buyInShop, finishStory, interactNorth, talkTo } from './walk';
@@ -151,5 +153,44 @@ describe('Uppvík folk', () => {
     expect(h.sim.hero.hp).toBe(h.sim.hero.maxHp);
     h.sim.command({ t: 'saved' });
     finishStory(h);
+  });
+});
+
+describe('the Eldr quest', () => {
+  it('Sölvi asks for a charred stave, Skeggi gives one, and Sölvi teaches Eldr and fills the seiðr', () => {
+    const h = new Harness({ preset: DEV_PRESETS.uppvik, screen: 'upp_int_runehall', tile: [19, 14] });
+    h.sim.state.hero.seidr = 3;
+    const log = () =>
+      questLog(DB.quests, { state: h.sim.state, quests: DB.quests }).find((q) => q.id === 'q_eldr')?.text.en;
+    expect(log()).toBeUndefined();
+    h.idle(2);
+    talkTo(h, 'solvi');
+    expect(h.sim.state.flags.q_eldr_asked).toBe(true);
+    expect(log()).toMatch(/Skeggi/);
+
+    h.sim.command({ t: 'warp', screen: 'myr_charcoal', x: 18 * 16 + 8, y: 14 * 16 + 14 });
+    h.idle(2);
+    talkTo(h, 'skeggi');
+    expect(h.sim.state.inv.items.charred_stave).toBe(1);
+    expect(log()).toMatch(/back to Sölvi/);
+    // Asked again, he does not hand out a second.
+    talkTo(h, 'skeggi');
+    expect(h.sim.state.inv.items.charred_stave).toBe(1);
+
+    h.sim.command({ t: 'warp', screen: 'upp_int_runehall', x: 19 * 16 + 8, y: 14 * 16 + 14 });
+    h.idle(2);
+    talkTo(h, 'solvi');
+    expect(h.sim.state.inv.galdr).toEqual(['eldr']);
+    expect(h.sim.state.inv.items.charred_stave ?? 0).toBe(0);
+    expect(h.sim.state.hero.seidr).toBe(h.sim.state.hero.maxSeidr);
+    expect(h.sim.state.flags.st_eldr_learned).toBe(true);
+    expect(log()).toMatch(/You know Eldr/);
+  });
+
+  it('Skeggi keeps his staves until Sölvi has asked', () => {
+    const h = new Harness({ preset: DEV_PRESETS.uppvik, screen: 'myr_charcoal', tile: [18, 14] });
+    h.idle(2);
+    talkTo(h, 'skeggi');
+    expect(h.sim.state.inv.items.charred_stave).toBeUndefined();
   });
 });
