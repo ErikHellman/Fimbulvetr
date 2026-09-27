@@ -33,7 +33,7 @@ import { moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
 import { scheduleNpcs, stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
-import { fixtureHazards, refreshFixtures } from './systems/fixtures';
+import { bumpLocks, fixtureHazards, refreshFixtures, swordSwitches } from './systems/fixtures';
 import { eat, equip, useItems } from './systems/items';
 import { collectPickups } from './systems/pickups';
 import { stepProps, swordProps } from './systems/props';
@@ -168,7 +168,7 @@ export class Sim implements SimRt {
     });
   }
 
-  /** What carves the dark, in screen pixels: the lantern (once owned) around the hero, burning fires. */
+  /** What carves the dark, in screen pixels: the lantern (once owned) around the hero, fires and braziers. */
   lights(): Light[] {
     if (this.darkness() === 0) return [];
     const out: Light[] = [];
@@ -176,7 +176,7 @@ export class Sim implements SimRt {
       out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });
     // Burning tiles and walls of fire (a gate drawn as fire) glow.
     for (const e of this.actors)
-      if (e.kind === 'fixture' && e.art === 'fix_fire' && e.mem['on'] === 1)
+      if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
     return out;
   }
@@ -258,11 +258,13 @@ export class Sim implements SimRt {
     scheduleNpcs(this);
     stepNpcs(this);
     moveAll(this);
+    bumpLocks(this, input);
     collectPickups(this);
     settleCritters(this);
     stepProps(this, input);
     resolveSword(this);
     swordProps(this);
+    swordSwitches(this);
     cutCover(this);
     resolveAttacks(this);
     fixtureHazards(this);

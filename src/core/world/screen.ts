@@ -24,10 +24,11 @@ export interface DoorThing {
 }
 
 /**
- * A room-wide condition, worked out from the live actors each tick: `clear` once no mortal enemy is left.
- * Things that wait on one latch when it first holds, until the room is entered again.
+ * A room-wide condition, worked out from the live actors each tick: `clear` once no mortal enemy is left,
+ * `switches` once every switch is lit, `braziers` once every brazier burns. Things that wait on one latch
+ * when it first holds, until the room is entered again.
  */
-export type RoomSignal = 'clear';
+export type RoomSignal = 'clear' | 'switches' | 'braziers';
 
 /** What a chest holds: an item (dungeon items go into the dungeon's state), or silver with its own line. */
 export type ChestGift =
@@ -123,6 +124,25 @@ export type Thing =
       readonly appear?: RoomSignal;
       readonly when?: Cond;
     }
+  /** A locked door: walking into it with a small key opens it for good (`id` saved in the dungeon's doors). */
+  | { readonly k: 'lock'; readonly id: string; readonly at: TilePos; readonly w: number; readonly h: number }
+  /**
+   * Bars that slam shut once Ask has stepped clear of them, and open when the room gives `opens`. While
+   * `when` fails they stay open. With an `id` the opening is saved in the dungeon's doors, for good.
+   */
+  | {
+      readonly k: 'shutter';
+      readonly id?: string;
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly opens: RoomSignal;
+      readonly when?: Cond;
+    }
+  /** A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. */
+  | { readonly k: 'switch'; readonly at: TilePos }
+  /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
+  | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
   | { readonly k: 'piece'; readonly id: string; readonly at: TilePos }
   /** Burning tiles (the raid): they hurt on touch and are not solid; out while `when` fails. */

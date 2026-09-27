@@ -2,12 +2,16 @@ import type { ItemId } from '@content/ids';
 import { wasPressed, type InputFrame } from '../../input/actions';
 import { applyEffect } from '../../story/effects';
 import type { SimRt } from '../rt';
+import { lightBrazier } from './fixtures';
+import { probeBox } from './story';
 
 /** What an item does when its slot button is pressed in play; returns whether it was used. */
 export type ItemUse = (rt: SimRt) => boolean;
 
-/** Slot items by id. The boomerang and the lantern's brazier-lighting join with the dungeon (M1c). */
-const USES: Partial<Record<ItemId, ItemUse>> = {};
+/** Slot items by id. The lantern shines by itself once owned; from a slot it lights braziers. */
+const USES: Partial<Record<ItemId, ItemUse>> = {
+  lantern: (rt) => lightBrazier(rt, probeBox(rt)),
+};
 
 /** Item slot buttons in play: K uses slot 0, L slot 1. Only a hero standing free can use an item. */
 export function useItems(rt: SimRt, input: InputFrame): void {

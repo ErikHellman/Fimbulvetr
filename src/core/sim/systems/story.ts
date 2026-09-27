@@ -31,6 +31,7 @@ import {
 } from '../../story/script';
 import type { SimRt } from '../rt';
 import { openChest } from './chests';
+import { unlockAt } from './fixtures';
 import { heroCtx } from './hero';
 import { placeNpcs } from './npcs';
 import { tryLift } from './props';
@@ -328,7 +329,7 @@ export function checkInteract(rt: SimRt, input: InputFrame): boolean {
     startStory(rt, [{ k: 'talk', dialogue: rt.db.npcs[id]?.talk ?? id, with: id }], a);
     return true;
   }
-  if (openChest(rt, probe)) return true;
+  if (openChest(rt, probe) || unlockAt(rt, probe)) return true;
   if (tryLift(rt)) return true;
   for (const thing of rt.db.screens[rt.screen.id].things) {
     if (thing.k === 'sign' && overlaps(probe, tileBox(thing.at.x, thing.at.y, thing.w, thing.h))) {

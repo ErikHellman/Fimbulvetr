@@ -82,6 +82,9 @@ export const SFX = [
   'sfx_gate',
   'sfx_chest',
   'sfx_secret',
+  'sfx_unlock',
+  'sfx_shutter',
+  'sfx_switch',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

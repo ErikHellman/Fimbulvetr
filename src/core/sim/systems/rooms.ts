@@ -6,8 +6,16 @@ import type { RoomSignal, Thing } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { condCtx } from './story';
 
+/** Whether the room has fixtures of `def` and every one of them is lit. */
+function allLit(rt: SimRt, def: string): boolean {
+  const all = rt.actors.filter((a) => a.kind === 'fixture' && a.def === def);
+  return all.length > 0 && all.every((a) => mem(a, 'lit') === 1);
+}
+
 const SIGNALS: Readonly<Record<RoomSignal, (rt: SimRt) => boolean>> = {
   clear: (rt) => !rt.actors.some((a) => a.kind === 'enemy' && !rt.db.enemies[a.def as EnemyId].immortal),
+  switches: (rt) => allLit(rt, 'switch'),
+  braziers: (rt) => allLit(rt, 'brazier'),
 };
 
 /** Whether a room-wide signal holds right now. */

@@ -17,7 +17,7 @@ export function spawnActors(rt: SimRt): Entity[] {
   rt.actors = spawnThings(rt);
   for (const e of rt.actors) holdBack(rt, e);
   placeNpcs(rt);
-  refreshFixtures(rt);
+  refreshFixtures(rt, false);
   stampCollision(rt);
   return rt.actors;
 }
@@ -66,6 +66,10 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'fire':
       case 'gate':
       case 'chest':
+      case 'lock':
+      case 'shutter':
+      case 'switch':
+      case 'brazier':
         spawnFixtures(rt, thing, index, out);
         break;
       case 'door':

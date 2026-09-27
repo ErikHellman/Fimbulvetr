@@ -251,4 +251,35 @@ export const SFX_BANK = {
     release: 0.3,
     volume: 0.3,
   },
+  /** A key turning in an old lock. */
+  sfx_unlock: {
+    wave: 'square',
+    freq: 440,
+    freqEnd: 660,
+    attack: 0,
+    sustain: 0.03,
+    release: 0.08,
+    volume: 0.25,
+    duty: 0.4,
+  },
+  /** Bars dropping shut, or grinding open. */
+  sfx_shutter: {
+    wave: 'noise',
+    freq: 400,
+    freqEnd: 120,
+    attack: 0,
+    sustain: 0.1,
+    release: 0.18,
+    volume: 0.4,
+  },
+  /** A switch stone struck alight. */
+  sfx_switch: {
+    wave: 'triangle',
+    freq: 1320,
+    freqEnd: 990,
+    attack: 0,
+    sustain: 0.06,
+    release: 0.15,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;
