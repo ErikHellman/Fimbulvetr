@@ -5,6 +5,7 @@ import { isSeason, type ClockState, type Season } from '../clock/types';
 import { LANGS, type Lang } from '../i18n/t';
 import type { Dir4 } from '../math/dir';
 import type { Flags } from '../state/flags';
+import { dungeonOf } from '../state/dungeons';
 import type { DungeonState, GameState } from '../state/gameState';
 import { tileFeet } from '../world/screen';
 
@@ -195,17 +196,6 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   if (p.slots !== undefined) state.inv.slots = [p.slots[0], p.slots[1]];
   for (const id of p.pieces ?? []) if (!state.world.pieces.includes(id)) state.world.pieces.push(id);
   for (const id of p.opened ?? []) if (!state.world.opened.includes(id)) state.world.opened.push(id);
-  for (const [id, d] of Object.entries(p.dungeons ?? {}) as [DungeonId, Partial<DungeonState>][]) {
-    const base = state.dungeons[id] as DungeonState | undefined;
-    state.dungeons[id] = {
-      keys: 0,
-      bigKey: false,
-      map: false,
-      compass: false,
-      bossDead: false,
-      doors: [],
-      ...base,
-      ...d,
-    };
-  }
+  for (const [id, d] of Object.entries(p.dungeons ?? {}) as [DungeonId, Partial<DungeonState>][])
+    Object.assign(dungeonOf(state, id), d);
 }

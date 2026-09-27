@@ -4,6 +4,7 @@ import { newClock, type ClockState } from '../clock/types';
 import type { Dir4 } from '../math/dir';
 import { createRng, type RngState } from '../math/rng';
 import type { Flags } from './flags';
+import { emptyDungeon } from './dungeons';
 
 export interface HeroState {
   screen: ScreenId;
@@ -80,12 +81,10 @@ export interface NewGameInit {
 }
 
 export function newGame(seed: number, init: NewGameInit): GameState {
-  const dungeons = Object.fromEntries(
-    init.dungeons.map((id) => [
-      id,
-      { keys: 0, bigKey: false, map: false, compass: false, bossDead: false, doors: [] },
-    ]),
-  ) as unknown as Record<DungeonId, DungeonState>;
+  const dungeons = Object.fromEntries(init.dungeons.map((id) => [id, emptyDungeon()])) as unknown as Record<
+    DungeonId,
+    DungeonState
+  >;
   return {
     seed: seed >>> 0,
     rng: createRng(seed),

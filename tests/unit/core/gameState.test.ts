@@ -41,3 +41,18 @@ describe('newGame', () => {
     expect(newGame(7, NEW_GAME).rng).toEqual({ s: 7 });
   });
 });
+
+describe('dungeonOf', () => {
+  it('fills in a dungeon a save lacks, and returns the stored one otherwise', async () => {
+    const { dungeonOf } = await import('@core/state/dungeons');
+    const { newGame: fresh } = await import('@core/state/gameState');
+    const { TEST_START: start } = await import('@content/start');
+    const s = fresh(1, start);
+    delete (s.dungeons as Partial<typeof s.dungeons>).d1;
+    const d = dungeonOf(s, 'd1');
+    expect(d).toEqual({ keys: 0, bigKey: false, map: false, compass: false, bossDead: false, doors: [] });
+    d.keys = 2;
+    expect(dungeonOf(s, 'd1').keys).toBe(2);
+    expect(s.dungeons.d1.keys).toBe(2);
+  });
+});
