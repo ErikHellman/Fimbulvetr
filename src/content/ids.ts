@@ -161,11 +161,20 @@ export const NPCS = [
   'steinn',
   // Myrkviðr, deep
   'heidr',
+  'huldra',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
 /** Quest log entries; their progress is derived from flags, never saved. */
-export const QUESTS = ['q_chores', 'q_legend', 'q_runestone_1', 'q_uppvik', 'q_eldr', 'q_volva'] as const;
+export const QUESTS = [
+  'q_chores',
+  'q_legend',
+  'q_runestone_1',
+  'q_uppvik',
+  'q_eldr',
+  'q_volva',
+  'q_huldra',
+] as const;
 export type QuestId = (typeof QUESTS)[number];
 
 export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr'] as const;

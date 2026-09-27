@@ -148,6 +148,33 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_huldra: {
+    id: 'q_huldra',
+    name: { en: 'The huldra’s bargain', sv: 'Huldrans handel' },
+    stages: [
+      {
+        when: flag('n_huldra_met'),
+        text: {
+          en: 'A woman in the birch glade offers a winter cloak for a promise, only at night.',
+          sv: 'En kvinna i björkgläntan erbjuder en vinterkappa mot ett löfte, bara om natten.',
+        },
+      },
+      {
+        when: flag('q_huldra_refused'),
+        text: {
+          en: 'You turned the huldra down. She will ask again another night.',
+          sv: 'Du sa nej till huldran. Hon frågar igen en annan natt.',
+        },
+      },
+      {
+        when: flag('q_huldra_promise'),
+        text: {
+          en: 'The huldra’s cloak keeps the snow off. One day she will come to collect your promise.',
+          sv: 'Huldrans kappa håller snön borta. En dag kommer hon för att kräva ditt löfte.',
+        },
+      },
+    ],
+  },
   q_eldr: {
     id: 'q_eldr',
     name: { en: 'Sölvi’s lesson', sv: 'Sölvis lektion' },

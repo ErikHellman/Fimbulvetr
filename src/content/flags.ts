@@ -64,6 +64,12 @@ export const FLAGS = {
   q_volva_asked: { t: 'bool' },
   /** Heiðr has the moss and brews blue mead. */
   q_volva_done: { t: 'bool' },
+  /** The huldra, in the birch glade at night. */
+  n_huldra_met: { t: 'bool' },
+  /** Ask promised the huldra something unnamed, for her winter cloak. She will come to collect it. */
+  q_huldra_promise: { t: 'bool' },
+  /** Ask turned her bargain down (she asks again). */
+  q_huldra_refused: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

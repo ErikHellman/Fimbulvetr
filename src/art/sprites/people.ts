@@ -21,6 +21,8 @@ export interface Look {
   readonly bottom: string;
   readonly apron?: string;
   readonly child?: boolean;
+  /** A cow's tail from under the skirt, seen from behind and the side (the huldra). */
+  readonly tail?: string;
 }
 
 const SKIN = C.skin;
@@ -316,6 +318,16 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     legs: 'skirt',
     bottom: '#222e52',
   },
+  /** The huldra: fair, long golden hair, a moss-green dress, and a cow's tail she cannot hide from behind. */
+  huldra: {
+    skin: '#f0d4bc',
+    hair: '#f0cc6a',
+    hairStyle: 'long',
+    top: '#4f8a4a',
+    legs: 'skirt',
+    bottom: '#3d6e3a',
+    tail: '#c8a878',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',
@@ -472,6 +484,21 @@ export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPo
       rect(r, 22, b + 18, 3, 8, topS);
       rect(r, 7, b + 26, 3, 2, skin);
       rect(r, 22, b + 26, 3, 2, skinS);
+    }
+  }
+  if (look.tail !== undefined && side !== 's') {
+    // Hanging from under the hem at the back, with a dark tuft at its end.
+    const tail = hex(look.tail);
+    const tuft = shade(look.tail, 0.55);
+    if (side === 'n') {
+      rect(r, 15, 20, 2, 6, tail);
+      rect(r, 16, 25, 2, 2, tail);
+      rect(r, 15, 27, 4, 3, tuft);
+      rect(r, 17, 21, 1, 4, shade(look.tail, 0.8));
+    } else {
+      rect(r, 22, 21, 2, 1, tail);
+      rect(r, 23, 22, 1, 5, tail);
+      rect(r, 22, 27, 3, 2, tuft);
     }
   }
   const sink = pose.sink ?? 0;

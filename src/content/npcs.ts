@@ -37,6 +37,7 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   ragna: { en: 'Ragna', sv: 'Ragna' },
   steinn: { en: 'Steinn', sv: 'Steinn' },
   heidr: { en: 'Heiðr', sv: 'Heiðr' },
+  huldra: { en: 'The huldra', sv: 'Huldran' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -155,4 +156,6 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   steinn: npc('steinn', [{ screen: 'upp_int_meadhall', at: { x: 18, y: 10 }, facing: 'e' }]),
   /** The völva keeps to her hut in the fen, behind her brewing table. */
   heidr: npc('heidr', [{ screen: 'myr_int_volva', at: { x: 22, y: 11 }, facing: 's' }]),
+  /** Only at night, by the stone in the birch ring, her back to the path: her tail shows. */
+  huldra: npc('huldra', [{ when: night, screen: 'myr_glade', at: { x: 20, y: 11 }, facing: 'n' }]),
 };
