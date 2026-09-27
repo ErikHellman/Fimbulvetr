@@ -6,8 +6,9 @@ import { LEGEND } from '@content/world/legend';
 import { SCREENS } from '@content/world/registry';
 import { SCREEN_IDS, type ScreenId } from '@content/world/screens';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
+import { decorPlacements } from '@core/world/decor';
 import { indexLayout, neighbourOf } from '@core/world/screen';
-import { cellAt, parseTextMap } from '@core/world/textmap';
+import { cellAt, parseTextMap, type TerrainGrid } from '@core/world/textmap';
 
 function walkable(id: ScreenId): (x: number, y: number) => boolean {
   const grid = parseTextMap(SCREENS[id].map, LEGEND);
@@ -31,6 +32,90 @@ describe('screens', () => {
     for (const thing of SCREENS[id].things) {
       if (!standing.has(thing.k)) continue;
       expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
+    }
+  });
+});
+
+const WATERSIDE = new Set(['water', 'ford', 'jetty']);
+
+describe('buildings', () => {
+  const cache = new Map<ScreenId, TerrainGrid>();
+  const grid = (id: ScreenId): TerrainGrid => {
+    let g = cache.get(id);
+    if (g === undefined) {
+      g = parseTextMap(SCREENS[id].map, LEGEND);
+      cache.set(id, g);
+    }
+    return g;
+  };
+  const cells = (id: ScreenId, terrain: string): Array<[number, number]> => {
+    const out: Array<[number, number]> = [];
+    for (let y = 0; y < SCREEN_ROWS; y++)
+      for (let x = 0; x < SCREEN_COLS; x++) if (cellAt(grid(id), x, y) === terrain) out.push([x, y]);
+    return out;
+  };
+
+  it.each(SCREEN_IDS)('%s has a door Thing on every open doorway', (id) => {
+    for (const [x, y] of cells(id, 'door')) {
+      const thing = SCREENS[id].things.find((t) => t.k === 'door' && t.at.x === x && t.at.y === y);
+      expect(thing, `${id} doorway at ${x},${y}`).toBeDefined();
+    }
+  });
+
+  it.each(SCREEN_IDS)('%s keeps every chimney inside its roof', (id) => {
+    for (const [x, y] of cells(id, 'chimney')) {
+      for (let dy = -1; dy <= 1; dy++)
+        for (let dx = -1; dx <= 1; dx++) {
+          const t = cellAt(grid(id), x + dx, y + dy);
+          expect(
+            t === 'roof' || t === 'chimney',
+            `${id} chimney at ${x},${y}: ${x + dx},${y + dy} is ${String(t)}`,
+          ).toBe(true);
+        }
+    }
+  });
+
+  it.each(SCREEN_IDS)('%s puts windows and shut doors in a wall under a roof', (id) => {
+    for (const [x, y] of [...cells(id, 'window'), ...cells(id, 'door_shut')]) {
+      const above = cellAt(grid(id), x, y - 1);
+      expect(above === 'roof' || above === 'chimney', `${id} ${x},${y} has ${String(above)} above`).toBe(
+        true,
+      );
+    }
+  });
+
+  it.each(SCREEN_IDS)('%s keeps every jetty tile at the waterside', (id) => {
+    for (const [x, y] of cells(id, 'jetty')) {
+      const beside = [
+        cellAt(grid(id), x, y - 1),
+        cellAt(grid(id), x, y + 1),
+        cellAt(grid(id), x - 1, y),
+        cellAt(grid(id), x + 1, y),
+      ];
+      expect(
+        beside.some((t) => t !== undefined && WATERSIDE.has(t)),
+        `${id} jetty at ${x},${y}`,
+      ).toBe(true);
+    }
+  });
+});
+
+describe('decor', () => {
+  it.each(SCREEN_IDS)('%s draws every object on a complete footprint', (id) => {
+    expect(() => decorPlacements(parseTextMap(SCREENS[id].map, LEGEND), TERRAIN)).not.toThrow();
+  });
+});
+
+describe('interact zones', () => {
+  it.each(SCREEN_IDS)('%s keeps every sign and use rectangle inside the map', (id) => {
+    for (const thing of SCREENS[id].things) {
+      if (thing.k !== 'sign' && thing.k !== 'use') continue;
+      const w = thing.w ?? 1;
+      const h = thing.h ?? 1;
+      expect(w, `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBeGreaterThan(0);
+      expect(h).toBeGreaterThan(0);
+      expect(thing.at.x + w).toBeLessThanOrEqual(SCREEN_COLS);
+      expect(thing.at.y + h).toBeLessThanOrEqual(SCREEN_ROWS);
     }
   });
 });

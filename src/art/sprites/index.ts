@@ -1,6 +1,8 @@
 import type { AnimTable } from '../anims';
+import { DECOR_ANIMS, decorFrames } from './decor';
 import { DUMMY_ANIMS, dummyFrames } from './dummy';
 import { FARM_ANIMS, farmFrames } from './farm';
+import { FX_ANIMS, fxFrames } from './fx';
 import { HERO_ANIMS, heroFrames } from './hero';
 import { missingFrame } from './missing';
 import { PEOPLE_ANIMS, peopleFrames } from './people';
@@ -14,6 +16,8 @@ export const ANIMS: AnimTable = {
   prop_dummy: DUMMY_ANIMS,
   ...PEOPLE_ANIMS,
   ...FARM_ANIMS,
+  ...DECOR_ANIMS,
+  ...FX_ANIMS,
   ...UI_ANIMS,
 };
 
@@ -23,6 +27,8 @@ export function buildSprites(): SpriteFrame[] {
     ...dummyFrames(),
     ...peopleFrames(),
     ...farmFrames(),
+    ...decorFrames(),
+    ...fxFrames(),
     ...uiFrames(),
     missingFrame(),
   ];

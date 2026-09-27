@@ -1,5 +1,5 @@
 import type { TerrainId } from '@content/terrain';
-import { nextFloat } from '@core/math/rng';
+import { nextFloat, nextInt } from '@core/math/rng';
 import { C } from '../palette';
 import type { Painter } from '../painter';
 import { insideBlob, onBlobEdge } from './blob';
@@ -8,7 +8,15 @@ export interface TerrainArt {
   readonly autotile: boolean;
   /** Plain variants (ignored for auto-tiled terrain, which always has 47). */
   readonly variants: number;
-  paint(p: Painter, v: { readonly mask: number; readonly variant: number }): void;
+  /** Animation frames per variant (default 1) and how long each shows. */
+  readonly frames?: number;
+  readonly frameMs?: number;
+  /**
+   * Terrains in the same group count as the same terrain when auto-tiling, so water meets the ford or a
+   * jetty without a bank, and a chimney does not break up its roof. Defaults to the terrain itself.
+   */
+  readonly group?: string;
+  paint(p: Painter, v: { readonly mask: number; readonly variant: number; readonly frame: number }): void;
 }
 
 function grass(p: Painter): void {
@@ -35,26 +43,40 @@ function region(
   }
 }
 
-function tree(p: Painter, variant: number): void {
-  grass(p);
-  p.rect(7, 12, 2, 4, C.trunk);
-  const cx = 7.5;
-  const cy = 6.5;
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      const dx = x + 0.5 - cx;
-      const dy = y + 0.5 - cy;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      if (d > 7) continue;
-      if (d > 6) p.px(x, y, C.ink);
-      else if (dx + dy > 2) p.px(x, y, C.leafShade);
-      else p.px(x, y, C.leaf);
-    }
+/**
+ * Running water: short light dashes on two rows per tile that drift 2 px south per frame, so four frames
+ * loop seamlessly. The row offsets come from the painter's rng, which is the same for every frame.
+ */
+function flow(p: Painter, mask: number, frame: number, inset: number, colour: string): void {
+  for (let k = 0; k < 2; k++) {
+    const x0 = nextInt(p.rng, 0, 7);
+    const y = (k * 8 + 3 + frame * 2) % 16;
+    for (let x = x0; x < 16; x += 8)
+      for (let i = 0; i < 3 && x + i < 16; i++)
+        if (insideBlob(mask, x + i, y, inset) && !onBlobEdge(mask, x + i, y, inset)) p.px(x + i, y, colour);
   }
-  const hx = 5 + variant;
-  p.px(hx, 4, C.leafLight);
-  p.px(hx + 1, 4, C.leafLight);
-  p.px(hx, 5, C.leafLight);
+}
+
+/** A turf roof seen from above: ink edge, leaf-shade stripes every third row. */
+function roof(p: Painter, mask: number): void {
+  grass(p);
+  region(p, mask, 0, C.turfShade, C.ink, C.turf, 0.12);
+  for (let y = 1; y < 16; y += 3)
+    for (let x = 0; x < 16; x++)
+      if (insideBlob(mask, x, y, 0) && !onBlobEdge(mask, x, y, 0) && (x + y) % 4 !== 0)
+        p.px(x, y, C.leafShade);
+}
+
+/** The ground under a decor sprite: grass with a denser shade speckle as its shadow. */
+function groundBase(p: Painter): void {
+  grass(p);
+  p.speckle(C.grassShade, 0.22);
+}
+
+/** The floor under indoor decor. */
+function floorBase(p: Painter): void {
+  floor(p);
+  p.speckle(C.floorShade, 0.22);
 }
 
 /** Grass on top, a short earth bank below: reads as "you can drop down here". */
@@ -64,22 +86,6 @@ function ledge(p: Painter): void {
   p.rect(0, 11, 16, 5, C.dirtShade);
   p.speckle(C.grassShade, 0.02);
   for (let x = 1; x < 16; x += 4) p.px(x, 13, C.dirt);
-}
-
-function disc(
-  p: Painter,
-  cx: number,
-  cy: number,
-  rad: number,
-  colour: (dx: number, dy: number) => string,
-): void {
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      const dx = x + 0.5 - cx;
-      const dy = y + 0.5 - cy;
-      if (dx * dx + dy * dy <= rad * rad) p.px(x, y, colour(dx, dy));
-    }
-  }
 }
 
 function planks(p: Painter, fill: string, line: string, vertical: boolean): void {
@@ -93,11 +99,6 @@ function planks(p: Painter, fill: string, line: string, vertical: boolean): void
 
 function floor(p: Painter): void {
   planks(p, C.floor, C.floorShade, false);
-}
-
-function furniture(p: Painter, draw: () => void): void {
-  floor(p);
-  draw();
 }
 
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
@@ -119,9 +120,13 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   water: {
     autotile: true,
     variants: 0,
+    frames: 4,
+    frameMs: 150,
+    group: 'water',
     paint: (p, v) => {
       grass(p);
       region(p, v.mask, 3, C.water, C.waterLight, C.waterShade, 0.08);
+      flow(p, v.mask, v.frame, 3, C.waterLight);
     },
   },
   rock: {
@@ -134,9 +139,9 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   },
   tree: {
     autotile: false,
-    variants: 2,
-    paint: (p, v) => {
-      tree(p, v.variant);
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
     },
   },
   ledge: {
@@ -186,13 +191,9 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   roof: {
     autotile: true,
     variants: 0,
+    group: 'roof',
     paint: (p, v) => {
-      grass(p);
-      region(p, v.mask, 0, C.turfShade, C.ink, C.turf, 0.12);
-      for (let y = 1; y < 16; y += 3)
-        for (let x = 0; x < 16; x++)
-          if (insideBlob(v.mask, x, y, 0) && !onBlobEdge(v.mask, x, y, 0) && (x + y) % 4 !== 0)
-            p.px(x, y, C.leafShade);
+      roof(p, v.mask);
     },
   },
   wall: {
@@ -210,6 +211,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     paint: (p) => {
       planks(p, C.wood, C.woodShade, true);
       p.rect(0, 0, 16, 2, C.ink);
+      p.rect(1, 2, 14, 1, C.woodShade);
       p.rect(2, 3, 12, 13, C.woodShade);
       p.rect(3, 4, 10, 12, C.ink);
     },
@@ -240,89 +242,117 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ford: {
     autotile: true,
     variants: 0,
+    frames: 4,
+    frameMs: 150,
+    group: 'water',
     paint: (p, v) => {
       grass(p);
       region(p, v.mask, 2, C.waterLight, C.water, C.rockLight, 0.08);
+      flow(p, v.mask, v.frame, 2, C.rockLight);
     },
   },
   well: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      disc(p, 8, 8, 7.5, (dx, dy) => (dx * dx + dy * dy > 49 ? C.ink : dx + dy > 3 ? C.rockShade : C.rock));
-      disc(p, 8, 8, 4, () => C.ink);
-      disc(p, 8, 8, 3, (dx) => (dx > 1 ? C.waterShade : C.water));
+      groundBase(p);
     },
   },
   trough: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      p.rect(0, 4, 16, 9, C.ink);
-      p.rect(1, 5, 14, 7, C.wood);
-      p.rect(2, 6, 12, 3, C.water);
-      p.rect(1, 10, 14, 2, C.woodShade);
+      groundBase(p);
     },
   },
   stump: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      disc(p, 8, 9, 6.5, (dx, dy) => (dx * dx + dy * dy > 36 ? C.ink : dy > 2 ? C.woodShade : C.straw));
-      disc(p, 8, 8, 2, () => C.strawShade);
+      groundBase(p);
     },
   },
   bed: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      furniture(p, () => {
-        p.rect(1, 1, 14, 15, C.ink);
-        p.rect(2, 2, 12, 13, C.straw);
-        p.rect(3, 3, 10, 3, C.sack);
-        p.rect(2, 7, 12, 8, C.blanket);
-        p.rect(2, 13, 12, 2, C.blanketShade);
-      });
+      floorBase(p);
     },
   },
   hearth: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      furniture(p, () => {
-        disc(p, 8, 8, 7.5, (dx, dy) => (dx * dx + dy * dy > 42 ? C.rockShade : C.rock));
-        disc(p, 8, 8, 4.5, () => C.ink);
-        disc(p, 8, 9, 3, (dx, dy) => (dy < -1 ? C.emberLight : C.ember));
-      });
+      floorBase(p);
     },
   },
   table: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      furniture(p, () => {
-        p.rect(1, 3, 14, 11, C.ink);
-        p.rect(2, 4, 12, 8, C.wood);
-        p.rect(2, 12, 12, 1, C.woodShade);
-        p.rect(4, 6, 3, 2, C.clay);
-        p.rect(9, 7, 2, 2, C.straw);
-      });
+      floorBase(p);
     },
   },
   menhir: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      p.rect(4, 0, 8, 16, C.ink);
-      p.rect(5, 1, 6, 14, C.rock);
-      p.rect(9, 1, 2, 14, C.rockShade);
-      p.rect(6, 4, 1, 3, C.ink);
-      p.rect(7, 5, 2, 1, C.ink);
-      p.rect(7, 9, 1, 4, C.ink);
+      groundBase(p);
+    },
+  },
+  door_shut: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.wood, C.woodShade, true);
+      p.rect(0, 0, 16, 2, C.ink);
+      p.rect(1, 2, 14, 1, C.woodShade);
+      p.rect(2, 3, 12, 13, C.ink);
+      p.rect(3, 4, 10, 12, C.wood);
+      for (const x of [5, 8, 11]) p.rect(x, 4, 1, 12, C.woodShade);
+      p.rect(3, 5, 2, 1, C.rockShade);
+      p.rect(3, 12, 2, 1, C.rockShade);
+      p.rect(11, 9, 2, 2, C.steelShade);
+    },
+  },
+  window: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.wood, C.woodShade, true);
+      p.rect(0, 0, 16, 2, C.ink);
+      p.rect(0, 14, 16, 2, C.woodShade);
+      p.rect(3, 3, 10, 10, C.ink);
+      p.rect(4, 4, 8, 8, C.rockShade);
+      p.rect(8, 4, 1, 8, C.wood);
+      p.rect(4, 8, 8, 1, C.wood);
+      p.rect(5, 5, 2, 1, C.rockLight);
+      p.px(5, 6, C.rockLight);
+      p.rect(3, 13, 10, 1, C.woodShade);
+    },
+  },
+  chimney: {
+    autotile: false,
+    variants: 1,
+    group: 'roof',
+    paint: (p) => {
+      roof(p, 0xff);
+      p.rect(4, 2, 8, 11, C.ink);
+      p.rect(5, 3, 6, 9, C.rock);
+      p.rect(9, 3, 2, 9, C.rockShade);
+      p.rect(5, 3, 6, 2, C.ink);
+    },
+  },
+  jetty: {
+    autotile: false,
+    variants: 1,
+    group: 'water',
+    paint: (p) => {
+      planks(p, C.wood, C.woodShade, false);
+      p.rect(0, 0, 16, 1, C.ink);
+      p.rect(0, 15, 16, 1, C.ink);
+      p.rect(1, 1, 2, 2, C.woodShade);
+      p.rect(1, 13, 2, 2, C.woodShade);
     },
   },
 };

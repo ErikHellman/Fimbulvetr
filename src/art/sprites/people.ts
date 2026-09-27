@@ -5,6 +5,7 @@ import { ellipse, rect } from '../draw';
 import { outline } from '../outline';
 import { C } from '../palette';
 import { createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
+import { ARM_SWING_LEFT, ARM_SWING_RIGHT, ARM_SWING_SIDE } from './hero';
 import type { SpriteFrame } from './types';
 
 /** How a placeholder person looks: colours plus a few part choices. */
@@ -195,17 +196,20 @@ function drawPerson(look: Look, side: Side, phase: number): Raster {
   // Torso and arms.
   const torsoH = look.child === true ? 7 : 9;
   if (side === 'w') {
+    const swing = ARM_SWING_SIDE[phase] ?? 0;
     rect(r, 11, b + 15, 10, torsoH, top);
     rect(r, 18, b + 15, 3, torsoH, topS);
-    rect(r, 13, b + 16, 3, torsoH - 3, topS);
-    rect(r, 13, b + 13 + torsoH, 3, 2, skin);
+    rect(r, 13 + swing, b + 16, 3, torsoH - 3, topS);
+    rect(r, 13 + swing, b + 13 + torsoH, 3, 2, skin);
   } else {
+    const dl = ARM_SWING_LEFT[phase] ?? 0;
+    const dr = ARM_SWING_RIGHT[phase] ?? 0;
     rect(r, 10, b + 15, 12, torsoH, top);
     rect(r, 19, b + 15, 3, torsoH, topS);
-    rect(r, 8, b + 16, 2, torsoH - 3, top);
-    rect(r, 8, b + 13 + torsoH, 2, 2, skin);
-    rect(r, 22, b + 16, 2, torsoH - 3, topS);
-    rect(r, 22, b + 13 + torsoH, 2, 2, skinS);
+    rect(r, 8, b + 16 + dl, 2, torsoH - 3, top);
+    rect(r, 8, b + 13 + torsoH + dl, 2, 2, skin);
+    rect(r, 22, b + 16 + dr, 2, torsoH - 3, topS);
+    rect(r, 22, b + 13 + torsoH + dr, 2, 2, skinS);
     if (look.apron !== undefined && side === 's') rect(r, 12, b + 18, 8, torsoH + 2, hex(look.apron));
   }
 

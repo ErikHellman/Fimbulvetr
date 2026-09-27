@@ -5,10 +5,12 @@ import type { Thing } from '@core/world/screen';
 import { Harness } from './harness';
 
 const SIGN = { en: 'Askdalr. Mind the sheep.', sv: 'Askdalr. Akta fåren.' };
+const WIDE = { en: 'The well. Two tiles wide.', sv: 'Brunnen. Två rutor bred.' };
 
 function storyDb(): ContentDb {
   const things: Thing[] = [
     { k: 'sign', at: { x: 12, y: 8 }, text: SIGN },
+    { k: 'sign', at: { x: 14, y: 8 }, w: 2, h: 2, text: WIDE },
     { k: 'use', at: { x: 16, y: 8 }, script: 'dev_script' },
     {
       k: 'trigger',
@@ -73,6 +75,15 @@ describe('signs', () => {
     const h = new Harness({ db: storyDb(), tile: [12, 9], facing: 's' });
     h.press(['interact']);
     expect(h.sim.mode).toBe('play');
+  });
+
+  it('are read from any tile along a wider block', () => {
+    const h = new Harness({ db: storyDb(), tile: [15, 10], facing: 'n' });
+    h.press(['interact']);
+    expect(h.sim.storyUi()).toMatchObject({ k: 'text', text: WIDE });
+    const far = new Harness({ db: storyDb(), tile: [12, 10], facing: 'n' });
+    far.press(['interact']);
+    expect(far.sim.mode).toBe('play');
   });
 });
 

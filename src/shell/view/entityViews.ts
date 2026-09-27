@@ -3,6 +3,7 @@ import { frameFor, type AnimTable } from '@art/anims';
 import type { Entity } from '@core/actors/entity';
 import type { Vec } from '@core/math/vec';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
+import { bodyBounds, type Bounds } from './bounds';
 
 /** Mirrors sim entities as sprites. Safe to call every frame: views are derived from state only. */
 export class EntityViews {
@@ -51,6 +52,13 @@ export class EntityViews {
         this.shadows.delete(id);
       }
     }
+  }
+
+  /** Where an entity's body is drawn (its hurt box at the sprite's feet), or null if it has no sprite yet. */
+  bounds(e: Entity): Bounds | null {
+    const s = this.sprites.get(e.id);
+    if (s === undefined) return null;
+    return bodyBounds(s.x, s.y, s.depth, e.hurt);
   }
 
   /** A soft shadow on the ground under anything lifted off it (hops, carried and thrown things). */

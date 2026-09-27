@@ -38,6 +38,7 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Shell: world view, UI scene
     - [x] Content: Askdalr (8 screens, 3 interiors, 13 NPCs, days 1–3)
     - [x] Exit route test, e2e, docs
+    - [x] World polish: decor sprites, animated water, fish and smoke, doors, windows, chimneys, arm swing, nameplate — plan: `docs/superpowers/plans/2026-09-27-world-polish.md`
     - [ ] User playtest and Swedish proofread
   - [ ] M1b Raid + Myrkviðr road
   - [ ] M1c Rótarhellir + Rótvættr

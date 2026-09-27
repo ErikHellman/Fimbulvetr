@@ -1,0 +1,200 @@
+import type { AnimDef } from '../anims';
+import { ellipse, rect } from '../draw';
+import { outline } from '../outline';
+import { C } from '../palette';
+import { createRaster, hex, setPixel, TRANSPARENT, type Raster, type Rgba } from '../raster';
+import type { SpriteFrame } from './types';
+
+/**
+ * Decor: the objects that stand on a block of solid tiles (trees, the well, furniture). Each is drawn once,
+ * with a 1 px margin and a 1 px ink outline, and stands on its bottom centre.
+ */
+
+const INK = hex(C.ink);
+const P = Object.fromEntries(Object.entries(C).map(([k, v]) => [k, hex(v)])) as Record<keyof typeof C, Rgba>;
+
+function frame(name: string, r: Raster): SpriteFrame {
+  return { name, raster: outline(r, INK, 1), ox: Math.floor(r.w / 2), oy: r.h - 1 };
+}
+
+/** A round leaf tree: 4×10 trunk, a two-lobed canopy shaded to the lower right. */
+function tree(): Raster {
+  const r = createRaster(32, 40);
+  rect(r, 14, 26, 4, 12, P.trunk);
+  rect(r, 17, 26, 1, 12, P.woodShade);
+  const shade = (cx: number, cy: number) => (x: number, y: number) =>
+    x - cx + (y - cy) > 6 ? P.leafShade : P.leaf;
+  ellipse(r, 16, 16, 14, 12, shade(16, 16));
+  ellipse(r, 21, 8, 7, 5, shade(21, 8));
+  ellipse(r, 10, 10, 3.5, 3, P.leafLight);
+  return r;
+}
+
+/** A spruce: three widening tiers on a short trunk, shaded on the right. */
+function pine(): Raster {
+  const r = createRaster(24, 44);
+  rect(r, 10, 34, 4, 8, P.trunk);
+  rect(r, 13, 34, 1, 8, P.woodShade);
+  for (let tier = 0; tier < 3; tier++) {
+    const top = 3 + tier * 10;
+    const baseHalf = 5 + tier * 3;
+    for (let i = 0; i < 12; i++) {
+      const half = Math.max(1, Math.round(((i + 1) * baseHalf) / 12));
+      rect(r, 12 - half, top + i, half * 2, 1, P.leaf);
+      rect(
+        r,
+        12 + half - Math.max(1, Math.floor(half / 3)),
+        top + i,
+        Math.max(1, Math.floor(half / 3)),
+        1,
+        P.leafShade,
+      );
+    }
+  }
+  rect(r, 9, 6, 2, 1, P.leafLight);
+  rect(r, 8, 16, 2, 1, P.leafLight);
+  return r;
+}
+
+/** The well: a stone ring under a gabled roof on two posts, with a crank, a rope and a bucket. */
+function well(f: number): Raster {
+  const r = createRaster(32, 44);
+  for (let i = 0; i < 8; i++) {
+    const half = Math.min(14, 4 + Math.floor(i * 1.5));
+    rect(r, 16 - half, 2 + i, half * 2, 1, i === 0 ? P.wood : P.woodShade);
+  }
+  rect(r, 6, 9, 3, 26, P.wood);
+  rect(r, 23, 9, 3, 26, P.wood);
+  rect(r, 8, 9, 1, 26, P.woodShade);
+  rect(r, 25, 9, 1, 26, P.woodShade);
+  rect(r, 6, 20, 20, 2, P.woodShade);
+  rect(r, 26, 20, 4, 1, P.rockShade);
+  rect(r, 29, 17, 1, 4, P.rockShade);
+  rect(r, 16, 22, 1, 12, P.strawShade);
+  rect(r, 14, 28, 4, 3, P.pailShade);
+  ellipse(r, 16, 36, 14, 6, (x, y) => (x - 16 + (y - 36) > 3 ? P.rockShade : P.rock));
+  ellipse(r, 16, 35, 9, 3.5, INK);
+  ellipse(r, 16, 35, 7, 2.5, P.water);
+  rect(r, 10 + f * 2, 34, 2, 1, P.waterLight);
+  rect(r, 20 - f, 36, 2, 1, P.waterLight);
+  if (f % 2 === 1) setPixel(r, f === 1 ? 13 : 19, 35, P.waterLight);
+  return r;
+}
+
+/** A long wooden trough on two legs; ripples drift along the water. */
+function trough(f: number): Raster {
+  const r = createRaster(48, 20);
+  rect(r, 2, 5, 44, 12, INK);
+  rect(r, 3, 6, 42, 10, P.wood);
+  rect(r, 3, 13, 42, 3, P.woodShade);
+  rect(r, 5, 8, 40, 4, P.water);
+  for (let k = 0; k < 5; k++)
+    for (let i = 0; i < 3; i++) rect(r, 5 + ((k * 8 + f * 2 + i) % 40), 9 + (k % 2), 1, 1, P.waterLight);
+  rect(r, 5, 17, 3, 2, P.woodShade);
+  rect(r, 40, 17, 3, 2, P.woodShade);
+  return r;
+}
+
+/** A stone hearth with two logs and a flame that sways and stretches. */
+function hearth(f: number): Raster {
+  const r = createRaster(32, 36);
+  ellipse(r, 16, 28, 14, 6, (x, y) => (x - 16 + (y - 28) > 3 ? P.rockShade : P.rock));
+  ellipse(r, 16, 27, 9, 3.5, INK);
+  rect(r, 10, 26, 12, 2, P.woodShade);
+  rect(r, 12, 24, 8, 2, P.wood);
+  const sway = [0, 1, 0, -1][f] ?? 0;
+  const tall = f % 2;
+  ellipse(r, 16 + sway, 20 - tall, 5, 7 + tall, P.ember);
+  ellipse(r, 16 + sway, 22, 2.5, 4, P.emberLight);
+  if (tall === 1) rect(r, 15 + sway, 10, 2, 2, P.ember);
+  const glow: ReadonlyArray<readonly [number, number]> = [
+    [6, 30],
+    [26, 29],
+    [10, 32],
+    [22, 32],
+  ];
+  glow.forEach(([x, y], i) => {
+    if ((i + f) % 4 < 2) setPixel(r, x, y, P.emberLight);
+  });
+  return r;
+}
+
+function bed(): Raster {
+  const r = createRaster(16, 30);
+  rect(r, 1, 1, 14, 28, INK);
+  rect(r, 2, 2, 12, 26, P.straw);
+  rect(r, 3, 3, 10, 5, P.sack);
+  rect(r, 2, 10, 12, 17, P.blanket);
+  rect(r, 2, 25, 12, 2, P.blanketShade);
+  rect(r, 2, 27, 12, 1, P.woodShade);
+  return r;
+}
+
+function table(): Raster {
+  const r = createRaster(32, 22);
+  rect(r, 2, 3, 28, 10, P.wood);
+  rect(r, 2, 12, 28, 1, P.woodShade);
+  rect(r, 3, 13, 3, 7, P.woodShade);
+  rect(r, 26, 13, 3, 7, P.woodShade);
+  rect(r, 8, 6, 4, 2, P.clay);
+  rect(r, 20, 7, 3, 2, P.straw);
+  return r;
+}
+
+function stump(): Raster {
+  const r = createRaster(16, 18);
+  rect(r, 2, 7, 12, 9, P.woodShade);
+  for (const x of [4, 8, 12]) rect(r, x, 8, 1, 7, P.wood);
+  ellipse(r, 8, 7, 6.5, 3.5, P.straw);
+  ellipse(r, 8, 7, 3, 1.5, P.strawShade);
+  return r;
+}
+
+function menhir(): Raster {
+  const r = createRaster(16, 30);
+  rect(r, 4, 2, 8, 26, P.rock);
+  rect(r, 9, 2, 3, 26, P.rockShade);
+  for (const [x, y] of [
+    [4, 2],
+    [11, 2],
+    [4, 27],
+    [11, 27],
+  ] as const)
+    setPixel(r, x, y, TRANSPARENT);
+  rect(r, 6, 7, 1, 4, INK);
+  rect(r, 7, 8, 2, 1, INK);
+  rect(r, 7, 15, 1, 6, INK);
+  rect(r, 6, 17, 3, 1, INK);
+  return r;
+}
+
+export function decorFrames(): SpriteFrame[] {
+  const out: SpriteFrame[] = [
+    frame('decor_tree_idle_s_0', tree()),
+    frame('decor_pine_idle_s_0', pine()),
+    frame('decor_bed_idle_s_0', bed()),
+    frame('decor_table_idle_s_0', table()),
+    frame('decor_stump_idle_s_0', stump()),
+    frame('decor_menhir_idle_s_0', menhir()),
+  ];
+  for (let f = 0; f < 4; f++) {
+    out.push(frame(`decor_well_idle_s_${f}`, well(f)));
+    out.push(frame(`decor_trough_idle_s_${f}`, trough(f)));
+    out.push(frame(`decor_hearth_idle_s_${f}`, hearth(f)));
+  }
+  return out;
+}
+
+const STILL = { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } } satisfies Record<string, AnimDef>;
+
+export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  decor_tree: STILL,
+  decor_pine: STILL,
+  decor_bed: STILL,
+  decor_table: STILL,
+  decor_stump: STILL,
+  decor_menhir: STILL,
+  decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
+  decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
+  decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },
+};

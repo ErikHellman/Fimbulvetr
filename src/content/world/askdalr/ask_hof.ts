@@ -19,7 +19,7 @@ export const askHof: ScreenDef = {
     'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
     'T............RRRRRRRRRRRRRR............T',
     'T.......T....RRRRRRRRRRRRRR............T',
-    'T...T........RRRRRRRRRRRRRR..........T.T',
+    'T...T........RRRRCRRRRRRRRR..........T.T',
     'T............RRRRRRRRRRRRRR............T',
     'T............RRRRRRRRRRRRRR............T',
     'T............RRRRRRRRRRRRRR...M........T',

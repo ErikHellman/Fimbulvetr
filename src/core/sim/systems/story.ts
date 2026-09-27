@@ -330,13 +330,13 @@ export function checkInteract(rt: SimRt, input: InputFrame): boolean {
   }
   if (tryLift(rt)) return true;
   for (const thing of rt.db.screens[rt.screen.id].things) {
-    if (thing.k === 'sign' && overlaps(probe, tileBox(thing.at.x, thing.at.y))) {
+    if (thing.k === 'sign' && overlaps(probe, tileBox(thing.at.x, thing.at.y, thing.w, thing.h))) {
       startStory(rt, [{ k: 'say', who: null, text: thing.text }]);
       return true;
     }
     if (
       thing.k === 'use' &&
-      overlaps(probe, tileBox(thing.at.x, thing.at.y)) &&
+      overlaps(probe, tileBox(thing.at.x, thing.at.y, thing.w, thing.h)) &&
       evalCond(thing.when, condCtx(rt))
     ) {
       startScript(rt, thing.script);

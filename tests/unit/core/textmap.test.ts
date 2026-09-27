@@ -21,6 +21,16 @@ describe('parseTextMap', () => {
     expect(cellAt(g, 40, 0)).toBeUndefined();
   });
 
+  it('reads the building and jetty characters', () => {
+    const g = parseTextMap(map(['d+CJ']), LEGEND);
+    expect([cellAt(g, 0, 0), cellAt(g, 1, 0), cellAt(g, 2, 0), cellAt(g, 3, 0)]).toEqual([
+      'door_shut',
+      'window',
+      'chimney',
+      'jetty',
+    ]);
+  });
+
   it('names the row and column of an unknown character', () => {
     expect(() => parseTextMap(map(['', '...&']), LEGEND)).toThrow(
       new MapError("row 2, col 4: unknown map character '&'"),
