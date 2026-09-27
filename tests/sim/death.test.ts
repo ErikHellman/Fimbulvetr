@@ -121,3 +121,22 @@ describe('entry point', () => {
     expect(a.sim.hash()).not.toBe(b.sim.hash());
   });
 });
+
+describe('dev switches', () => {
+  it('god mode keeps the hero from harm', () => {
+    const h = new Harness({ db: deadly(), tile: [21, 9], facing: 'e' });
+    h.sim.command({ t: 'god', on: true });
+    h.hold(['right'], 120);
+    expect(h.sim.hero.hp).toBe(12);
+    expect(h.sim.mode).toBe('play');
+  });
+
+  it('killAll removes every mortal enemy', () => {
+    const db = { ...DB, enemies: { ...DB.enemies, dummy: { ...DB.enemies.dummy, immortal: false } } };
+    const h = new Harness({ db });
+    h.sim.command({ t: 'killAll' });
+    h.idle(1);
+    expect(h.sim.enemies).toHaveLength(0);
+    expect(h.count('killed')).toBe(1);
+  });
+});

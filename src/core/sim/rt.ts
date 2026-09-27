@@ -60,6 +60,8 @@ export interface SimRt {
   transition: Transition | null;
   story: StoryRun | null;
   entry: Entry;
+  /** Dev: the hero takes no damage (undefined when off, so it never changes the hash). */
+  god?: boolean;
   emit(event: SimEvent): void;
   newId(): number;
   load(id: ScreenId): LoadedScreen;

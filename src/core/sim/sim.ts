@@ -1,3 +1,4 @@
+import type { EnemyId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
 import { runFsm } from '../actors/fsm';
@@ -24,7 +25,7 @@ import type { ContentDb } from './db';
 import type { SimEvent } from './events';
 import type { Entry, LoadedScreen, Mode, SimRt, Transition } from './rt';
 import { tickWorldClock } from './systems/clock';
-import { resolveAttacks, resolveSword } from './systems/combat';
+import { killEnemy, resolveAttacks, resolveSword } from './systems/combat';
 import { coverFor, cutCover, refreshCover } from './systems/cover';
 import { actorCtx, runEnemies } from './systems/enemies';
 import { heroCtx, syncHero } from './systems/hero';
@@ -68,6 +69,9 @@ export class Sim implements SimRt {
   story: StoryRun | null = null;
   /** Where the hero entered the current screen (Continue returns here). */
   entry: Entry;
+  /** Dev switches; undefined when off so they never change the hash. */
+  god?: boolean;
+  weatherOverride?: WeatherKind;
   tick = 0;
   private events: SimEvent[] = [];
   private readonly queue: Command[] = [];
@@ -148,6 +152,7 @@ export class Sim implements SimRt {
   /** The weather on the current screen: story weather outdoors, always clear indoors. */
   weather(): WeatherKind {
     if (this.db.screens[this.screen.id].indoor === true) return 'clear';
+    if (this.weatherOverride !== undefined) return this.weatherOverride;
     const ctx = condCtx(this);
     return this.db.weather.find((r) => evalCond(r.when, ctx))?.kind ?? 'clear';
   }
@@ -188,6 +193,8 @@ export class Sim implements SimRt {
         transition: this.transition,
         story: this.story,
         entry: this.entry,
+        god: this.god,
+        weatherOverride: this.weatherOverride,
         nextId: this.nextId,
         entities: this.entities,
       }),
@@ -295,6 +302,24 @@ export class Sim implements SimRt {
         break;
       case 'eat':
         eat(this, c.item);
+        break;
+      case 'setHp':
+        this.hero.hp = Math.max(0, Math.min(this.hero.maxHp, Math.floor(c.hp)));
+        break;
+      case 'god':
+        if (c.on) this.god = true;
+        else delete this.god;
+        break;
+      case 'weather':
+        if (c.kind === null) delete this.weatherOverride;
+        else this.weatherOverride = c.kind;
+        break;
+      case 'killAll':
+        for (const e of [...this.actors]) {
+          if (e.kind !== 'enemy') continue;
+          const def = this.db.enemies[e.def as EnemyId];
+          if (!def.immortal) killEnemy(this, e, def);
+        }
         break;
     }
   }

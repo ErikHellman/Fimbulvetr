@@ -111,6 +111,7 @@ export function resolveAttacks(rt: SimRt): void {
 /** One hit on the hero from `source`; returns whether it landed or was blocked (not ignored). */
 export function hurtHero(rt: SimRt, source: Entity, amount: number, knock: number, tags: number): boolean {
   const { hero, db } = rt;
+  if (rt.god === true) return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
   const result = resolveHit(

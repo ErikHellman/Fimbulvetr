@@ -62,6 +62,36 @@ describe('dev console commands', () => {
     expect(h.sim.state.flags.st_intro_seen).toBe(true);
   });
 
+  it('gives items, sets health, forces weather and kills through dev commands', () => {
+    const { b, h } = bridge();
+    expect(run(b, 'give lantern')).toBe('gave 1 lantern');
+    expect(run(b, 'give flatbread 3')).toBe('gave 3 flatbread');
+    expect(run(b, 'hp 5')).toBe('hp 5');
+    expect(run(b, 'weather storm')).toBe('weather storm');
+    h.idle(1);
+    expect(h.sim.state.inv.items).toMatchObject({ lantern: 1, flatbread: 3 });
+    expect(h.sim.hero.hp).toBe(5);
+    expect(h.sim.weather()).toBe('storm');
+    expect(run(b, 'weather off')).toBe('weather follows the story');
+    h.idle(1);
+    expect(h.sim.weather()).toBe('clear');
+    expect(run(b, 'give nothing')).toBe("unknown item 'nothing'");
+    expect(run(b, 'weather monsoon')).toMatch(/^weather: clear, rain/);
+  });
+
+  it('switches god mode on and off without leaving a trace in the hash', () => {
+    const { b, h } = bridge();
+    const before = h.sim.hash();
+    expect(run(b, 'god')).toBe('god on');
+    h.sim.flushCommands();
+    expect(h.sim.god).toBe(true);
+    expect(h.sim.hash()).not.toBe(before);
+    expect(run(b, 'god off')).toBe('god off');
+    h.sim.flushCommands();
+    expect(h.sim.god).toBeUndefined();
+    expect(h.sim.hash()).toBe(before);
+  });
+
   it('explains mistakes', () => {
     const { b } = bridge();
     expect(run(b, 'warp nowhere')).toBe("unknown screen 'nowhere'");

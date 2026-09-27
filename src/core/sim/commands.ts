@@ -1,7 +1,7 @@
 import type { FlagId } from '@content/flags';
 import type { ItemId, ShopId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
-import type { Season } from '../clock/types';
+import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
 
 /** Out-of-band requests (menus, shops, saves, dev tools), applied at the start of the next tick. */
@@ -16,4 +16,12 @@ export type Command =
   /** Eats food (or drinks mead) from the pack. */
   | { readonly t: 'eat'; readonly item: ItemId }
   /** Dev: give items. */
-  | { readonly t: 'give'; readonly item: ItemId; readonly n: number };
+  | { readonly t: 'give'; readonly item: ItemId; readonly n: number }
+  /** Dev: set the hero's health (quarter hearts; 0 makes them fall). */
+  | { readonly t: 'setHp'; readonly hp: number }
+  /** Dev: the hero takes no damage. */
+  | { readonly t: 'god'; readonly on: boolean }
+  /** Dev: force the weather outdoors (null: back to the story's weather). */
+  | { readonly t: 'weather'; readonly kind: WeatherKind | null }
+  /** Dev: every enemy on the screen dies (the immortal ones refill). */
+  | { readonly t: 'killAll' };
