@@ -180,6 +180,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     story: () => {
       const ui = bridge().sim.storyUi();
       if (ui === null) return null;
+      if (ui.k === 'save') return { k: 'save', who: null, text: '', shown: 1, choices: [], cursor: 0 };
       if (ui.k === 'shop')
         return {
           k: 'shop',

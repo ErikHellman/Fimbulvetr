@@ -58,6 +58,8 @@ export type StoryUi =
       readonly cursor: number;
       readonly last: BuyResult | null;
     }
+  /** The save-slot picker is up (the shell owns it and answers with `saved`). */
+  | { readonly k: 'save' }
   | null;
 
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
@@ -174,6 +176,9 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
     case 'shop':
       run.shop = { cursor: 0, last: null };
       return true;
+    case 'save':
+      delete run.saved;
+      return true;
     case 'say':
     case 'card':
     case 'move':
@@ -213,6 +218,10 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
     }
     case 'shop':
       return stepShop(rt, run, step.id, input);
+    case 'save':
+      if (run.saved !== true) return true;
+      delete run.saved;
+      return false;
     case 'do':
     case 'face':
     case 'warp':
@@ -280,6 +289,7 @@ export function storyUi(rt: SimRt): StoryUi {
       cursor: 0,
     };
   }
+  if (step.k === 'save') return { k: 'save' };
   if (step.k === 'shop' && run.shop !== null) {
     const shop = rt.db.shops[step.id];
     if (shop === undefined) return null;

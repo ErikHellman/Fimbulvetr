@@ -24,4 +24,6 @@ export type Command =
   /** Dev: force the weather outdoors (null: back to the story's weather). */
   | { readonly t: 'weather'; readonly kind: WeatherKind | null }
   /** Dev: every enemy on the screen dies (the immortal ones refill). */
-  | { readonly t: 'killAll' };
+  | { readonly t: 'killAll' }
+  /** The save-slot picker closed (a slot was written, or not): a waiting `save` step carries on. */
+  | { readonly t: 'saved' };

@@ -378,6 +378,9 @@ export class Sim implements SimRt {
         if (c.kind === null) delete this.weatherOverride;
         else this.weatherOverride = c.kind;
         break;
+      case 'saved':
+        if (this.story?.cur?.k === 'save') this.story.saved = true;
+        break;
       case 'killAll':
         for (const e of [...this.actors]) {
           if (e.kind !== 'enemy') continue;
