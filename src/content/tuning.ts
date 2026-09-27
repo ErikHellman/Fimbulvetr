@@ -43,6 +43,19 @@ export const TUNING: Tuning = {
   },
   throw: { speed: 4, flightTicks: 20 },
   weapons: {
+    /** The pitchfork of the raid night: long reach, light blows. */
+    pitchfork: {
+      comboDamage: [1, 1, 2],
+      spinDamage: 2,
+      knock: 5,
+      boxes: {
+        e: { x: 2, y: -20, w: 26, h: 14 },
+        w: { x: -28, y: -20, w: 26, h: 14 },
+        n: { x: -6, y: -44, w: 12, h: 26 },
+        s: { x: -6, y: -8, w: 12, h: 24 },
+      },
+      spinBox: { x: -26, y: -36, w: 52, h: 44 },
+    },
     /** The farm hand-axe: short reach, light blows. */
     handaxe: {
       comboDamage: [1, 1, 2],

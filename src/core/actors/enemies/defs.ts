@@ -32,6 +32,8 @@ export interface EnemyDef {
    * `from`…`to`, the box for its facing hurts the hero. The ticks before `from` are the telegraph.
    */
   readonly attacks?: Readonly<Partial<Record<string, AttackWindow>>>;
+  /** Armoured: every blow clinks off (a raid troll). Behaviours can also guard for a while (`mem.guard`). */
+  readonly guard?: boolean;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */
   readonly stunnable?: number;
   /** A boss: named on the health bar. */

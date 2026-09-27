@@ -22,7 +22,8 @@ import { applyAll } from './story';
  */
 export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult {
   const def = target.kind === 'enemy' ? enemyDef(rt, target) : undefined;
-  if (mem(target, 'guard') === 1 && target.faction !== hit.faction && target.iframes === 0) {
+  const guarded = def?.guard === true || mem(target, 'guard') === 1;
+  if (guarded && target.faction !== hit.faction && target.iframes === 0) {
     // A guarded weak point (a closed core): the blow clinks off.
     target.knock = scale(hit.dir, hit.knock / 2);
     rt.emit({ t: 'hit', target: target.id, blocked: true, dealt: 0 });

@@ -170,4 +170,14 @@ export const SFX_BANK = {
     release: 0.4,
     volume: 0.4,
   },
+  /** A beast's warning before it strikes. */
+  sfx_growl: {
+    wave: 'saw',
+    freq: 110,
+    freqEnd: 80,
+    attack: 0.03,
+    sustain: 0.25,
+    release: 0.15,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;
