@@ -50,7 +50,8 @@ describe('pause menu', () => {
 
   it('moves between tabs with left and right, wrapping, and M jumps to the map', () => {
     const items = menuItems(inventory(), DB.items);
-    expect(run(openMenu(), items, ['right']).state?.tab).toBe('map');
+    expect(run(openMenu(), items, ['right']).state?.tab).toBe('gear');
+    expect(run(openMenu(), items, ['right'], ['right']).state?.tab).toBe('map');
     expect(run(openMenu(), items, ['left']).state?.tab).toBe('system');
     expect(run(openMenu(), items, ['map']).state?.tab).toBe('map');
     expect(run(openMenu('map'), items, ['map']).state).toBeNull();

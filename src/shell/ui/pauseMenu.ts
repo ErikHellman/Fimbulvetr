@@ -5,7 +5,7 @@ import type { InventoryState } from '@core/state/gameState';
 
 /** The pause menu: pure state and input handling, drawn by the UI scene. The sim does not run meanwhile. */
 
-export const MENU_TABS = ['items', 'map', 'quests', 'system'] as const;
+export const MENU_TABS = ['items', 'gear', 'map', 'quests', 'system'] as const;
 export type MenuTab = (typeof MENU_TABS)[number];
 
 /** Rows of the system tab. */

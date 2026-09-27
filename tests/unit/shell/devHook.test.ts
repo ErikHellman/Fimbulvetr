@@ -24,6 +24,7 @@ const NO_VIEW = {
   snow: 0,
   leaves: 0,
   fog: 0,
+  flames: 0,
   bolts: 0,
   dark: 0,
   lights: 0,

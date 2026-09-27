@@ -33,11 +33,12 @@ import { EntityViews } from '@shell/view/entityViews';
 import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
-import { bindingsOf } from '@shell/input/remap';
+import { bindingsOf, keyLabel } from '@shell/input/remap';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
+import { FireView } from '@shell/view/fireView';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -63,6 +64,7 @@ export class PlayScene extends Phaser.Scene {
   private darkness!: DarknessView;
   private fog!: DarknessView;
   private fx!: FxView;
+  private flames!: FireView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
   private readonly latch = new InputLatch();
@@ -124,6 +126,7 @@ export class PlayScene extends Phaser.Scene {
     this.colour = cam.filters.internal.addColorMatrix();
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
+    this.flames = new FireView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
         this.audio.play(id);
@@ -144,6 +147,7 @@ export class PlayScene extends Phaser.Scene {
       sim: this.sim,
       frames: data.assets.frames,
       lang: () => data.settings.lang,
+      keyLabel: (action) => keyLabel(bindingsOf(data.settings.keys).kb[action][0] ?? ''),
       sfx: (id) => {
         this.audio.play(id);
       },
@@ -358,6 +362,7 @@ export class PlayScene extends Phaser.Scene {
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)), this.artOf);
     }
     this.fx.tick(this.sim.tick);
+    this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {
       stage.view.tick(this.sim.tick);
@@ -457,6 +462,7 @@ export class PlayScene extends Phaser.Scene {
       bolts: this.weather.bolts,
       dark: this.darkness.shown.dark,
       fog: this.fog.shown.dark,
+      flames: this.flames.shown,
       lights: this.darkness.shown.lights,
     };
     const out = { ...sum };

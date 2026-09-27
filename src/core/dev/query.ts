@@ -1,4 +1,4 @@
-import type { DungeonId, ItemId, WeaponId } from '@content/ids';
+import type { ArmorId, DungeonId, GaldrId, ItemId, WeaponId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { setMinute, setPolicy, setSeason } from '../clock/clock';
 import { WEATHER_KINDS, isSeason, type ClockState, type Season, type WeatherKind } from '../clock/types';
@@ -191,6 +191,11 @@ export interface DevPreset {
   readonly pieces?: readonly string[];
   readonly opened?: readonly string[];
   readonly dungeons?: Readonly<Partial<Record<DungeonId, Partial<DungeonState>>>>;
+  readonly armor?: ArmorId;
+  readonly galdr?: readonly GaldrId[];
+  /** Seiðr now (the bar's size stays 10 unless `maxSeidr` says otherwise). */
+  readonly seidr?: number;
+  readonly maxSeidr?: number;
 }
 
 /** Applies a preset to a fresh state. A dev query's own screen/at/season/time still win afterwards. */
@@ -222,4 +227,8 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   for (const id of p.opened ?? []) if (!state.world.opened.includes(id)) state.world.opened.push(id);
   for (const [id, d] of Object.entries(p.dungeons ?? {}) as [DungeonId, Partial<DungeonState>][])
     Object.assign(dungeonOf(state, id), d);
+  if (p.armor !== undefined) state.inv.armor = p.armor;
+  if (p.galdr !== undefined) state.inv.galdr = [...p.galdr];
+  if (p.maxSeidr !== undefined) state.hero.maxSeidr = p.maxSeidr;
+  if (p.seidr !== undefined) state.hero.seidr = Math.min(p.seidr, state.hero.maxSeidr);
 }

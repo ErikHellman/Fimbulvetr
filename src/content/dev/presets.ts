@@ -102,6 +102,22 @@ export const DEV_PRESETS = {
     flags: MYR_FLAGS,
     vars: { ask_pen: 31 },
   } /** A winter night on the Myrkviðr road, half an hour before sunrise: snow, rolled foes and trolls. */,
+  /** Myrkviðr in autumn with Eldr learned and a full seiðr bar: burn the leaf piles. */
+  eldr: {
+    screen: 'myr_pines',
+    tile: [20, 10],
+    facing: 'w',
+    weapon: 'seax',
+    shield: true,
+    minute: 12 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 40,
+    ...LANTERN,
+    flags: MYR_FLAGS,
+    vars: { ask_pen: 31 },
+    galdr: ['eldr'],
+  },
   turning: {
     screen: 'myr_road',
     tile: [20, 18],

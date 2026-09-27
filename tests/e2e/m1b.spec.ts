@@ -46,6 +46,8 @@ test('the pause menu stops the world and puts an item in a slot', async ({ page 
   await tap(page, 'KeyL');
   await expect.poll(() => hook(page, () => window.__fimbul?.slots())).toEqual([null, 'lantern']);
   await tap(page, 'ArrowRight');
+  expect(await hook(page, () => window.__fimbul?.menu()?.tab)).toBe('gear');
+  await tap(page, 'ArrowRight');
   expect(await hook(page, () => window.__fimbul?.menu()?.tab)).toBe('map');
   await tap(page, 'Escape');
   await expect.poll(() => hook(page, () => window.__fimbul?.menu())).toBeNull();

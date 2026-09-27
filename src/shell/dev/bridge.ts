@@ -26,6 +26,8 @@ export interface ViewStats {
   readonly bolts: number;
   readonly dark: number;
   readonly fog: number;
+  /** Burning cover tiles drawn. */
+  readonly flames: number;
   readonly lights: number;
 }
 

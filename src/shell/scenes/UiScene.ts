@@ -23,6 +23,7 @@ import type { SaveSummary } from '@shell/platform/saveStore';
 import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
 import { slotName, summaryLine } from '@shell/ui/slotText';
 import { wareName } from '@shell/ui/wareText';
+import { gearLines } from '@shell/ui/gearText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -32,6 +33,8 @@ export interface UiLink {
   readonly lang: () => Lang;
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
+  /** The key bound to an action now, as the HUD labels it (K, L, I… or the player's own). */
+  readonly keyLabel: (action: 'item1' | 'item2' | 'galdr') => string;
   /** The open pause menu and what its items page lists, or null in play. */
   readonly menu: () => {
     readonly state: MenuState;
@@ -49,6 +52,7 @@ export interface UiLink {
 
 const TAB_LABEL = {
   items: UI.menu_items,
+  gear: UI.menu_gear,
   map: UI.menu_map,
   quests: UI.menu_quests,
   system: UI.menu_system,
@@ -64,6 +68,8 @@ export const UI_LINK = 'uiLink';
 
 const INK = 0x1b1522;
 const GOLD = 0xd9b34a;
+/** The seiðr bar's blue. */
+const SEIDR = 0x7fd8e8;
 const RED = 0xe0433f;
 const CAVE = 0x6e6258;
 const CAVE_SEEN = 0x9a8a78;
@@ -101,6 +107,11 @@ export class UiScene extends Phaser.Scene {
   private hearts: Phaser.GameObjects.Image[] = [];
   private silver!: Phaser.GameObjects.BitmapText;
   private slotIcons: Phaser.GameObjects.Image[] = [];
+  private slotLabels: Phaser.GameObjects.BitmapText[] = [];
+  private galdrBox!: Phaser.GameObjects.Graphics;
+  private galdrIcon!: Phaser.GameObjects.Image;
+  private galdrLabel!: Phaser.GameObjects.BitmapText;
+  private seidrBar!: Phaser.GameObjects.Graphics;
   private box!: Phaser.GameObjects.Graphics;
   private name!: Phaser.GameObjects.BitmapText;
   private body!: Phaser.GameObjects.BitmapText;
@@ -133,6 +144,7 @@ export class UiScene extends Phaser.Scene {
     this.cameras.main.setRoundPixels(true);
     this.hearts = [];
     this.slotIcons = [];
+    this.slotLabels = [];
     const hud = this.add.graphics();
     const silverRef = this.frameRef('ui_silver_idle_s_0');
     this.add.image(6, 30, silverRef.key, silverRef.frame).setOrigin(0, 0);
@@ -149,10 +161,22 @@ export class UiScene extends Phaser.Scene {
         .fillRect(x, 6, 22, 22)
         .lineStyle(1, GOLD, 1)
         .strokeRect(x + 0.5, 6.5, 21, 21);
-      this.text(x + 8, 29, i === 0 ? 'K' : 'L', DIM);
+      this.slotLabels.push(this.text(x + 8, 29, i === 0 ? 'K' : 'L', DIM));
       const icon = this.add.image(x + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
       this.slotIcons.push(icon);
     }
+    // The galdr, once one is known: its box left of the item slots, and the seiðr bar under the hearts.
+    const gx = GAME_W - 82;
+    this.galdrBox = this.add
+      .graphics()
+      .fillStyle(INK, 0.75)
+      .fillRect(gx, 6, 22, 22)
+      .lineStyle(1, SEIDR, 1)
+      .strokeRect(gx + 0.5, 6.5, 21, 21)
+      .setVisible(false);
+    this.galdrIcon = this.add.image(gx + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
+    this.galdrLabel = this.text(gx + 8, 29, '', DIM);
+    this.seidrBar = this.add.graphics();
     this.box = this.add.graphics();
     this.name = this.text(BOX.x + 12, BOX.y - 14, '', GOLD);
     this.body = this.text(BOX.x + 12, BOX.y + 10, '', PAPER);
@@ -224,6 +248,7 @@ export class UiScene extends Phaser.Scene {
       return;
     }
     if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
+    else if (state.tab === 'gear') this.menuGear(top, lang);
     else if (state.tab === 'map') this.menuMap(top, lang);
     else if (state.tab === 'quests') this.menuQuests(top, lang);
     else {
@@ -256,6 +281,26 @@ export class UiScene extends Phaser.Scene {
       icon
         .setTexture(ref.key, ref.frame)
         .setPosition(MENU.x + 48, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
+        .setVisible(true)
+        .setScale(0.5);
+    });
+  }
+
+  /** What Ask carries and wears, each line with its icon. */
+  private menuGear(top: number, lang: Lang): void {
+    const lines = gearLines(this.link.sim.state, lang);
+    this.menuBody.setText(lines.map((l) => `      ${l.text}`).join('\n')).setPosition(MENU.x + 24, top);
+    lines.forEach((line, i) => {
+      if (line.icon === null) return;
+      let icon = this.menuIcons[i];
+      if (icon === undefined) {
+        icon = this.add.image(0, 0, '__MISSING').setOrigin(0.5, 0.5);
+        this.menuIcons.push(icon);
+      }
+      const ref = this.link.frames.get(`${line.icon}_idle_s_0`);
+      icon
+        .setTexture(ref.key, ref.frame)
+        .setPosition(MENU.x + 34, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
         .setVisible(true)
         .setScale(0.5);
     });
@@ -421,6 +466,8 @@ export class UiScene extends Phaser.Scene {
       img.setVisible(i < hearts).setTexture(ref.key, ref.frame);
     });
     this.silver.setText(String(sim.state.hero.silver));
+    this.drawGaldr(Math.ceil(hearts / MAX_HEARTS_PER_ROW));
+    this.slotLabels.forEach((label, i) => label.setText(this.link.keyLabel(i === 0 ? 'item1' : 'item2')));
     sim.state.inv.slots.forEach((item, i) => {
       const icon = this.slotIcons[i];
       if (icon === undefined) return;
@@ -431,6 +478,32 @@ export class UiScene extends Phaser.Scene {
       const ref = frames.get(`item_${item}_idle_s_0`);
       icon.setTexture(ref.key, ref.frame).setVisible(true);
     });
+  }
+
+  /** The galdr box and the seiðr bar (under `heartRows` rows of hearts), shown once a galdr is known. */
+  private drawGaldr(heartRows: number): void {
+    const { sim, frames } = this.link;
+    const galdr = sim.state.inv.galdr[0];
+    const known = galdr !== undefined;
+    this.galdrBox.setVisible(known);
+    this.galdrLabel.setText(known ? this.link.keyLabel('galdr') : '');
+    this.seidrBar.clear();
+    if (!known) {
+      this.galdrIcon.setVisible(false);
+      return;
+    }
+    const ref = frames.get(`galdr_${galdr}_idle_s_0`);
+    this.galdrIcon.setTexture(ref.key, ref.frame).setVisible(true);
+    const hero = sim.state.hero;
+    const y = 6 + heartRows * 10;
+    const w = hero.maxSeidr * 2;
+    this.seidrBar
+      .fillStyle(INK, 0.8)
+      .fillRect(6, y, w + 2, 5)
+      .fillStyle(SEIDR, 1)
+      .fillRect(7, y + 1, Math.round((w * hero.seidr) / Math.max(1, hero.maxSeidr)), 3)
+      .lineStyle(1, GOLD, 0.8)
+      .strokeRect(5.5, y - 0.5, w + 3, 6);
   }
 
   private speaker(who: Speaker): string {

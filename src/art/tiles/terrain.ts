@@ -108,6 +108,13 @@ function floor(p: Painter): void {
   planks(p, C.floor, C.floorShade, false);
 }
 
+/** Pale shore sand. */
+function sand(p: Painter): void {
+  p.fill('#d6c48f');
+  p.speckle('#b8a36e', 0.12);
+  p.speckle('#eee0b0', 0.05);
+}
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   grass: {
     autotile: false,
@@ -470,6 +477,59 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       p.rect(3, 1, 10, 15, C.ink);
       p.rect(2, 4, 12, 12, C.ink);
       p.rect(4, 0, 8, 1, C.ink);
+    },
+  },
+  planks: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      planks(p, C.floor, C.floorShade, v.variant === 1);
+      p.speckle(C.dirtShade, 0.03);
+    },
+  },
+  palisade: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      grass(p);
+      for (const x of [0, 4, 8, 12]) {
+        p.rect(x, 3, 4, 13, C.wood);
+        p.rect(x + 3, 3, 1, 13, C.woodShade);
+        p.rect(x + 1, 1, 2, 2, C.wood);
+        p.px(x + 1, 0, C.ink);
+        p.px(x + 2, 0, C.ink);
+        p.rect(x, 3, 1, 13, C.ink);
+      }
+      p.rect(0, 9, 16, 1, C.woodShade);
+    },
+  },
+  sand: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      sand(p);
+    },
+  },
+  stall: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.floor, C.floorShade, false);
+    },
+  },
+  thingstone: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+    },
+  },
+  anvil: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.floor, C.floorShade, false);
+      p.speckle(C.ink, 0.05);
     },
   },
 };
