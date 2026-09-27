@@ -26,7 +26,10 @@ export interface Look {
 const SKIN = C.skin;
 const TAN = '#c98f6a';
 
-/** Everyone in Askdalr. Real art replaces these frames by name (`npc_<id>_<anim>_<dir>_<n>`). */
+/**
+ * Everyone in Askdalr, Myrkviðr and Uppvík. Real art replaces these frames by name
+ * (`npc_<id>_<anim>_<dir>_<n>`).
+ */
 export const LOOKS: Readonly<Record<NpcId, Look>> = {
   halvar: {
     skin: TAN,
@@ -182,6 +185,126 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     top: '#7a6a5a',
     legs: 'skirt',
     bottom: '#5a4a3a',
+  },
+  /** Uppvík. The mead-hall keeper: stout, grey-blonde braid, a green dress and a white apron. */
+  thordis: {
+    skin: SKIN,
+    hair: '#cdb98a',
+    hairStyle: 'braid',
+    top: '#4a7a4a',
+    legs: 'skirt',
+    bottom: '#3a5f3a',
+    apron: '#ece4d0',
+  },
+  /** The trader: sleek black hair and beard, a rich blue coat. */
+  hrafnkell: {
+    skin: SKIN,
+    hair: '#1c1c24',
+    hairStyle: 'short',
+    beard: '#1c1c24',
+    top: '#2f4f9a',
+    legs: 'pants',
+    bottom: '#3a3a48',
+  },
+  /** The smith: bald, sooty, a leather apron over bare arms. */
+  ketill: {
+    skin: TAN,
+    hair: '#4a3a2a',
+    hairStyle: 'bald',
+    beard: '#5a3a22',
+    top: '#7a6048',
+    legs: 'pants',
+    bottom: '#3a3028',
+    apron: '#4a3422',
+  },
+  /** The rune-carver: long white hair, a red-brown robe. */
+  solvi: {
+    skin: '#d8c0a8',
+    hair: '#e0ddd4',
+    hairStyle: 'long',
+    beard: '#d4d0c6',
+    top: '#8a3a2a',
+    legs: 'skirt',
+    bottom: '#6a2c22',
+  },
+  /** The hof keeper: a white kerchief, a deep red dress. */
+  gunnhildr: {
+    skin: SKIN,
+    hair: '#8a6a4a',
+    hairStyle: 'kerchief',
+    scarf: '#f0ece0',
+    top: '#9a2a2a',
+    legs: 'skirt',
+    bottom: '#7a2222',
+  },
+  /** The gate warden: broad, yellow-bearded, in a mail-grey coat. */
+  bersi: {
+    skin: TAN,
+    hair: '#c8a040',
+    hairStyle: 'short',
+    beard: '#d0a848',
+    top: '#6a7078',
+    legs: 'pants',
+    bottom: '#4a4a3a',
+  },
+  /** The weaver: auburn hair loose, a saffron dress. */
+  jorunn: {
+    skin: SKIN,
+    hair: '#8a3a22',
+    hairStyle: 'long',
+    top: '#d09a2a',
+    legs: 'skirt',
+    bottom: '#a07a22',
+  },
+  /** The fisher: weathered, a grey hood against the spray. */
+  eyvindr: {
+    skin: '#b88a68',
+    hair: '#6a6258',
+    hairStyle: 'kerchief',
+    scarf: '#5a6a72',
+    beard: '#7a7268',
+    top: '#4a5a62',
+    legs: 'pants',
+    bottom: '#3a4048',
+  },
+  /** A town boy, fair and quick. */
+  hjalti: {
+    skin: SKIN,
+    hair: '#f0dc9a',
+    hairStyle: 'short',
+    top: '#c2542a',
+    legs: 'pants',
+    bottom: '#5a5448',
+    child: true,
+  },
+  /** The drinker: a drooping moustache-beard, a stained green tunic. */
+  glumr: {
+    skin: '#d49a82',
+    hair: '#6a4a2a',
+    hairStyle: 'short',
+    beard: '#7a5430',
+    top: '#5a6a2a',
+    legs: 'pants',
+    bottom: '#4a3a2a',
+  },
+  /** The ship's captain from the south: dark skin, black braid, a sea-blue cloak. */
+  ragna: {
+    skin: '#8a5a3a',
+    hair: '#1a1414',
+    hairStyle: 'braid',
+    top: '#2a6a8a',
+    legs: 'pants',
+    bottom: '#3a3a3a',
+  },
+  /** The old huscarl: white-bearded, in faded red. */
+  steinn: {
+    skin: TAN,
+    hair: '#c8c4bc',
+    hairStyle: 'bald',
+    beard: '#e0dcd4',
+    top: '#7a3a3a',
+    legs: 'pants',
+    bottom: '#4a4038',
   },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {

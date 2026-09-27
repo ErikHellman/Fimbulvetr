@@ -67,6 +67,28 @@ describe('buying', () => {
     expect(h.sim.mode).toBe('play');
   });
 
+  it('spends the press that closes the keeper’s last line on the line, not on the first row', () => {
+    const db = shopDb();
+    const talkFirst: ContentDb = {
+      ...db,
+      scripts: {
+        dev_script: {
+          steps: [
+            { k: 'say', who: null, text: { en: 'Hello.', sv: 'Hej.' } },
+            { k: 'shop', id: 'dev_shop' },
+          ],
+        },
+      },
+    };
+    const h = new Harness({ db: talkFirst, tile: [12, 9], facing: 'n' });
+    h.sim.state.hero.silver = 40;
+    h.press(['interact']);
+    for (let i = 0; i < 20 && h.sim.storyUi()?.k !== 'shop'; i++) h.press(['confirm']);
+    expect(h.sim.storyUi()).toMatchObject({ k: 'shop', last: null });
+    expect(h.sim.state.hero.silver).toBe(40);
+    expect(h.sim.state.inv.items.lantern).toBeUndefined();
+  });
+
   it('leaves on cancel', () => {
     const h = new Harness({ db: shopDb(), tile: [12, 9], facing: 'n' });
     h.press(['interact']).press(['cancel']);

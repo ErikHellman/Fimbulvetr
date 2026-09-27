@@ -1,7 +1,7 @@
 import type { NpcDef } from '@core/actors/npc';
 import type { L10n } from '@core/i18n/t';
 import type { Cond } from '@core/story/cond';
-import { afterRaid, all, any, evening, eveningDue, not, raid, raidNight } from './dialogue/util';
+import { afterRaid, all, any, daytime, evening, eveningDue, not, raid, raidNight } from './dialogue/util';
 import type { NpcId } from './ids';
 
 /** Names as shown above their lines. Old Norse names are the same in both languages. */
@@ -24,10 +24,26 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   dagny: { en: 'Dagný', sv: 'Dagný' },
   skeggi: { en: 'Skeggi', sv: 'Skeggi' },
   arnbjorg: { en: 'Arnbjörg', sv: 'Arnbjörg' },
+  thordis: { en: 'Þórdís', sv: 'Þórdís' },
+  hrafnkell: { en: 'Hrafnkell', sv: 'Hrafnkell' },
+  ketill: { en: 'Ketill', sv: 'Ketill' },
+  solvi: { en: 'Sölvi', sv: 'Sölvi' },
+  gunnhildr: { en: 'Gunnhildr', sv: 'Gunnhildr' },
+  bersi: { en: 'Bersi', sv: 'Bersi' },
+  jorunn: { en: 'Jórunn', sv: 'Jórunn' },
+  eyvindr: { en: 'Eyvindr', sv: 'Eyvindr' },
+  hjalti: { en: 'Hjalti', sv: 'Hjalti' },
+  glumr: { en: 'Glúmr', sv: 'Glúmr' },
+  ragna: { en: 'Ragna', sv: 'Ragna' },
+  steinn: { en: 'Steinn', sv: 'Steinn' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
 const up: Cond = all({ k: 'not', c: { k: 'phase', is: 'night' } }, not(raid));
+
+/** Rain or storm over the region: Uppvík's folk go indoors. */
+const wet: Cond = { k: 'weather', is: ['rain', 'storm'] };
+const night: Cond = { k: 'phase', is: 'night' };
 
 const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
   id,
@@ -90,4 +106,50 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   dagny: npc('dagny', [{ screen: 'myr_road', at: { x: 28, y: 7 }, facing: 'w' }]),
   skeggi: npc('skeggi', [{ screen: 'myr_charcoal', at: { x: 18, y: 11 }, facing: 'e' }]),
   arnbjorg: npc('arnbjorg', [{ screen: 'myr_roots', at: { x: 17, y: 9 }, facing: 'n' }]),
+  /**
+   * Uppvík. By evening the traders, the smith and the idlers crowd into Þórdís's mead hall; in rain the
+   * outdoor folk shelter there or in Hrafnkell's house. Only Bersi stands his gate in any weather.
+   */
+  thordis: npc('thordis', [{ screen: 'upp_int_meadhall', at: { x: 19, y: 6 }, facing: 's' }]),
+  hrafnkell: npc('hrafnkell', [
+    { when: evening, screen: 'upp_int_meadhall', at: { x: 22, y: 10 }, facing: 'w' },
+    { screen: 'upp_int_trader', at: { x: 19, y: 8 }, facing: 's' },
+  ]),
+  ketill: npc('ketill', [
+    { when: evening, screen: 'upp_int_meadhall', at: { x: 27, y: 9 }, facing: 'n' },
+    { when: wet, screen: 'upp_int_smithy', at: { x: 22, y: 10 }, facing: 'w' },
+    { screen: 'upp_smiths', at: { x: 16, y: 7 }, facing: 'w' },
+  ]),
+  solvi: npc('solvi', [{ screen: 'upp_int_runehall', at: { x: 19, y: 10 }, facing: 's' }]),
+  gunnhildr: npc('gunnhildr', [{ screen: 'upp_int_hof', at: { x: 23, y: 9 }, facing: 'w' }]),
+  bersi: npc('bersi', [{ when: not(night), screen: 'upp_gate', at: { x: 24, y: 11 }, facing: 'w' }]),
+  jorunn: npc('jorunn', [
+    { when: all(daytime, wet), screen: 'upp_int_trader', at: { x: 15, y: 12 }, facing: 'e' },
+    { when: daytime, screen: 'upp_square', at: { x: 12, y: 10 }, facing: 's' },
+  ]),
+  eyvindr: npc('eyvindr', [
+    { when: any(evening, wet), screen: 'upp_int_meadhall', at: { x: 14, y: 13 }, facing: 'w' },
+    { screen: 'upp_smiths', at: { x: 31, y: 11 }, facing: 'e' },
+  ]),
+  hjalti: npc('hjalti', [
+    {
+      when: all(daytime, not(wet)),
+      screen: 'upp_square',
+      at: { x: 22, y: 12 },
+      facing: 'w',
+      patrol: [
+        { x: 22, y: 12 },
+        { x: 22, y: 9 },
+      ],
+    },
+  ]),
+  glumr: npc('glumr', [
+    { when: evening, screen: 'upp_int_meadhall', at: { x: 25, y: 13 }, facing: 'e' },
+    { screen: 'upp_hall', at: { x: 28, y: 8 }, facing: 's' },
+  ]),
+  ragna: npc('ragna', [
+    { when: any(evening, wet), screen: 'upp_int_meadhall', at: { x: 12, y: 11 }, facing: 's' },
+    { screen: 'upp_smiths', at: { x: 24, y: 16 }, facing: 'e' },
+  ]),
+  steinn: npc('steinn', [{ screen: 'upp_int_meadhall', at: { x: 18, y: 10 }, facing: 'e' }]),
 };

@@ -124,6 +124,7 @@ function actorOf(rt: SimRt, ref: ActorRef): Entity {
 export function stepStory(rt: SimRt, input: InputFrame): void {
   const run = rt.story;
   if (run === null) return;
+  let frame = input;
   for (let i = 0; i < MAX_INSTANT_STEPS; i++) {
     if (run.cur === null) {
       const next = run.queue.shift();
@@ -138,11 +139,14 @@ export function stepStory(rt: SimRt, input: InputFrame): void {
         continue;
       }
     }
-    if (tick(rt, run, run.cur, input)) {
+    if (tick(rt, run, run.cur, frame)) {
       run.t += 1;
       return;
     }
     run.cur = null;
+    // The press that ended a step is spent on it: the next step starts this tick with nothing pressed, so
+    // closing a keeper's last line does not also buy the first row.
+    frame = { ...frame, pressed: 0 };
   }
 }
 

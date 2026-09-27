@@ -6,6 +6,19 @@ export const uppSmiths: ScreenDef = {
   purpose:
     "Ketill's smithy (door; his anvil outside is his shop by day), Sölvi's rune-carver's hall (door), and the bay with a jetty.",
   things: [
+    /** Ketill's anvil: his shop by day, unless rain drives him indoors. */
+    {
+      k: 'use',
+      at: { x: 15, y: 7 },
+      script: 'shop_ketill',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'phase', is: ['morning', 'day'] },
+          { k: 'not', c: { k: 'weather', is: ['rain', 'storm'] } },
+        ],
+      },
+    },
     { k: 'door', at: { x: 9, y: 6 }, dir: 'n', to: 'upp_int_smithy', arrive: { x: 19, y: 15 }, facing: 'n' },
     {
       k: 'door',

@@ -4,12 +4,19 @@ import { evening, flag, not } from './util';
 /** Arnbjörg, a pilgrim at the roots of the World Tree. */
 export const ARNBJORG: DialogueDef = {
   entry: [
+    { when: flag('st_uppvik_reached'), node: 'uppvik' },
     { when: flag('st_stone1_lit'), node: 'lit' },
     { when: not(flag('n_arnbjorg_met')), node: 'meet' },
     { when: evening, node: 'night' },
     { node: 'day' },
   ],
   nodes: {
+    uppvik: {
+      text: {
+        en: 'You walked all the way to Uppvík and back? Pray at their hof for me. Their rune-stone is older than ours.',
+        sv: 'Gick du ända till Uppvík och tillbaka? Be vid deras hov för mig. Deras runsten är äldre än vår.',
+      },
+    },
     meet: {
       text: {
         en: 'I came to pray at the roots, as my mother did. Now cold breathes out of the cave, and the roots are rotting.',

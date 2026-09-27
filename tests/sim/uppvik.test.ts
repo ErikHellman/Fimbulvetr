@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEV_PRESETS } from '@content/dev/presets';
 import { SOLID } from '@core/world/collision';
 import { Harness } from './harness';
-import { finishStory, talkTo } from './walk';
+import { buyInShop, finishStory, interactNorth, talkTo } from './walk';
 
 const solid = (h: Harness, x: number, y: number): boolean =>
   ((h.sim.screen.collision.flags[y * 40 + x] ?? 0) & SOLID) !== 0;
@@ -21,7 +21,9 @@ describe('the road north', () => {
   });
 });
 
-const town = (screen: 'upp_gate' | 'upp_int_meadhall', tile: readonly [number, number], minute: number) =>
+type TownScreen = 'upp_gate' | 'upp_int_meadhall' | 'upp_int_trader' | 'upp_smiths' | 'upp_int_hof';
+
+const town = (screen: TownScreen, tile: readonly [number, number], minute: number) =>
   new Harness({
     preset: DEV_PRESETS.north,
     screen,
@@ -68,5 +70,86 @@ describe('Uppvík', () => {
     h.sim.command({ t: 'saved' });
     finishStory(h);
     expect(h.sim.mode).toBe('play');
+  });
+});
+
+const npcsHere = (h: Harness): string[] =>
+  h.sim.actors
+    .filter((a) => a.kind === 'npc')
+    .map((a) => a.def)
+    .sort();
+
+describe('Uppvík folk', () => {
+  it('Þórdís gives a new traveller one horn, once', () => {
+    const h = town('upp_int_meadhall', [19, 12], 12 * 60);
+    h.idle(2);
+    talkTo(h, 'thordis');
+    expect(h.sim.state.inv.items.horn).toBe(1);
+    expect(h.sim.state.flags.w_horn_thordis).toBe(true);
+    talkTo(h, 'thordis');
+    expect(h.sim.state.inv.items.horn).toBe(1);
+  });
+
+  it('Hrafnkell sells mead across his counter by day; by night the counter is bare', () => {
+    const h = town('upp_int_trader', [19, 13], 12 * 60);
+    h.sim.state.inv.items.horn = 1;
+    h.sim.state.hero.silver = 50;
+    h.idle(2);
+    interactNorth(h, 18, 9);
+    expect(h.sim.mode).toBe('story');
+    buyInShop(h, 0);
+    expect(h.sim.state.inv.items.mead_red).toBe(1);
+    expect(h.sim.state.hero.silver).toBe(30);
+    const night = town('upp_int_trader', [19, 13], 23 * 60);
+    night.idle(2);
+    expect(npcsHere(night)).not.toContain('hrafnkell');
+    interactNorth(night, 18, 9);
+    expect(night.sim.mode).toBe('play');
+  });
+
+  it('Ketill sells the Uppvík sword at his anvil, and from the anvil indoors when it rains', () => {
+    const h = town('upp_smiths', [14, 9], 12 * 60);
+    h.sim.state.hero.silver = 100;
+    h.idle(2);
+    interactNorth(h, 15, 7);
+    buyInShop(h, 0);
+    expect(h.sim.state.inv.weapon).toBe('uppvik_sword');
+    expect(h.sim.state.hero.silver).toBe(20);
+
+    const wet = town('upp_smiths', [14, 9], 12 * 60);
+    wet.sim.command({ t: 'weather', kind: 'rain' });
+    wet.idle(70);
+    expect(npcsHere(wet)).not.toContain('ketill');
+    wet.sim.command({ t: 'warp', screen: 'upp_int_smithy', x: 21 * 16 + 8, y: 13 * 16 + 14 });
+    wet.idle(2);
+    expect(npcsHere(wet)).toContain('ketill');
+    wet.sim.state.hero.silver = 100;
+    interactNorth(wet, 21, 10);
+    buyInShop(wet, 1);
+    expect(wet.sim.state.inv.armor).toBe('byrnie');
+  });
+
+  it('gathers the town in the mead hall at dusk, and the outdoor folk when it rains', () => {
+    const dusk = town('upp_int_meadhall', [19, 15], 19 * 60);
+    dusk.idle(2);
+    expect(npcsHere(dusk)).toEqual(['eyvindr', 'glumr', 'hrafnkell', 'ketill', 'ragna', 'steinn', 'thordis']);
+    const noon = town('upp_int_meadhall', [19, 15], 12 * 60);
+    noon.idle(2);
+    expect(npcsHere(noon)).toEqual(['steinn', 'thordis']);
+    noon.sim.command({ t: 'weather', kind: 'storm' });
+    noon.idle(70);
+    expect(npcsHere(noon)).toEqual(['eyvindr', 'ragna', 'steinn', 'thordis']);
+  });
+
+  it('prayer at the hof fills seiðr as well as health', () => {
+    const h = town('upp_int_hof', [20, 10], 12 * 60);
+    h.sim.state.hero.seidr = 2;
+    h.sim.hero.hp = 3;
+    interactNorth(h, 20, 8);
+    for (let i = 0; i < 400 && h.sim.storyUi()?.k !== 'save'; i++) h.step(h.frame([])).press(['confirm']);
+    expect(h.sim.state.hero.seidr).toBe(h.sim.state.hero.maxSeidr);
+    expect(h.sim.hero.hp).toBe(h.sim.hero.maxHp);
+    h.sim.command({ t: 'saved' });
+    finishStory(h);
   });
 });

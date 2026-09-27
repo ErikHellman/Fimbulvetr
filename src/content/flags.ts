@@ -39,6 +39,21 @@ export const FLAGS = {
   st_road_open: { t: 'bool' },
   /** Ask has come to Uppvík's gate. */
   st_uppvik_reached: { t: 'bool' },
+  /** First meetings in Uppvík. */
+  n_thordis_met: { t: 'bool' },
+  n_hrafnkell_met: { t: 'bool' },
+  n_ketill_met: { t: 'bool' },
+  n_solvi_met: { t: 'bool' },
+  n_gunnhildr_met: { t: 'bool' },
+  n_bersi_met: { t: 'bool' },
+  n_jorunn_met: { t: 'bool' },
+  n_eyvindr_met: { t: 'bool' },
+  n_hjalti_met: { t: 'bool' },
+  n_glumr_met: { t: 'bool' },
+  n_ragna_met: { t: 'bool' },
+  n_steinn_met: { t: 'bool' },
+  /** Þórdís gave Ask the first mead horn. */
+  w_horn_thordis: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -142,6 +142,19 @@ export const NPCS = [
   'dagny',
   'skeggi',
   'arnbjorg',
+  // Uppvík
+  'thordis',
+  'hrafnkell',
+  'ketill',
+  'solvi',
+  'gunnhildr',
+  'bersi',
+  'jorunn',
+  'eyvindr',
+  'hjalti',
+  'glumr',
+  'ragna',
+  'steinn',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -149,7 +162,7 @@ export type NpcId = (typeof NPCS)[number];
 export const QUESTS = ['q_chores', 'q_legend', 'q_runestone_1'] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop'] as const;
+export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill'] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
@@ -172,6 +185,8 @@ export const SCRIPTS = [
   'upp_knock_in',
   'upp_knock_out',
   'uppvik_arrive',
+  'shop_hrafnkell',
+  'shop_ketill',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

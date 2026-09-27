@@ -83,8 +83,25 @@ const rest: ScriptDef = {
   ],
 };
 
+/** Hrafnkell across his counter, and Ketill at his anvil: a word, then the wares. */
+const shopHrafnkell: ScriptDef = {
+  steps: [
+    { k: 'talk', dialogue: 'hrafnkell', with: 'hrafnkell' },
+    { k: 'shop', id: 'hrafnkell' },
+  ],
+};
+
+const shopKetill: ScriptDef = {
+  steps: [
+    { k: 'talk', dialogue: 'ketill', with: 'ketill' },
+    { k: 'shop', id: 'ketill' },
+  ],
+};
+
 export const UPPVIK_SCRIPTS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   uppvik_arrive: arrive,
+  shop_hrafnkell: shopHrafnkell,
+  shop_ketill: shopKetill,
   upp_knock_in: knock(false),
   upp_knock_out: knock(true),
   meadhall_rest: rest,
