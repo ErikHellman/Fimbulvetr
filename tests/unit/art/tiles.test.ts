@@ -84,6 +84,18 @@ describe('tileset', () => {
     expect(idx[1]).toBe(ts.entries.water.start + 46);
   });
 
+  it('lets water run up to a jetty and keeps a roof whole around a chimney', () => {
+    const pier: TerrainId[] = Array.from({ length: 9 }, () => 'water');
+    pier[4] = 'jetty';
+    const byPier = tileIndices({ cols: 3, rows: 3, cells: pier }, ts, 1);
+    expect(byPier[1]).toBe(ts.entries.water.start + 46);
+    const house: TerrainId[] = Array.from({ length: 9 }, () => 'roof');
+    house[4] = 'chimney';
+    const byStack = tileIndices({ cols: 3, rows: 3, cells: house }, ts, 1);
+    expect(byStack[1]).toBe(ts.entries.roof.start + 46);
+    expect(byStack[4]).toBe(ts.entries.chimney.start);
+  });
+
   it('is deterministic', () => {
     const again = buildTileset();
     expect(ts.tiles.every((t, i) => rastersEqual(t, again.tiles[i] ?? t))).toBe(true);

@@ -242,6 +242,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     paint: (p) => {
       planks(p, C.wood, C.woodShade, true);
       p.rect(0, 0, 16, 2, C.ink);
+      p.rect(1, 2, 14, 1, C.woodShade);
       p.rect(2, 3, 12, 13, C.woodShade);
       p.rect(3, 4, 10, 12, C.ink);
     },
@@ -359,6 +360,61 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       p.rect(6, 4, 1, 3, C.ink);
       p.rect(7, 5, 2, 1, C.ink);
       p.rect(7, 9, 1, 4, C.ink);
+    },
+  },
+  door_shut: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.wood, C.woodShade, true);
+      p.rect(0, 0, 16, 2, C.ink);
+      p.rect(1, 2, 14, 1, C.woodShade);
+      p.rect(2, 3, 12, 13, C.ink);
+      p.rect(3, 4, 10, 12, C.wood);
+      for (const x of [5, 8, 11]) p.rect(x, 4, 1, 12, C.woodShade);
+      p.rect(3, 5, 2, 1, C.rockShade);
+      p.rect(3, 12, 2, 1, C.rockShade);
+      p.rect(11, 9, 2, 2, C.steelShade);
+    },
+  },
+  window: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.wood, C.woodShade, true);
+      p.rect(0, 0, 16, 2, C.ink);
+      p.rect(0, 14, 16, 2, C.woodShade);
+      p.rect(3, 3, 10, 10, C.ink);
+      p.rect(4, 4, 8, 8, C.rockShade);
+      p.rect(8, 4, 1, 8, C.wood);
+      p.rect(4, 8, 8, 1, C.wood);
+      p.rect(5, 5, 2, 1, C.rockLight);
+      p.px(5, 6, C.rockLight);
+      p.rect(3, 13, 10, 1, C.woodShade);
+    },
+  },
+  chimney: {
+    autotile: false,
+    variants: 1,
+    group: 'roof',
+    paint: (p) => {
+      roof(p, 0xff);
+      p.rect(4, 2, 8, 11, C.ink);
+      p.rect(5, 3, 6, 9, C.rock);
+      p.rect(9, 3, 2, 9, C.rockShade);
+      p.rect(5, 3, 6, 2, C.ink);
+    },
+  },
+  jetty: {
+    autotile: false,
+    variants: 1,
+    group: 'water',
+    paint: (p) => {
+      planks(p, C.wood, C.woodShade, false);
+      p.rect(0, 0, 16, 1, C.ink);
+      p.rect(0, 15, 16, 1, C.ink);
+      p.rect(1, 1, 2, 2, C.woodShade);
+      p.rect(1, 13, 2, 2, C.woodShade);
     },
   },
 };

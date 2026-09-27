@@ -24,6 +24,10 @@ export const TERRAIN_IDS = [
   'hearth',
   'table',
   'menhir',
+  'door_shut',
+  'window',
+  'chimney',
+  'jetty',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -60,4 +64,12 @@ export const TERRAIN = {
   table: { solid: true, decor: { art: ['decor_table'], w: 2, h: 1 } },
   /** A standing stone. */
   menhir: { solid: true, decor: { art: ['decor_menhir'], w: 1, h: 1 } },
+  /** A closed door on a house you cannot enter. */
+  door_shut: { solid: true },
+  /** A window in a house wall. */
+  window: { solid: true },
+  /** A chimney stack on a roof; the shell puts smoke on it. */
+  chimney: { solid: true },
+  /** Planks over water: walkable, water laps right up to its edge. */
+  jetty: { solid: false },
 } as const satisfies Record<TerrainId, TerrainDef>;
