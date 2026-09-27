@@ -1,5 +1,5 @@
 import type { TerrainId } from '@content/terrain';
-import { nextFloat } from '@core/math/rng';
+import { nextFloat, nextInt } from '@core/math/rng';
 import { C } from '../palette';
 import type { Painter } from '../painter';
 import { insideBlob, onBlobEdge } from './blob';
@@ -8,7 +8,15 @@ export interface TerrainArt {
   readonly autotile: boolean;
   /** Plain variants (ignored for auto-tiled terrain, which always has 47). */
   readonly variants: number;
-  paint(p: Painter, v: { readonly mask: number; readonly variant: number }): void;
+  /** Animation frames per variant (default 1) and how long each shows. */
+  readonly frames?: number;
+  readonly frameMs?: number;
+  /**
+   * Terrains in the same group count as the same terrain when auto-tiling, so water meets the ford or a
+   * jetty without a bank, and a chimney does not break up its roof. Defaults to the terrain itself.
+   */
+  readonly group?: string;
+  paint(p: Painter, v: { readonly mask: number; readonly variant: number; readonly frame: number }): void;
 }
 
 function grass(p: Painter): void {
@@ -33,6 +41,30 @@ function region(
       else p.px(x, y, nextFloat(p.rng) < density ? speck : fill);
     }
   }
+}
+
+/**
+ * Running water: short light dashes on two rows per tile that drift 2 px south per frame, so four frames
+ * loop seamlessly. The row offsets come from the painter's rng, which is the same for every frame.
+ */
+function flow(p: Painter, mask: number, frame: number, inset: number, colour: string): void {
+  for (let k = 0; k < 2; k++) {
+    const x0 = nextInt(p.rng, 0, 7);
+    const y = (k * 8 + 3 + frame * 2) % 16;
+    for (let x = x0; x < 16; x += 8)
+      for (let i = 0; i < 3 && x + i < 16; i++)
+        if (insideBlob(mask, x + i, y, inset) && !onBlobEdge(mask, x + i, y, inset)) p.px(x + i, y, colour);
+  }
+}
+
+/** A turf roof seen from above: ink edge, leaf-shade stripes every third row. */
+function roof(p: Painter, mask: number): void {
+  grass(p);
+  region(p, mask, 0, C.turfShade, C.ink, C.turf, 0.12);
+  for (let y = 1; y < 16; y += 3)
+    for (let x = 0; x < 16; x++)
+      if (insideBlob(mask, x, y, 0) && !onBlobEdge(mask, x, y, 0) && (x + y) % 4 !== 0)
+        p.px(x, y, C.leafShade);
 }
 
 function tree(p: Painter, variant: number): void {
@@ -119,9 +151,13 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   water: {
     autotile: true,
     variants: 0,
+    frames: 4,
+    frameMs: 150,
+    group: 'water',
     paint: (p, v) => {
       grass(p);
       region(p, v.mask, 3, C.water, C.waterLight, C.waterShade, 0.08);
+      flow(p, v.mask, v.frame, 3, C.waterLight);
     },
   },
   rock: {
@@ -186,13 +222,9 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   roof: {
     autotile: true,
     variants: 0,
+    group: 'roof',
     paint: (p, v) => {
-      grass(p);
-      region(p, v.mask, 0, C.turfShade, C.ink, C.turf, 0.12);
-      for (let y = 1; y < 16; y += 3)
-        for (let x = 0; x < 16; x++)
-          if (insideBlob(v.mask, x, y, 0) && !onBlobEdge(v.mask, x, y, 0) && (x + y) % 4 !== 0)
-            p.px(x, y, C.leafShade);
+      roof(p, v.mask);
     },
   },
   wall: {
@@ -240,9 +272,13 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ford: {
     autotile: true,
     variants: 0,
+    frames: 4,
+    frameMs: 150,
+    group: 'water',
     paint: (p, v) => {
       grass(p);
       region(p, v.mask, 2, C.waterLight, C.water, C.rockLight, 0.08);
+      flow(p, v.mask, v.frame, 2, C.rockLight);
     },
   },
   well: {
