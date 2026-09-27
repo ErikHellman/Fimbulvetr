@@ -9,6 +9,9 @@ export const myrTrollskog: ScreenDef = {
     /** The stone in the ring's gap: a troll the sun caught. Lift it and throw it. */
     { k: 'prop', id: 'troll_stone', at: { x: 28, y: 12 } },
     { k: 'piece', id: 'hp_myr_trollskog', at: { x: 28, y: 8 } },
+    /** Two old trolls walk the wood every night; the sunrise turns them to stone where they stand. */
+    { k: 'enemy', id: 'forest_troll', at: { x: 12, y: 9 }, when: { k: 'phase', is: 'night' } },
+    { k: 'enemy', id: 'forest_troll', at: { x: 20, y: 15 }, when: { k: 'phase', is: 'night' } },
   ],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
   spawns: [

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEV_PRESETS } from '@content/dev/presets';
 import { Harness } from './harness';
-import { finishStory, interactNorth } from './walk';
+import { face, finishStory, interactNorth, walkTo } from './walk';
 
 const shopRows = (h: Harness): string[] => {
   const ui = h.sim.storyUi();
@@ -73,5 +73,53 @@ describe('the huldra', () => {
     bargain(h, 0);
     expect(h.sim.state.flags.q_huldra_promise).toBe(true);
     expect(h.sim.state.inv.items.winter_cloak).toBe(1);
+  });
+});
+
+describe('the troll wood', () => {
+  const wood = (minute: number) =>
+    new Harness({ preset: DEV_PRESETS.uppvik, screen: 'myr_trollskog', tile: [28, 15], minute, facing: 'n' });
+
+  it('has trolls walking it at night', () => {
+    const day = wood(12 * 60);
+    day.idle(2);
+    expect(day.sim.enemies.filter((e) => e.def === 'forest_troll')).toHaveLength(0);
+    const night = wood(23 * 60);
+    night.idle(2);
+    expect(night.sim.enemies.filter((e) => e.def === 'forest_troll')).toHaveLength(2);
+  });
+
+  it('opens its ring of stones when the troll stone in the gap is lifted away', () => {
+    const h = wood(12 * 60);
+    h.idle(2);
+    walkTo(h, 28, 13);
+    face(h, 'n');
+    h.press(['interact']).idle(20);
+    expect(h.sim.hero.fsm.s).toBe('carry');
+    h.hold(['down', 'interact'], 1).idle(60);
+    expect(h.sim.actors.some((a) => a.def === 'troll_stone')).toBe(false);
+    walkTo(h, 28, 8);
+    h.idle(2);
+    expect(h.sim.state.world.pieces).toContain('hp_myr_trollskog');
+  });
+});
+
+describe('the fen islet', () => {
+  it('keeps its heart piece behind brambles until Eldr burns them', () => {
+    const h = new Harness({ preset: DEV_PRESETS.uppvik, screen: 'myr_fen', tile: [30, 11], facing: 's' });
+    h.sim.state.inv.galdr = ['eldr'];
+    h.idle(2);
+    const brambles = () => h.sim.actors.filter((a) => a.def === 'bramble');
+    expect(brambles()).toHaveLength(1);
+    walkTo(h, 30, 12);
+    face(h, 's');
+    // The blade only tangles in them.
+    h.press(['sword']).idle(30);
+    expect(brambles()).toHaveLength(1);
+    h.press(['galdr']).idle(90);
+    expect(brambles()).toHaveLength(0);
+    walkTo(h, 30, 16);
+    h.idle(2);
+    expect(h.sim.state.world.pieces).toContain('hp_myr_fen');
   });
 });
