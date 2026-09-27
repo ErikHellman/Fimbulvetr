@@ -39,12 +39,12 @@ export function openMenu(tab: MenuTab = 'items'): MenuState {
   return { tab, cursor: 0, confirm: false };
 }
 
-/** What the items tab lists: owned sub-items, then food, both in registry order. */
+/** What the items tab lists: owned sub-items, then food and mead, both in registry order. */
 export function menuItems(inv: InventoryState, defs: Readonly<Record<ItemId, ItemDef>>): MenuItem[] {
   const owned = ITEMS.filter((id) => (inv.items[id] ?? 0) > 0);
   const slotOf = (id: ItemId): 0 | 1 | null => (inv.slots[0] === id ? 0 : inv.slots[1] === id ? 1 : null);
   const subs = owned.filter((id) => defs[id].slot);
-  const food = owned.filter((id) => defs[id].heal !== undefined);
+  const food = owned.filter((id) => defs[id].heal !== undefined || defs[id].seidr !== undefined);
   return [
     ...subs.map((id) => ({ id, count: inv.items[id] ?? 0, kind: 'sub' as const, slot: slotOf(id) })),
     ...food.map((id) => ({ id, count: inv.items[id] ?? 0, kind: 'food' as const, slot: null })),

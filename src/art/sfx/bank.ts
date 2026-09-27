@@ -383,4 +383,14 @@ export const SFX_BANK = {
     release: 0.35,
     volume: 0.3,
   },
+  /** A long swallow from a mead horn. */
+  sfx_drink: {
+    wave: 'triangle',
+    freq: 330,
+    freqEnd: 220,
+    attack: 0.02,
+    sustain: 0.18,
+    release: 0.12,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

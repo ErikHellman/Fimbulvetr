@@ -37,6 +37,17 @@ describe('pause menu', () => {
     ]);
   });
 
+  it('lists mead to drink, green mead too', () => {
+    const inv = inventory();
+    inv.items = { ...inv.items, horn: 2, mead_green: 1 };
+    expect(menuItems(inv, DB.items).map((i) => i.id)).toEqual([
+      'lantern',
+      'boomerang',
+      'mead_green',
+      'flatbread',
+    ]);
+  });
+
   it('moves between tabs with left and right, wrapping, and M jumps to the map', () => {
     const items = menuItems(inventory(), DB.items);
     expect(run(openMenu(), items, ['right']).state?.tab).toBe('map');

@@ -67,6 +67,9 @@ export function createDrop(id: number, kind: DropKind, pos: Vec): Entity {
   return e;
 }
 
+/** Seiðr in a dropped jar. */
+export const SEIDR_JAR = 2;
+
 /**
  * Walking over a pickup collects it: a dropped heart heals a heart, silver adds one, and every fourth piece
  * of heart adds a heart and refills health. Drops that are left lying run out.
@@ -94,6 +97,12 @@ export function collectPickups(rt: SimRt): void {
     if (e.def === 'silver') {
       const hero = rt.state.hero;
       hero.silver = Math.min(PURSE_CAP[hero.purse], hero.silver + 1);
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
+      continue;
+    }
+    if (e.def === 'seidr') {
+      const hero = rt.state.hero;
+      hero.seidr = Math.min(hero.maxSeidr, hero.seidr + SEIDR_JAR);
       rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;
     }

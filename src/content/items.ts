@@ -86,12 +86,16 @@ const DUNGEON: Partial<Record<ItemId, DungeonGift>> = {
   compass: 'compass',
 };
 
-/** Food heals a heart and a half. */
-const HEAL: Partial<Record<ItemId, number>> = { flatbread: 6, cheese: 6 };
+/** Food heals a heart and a half; red and blue mead heal every heart (the cap trims it). */
+const HEAL: Partial<Record<ItemId, number>> = { flatbread: 6, cheese: 6, mead_red: 80, mead_blue: 80 };
+/** Green and blue mead fill the seiðr bar. */
+const SEIDR: Partial<Record<ItemId, number>> = { mead_green: 30, mead_blue: 30 };
+const IN_HORN: ReadonlySet<ItemId> = new Set(['mead_red', 'mead_green', 'mead_blue']);
 
 export const ITEM_DEFS = Object.fromEntries(
   ITEMS.map((id) => {
     const heal = HEAL[id];
+    const seidr = SEIDR[id];
     const dungeon = DUNGEON[id];
     const name = ITEM_NAMES[id];
     const def: ItemDef = {
@@ -102,6 +106,10 @@ export const ITEM_DEFS = Object.fromEntries(
       ...(heal === undefined ? {} : { heal }),
       ...(dungeon === undefined ? {} : { dungeon }),
       ...(id === 'heart_container' ? { hearts: 1 } : {}),
+      ...(seidr === undefined ? {} : { seidr }),
+      ...(IN_HORN.has(id) ? { horn: true } : {}),
+      ...(id === 'seidr_upgrade' ? { maxSeidr: 5 } : {}),
+      ...(id === 'purse' ? { purse: true } : {}),
     };
     return [id, def];
   }),

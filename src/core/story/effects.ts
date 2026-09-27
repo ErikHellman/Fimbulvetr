@@ -12,6 +12,8 @@ export const PURSE_CAP = [100, 300, 999] as const;
 export const HEART = 4;
 /** Twenty hearts at most. */
 export const MAX_HP = 20 * HEART;
+/** The seiðr bar's largest size (10 at the start, +5 per vessel). */
+export const MAX_SEIDR = 30;
 
 /** A change to the saved state. Dialogue choices, scripts, triggers and pickups all use it. */
 export type Effect =
@@ -23,6 +25,8 @@ export type Effect =
   | { readonly k: 'silver'; readonly n: number }
   /** Quarter hearts; 0 or less heals fully. */
   | { readonly k: 'heal'; readonly n: number }
+  /** Seiðr points; 0 or less fills the bar. */
+  | { readonly k: 'seidr'; readonly n: number }
   | { readonly k: 'weapon'; readonly id: WeaponId }
   | { readonly k: 'shield'; readonly has: boolean }
   | { readonly k: 'setSeason'; readonly season: Season }
@@ -71,6 +75,9 @@ export function applyEffect(e: Effect, rt: SimRt): void {
     case 'heal':
       rt.hero.hp = e.n <= 0 ? rt.hero.maxHp : Math.min(rt.hero.maxHp, rt.hero.hp + e.n);
       break;
+    case 'seidr':
+      s.hero.seidr = e.n <= 0 ? s.hero.maxSeidr : Math.min(s.hero.maxSeidr, s.hero.seidr + e.n);
+      break;
     case 'weapon':
       s.inv.weapon = e.id;
       break;
@@ -115,9 +122,28 @@ export function giveItem(rt: SimRt, item: ItemId, n: number): void {
     rt.hero.maxHp = Math.min(MAX_HP, rt.hero.maxHp + def.hearts * HEART * n);
     rt.hero.hp = rt.hero.maxHp;
   }
-  inv.items[item] = Math.min(def.max, (inv.items[item] ?? 0) + n);
+  // Mead goes into empty horns only.
+  const room = def.horn === true ? hornsFree(rt) : n;
+  const add = Math.min(n, room);
+  if (add <= 0) return;
+  inv.items[item] = Math.min(def.max, (inv.items[item] ?? 0) + add);
+  const hero = rt.state.hero;
+  if (def.purse === true) hero.purse = Math.min(2, inv.items[item] ?? 0) as 0 | 1 | 2;
+  if (def.maxSeidr !== undefined) {
+    hero.maxSeidr = Math.min(MAX_SEIDR, hero.maxSeidr + def.maxSeidr * add);
+    hero.seidr = hero.maxSeidr;
+  }
   if (def.slot && !inv.slots.includes(item)) {
     if (inv.slots[0] === null) inv.slots = [item, inv.slots[1]];
     else if (inv.slots[1] === null) inv.slots = [inv.slots[0], item];
   }
+}
+
+/** Horns owned minus the mead already in them. */
+export function hornsFree(rt: SimRt): number {
+  const items = rt.state.inv.items;
+  let full = 0;
+  for (const [id, n] of Object.entries(items) as [ItemId, number][])
+    if (rt.db.items[id].horn === true) full += n;
+  return (items.horn ?? 0) - full;
 }

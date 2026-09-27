@@ -116,6 +116,7 @@ export const SFX = [
   'sfx_menu_move',
   'sfx_menu_ok',
   'sfx_save',
+  'sfx_drink',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

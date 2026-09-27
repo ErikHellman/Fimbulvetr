@@ -61,6 +61,8 @@ export interface AttackWindow {
 export interface DropTable {
   readonly heart: number;
   readonly silver: number;
+  /** A seiðr jar (two points of seiðr). */
+  readonly seidr?: number;
   readonly none: number;
 }
 
