@@ -2,7 +2,10 @@ import type { GameState } from '@core/state/gameState';
 import { loadSave, makeSave, parseSaveJson, type LoadResult, type SaveData } from '@core/state/save';
 import { Autosaver } from './autosave';
 import { downloadSave } from './exportImport';
-import type { SaveStore } from './saveStore';
+import type { SaveStore, SaveSummary, SlotId } from './saveStore';
+
+export const SLOT_IDS = ['auto', 'auto_prev', 's1', 's2', 's3'] as const satisfies readonly SlotId[];
+export type ManualSlot = 's1' | 's2' | 's3';
 
 export const AUTOSAVE_INTERVAL_MS = 4000;
 
@@ -32,6 +35,55 @@ export class SaveService {
 
   get available(): boolean {
     return this.store !== null;
+  }
+
+  /** Every slot's summary for the title and slot screens (null: empty or unreadable). */
+  async slots(): Promise<Record<SlotId, SaveSummary | null>> {
+    const out: Record<SlotId, SaveSummary | null> = {
+      auto: null,
+      auto_prev: null,
+      s1: null,
+      s2: null,
+      s3: null,
+    };
+    if (this.store === null) return out;
+    for (const slot of SLOT_IDS) {
+      try {
+        out[slot] = (await this.store.get(slot))?.summary ?? null;
+      } catch (e) {
+        console.warn(`[save] reading ${slot} failed:`, e);
+      }
+    }
+    return out;
+  }
+
+  /** A slot's game, validated and migrated; null when empty or unusable. */
+  async loadSlot(slot: SlotId): Promise<GameState | null> {
+    if (this.store === null) return null;
+    let record;
+    try {
+      record = await this.store.get(slot);
+    } catch (e) {
+      console.warn(`[save] reading ${slot} failed:`, e);
+      return null;
+    }
+    if (record === undefined) return null;
+    const result = loadSave(record.save, this.knownScreens);
+    if (result.ok) return result.state;
+    console.warn(`[save] ${slot} is unusable: ${result.error.detail}`);
+    return null;
+  }
+
+  /** Writes a manual slot (at a mead hall or hof). Returns whether it was written. */
+  async writeSlot(slot: ManualSlot, state: GameState): Promise<boolean> {
+    if (this.store === null) return false;
+    try {
+      await this.store.writeSlot(slot, this.toSave(state));
+      return true;
+    } catch (e) {
+      console.warn(`[save] writing ${slot} failed:`, e);
+      return false;
+    }
   }
 
   /** The newest usable autosave, falling back to the one before it. */

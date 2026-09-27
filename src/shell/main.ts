@@ -18,6 +18,7 @@ import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { BootScene } from '@shell/scenes/BootScene';
 import { PlayScene } from '@shell/scenes/PlayScene';
+import { TitleScene } from '@shell/scenes/TitleScene';
 import { UiScene } from '@shell/scenes/UiScene';
 import type { Services } from '@shell/services';
 
@@ -50,7 +51,7 @@ function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
     banner: false,
     scale: { mode: Phaser.Scale.NONE, autoCenter: Phaser.Scale.NO_CENTER },
     input: { keyboard: false, gamepad: false },
-    scene: [new BootScene(services), new PlayScene(), new UiScene(), ...extra],
+    scene: [new BootScene(services), new TitleScene(), new PlayScene(), new UiScene(), ...extra],
   });
   game.canvas.setAttribute('aria-label', GAME_TITLE);
   attachZoom(game, () => services.settings.scaling);
@@ -84,6 +85,8 @@ async function main(): Promise<void> {
   }
   const saves = new SaveService(store, __BUILD_ID__, new Set<string>(SCREEN_IDS));
   const fresh = query?.screen !== undefined || query?.preset !== undefined;
+  // The title screen, unless a dev query names where to start (or says `title=0`).
+  const title = query?.title ?? !(fresh || query?.nosave === true);
   const loaded = fresh ? null : await saves.loadAuto();
   const state = loaded ?? newGame(query?.seed ?? randomSeed(), NEW_GAME);
   if (query?.preset !== undefined && isDevPresetId(query.preset))
@@ -101,7 +104,7 @@ async function main(): Promise<void> {
       muted: query?.mute === true,
       rolled: query?.rolled ?? true,
       ...(query?.weather === undefined ? {} : { weather: query.weather }),
-      start: gallery === null ? 'play' : 'gallery',
+      start: gallery !== null ? 'gallery' : title ? 'title' : 'play',
     },
     gallery === null ? [] : [gallery],
   );

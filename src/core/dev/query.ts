@@ -23,6 +23,8 @@ export interface DevQuery {
   readonly weather?: WeatherKind;
   /** `rolled=0`: no rolled weather or spawn tables (the e2e runs pin it off). */
   readonly rolled: boolean;
+  /** `title=0` skips the title screen, `title=1` shows it even with a screen or preset named. */
+  readonly title?: boolean;
   /** `dev=gallery`: show the texture gallery instead of the game. */
   readonly gallery: boolean;
   readonly nosave: boolean;
@@ -128,6 +130,9 @@ export function parseDevQuery(
   const ro = params.get('rolled');
   if (ro !== undefined && ro !== '0' && ro !== '1') warnings.push(`bad rolled '${ro}' (use 0 or 1)`);
 
+  const ti = params.get('title');
+  if (ti !== undefined && ti !== '0' && ti !== '1') warnings.push(`bad title '${ti}' (use 0 or 1)`);
+
   const dev = params.get('dev');
   if (dev !== undefined && dev !== 'gallery') warnings.push(`unknown dev view '${dev}'`);
 
@@ -141,6 +146,7 @@ export function parseDevQuery(
     preset,
     weather,
     rolled: ro !== '0',
+    ...(ti === '0' || ti === '1' ? { title: ti === '1' } : {}),
     gallery: dev === 'gallery',
     nosave: params.has('nosave'),
     mute: params.has('mute'),

@@ -37,6 +37,30 @@ describe('SaveService', () => {
     warn.mockRestore();
   });
 
+  it('writes manual slots, lists them with summaries and loads them back', async () => {
+    const store = await SaveStore.open(factory());
+    const service = new SaveService(store, 'test', known);
+    expect(await service.slots()).toEqual({ auto: null, auto_prev: null, s1: null, s2: null, s3: null });
+    const game = newGame(1, NEW_GAME);
+    game.hero.hp = 8;
+    game.clock.day = 3;
+    await service.writeSlot('s2', game);
+    await store.writeAuto(makeSave(newGame(2, NEW_GAME), 'test', 'x'));
+    const slots = await service.slots();
+    expect(slots.s2).toMatchObject({ hearts: 2, day: 3 });
+    expect(slots.auto).not.toBeNull();
+    expect(slots.s1).toBeNull();
+    expect((await service.loadSlot('s2'))?.hero.hp).toBe(8);
+    expect(await service.loadSlot('s1')).toBeNull();
+  });
+
+  it('lists nothing and loads nothing without storage', async () => {
+    const service = new SaveService(null, 'test', known);
+    expect(await service.slots()).toEqual({ auto: null, auto_prev: null, s1: null, s2: null, s3: null });
+    expect(await service.loadSlot('s1')).toBeNull();
+    await expect(service.writeSlot('s1', newGame(1, NEW_GAME))).resolves.toBe(false);
+  });
+
   it('works without storage', async () => {
     const service = new SaveService(null, 'test', known);
     expect(service.available).toBe(false);

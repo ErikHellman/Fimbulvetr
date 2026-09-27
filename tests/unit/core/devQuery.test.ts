@@ -51,6 +51,13 @@ describe('parseDevQuery', () => {
     expect(bad.warnings).toHaveLength(2);
   });
 
+  it('reads the title switch', () => {
+    expect(parseDevQuery('title=0', known).title).toBe(false);
+    expect(parseDevQuery('title=1', known).title).toBe(true);
+    expect(parseDevQuery('', known).title).toBeUndefined();
+    expect(parseDevQuery('title=maybe', known).warnings).toHaveLength(1);
+  });
+
   it('parses clock times', () => {
     expect(parseClockTime('day')).toBe(720);
     expect(parseClockTime('night')).toBe(0);

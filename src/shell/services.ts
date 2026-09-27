@@ -19,8 +19,8 @@ export interface Services {
   readonly rolled: boolean;
   /** Dev/test `?weather=`: the starting weather override. */
   readonly weather?: WeatherKind;
-  /** The scene Boot hands over to: the game, or the dev texture gallery. */
-  readonly start: 'play' | 'gallery';
+  /** The scene Boot hands over to: the title screen, straight into the game, or the dev texture gallery. */
+  readonly start: 'title' | 'play' | 'gallery';
 }
 
 export interface RenderAssets {
