@@ -11,5 +11,9 @@ export type Command =
   | { readonly t: 'setSeason'; readonly season: Season }
   | { readonly t: 'setFlag'; readonly flag: FlagId; readonly value: FlagValue }
   | { readonly t: 'buy'; readonly shop: ShopId; readonly item: ItemId }
+  /** Puts an owned sub-item in item slot 0 (K) or 1 (L), or empties the slot; swaps if it was in the other. */
+  | { readonly t: 'equip'; readonly slot: 0 | 1; readonly item: ItemId | null }
+  /** Eats food (or drinks mead) from the pack. */
+  | { readonly t: 'eat'; readonly item: ItemId }
   /** Dev: give items. */
   | { readonly t: 'give'; readonly item: ItemId; readonly n: number };

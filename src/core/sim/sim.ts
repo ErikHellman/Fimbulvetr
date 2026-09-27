@@ -33,6 +33,7 @@ import { runCritters, settleCritters } from './systems/critters';
 import { stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
 import { fixtureHazards, refreshFixtures } from './systems/fixtures';
+import { eat, equip, useItems } from './systems/items';
 import { collectPickups } from './systems/pickups';
 import { stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
@@ -102,6 +103,12 @@ export class Sim implements SimRt {
 
   command(c: Command): void {
     this.queue.push(c);
+  }
+
+  /** Applies queued commands now (the pause menu equips while the sim is not stepping). */
+  flushCommands(): void {
+    for (const c of this.queue.splice(0)) this.apply(c);
+    syncHero(this);
   }
 
   drainEvents(): SimEvent[] {
@@ -234,6 +241,7 @@ export class Sim implements SimRt {
     refreshFixtures(this);
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
+    useItems(this, input);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
     const ctx = actorCtx(this);
     runEnemies(this, ctx);
@@ -280,6 +288,12 @@ export class Sim implements SimRt {
         break;
       case 'give':
         giveItem(this, c.item, c.n);
+        break;
+      case 'equip':
+        equip(this, c.slot, c.item);
+        break;
+      case 'eat':
+        eat(this, c.item);
         break;
     }
   }

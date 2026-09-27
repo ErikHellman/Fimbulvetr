@@ -11,4 +11,6 @@ export interface ItemDef {
   readonly slot: boolean;
   /** How many can be carried. */
   readonly max: number;
+  /** Food and mead: quarter hearts healed when eaten from the menu. */
+  readonly heal?: number;
 }

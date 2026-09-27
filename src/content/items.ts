@@ -40,9 +40,18 @@ const MAX: Partial<Record<ItemId, number>> = {
   purse: 2,
 };
 
+/** Food heals a heart and a half. */
+const HEAL: Partial<Record<ItemId, number>> = { flatbread: 6, cheese: 6 };
+
 export const ITEM_DEFS = Object.fromEntries(
-  ITEMS.map((id) => [
-    id,
-    { name: ITEM_NAMES[id], slot: (SUB_ITEMS as readonly string[]).includes(id), max: MAX[id] ?? 1 },
-  ]),
+  ITEMS.map((id) => {
+    const heal = HEAL[id];
+    const def: ItemDef = {
+      name: ITEM_NAMES[id],
+      slot: (SUB_ITEMS as readonly string[]).includes(id),
+      max: MAX[id] ?? 1,
+      ...(heal === undefined ? {} : { heal }),
+    };
+    return [id, def];
+  }),
 ) as Readonly<Record<ItemId, ItemDef>>;
