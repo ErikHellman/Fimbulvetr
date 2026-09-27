@@ -1,12 +1,14 @@
 import * as Phaser from 'phaser';
 import { grade } from '@art/grading';
 import { ANIMS } from '@art/sprites';
+import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
 import { daylight } from '@core/clock/clock';
+import type { Entity } from '@core/actors/entity';
 import { InputLatch } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
 import { add, lerp } from '@core/math/vec';
@@ -155,6 +157,10 @@ export class PlayScene extends Phaser.Scene {
     } else if (ev.t === 'autosave') this.services.saves.autosaver.request(this.sim.snapshot());
   }
 
+  /** The hero's sprite follows the weapon in hand; everything else draws its own art. */
+  private readonly artOf = (e: Entity): string =>
+    e.kind === 'hero' ? heroArtFor(this.sim.state.inv.weapon) : e.art;
+
   private draw(alpha: number): void {
     const tr = this.sim.transition;
     this.fadeRect.setAlpha(this.sim.fade());
@@ -165,11 +171,11 @@ export class PlayScene extends Phaser.Scene {
       const cam = lerp(from, to, p);
       this.cameras.main.setScroll(Math.round(cam.x), Math.round(cam.y));
       const hero = lerp(add(from, tr.heroFrom), add(to, tr.heroTo), p);
-      this.views.sync(this.sim.entities, (e) => (e === this.sim.hero ? hero : add(to, e.pos)));
+      this.views.sync(this.sim.entities, (e) => (e === this.sim.hero ? hero : add(to, e.pos)), this.artOf);
     } else {
       const origin = this.sim.originOf(this.sim.screen.id);
       this.cameras.main.setScroll(origin.x, origin.y);
-      this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)));
+      this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)), this.artOf);
     }
     const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {

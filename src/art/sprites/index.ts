@@ -15,6 +15,8 @@ export type { SpriteFrame } from './types';
 
 export const ANIMS: AnimTable = {
   hero: HERO_ANIMS,
+  hero_axe: HERO_ANIMS,
+  hero_fork: HERO_ANIMS,
   prop_dummy: DUMMY_ANIMS,
   ...PEOPLE_ANIMS,
   ...FARM_ANIMS,

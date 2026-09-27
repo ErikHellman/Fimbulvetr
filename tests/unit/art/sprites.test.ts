@@ -3,6 +3,7 @@ import { frameName } from '@art/anims';
 import { countOpaque, flipX, getPixel, hex, rastersEqual } from '@art/raster';
 import { C } from '@art/palette';
 import { ANIMS, buildSprites } from '@art/sprites';
+import { heroArtFor } from '@art/sprites/hero';
 
 const frames = buildSprites();
 const byName = new Map(frames.map((f) => [f.name, f]));
@@ -99,6 +100,28 @@ describe('sprites', () => {
         }
       }
     }
+  });
+});
+
+describe('hero kits', () => {
+  it('draws the blade in hand: a hand-axe, a pitchfork or the seax', () => {
+    for (const name of ['attack1_s_1', 'attack2_w_1', 'charge_n_0'])
+      expect(rastersEqual(frame(`hero_axe_${name}`).raster, frame(`hero_${name}`).raster), name).toBe(false);
+    expect(rastersEqual(frame('hero_fork_attack1_s_1').raster, frame('hero_axe_attack1_s_1').raster)).toBe(
+      false,
+    );
+  });
+
+  it('shows the shield only once it is carried', () => {
+    expect(rastersEqual(frame('hero_axe_idle_n_0').raster, frame('hero_idle_n_0').raster)).toBe(false);
+    expect(rastersEqual(frame('hero_axe_idle_n_0').raster, frame('hero_fork_idle_n_0').raster)).toBe(true);
+  });
+
+  it('follows the weapon', () => {
+    expect(heroArtFor('handaxe')).toBe('hero_axe');
+    expect(heroArtFor('pitchfork')).toBe('hero_fork');
+    expect(heroArtFor('seax')).toBe('hero');
+    for (const art of ['hero_axe', 'hero_fork']) expect(ANIMS[art]).toBe(ANIMS['hero']);
   });
 });
 

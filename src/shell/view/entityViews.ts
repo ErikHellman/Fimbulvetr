@@ -16,11 +16,16 @@ export class EntityViews {
     private readonly anims: AnimTable,
   ) {}
 
-  sync(entities: readonly Entity[], place: (e: Entity) => Vec): void {
+  /** `artOf` may swap an entity's art (the hero's sprite follows the weapon in hand). */
+  sync(
+    entities: readonly Entity[],
+    place: (e: Entity) => Vec,
+    artOf: (e: Entity) => string = (e) => e.art,
+  ): void {
     const seen = new Set<number>();
     for (const e of entities) {
       seen.add(e.id);
-      const ref = this.frames.get(frameFor(this.anims, e.art, e.anim, e.facing, e.animT));
+      const ref = this.frames.get(frameFor(this.anims, artOf(e), e.anim, e.facing, e.animT));
       let sprite = this.sprites.get(e.id);
       if (sprite === undefined) {
         sprite = this.scene.add.sprite(0, 0, ref.key, ref.frame);
