@@ -8,6 +8,7 @@ import { cloneState } from '@core/state/save';
 import { tileFeet } from '@core/world/screen';
 import { importMessageKey } from '@shell/platform/exportImport';
 import type { DevBridge, ViewStats } from './bridge';
+import { wareId } from '@shell/ui/wareText';
 import type { FrameSummary } from './stats';
 
 export interface HeroView {
@@ -187,7 +188,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
           who: null,
           text: ui.name.en,
           shown: 1,
-          choices: ui.rows.map((r) => r.item),
+          choices: ui.rows.map((r) => wareId(r.ware)),
           cursor: ui.cursor,
         };
       return {

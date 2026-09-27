@@ -1,8 +1,8 @@
-import type { ItemId, ShopId } from '@content/ids';
+import type { ArmorId, GaldrId, ItemId, ShopId, WeaponId } from '@content/ids';
 import type { L10n } from '../i18n/t';
 import type { SimRt } from '../sim/rt';
 import { evalCond, type Cond, type CondCtx } from './cond';
-import { giveItem } from './effects';
+import { giveItem, hornsFree } from './effects';
 
 export interface ShopDef {
   readonly id: ShopId;
@@ -10,12 +10,26 @@ export interface ShopDef {
   readonly stock: readonly StockEntry[];
 }
 
-export interface StockEntry {
-  readonly item: ItemId;
+/** What a shop sells: an item into the bag, or a weapon, armour or galdr straight onto Ask. */
+export type Ware =
+  | { readonly item: ItemId }
+  | { readonly weapon: WeaponId }
+  | { readonly armor: ArmorId }
+  | { readonly galdr: GaldrId };
+
+export type StockEntry = Ware & {
   readonly price: number;
-  /** How many one purchase gives. */
+  /** How many one purchase gives (items only). */
   readonly n?: number;
   readonly when?: Cond;
+};
+
+/** Just the ware of a stock entry (without price or condition). */
+export function wareOf(entry: StockEntry): Ware {
+  if ('item' in entry) return { item: entry.item };
+  if ('weapon' in entry) return { weapon: entry.weapon };
+  if ('armor' in entry) return { armor: entry.armor };
+  return { galdr: entry.galdr };
 }
 
 export type BuyResult = 'ok' | 'poor' | 'owned' | 'full' | 'unknown';
@@ -24,20 +38,49 @@ export function visibleStock(shop: ShopDef, ctx: CondCtx): readonly StockEntry[]
   return shop.stock.filter((s) => evalCond(s.when, ctx));
 }
 
-/** Buys one lot of `item`. The shop screen and the `buy` command both come here. */
-export function buy(rt: SimRt, shopId: ShopId, item: ItemId): BuyResult {
+const stockOf = (rt: SimRt, shopId: ShopId): readonly StockEntry[] => {
   const shop = rt.db.shops[shopId];
-  const entry =
-    shop === undefined
-      ? undefined
-      : visibleStock(shop, { state: rt.state, quests: rt.db.quests }).find((s) => s.item === item);
-  if (entry === undefined) return 'unknown';
-  const def = rt.db.items[item];
-  const have = rt.state.inv.items[item] ?? 0;
-  if (have >= def.max) return def.max === 1 ? 'owned' : 'full';
+  return shop === undefined ? [] : visibleStock(shop, { state: rt.state, quests: rt.db.quests });
+};
+
+/** Buys one lot of `item` (the dev `buy` command). */
+export function buy(rt: SimRt, shopId: ShopId, item: ItemId): BuyResult {
+  const entry = stockOf(rt, shopId).find((s) => 'item' in s && s.item === item);
+  return entry === undefined ? 'unknown' : purchase(rt, entry);
+}
+
+/** Buys the shop screen's row `index` (of the visible stock). */
+export function buyRow(rt: SimRt, shopId: ShopId, index: number): BuyResult {
+  const entry = stockOf(rt, shopId)[index];
+  return entry === undefined ? 'unknown' : purchase(rt, entry);
+}
+
+/** Why a ware cannot be taken now, or null when it can. */
+function refusal(rt: SimRt, entry: StockEntry): BuyResult | null {
+  const inv = rt.state.inv;
+  if ('weapon' in entry) return inv.weapon === entry.weapon ? 'owned' : null;
+  if ('armor' in entry) {
+    // Armour that already takes as much off a blow counts as owned.
+    const worn = rt.db.tuning.armor;
+    return worn[inv.armor].reduce >= worn[entry.armor].reduce ? 'owned' : null;
+  }
+  if ('galdr' in entry) return inv.galdr.includes(entry.galdr) ? 'owned' : null;
+  const def = rt.db.items[entry.item];
+  if ((inv.items[entry.item] ?? 0) >= def.max) return def.max === 1 ? 'owned' : 'full';
+  if (def.horn === true && hornsFree(rt) <= 0) return 'full';
+  return null;
+}
+
+function purchase(rt: SimRt, entry: StockEntry): BuyResult {
+  const no = refusal(rt, entry);
+  if (no !== null) return no;
   if (rt.state.hero.silver < entry.price) return 'poor';
   rt.state.hero.silver -= entry.price;
-  giveItem(rt, item, entry.n ?? 1);
+  const inv = rt.state.inv;
+  if ('item' in entry) giveItem(rt, entry.item, entry.n ?? 1);
+  else if ('weapon' in entry) inv.weapon = entry.weapon;
+  else if ('armor' in entry) inv.armor = entry.armor;
+  else inv.galdr.push(entry.galdr);
   rt.emit({ t: 'sfx', id: 'sfx_buy' });
   return 'ok';
 }

@@ -22,6 +22,7 @@ import { settingsLines } from '@shell/ui/settingsText';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
 import { slotName, summaryLine } from '@shell/ui/slotText';
+import { wareName } from '@shell/ui/wareText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -498,7 +499,7 @@ export class UiScene extends Phaser.Scene {
 
   private drawShop(ui: Extract<StoryUi, { k: 'shop' }>, lang: Lang): void {
     const rows = ui.rows.map(
-      (r, i) => `${i === ui.cursor ? '>' : ' '} ${this.itemName(r.item, lang)} — ${String(r.price)}`,
+      (r, i) => `${i === ui.cursor ? '>' : ' '} ${wareName(r.ware, lang)} — ${String(r.price)}`,
     );
     rows.push(`${ui.cursor === ui.rows.length ? '>' : ' '} ${t(UI.shop_leave, lang)}`);
     const note = ui.last === null ? '' : t(UI[`shop_${ui.last}`], lang);
