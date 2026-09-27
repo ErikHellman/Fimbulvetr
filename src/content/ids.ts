@@ -96,6 +96,7 @@ export const NPCS = [
   'hallbera',
   'thorkell',
   'rannveig',
+  'kolbeinn',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -118,6 +119,7 @@ export const SCRIPTS = [
   'embla_evening',
   'raid_begins',
   'shop_sigrun',
+  'raid_gate',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

@@ -34,6 +34,19 @@ describe('screens', () => {
       expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
     }
   });
+
+  it.each(SCREEN_IDS)('%s lays fires and gates on walkable tiles only', (id) => {
+    const ok = walkable(id);
+    for (const thing of SCREENS[id].things) {
+      if (thing.k !== 'fire' && thing.k !== 'gate') continue;
+      for (let y = 0; y < thing.h; y++)
+        for (let x = 0; x < thing.w; x++)
+          expect(
+            ok(thing.at.x + x, thing.at.y + y),
+            `${id} ${thing.k} at ${thing.at.x + x},${thing.at.y + y}`,
+          ).toBe(true);
+    }
+  });
 });
 
 const WATERSIDE = new Set(['water', 'ford', 'jetty']);

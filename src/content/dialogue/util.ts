@@ -12,6 +12,10 @@ export const atLeast = (id: FlagId, n: number): Cond => ({ k: 'flag', id, gte: n
 export const evening: Cond = { k: 'phase', is: ['evening', 'night'] };
 export const daytime: Cond = { k: 'phase', is: ['morning', 'day'] };
 export const raid: Cond = { k: 'flag', id: 'st_raid_begun' };
+/** The raid night itself: begun and not yet over. */
+export const raidNight: Cond = all(raid, not(flag('st_raid_done')));
+/** After the raid night. */
+export const afterRaid: Cond = flag('st_raid_done');
 
 /** The day's chore is done (not yet paid). */
 export const choresDone = (n: 1 | 2 | 3): Cond =>

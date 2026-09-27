@@ -173,8 +173,9 @@ export class Sim implements SimRt {
     const out: Light[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });
+    // Burning tiles and walls of fire (a gate drawn as fire) glow.
     for (const e of this.actors)
-      if (e.kind === 'fixture' && e.def === 'fire' && e.mem['on'] === 1)
+      if (e.kind === 'fixture' && e.art === 'fix_fire' && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
     return out;
   }

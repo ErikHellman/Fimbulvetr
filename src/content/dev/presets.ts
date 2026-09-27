@@ -8,6 +8,9 @@ const DAY1_DONE = {
   ev_embla_d1: true,
 } as const;
 const DAY2_DONE = { ...DAY1_DONE, q_logs: 5, q_paid_d2: true, ev_embla_d2: true } as const;
+const DAY3_DONE = { ...DAY2_DONE, st_farm_day: 3, q_ravens: 5, q_paid_d3: true, ev_embla_d3: true } as const;
+/** The prologue as the M1a route leaves it: silver spent on the lantern, which hangs in slot K. */
+const LANTERN = { items: { lantern: 1 }, slots: ['lantern', null] } as const;
 
 /** Dev starting points for `?preset=`. Content milestones add story presets (day2, night3, …). */
 export const DEV_PRESETS = {
@@ -44,7 +47,35 @@ export const DEV_PRESETS = {
     shield: false,
     minute: 21 * 60,
     silver: 30,
-    flags: { ...DAY2_DONE, st_farm_day: 3, q_ravens: 5, q_paid_d3: true, ev_embla_d3: true },
+    flags: DAY3_DONE,
+    vars: { ask_pen: 31 },
+  },
+  /** The raid night: Ask has just woken to fire, pitchfork in hand. */
+  raid: {
+    screen: 'ask_int_longhouse',
+    tile: [10, 8],
+    facing: 's',
+    weapon: 'pitchfork',
+    shield: false,
+    minute: 2 * 60,
+    season: 'autumn',
+    silver: 5,
+    ...LANTERN,
+    flags: { ...DAY3_DONE, st_raid_begun: true },
+    vars: { ask_pen: 31 },
+  },
+  /** The morning after the raid, by Halvar's bed. */
+  morning: {
+    screen: 'ask_int_longhouse',
+    tile: [25, 8],
+    facing: 'e',
+    weapon: 'pitchfork',
+    shield: false,
+    minute: 7 * 60,
+    season: 'autumn',
+    silver: 5,
+    ...LANTERN,
+    flags: { ...DAY3_DONE, st_raid_begun: true, st_raid_done: true },
     vars: { ask_pen: 31 },
   },
 } as const satisfies Record<string, DevPreset>;

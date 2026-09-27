@@ -143,6 +143,17 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     legs: 'skirt',
     bottom: '#256d6a',
   },
+  /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
+  kolbeinn: {
+    skin: '#d8c8b8',
+    hair: '#1f1a24',
+    hairStyle: 'kerchief',
+    scarf: '#2c2338',
+    beard: '#1f1a24',
+    top: '#3a2e4a',
+    legs: 'skirt',
+    bottom: '#2c2338',
+  },
 };
 
 export type Side = 's' | 'n' | 'w';

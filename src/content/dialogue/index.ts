@@ -7,6 +7,7 @@ import { GRIMR } from './grimr';
 import { GYDA } from './gyda';
 import { HALLBERA } from './hallbera';
 import { HALVAR } from './halvar';
+import { KOLBEINN } from './kolbeinn';
 import { ODDR } from './oddr';
 import { RANNVEIG } from './rannveig';
 import { SIGRUN } from './sigrun';
@@ -29,4 +30,5 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   hallbera: HALLBERA,
   thorkell: THORKELL,
   rannveig: RANNVEIG,
+  kolbeinn: KOLBEINN,
 };
