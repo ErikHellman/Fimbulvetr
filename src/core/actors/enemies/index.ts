@@ -4,6 +4,7 @@ import type { Machine } from '../fsm';
 import type { ActorCtx, EnemyDef } from './defs';
 import { DRAUGR_MACHINE } from './draugr';
 import { DUMMY_MACHINE } from './dummy';
+import { ROOT_BITER_MACHINE } from './root_biter';
 import { TROLL_MACHINE } from './troll';
 import { VARGR_MACHINE } from './vargr';
 
@@ -12,6 +13,7 @@ const MACHINES = {
   vargr: VARGR_MACHINE,
   draugr: DRAUGR_MACHINE,
   troll: TROLL_MACHINE,
+  root_biter: ROOT_BITER_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -25,6 +27,7 @@ const START: Readonly<Record<BehaviourId, string>> = {
   vargr: 'prowl',
   draugr: 'rise',
   troll: 'stomp',
+  root_biter: 'buried',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

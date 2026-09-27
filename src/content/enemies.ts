@@ -98,4 +98,33 @@ export const ENEMY_DEFS = {
       },
     },
   },
+  /** A root with a mouth: buried until Ask comes near, it rears up (400 ms) and snaps. */
+  root_biter: {
+    id: 'root_biter',
+    art: 'enemy_root_biter',
+    hp: 4,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -7, y: -20, w: 14, h: 20 },
+    behaviour: 'root_biter',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    attacks: {
+      bite: {
+        from: 0,
+        to: 5,
+        boxes: {
+          n: { x: -9, y: -34, w: 18, h: 24 },
+          s: { x: -9, y: -10, w: 18, h: 24 },
+          e: { x: -2, y: -20, w: 24, h: 20 },
+          w: { x: -22, y: -20, w: 24, h: 20 },
+        },
+        amount: 2,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    stunnable: 150,
+    drops: { heart: 3, silver: 2, none: 5 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

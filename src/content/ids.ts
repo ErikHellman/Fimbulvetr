@@ -52,7 +52,7 @@ export type ArmorId = (typeof ARMORS)[number];
 export const RINGS = ['ring_stamina', 'ring_thrift', 'ring_beacon', 'ring_berserker'] as const;
 export type RingId = (typeof RINGS)[number];
 
-export const ENEMIES = ['dummy', 'vargr', 'draugr', 'troll'] as const;
+export const ENEMIES = ['dummy', 'vargr', 'draugr', 'troll', 'root_biter'] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
 export const SFX = [

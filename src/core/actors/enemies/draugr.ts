@@ -30,6 +30,8 @@ export const DRAUGR_MACHINE: Machine<DraugrState, ActorCtx> = {
       setAnim(e, 'rise');
     },
     tick(e) {
+      // The start state: `enter` does not run at spawn, so the pose is set here.
+      setAnim(e, 'rise');
       e.iframes = Math.max(e.iframes, 2);
       return e.fsm.t >= DRAUGR.riseTicks - 1 ? 'lurk' : undefined;
     },
