@@ -1,4 +1,4 @@
-import type { NpcId } from '@content/ids';
+import type { EnemyId, NpcId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { Action } from '@core/input/actions';
 import type { Dir4 } from '@core/math/dir';
@@ -25,7 +25,7 @@ function blocked(sim: Sim): (tx: number, ty: number) => boolean {
     const solidActor =
       a.kind === 'npc' ||
       (a.kind === 'prop' && (a.mem['carried'] ?? 0) === 0) ||
-      (a.kind === 'enemy' && sim.db.enemies[a.def as 'dummy'].solid);
+      (a.kind === 'enemy' && sim.db.enemies[a.def as EnemyId].solid);
     if (solidActor)
       occupied.add(`${String(Math.floor(a.pos.x / TILE))},${String(Math.floor((a.pos.y - 1) / TILE))}`);
   }

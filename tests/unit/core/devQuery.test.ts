@@ -90,6 +90,35 @@ describe('presets', () => {
     expect(state.inv.items.flatbread).toBe(2);
   });
 
+  it('applies the season, clock policy, health, slots and world progress of a preset', () => {
+    const state = newGame(1, NEW_GAME);
+    applyPreset(state, {
+      screen: 'test_a',
+      tile: [3, 4],
+      weapon: 'seax',
+      shield: true,
+      season: 'autumn',
+      policy: 'cycling',
+      maxHp: 16,
+      hp: 20,
+      slots: ['lantern', null],
+      items: { lantern: 1 },
+      pieces: ['hp_ask_ridge'],
+      opened: ['d1_c_map'],
+      dungeons: { d1: { keys: 2, map: true } },
+    });
+    expect(state.clock.season).toBe('autumn');
+    expect(state.clock.epoch).toBe(1);
+    expect(state.clock.policy).toBe('cycling');
+    expect(state.hero.maxHp).toBe(16);
+    expect(state.hero.hp).toBe(16);
+    expect(state.inv.slots).toEqual(['lantern', null]);
+    expect(state.world.pieces).toEqual(['hp_ask_ridge']);
+    expect(state.world.opened).toEqual(['d1_c_map']);
+    expect(state.dungeons.d1).toMatchObject({ keys: 2, map: true, compass: false, doors: [] });
+    expect(state.dungeons.d2.keys).toBe(0);
+  });
+
   it('every dev preset starts on a known screen', () => {
     for (const p of Object.values(DEV_PRESETS)) expect(SCREEN_IDS).toContain(p.screen);
   });
