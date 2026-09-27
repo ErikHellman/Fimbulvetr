@@ -169,12 +169,20 @@ export function interactNorth(h: Harness, tx: number, ty: number): Harness {
   return h.step(frameOf([], ['interact']));
 }
 
-/** The nearest live enemy and its distance in px, or null. Raid trolls (armoured) are never fought. */
+/** States in which a foe cannot be hurt (rising, buried, sinking): nothing to fight yet. */
+const UNTOUCHABLE = new Set(['rise', 'buried', 'retract']);
+
+/**
+ * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls (armoured), the
+ * immortal (bulbs, spikes) and bosses (fought by hand) are left alone.
+ */
 function nearestFoe(sim: Sim): { e: Sim['actors'][number]; d: number } | null {
   let best: { e: Sim['actors'][number]; d: number } | null = null;
   for (const e of sim.actors) {
-    if (e.kind !== 'enemy' || sim.db.enemies[e.def as EnemyId].guard === true) continue;
-    if (e.fsm.s === 'rise') continue;
+    if (e.kind !== 'enemy') continue;
+    const def = sim.db.enemies[e.def as EnemyId];
+    if (def.guard === true || def.immortal || def.boss !== undefined) continue;
+    if (UNTOUCHABLE.has(e.fsm.s)) continue;
     const d = Math.sqrt((e.pos.x - sim.hero.pos.x) ** 2 + (e.pos.y - sim.hero.pos.y) ** 2);
     if (best === null || d < best.d) best = { e, d };
   }
@@ -218,12 +226,16 @@ export function fightNear(h: Harness, radius = 56, budget = 1500): Harness {
   return h;
 }
 
-/** Walks to a tile, stopping to fight anything that comes close on the way. */
-export function walkFighting(h: Harness, tx: number, ty: number, budget = 4000): Harness {
-  for (let round = 0; round < 40; round++) {
+/**
+ * Walks to a tile, stopping to fight anything that comes close on the way. `wary` looks around every
+ * few steps instead of every few seconds (for foes that rise out of the ground).
+ */
+export function walkFighting(h: Harness, tx: number, ty: number, budget = 4000, wary = false): Harness {
+  const leg = wary ? 16 : 240;
+  for (let round = 0; round < (wary ? 400 : 40); round++) {
     fightNear(h);
     try {
-      return walkTo(h, tx, ty, Math.min(budget, 240));
+      return walkTo(h, tx, ty, Math.min(budget, leg));
     } catch (e) {
       if (!(e instanceof Error) || !e.message.startsWith('could not reach')) throw e;
     }

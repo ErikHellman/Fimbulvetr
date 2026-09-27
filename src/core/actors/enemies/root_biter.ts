@@ -79,6 +79,7 @@ export const ROOT_BITER_MACHINE: Machine<RootBiterState, ActorCtx> = {
       return distToHero(e, c) < ROOT_BITER.again ? 'emerge' : 'retract';
     },
   },
+  // Struck, it reels but stays up, so a quick combo can finish it.
   hurt: {
     enter(e) {
       still(e);
@@ -86,7 +87,7 @@ export const ROOT_BITER_MACHINE: Machine<RootBiterState, ActorCtx> = {
     },
     tick(e) {
       still(e);
-      return e.fsm.t >= ROOT_BITER.hurtTicks - 1 ? 'retract' : undefined;
+      return e.fsm.t >= ROOT_BITER.hurtTicks - 1 ? 'up' : undefined;
     },
   },
   retract: {
