@@ -56,5 +56,26 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: Rótarhellir (12 rooms), the cave mouth, the runestone and the ending
     - [x] Progression solver, exit route test, e2e, v1-m1c fixture, balance, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M2 Uppvík + turning world · [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
+- [ ] M2 Uppvík + turning world — brief: `docs/briefs/m2.md`, plan: `docs/superpowers/plans/2026-09-27-m2.md`
+  - [ ] M2a Turning world
+    - [x] Pinning, rolled sky and wind, fog and rain, snow/drift/mud/ice cover, wind on projectiles
+    - [x] Spawn tables, forest trolls ↔ stone, the save step
+    - [x] Art: cover tiles, weather particles, forest troll and troll stone, SFX
+    - [x] Shell: weather and fog views, settings model and menu with remapping and colour-blind aid, title screen with 3 slots, slot picker, Gyða's hof
+    - [x] Myrkviðr turns (spawn points, drifts, preset `turning`), exit tests, e2e, v1-m2a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M2b Uppvík: the road north, the hub, economy, gear, galdr/seiðr/Eldr, fire, mead
+    - [x] Seiðr, mead in horns and the purse; armour and the Uppvík sword; shops selling weapons, armour and galdr
+    - [x] Fire spreading with the wind; galdr casting and Eldr (burns, melts, lights)
+    - [x] Art and shell: the cast pose, Eldr and flames, town terrain and decor, the Gear tab, the seiðr bar
+    - [x] Content: the road north, Uppvík (4 screens, 5 interiors), 12 townsfolk, Hrafnkell's and Ketill's shops, the Eldr quest
+    - [x] Exit route test, e2e, v1-m2b fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M2c Deep Myrkviðr: fen, glade, troll wood, the völva, the huldra, the vargar hunt, +3 enemies
+    - [x] The pack leader and the rime raven (flying), with art and sounds
+    - [x] The fen, the völva's hut, the birch glade and the troll wood; seasonal herbs
+    - [x] Heiðr and her brews, the huldra's bargain, the vargar hunt, trolls in the troll wood
+    - [x] Overworld solver proofs (and brambles barring the bypass round the pine), exit route, e2e, v1-m2c fixture, docs
+    - [ ] User playtest and Swedish proofread
+- [ ] M3 Mýrland + D2 · [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

@@ -1,5 +1,5 @@
 import type { EnemyId } from '@content/ids';
-import { mem, type Entity } from '../../actors/entity';
+import { mem, type Entity, type Faction } from '../../actors/entity';
 import type { EnemyDef } from '../../actors/enemies/defs';
 import { changeState } from '../../actors/fsm';
 import { swordOf } from '../../actors/tuning';
@@ -9,7 +9,7 @@ import { STUN, resolveHit, type HitData, type HitResult } from '../../combat/hit
 import { EMPTY_FRAME } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
-import { normalize, scale, sub } from '../../math/vec';
+import { normalize, scale, sub, type Vec } from '../../math/vec';
 import { dungeonOf } from '../../state/dungeons';
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
@@ -35,7 +35,9 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
     target.mem['stun'] = mem(target, 'stunFor') > 0 ? mem(target, 'stunFor') : def.stunnable;
     target.vel = { x: 0, y: 0 };
   }
-  const result = resolveHit(target, hit, {
+  // A foe weak to the element (a draugr to fire) takes double.
+  const weak = def?.weak?.includes(hit.element) === true && hit.amount > 0;
+  const result = resolveHit(target, weak ? { ...hit, amount: hit.amount * 2 } : hit, {
     shielding: false,
     iframes: rt.db.tuning.enemyIframes,
     knockResist: def?.knockResist ?? 0,
@@ -123,14 +125,23 @@ export function resolveAttacks(rt: SimRt): void {
 }
 
 /** One hit on the hero from `source`; returns whether it landed or was blocked (not ignored). */
-export function hurtHero(rt: SimRt, source: Entity, amount: number, knock: number, tags: number): boolean {
+export function hurtHero(
+  rt: SimRt,
+  source: { readonly pos: Vec; readonly faction: Faction },
+  amount: number,
+  knock: number,
+  tags: number,
+): boolean {
   const { hero, db } = rt;
   if (rt.god === true) return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
+  // Armour takes its share off every blow, but a blow always lands at least a quarter heart.
+  const reduce = db.tuning.armor[rt.state.inv.armor].reduce;
+  const dealt = amount <= 0 ? amount : Math.max(1, amount - Math.round(amount * reduce));
   const result = resolveHit(
     hero,
-    { amount, element: 'none', knock, dir, faction: source.faction, tags },
+    { amount: dealt, element: 'none', knock, dir, faction: source.faction, tags },
     { shielding: mem(hero, 'shielding') === 1, iframes: db.tuning.hero.hurtIframes, knockResist: 0 },
   );
   if (result.outcome === 'ignored') return false;

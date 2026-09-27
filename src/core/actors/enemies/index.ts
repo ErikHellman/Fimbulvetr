@@ -8,6 +8,8 @@ import { ROOT_BITER_MACHINE } from './root_biter';
 import { BULB_MACHINE, ROTVAETTR_MACHINE, SPIKE_MACHINE } from './rotvaettr';
 import { TROLL_MACHINE } from './troll';
 import { VARGR_MACHINE } from './vargr';
+import { ALPHA_MACHINE } from './alpha';
+import { RIME_RAVEN_MACHINE } from './raven';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -18,6 +20,8 @@ const MACHINES = {
   rotvaettr: ROTVAETTR_MACHINE,
   rot_bulb: BULB_MACHINE,
   root_spike: SPIKE_MACHINE,
+  vargr_alpha: ALPHA_MACHINE,
+  rime_raven: RIME_RAVEN_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -35,6 +39,8 @@ const START: Readonly<Record<BehaviourId, string>> = {
   rotvaettr: 'wake',
   rot_bulb: 'glow',
   root_spike: 'tell',
+  vargr_alpha: 'prowl',
+  rime_raven: 'circle',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

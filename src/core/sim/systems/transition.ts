@@ -41,7 +41,7 @@ export function markVisited(rt: SimRt, id: ScreenId): void {
 /** Makes `id` the live screen with fresh actors and the hero at `heroAt`, and records it as the entry. */
 export function enterScreen(rt: SimRt, id: ScreenId, heroAt: Vec, facing: Dir4 = rt.hero.facing): void {
   rt.screen = rt.load(id);
-  rt.actors = spawnActors(rt);
+  rt.actors = spawnActors(rt, heroAt);
   placeHero(rt, heroAt);
   rt.hero.facing = facing;
   rt.entry = { x: heroAt.x, y: heroAt.y, facing };

@@ -1,0 +1,40 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const uppIntMeadhall: ScreenDef = {
+  id: 'upp_int_meadhall',
+  region: 'myrkvidr',
+  purpose: "Þórdís's mead hall: benches to sleep on (rest and save), a long hearth, tables. Open all night.",
+  indoor: true,
+  things: [
+    { k: 'door', at: { x: 19, y: 17 }, dir: 's', to: 'upp_hall', arrive: { x: 16, y: 8 }, facing: 's' },
+    /** The sleeping benches along both walls: rest, and keep a record of the journey. */
+    { k: 'use', at: { x: 9, y: 6 }, h: 2, script: 'meadhall_rest' },
+    { k: 'use', at: { x: 9, y: 11 }, h: 2, script: 'meadhall_rest' },
+    { k: 'use', at: { x: 30, y: 6 }, h: 2, script: 'meadhall_rest' },
+    { k: 'use', at: { x: 30, y: 11 }, h: 2, script: 'meadhall_rest' },
+  ],
+  map: [
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXwwwwwwwwwwwwwwwwwwwwwwwwXXXXXXXX',
+    'XXXXXXXXwffffffffffffffffffffffwXXXXXXXX',
+    'XXXXXXXXwbfffffffttfffffffffffbwXXXXXXXX',
+    'XXXXXXXXwbffttffffffffffffttffbwXXXXXXXX',
+    'XXXXXXXXwffffffffffffffffffffffwXXXXXXXX',
+    'XXXXXXXXwffffffffffhhffffffffffwXXXXXXXX',
+    'XXXXXXXXwffffffffffhhffffffffffwXXXXXXXX',
+    'XXXXXXXXwbffffffffffffffffffffbwXXXXXXXX',
+    'XXXXXXXXwbffffffffffffffffffffbwXXXXXXXX',
+    'XXXXXXXXwfffttffffffffffffttfffwXXXXXXXX',
+    'XXXXXXXXwffffffffffffffffffffffwXXXXXXXX',
+    'XXXXXXXXwffffffffffffffffffffffwXXXXXXXX',
+    'XXXXXXXXwffffffffffffffffffffffwXXXXXXXX',
+    'XXXXXXXXwwwwwwwwwwwDwwwwwwwwwwwwXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  ],
+};

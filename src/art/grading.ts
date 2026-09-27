@@ -65,9 +65,19 @@ const WEATHER: Readonly<Record<WeatherKind, Matrix>> = {
   storm: multiply(channels(0.72, 0.76, 0.88), saturation(0.6)),
 };
 
-/** The world camera's colour matrix for a season, a daylight level (0 night … 1 day) and weather. */
-export function grade(season: Season, light: number, weather: WeatherKind): number[] {
+/**
+ * The colour-blind aid: moves the red–green difference into blue and green, so reds read magenta and
+ * greens read teal for red–green colour blindness. Every row sums to 1, so greys are untouched.
+ */
+export const COLOUR_BLIND: Matrix = [1, 0, 0, 0, 0, 0.15, 0.85, 0, 0, 0, 0.6, -0.6, 1, 0, 0, 0, 0, 0, 1, 0];
+
+/**
+ * The world camera's colour matrix for a season, a daylight level (0 night … 1 day) and weather, with the
+ * colour-blind aid applied last when it is on.
+ */
+export function grade(season: Season, light: number, weather: WeatherKind, colourBlind = false): number[] {
   const duskAmount = (1 - Math.abs(2 * light - 1)) * 0.6;
   const timeOfDay = multiply(lerpMatrix(IDENTITY, DUSK, duskAmount), lerpMatrix(NIGHT, IDENTITY, light));
-  return multiply(WEATHER[weather], multiply(timeOfDay, SEASON[season]));
+  const graded = multiply(WEATHER[weather], multiply(timeOfDay, SEASON[season]));
+  return colourBlind ? multiply(COLOUR_BLIND, graded) : graded;
 }

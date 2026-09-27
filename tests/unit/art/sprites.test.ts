@@ -33,8 +33,11 @@ describe('sprites', () => {
   });
 
   it('draws something in every frame, with the feet inside it', () => {
+    // Weather particles are specks by nature: a snowflake is a few pixels.
+    const specks = ['fx_drop_', 'fx_snow_', 'fx_leaf_'];
     for (const f of frames) {
-      expect(countOpaque(f.raster), f.name).toBeGreaterThan(20);
+      const min = specks.some((p) => f.name.startsWith(p)) ? 0 : 20;
+      expect(countOpaque(f.raster), f.name).toBeGreaterThan(min);
       expect(f.ox).toBeGreaterThanOrEqual(0);
       expect(f.ox).toBeLessThanOrEqual(f.raster.w);
       expect(f.oy).toBeGreaterThanOrEqual(0);
@@ -79,26 +82,19 @@ describe('sprites', () => {
             : 0;
       if (margin === 0) continue; // skip missing frame
       const r = f.raster;
+      // Only the band within `margin` of an edge can break the rule; collect offenders, assert once.
+      const bad: string[] = [];
       for (let y = 0; y < r.h; y++) {
+        const edgeRow = y < margin || y >= r.h - margin;
         for (let x = 0; x < r.w; x++) {
-          const pixel = getPixel(r, x, y);
-          // Check if pixel is opaque and not ink
-          if (
-            pixel[3] > 0 &&
-            !(pixel[0] === inkColor[0] && pixel[1] === inkColor[1] && pixel[2] === inkColor[2])
-          ) {
-            // Non-ink opaque pixel found; verify margin
-            expect(x, `${f.name}: non-ink pixel at x=${x} violates left margin`).toBeGreaterThanOrEqual(
-              margin,
-            );
-            expect(x, `${f.name}: non-ink pixel at x=${x} violates right margin`).toBeLessThan(r.w - margin);
-            expect(y, `${f.name}: non-ink pixel at y=${y} violates top margin`).toBeGreaterThanOrEqual(
-              margin,
-            );
-            expect(y, `${f.name}: non-ink pixel at y=${y} violates bottom margin`).toBeLessThan(r.h - margin);
-          }
+          if (!edgeRow && x >= margin && x < r.w - margin) continue;
+          const i = (y * r.w + x) * 4;
+          const ink =
+            r.data[i] === inkColor[0] && r.data[i + 1] === inkColor[1] && r.data[i + 2] === inkColor[2];
+          if ((r.data[i + 3] ?? 0) > 0 && !ink) bad.push(`${x},${y}`);
         }
       }
+      expect(bad, `${f.name}: non-ink pixels inside the ${margin}px margin`).toEqual([]);
     }
   });
 });
@@ -127,7 +123,7 @@ describe('hero kits', () => {
 
 describe('enemies', () => {
   it('draw a telegraph that reads differently from standing still', () => {
-    for (const art of ['enemy_vargr', 'enemy_draugr', 'enemy_troll'])
+    for (const art of ['enemy_vargr', 'enemy_vargr_alpha', 'enemy_draugr', 'enemy_troll'])
       for (const dir of ['s', 'w', 'n'])
         expect(
           rastersEqual(frame(`${art}_tell_${dir}_0`).raster, frame(`${art}_idle_${dir}_0`).raster),
@@ -138,6 +134,8 @@ describe('enemies', () => {
   it('draw every animation their behaviours use', () => {
     const used: Readonly<Record<string, readonly string[]>> = {
       enemy_vargr: ['idle', 'walk', 'tell', 'lunge', 'hurt'],
+      enemy_vargr_alpha: ['idle', 'walk', 'howl', 'tell', 'lunge', 'hurt'],
+      enemy_rime_raven: ['fly', 'tell', 'dive', 'hurt'],
       enemy_draugr: ['idle', 'walk', 'rise', 'tell', 'swing', 'hurt'],
       enemy_troll: ['idle', 'walk', 'tell', 'smash'],
       fix_fire: ['burn', 'out', 'closed', 'open'],

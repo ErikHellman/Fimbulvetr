@@ -20,7 +20,7 @@ import {
   type Speaker,
 } from '../../story/dialogue';
 import { applyEffect, type Effect } from '../../story/effects';
-import { buy, visibleStock, type BuyResult } from '../../story/shop';
+import { buyRow, visibleStock, wareOf, type BuyResult, type Ware } from '../../story/shop';
 import {
   FADE_STEP_TICKS,
   MAX_INSTANT_STEPS,
@@ -35,6 +35,7 @@ import { unlockAt } from './fixtures';
 import { heroCtx } from './hero';
 import { placeNpcs } from './npcs';
 import { tryLift } from './props';
+import { skyOf } from './weather';
 import { enterScreen, markVisited } from './transition';
 
 /** What the UI shows for the running script. */
@@ -52,17 +53,24 @@ export type StoryUi =
       readonly k: 'shop';
       readonly shop: ShopId;
       readonly name: L10n;
-      readonly rows: readonly { readonly item: ItemId; readonly price: number }[];
+      /** `item` repeats the ware's item id when it is one. */
+      readonly rows: readonly { readonly item?: ItemId; readonly ware: Ware; readonly price: number }[];
       /** Rows, then one more for "leave". */
       readonly cursor: number;
       readonly last: BuyResult | null;
     }
+  /** The save-slot picker is up (the shell owns it and answers with `saved`). */
+  | { readonly k: 'save' }
   | null;
 
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
 const advancePressed = (input: InputFrame): boolean => ADVANCE.some((a) => wasPressed(input, a));
 
-export const condCtx = (rt: SimRt): CondCtx => ({ state: rt.state, quests: rt.db.quests });
+export const condCtx = (rt: SimRt): CondCtx => ({
+  state: rt.state,
+  quests: rt.db.quests,
+  weather: () => skyOf(rt),
+});
 
 function dialogueEnv(rt: SimRt, id: keyof SimRt['db']['dialogue']): DialogueEnv {
   const def = rt.db.dialogue[id];
@@ -116,6 +124,7 @@ function actorOf(rt: SimRt, ref: ActorRef): Entity {
 export function stepStory(rt: SimRt, input: InputFrame): void {
   const run = rt.story;
   if (run === null) return;
+  let frame = input;
   for (let i = 0; i < MAX_INSTANT_STEPS; i++) {
     if (run.cur === null) {
       const next = run.queue.shift();
@@ -130,11 +139,14 @@ export function stepStory(rt: SimRt, input: InputFrame): void {
         continue;
       }
     }
-    if (tick(rt, run, run.cur, input)) {
+    if (tick(rt, run, run.cur, frame)) {
       run.t += 1;
       return;
     }
     run.cur = null;
+    // The press that ended a step is spent on it: the next step starts this tick with nothing pressed, so
+    // closing a keeper's last line does not also buy the first row.
+    frame = { ...frame, pressed: 0 };
   }
 }
 
@@ -168,6 +180,9 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
     }
     case 'shop':
       run.shop = { cursor: 0, last: null };
+      return true;
+    case 'save':
+      delete run.saved;
       return true;
     case 'say':
     case 'card':
@@ -208,6 +223,10 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
     }
     case 'shop':
       return stepShop(rt, run, step.id, input);
+    case 'save':
+      if (run.saved !== true) return true;
+      delete run.saved;
+      return false;
     case 'do':
     case 'face':
     case 'warp':
@@ -235,7 +254,7 @@ function stepShop(rt: SimRt, run: StoryRun, id: ShopId, input: InputFrame): bool
     run.shop = null;
     return false;
   }
-  ui.last = buy(rt, id, row.item);
+  ui.last = buyRow(rt, id, ui.cursor);
   return true;
 }
 
@@ -275,6 +294,8 @@ export function storyUi(rt: SimRt): StoryUi {
       cursor: 0,
     };
   }
+  // Once answered, the picker is gone even before the step ends on the next tick.
+  if (step.k === 'save') return run.saved === true ? null : { k: 'save' };
   if (step.k === 'shop' && run.shop !== null) {
     const shop = rt.db.shops[step.id];
     if (shop === undefined) return null;
@@ -282,7 +303,10 @@ export function storyUi(rt: SimRt): StoryUi {
       k: 'shop',
       shop: step.id,
       name: shop.name,
-      rows: visibleStock(shop, condCtx(rt)).map((s) => ({ item: s.item, price: s.price })),
+      rows: visibleStock(shop, condCtx(rt)).map((s) => {
+        const ware = wareOf(s);
+        return 'item' in ware ? { item: ware.item, ware, price: s.price } : { ware, price: s.price };
+      }),
       cursor: run.shop.cursor,
       last: run.shop.last,
     };

@@ -1,0 +1,37 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const myrIntVolva: ScreenDef = {
+  id: 'myr_int_volva',
+  region: 'myrkvidr',
+  purpose: "Inside Heiðr's hut: a hearth, her bed, jars and bundles of herbs.",
+  indoor: true,
+  things: [
+    { k: 'door', at: { x: 19, y: 15 }, dir: 's', to: 'myr_fen', arrive: { x: 8, y: 8 }, facing: 's' },
+    /** Her brewing table: talk, then buy. */
+    { k: 'use', at: { x: 22, y: 12 }, w: 2, script: 'shop_heidr' },
+  ],
+  map: [
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwwwwwwwwwwwwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwbfffffttffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwbfffffffffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwffffhhffffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwffffhhffffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwffffffffffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwfffffffttfwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwffffffffffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwffffffffffwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXwwwwwDwwwwwwXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  ],
+};

@@ -1,15 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, collectErrors, hero, screenId } from './helpers';
+import { boot, collectErrors, hero, screenId, tap } from './helpers';
 
 const hook = <T>(page: Page, fn: () => T): Promise<T> => page.evaluate(fn);
 const mode = (page: Page) => page.evaluate(() => window.__fimbul?.mode());
-
-async function tap(page: Page, key: string): Promise<void> {
-  await page.keyboard.down(key);
-  await page.waitForTimeout(60);
-  await page.keyboard.up(key);
-  await page.waitForTimeout(60);
-}
 
 test('the raid night: storm, darkness, fire light and the dead in the yard', async ({ page }) => {
   const errors = collectErrors(page);
@@ -40,16 +33,24 @@ test('the pause menu stops the world and puts an item in a slot', async ({ page 
   expect(await hook(page, () => window.__fimbul?.slots())).toEqual(['lantern', null]);
   await tap(page, 'Tab');
   await expect.poll(() => hook(page, () => window.__fimbul?.menu()?.tab)).toBe('items');
-  const minute = await hook(page, () => window.__fimbul?.clock().minute);
+  // The clock in ticks (minute and sub-minute): frozen while the menu is open, moving once it closes.
+  const ticks = () =>
+    hook(page, () => {
+      const c = window.__fimbul?.clock();
+      return c === undefined ? 0 : c.minute * 60 + c.sub;
+    });
+  const paused = await ticks();
   await page.waitForTimeout(1500);
-  expect(await hook(page, () => window.__fimbul?.clock().minute)).toBe(minute);
+  expect(await ticks()).toBe(paused);
   await tap(page, 'KeyL');
   await expect.poll(() => hook(page, () => window.__fimbul?.slots())).toEqual([null, 'lantern']);
+  await tap(page, 'ArrowRight');
+  expect(await hook(page, () => window.__fimbul?.menu()?.tab)).toBe('gear');
   await tap(page, 'ArrowRight');
   expect(await hook(page, () => window.__fimbul?.menu()?.tab)).toBe('map');
   await tap(page, 'Escape');
   await expect.poll(() => hook(page, () => window.__fimbul?.menu())).toBeNull();
-  await expect.poll(() => hook(page, () => window.__fimbul?.clock().minute)).toBeGreaterThan(minute ?? 0);
+  await expect.poll(ticks).toBeGreaterThan(paused);
   expect(errors).toEqual([]);
 });
 

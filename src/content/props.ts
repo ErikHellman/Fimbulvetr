@@ -89,4 +89,27 @@ export const PROP_DEFS = {
     throwDamage: 0,
     wall: true,
   },
+  /** A troll the sunrise caught: heavy grey stone, and whatever it had in its fists spills when it breaks. */
+  troll_stone: {
+    id: 'troll_stone',
+    art: 'prop_troll_stone',
+    body: { x: -11, y: -12, w: 22, h: 12 },
+    hurt: { x: -12, y: -30, w: 24, h: 30 },
+    liftable: true,
+    fragile: true,
+    throwDamage: 8,
+    loot: ['silver', 'silver', 'silver', 'silver', 'silver', 'heart'],
+  },
+  /** A thicket of thorns across a way: the blade only tangles in it; fire burns it off. */
+  bramble: {
+    id: 'bramble',
+    art: 'prop_bramble',
+    body: TILE_BOX,
+    hurt: TILE_BOX,
+    liftable: false,
+    fragile: false,
+    throwDamage: 0,
+    wall: true,
+    burns: true,
+  },
 } as const satisfies Record<PropId, PropDef>;

@@ -1,7 +1,7 @@
-import type { DungeonId, ItemId, WeaponId } from '@content/ids';
+import type { ArmorId, DungeonId, GaldrId, ItemId, WeaponId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { setMinute, setPolicy, setSeason } from '../clock/clock';
-import { isSeason, type ClockState, type Season } from '../clock/types';
+import { WEATHER_KINDS, isSeason, type ClockState, type Season, type WeatherKind } from '../clock/types';
 import { LANGS, type Lang } from '../i18n/t';
 import type { Dir4 } from '../math/dir';
 import type { Flags } from '../state/flags';
@@ -19,6 +19,12 @@ export interface DevQuery {
   readonly lang?: Lang;
   /** A named starting kit from content/dev/presets (validated against the known ids). */
   readonly preset?: string;
+  /** `weather=<kind>`: the dev weather override, as the console's `weather` command. */
+  readonly weather?: WeatherKind;
+  /** `rolled=0`: no rolled weather or spawn tables (the e2e runs pin it off). */
+  readonly rolled: boolean;
+  /** `title=0` skips the title screen, `title=1` shows it even with a screen or preset named. */
+  readonly title?: boolean;
   /** `dev=gallery`: show the texture gallery instead of the game. */
   readonly gallery: boolean;
   readonly nosave: boolean;
@@ -113,6 +119,20 @@ export function parseDevQuery(
     else warnings.push(`unknown preset '${pr}'`);
   }
 
+  let weather: WeatherKind | undefined;
+  const we = params.get('weather');
+  if (we !== undefined) {
+    const found = WEATHER_KINDS.find((k) => k === we);
+    if (found === undefined) warnings.push(`unknown weather '${we}'`);
+    else weather = found;
+  }
+
+  const ro = params.get('rolled');
+  if (ro !== undefined && ro !== '0' && ro !== '1') warnings.push(`bad rolled '${ro}' (use 0 or 1)`);
+
+  const ti = params.get('title');
+  if (ti !== undefined && ti !== '0' && ti !== '1') warnings.push(`bad title '${ti}' (use 0 or 1)`);
+
   const dev = params.get('dev');
   if (dev !== undefined && dev !== 'gallery') warnings.push(`unknown dev view '${dev}'`);
 
@@ -124,6 +144,9 @@ export function parseDevQuery(
     seed,
     lang,
     preset,
+    weather,
+    rolled: ro !== '0',
+    ...(ti === '0' || ti === '1' ? { title: ti === '1' } : {}),
     gallery: dev === 'gallery',
     nosave: params.has('nosave'),
     mute: params.has('mute'),
@@ -168,6 +191,11 @@ export interface DevPreset {
   readonly pieces?: readonly string[];
   readonly opened?: readonly string[];
   readonly dungeons?: Readonly<Partial<Record<DungeonId, Partial<DungeonState>>>>;
+  readonly armor?: ArmorId;
+  readonly galdr?: readonly GaldrId[];
+  /** Seiðr now (the bar's size stays 10 unless `maxSeidr` says otherwise). */
+  readonly seidr?: number;
+  readonly maxSeidr?: number;
 }
 
 /** Applies a preset to a fresh state. A dev query's own screen/at/season/time still win afterwards. */
@@ -175,6 +203,7 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   applyDevQuery(state, {
     screen: p.screen,
     tile: p.tile,
+    rolled: true,
     gallery: false,
     nosave: false,
     mute: false,
@@ -198,4 +227,8 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   for (const id of p.opened ?? []) if (!state.world.opened.includes(id)) state.world.opened.push(id);
   for (const [id, d] of Object.entries(p.dungeons ?? {}) as [DungeonId, Partial<DungeonState>][])
     Object.assign(dungeonOf(state, id), d);
+  if (p.armor !== undefined) state.inv.armor = p.armor;
+  if (p.galdr !== undefined) state.inv.galdr = [...p.galdr];
+  if (p.maxSeidr !== undefined) state.hero.maxSeidr = p.maxSeidr;
+  if (p.seidr !== undefined) state.hero.seidr = Math.min(p.seidr, state.hero.maxSeidr);
 }

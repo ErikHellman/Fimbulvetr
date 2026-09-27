@@ -5,11 +5,11 @@ import type { InventoryState } from '@core/state/gameState';
 
 /** The pause menu: pure state and input handling, drawn by the UI scene. The sim does not run meanwhile. */
 
-export const MENU_TABS = ['items', 'map', 'quests', 'system'] as const;
+export const MENU_TABS = ['items', 'gear', 'map', 'quests', 'system'] as const;
 export type MenuTab = (typeof MENU_TABS)[number];
 
 /** Rows of the system tab. */
-export const SYSTEM_ROWS = ['resume', 'start_over'] as const;
+export const SYSTEM_ROWS = ['resume', 'settings', 'start_over'] as const;
 
 export interface MenuState {
   readonly tab: MenuTab;
@@ -31,18 +31,20 @@ export type MenuAction =
   | { readonly k: 'close' }
   | { readonly k: 'equip'; readonly slot: 0 | 1; readonly item: ItemId }
   | { readonly k: 'eat'; readonly item: ItemId }
+  /** Open the settings menu (the scene runs it over the system tab). */
+  | { readonly k: 'settings' }
   | { readonly k: 'startOver' };
 
 export function openMenu(tab: MenuTab = 'items'): MenuState {
   return { tab, cursor: 0, confirm: false };
 }
 
-/** What the items tab lists: owned sub-items, then food, both in registry order. */
+/** What the items tab lists: owned sub-items, then food and mead, both in registry order. */
 export function menuItems(inv: InventoryState, defs: Readonly<Record<ItemId, ItemDef>>): MenuItem[] {
   const owned = ITEMS.filter((id) => (inv.items[id] ?? 0) > 0);
   const slotOf = (id: ItemId): 0 | 1 | null => (inv.slots[0] === id ? 0 : inv.slots[1] === id ? 1 : null);
   const subs = owned.filter((id) => defs[id].slot);
-  const food = owned.filter((id) => defs[id].heal !== undefined);
+  const food = owned.filter((id) => defs[id].heal !== undefined || defs[id].seidr !== undefined);
   return [
     ...subs.map((id) => ({ id, count: inv.items[id] ?? 0, kind: 'sub' as const, slot: slotOf(id) })),
     ...food.map((id) => ({ id, count: inv.items[id] ?? 0, kind: 'food' as const, slot: null })),
@@ -93,7 +95,9 @@ export function stepMenu(
     } else if (any(frame, ['confirm', 'interact'])) return { state, actions: [{ k: 'eat', item: item.id }] };
   }
   if (state.tab === 'system' && any(frame, ['confirm', 'interact'])) {
-    if (SYSTEM_ROWS[state.cursor] === 'resume') return close;
+    const row = SYSTEM_ROWS[state.cursor];
+    if (row === 'resume') return close;
+    if (row === 'settings') return { state, actions: [{ k: 'settings' }] };
     return { state: { ...state, confirm: true }, actions: [] };
   }
   return { state, actions: [] };

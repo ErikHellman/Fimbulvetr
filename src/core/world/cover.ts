@@ -1,8 +1,10 @@
 import type { CoverId } from '@content/ids';
+import type { TerrainId } from '@content/terrain';
 import type { Season } from '../clock/types';
 import type { Box } from '../math/box';
 import type { CoverSave } from '../state/gameState';
 import { TILE } from './dims';
+import type { TerrainGrid } from './textmap';
 
 /** How the rules see a kind of ground cover. */
 export interface CoverDef {
@@ -15,6 +17,31 @@ export interface CoverDef {
   readonly hides?: boolean;
   /** Blown away by the boomerang (and later Vindr), not only cut. */
   readonly blown?: boolean;
+  /**
+   * Grows by itself, outdoors, on these terrains (not only where the map draws it): snow on the ground,
+   * ice on water. With `by`, only on tiles next to one of those terrains (mud along the water).
+   */
+  readonly grows?: { readonly on: readonly TerrainId[]; readonly by?: readonly TerrainId[] };
+  /** Only on wet days (mud: spring, when the morning is not clear). */
+  readonly wet?: boolean;
+  /** `false`: the sword cannot clear it (drifts, mud, ice). */
+  readonly cut?: false;
+  /** Walkable: it takes the SOLID and LOW off the tile beneath while it stands (ice on water). */
+  readonly walk?: boolean;
+  /** The winter cloak halves how much it slows Ask. */
+  readonly cloak?: boolean;
+  /** Catches fire (Eldr, burning neighbours): it burns down to a cleared tile. */
+  readonly burns?: boolean;
+  /** Fire melts it away (Eldr on drifts and ice). */
+  readonly melts?: boolean;
+}
+
+/** What derived cover needs to know about a screen. */
+export interface CoverDerive {
+  readonly terrain: TerrainGrid;
+  /** Only the open sky grows snow, mud and ice. */
+  readonly outdoor: boolean;
+  readonly wet: boolean;
 }
 
 /** One screen's cover: `kind[i]` is 0 for none or 1 + index into the cover list; `cleared[i]` is 0 or 1. */
@@ -25,6 +52,25 @@ export interface CoverGrid {
   readonly cleared: Uint8Array;
   /** The season epoch this grid was built for; a new epoch means everything regrew. */
   readonly epoch: number;
+  /** Whether it was built for a wet day (mud stands). */
+  readonly wet: boolean;
+  /** Ticks each tile has left to burn (0: not burning). Never saved; what burns out is `cleared`. */
+  readonly burn: Uint8Array;
+  /** How many tiles are burning (so an idle screen costs nothing). */
+  burning: number;
+}
+
+/** Whether a tile or one of its eight neighbours is one of `kinds`. */
+function beside(t: TerrainGrid, x: number, y: number, kinds: readonly TerrainId[]): boolean {
+  for (let dy = -1; dy <= 1; dy++)
+    for (let dx = -1; dx <= 1; dx++) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || ny < 0 || nx >= t.cols || ny >= t.rows) continue;
+      const cell = t.cells[ny * t.cols + nx];
+      if (cell !== undefined && kinds.includes(cell)) return true;
+    }
+  return false;
 }
 
 export function buildCover(
@@ -35,21 +81,55 @@ export function buildCover(
   season: Season,
   epoch: number,
   save: CoverSave | undefined,
+  derive?: CoverDerive,
 ): CoverGrid {
   const rows = map.length;
   const cols = map[0]?.length ?? 0;
   const kind = new Uint8Array(cols * rows);
+  // Derived kinds in registry order: the first whose terrain, neighbours and weather fit wins.
+  const growing =
+    derive?.outdoor === true
+      ? order.filter((id) => {
+          const d = defs[id];
+          return d.grows !== undefined && d.seasons.includes(season) && (d.wet !== true || derive.wet);
+        })
+      : [];
   map.forEach((line, y) => {
     for (let x = 0; x < cols; x++) {
+      const i = y * cols + x;
       const id = legend[line.charAt(x)];
-      if (id !== undefined && defs[id].seasons.includes(season)) kind[y * cols + x] = order.indexOf(id) + 1;
+      if (id !== undefined && defs[id].seasons.includes(season)) {
+        kind[i] = order.indexOf(id) + 1;
+        continue;
+      }
+      if (derive === undefined) continue;
+      const cell = derive.terrain.cells[i];
+      const grown = growing.find((g) => {
+        const rule = defs[g].grows;
+        return (
+          rule !== undefined &&
+          cell !== undefined &&
+          rule.on.includes(cell) &&
+          (rule.by === undefined || beside(derive.terrain, x, y, rule.by))
+        );
+      });
+      if (grown !== undefined) kind[i] = order.indexOf(grown) + 1;
     }
   });
   const cleared =
     save !== undefined && save.epoch === epoch
       ? decodeBits(save.cleared, cols * rows)
       : new Uint8Array(cols * rows);
-  return { cols, rows, kind, cleared, epoch };
+  return {
+    cols,
+    rows,
+    kind,
+    cleared,
+    epoch,
+    wet: derive?.wet ?? false,
+    burn: new Uint8Array(cols * rows),
+    burning: 0,
+  };
 }
 
 /** The cover standing (uncut) on a tile, or null. */

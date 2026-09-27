@@ -35,6 +35,49 @@ export const FLAGS = {
   st_d1_boss_dead: { t: 'bool' },
   /** The first runestone burns again. */
   st_stone1_lit: { t: 'bool' },
+  /** Önundr has sawn through the pine across the road north: Uppvík lies open. */
+  st_road_open: { t: 'bool' },
+  /** Ask has come to Uppvík's gate. */
+  st_uppvik_reached: { t: 'bool' },
+  /** First meetings in Uppvík. */
+  n_thordis_met: { t: 'bool' },
+  n_hrafnkell_met: { t: 'bool' },
+  n_ketill_met: { t: 'bool' },
+  n_solvi_met: { t: 'bool' },
+  n_gunnhildr_met: { t: 'bool' },
+  n_bersi_met: { t: 'bool' },
+  n_jorunn_met: { t: 'bool' },
+  n_eyvindr_met: { t: 'bool' },
+  n_hjalti_met: { t: 'bool' },
+  n_glumr_met: { t: 'bool' },
+  n_ragna_met: { t: 'bool' },
+  n_steinn_met: { t: 'bool' },
+  /** Þórdís gave Ask the first mead horn. */
+  w_horn_thordis: { t: 'bool' },
+  /** Sölvi asked for a stave charred in Skeggi's kiln, to carve the fire-song's lesson on. */
+  q_eldr_asked: { t: 'bool' },
+  /** Sölvi taught Ask Eldr, the first galdr. */
+  st_eldr_learned: { t: 'bool' },
+  /** Heiðr the völva, in her fen hut. */
+  n_heidr_met: { t: 'bool' },
+  /** Heiðr asked for three clumps of fen-moss. */
+  q_volva_asked: { t: 'bool' },
+  /** Heiðr has the moss and brews blue mead. */
+  q_volva_done: { t: 'bool' },
+  /** The huldra, in the birch glade at night. */
+  n_huldra_met: { t: 'bool' },
+  /** Ask promised the huldra something unnamed, for her winter cloak. She will come to collect it. */
+  q_huldra_promise: { t: 'bool' },
+  /** Ask turned her bargain down (she asks again). */
+  q_huldra_refused: { t: 'bool' },
+  /** Ask took the hunters' notice from the Þing-stone: the vargr pack leader, on the north road. */
+  q_vargar_taken: { t: 'bool' },
+  /** Dagný told Ask how the pack leader fights. */
+  q_vargar_tracked: { t: 'bool' },
+  /** The pack leader is dead (set by its death). */
+  q_vargar_alpha: { t: 'bool' },
+  /** Bersi paid the bounty, a bigger purse. */
+  q_vargar_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

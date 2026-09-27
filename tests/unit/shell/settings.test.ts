@@ -73,3 +73,18 @@ describe('settings', () => {
     expect(preferredLang(['de-DE'])).toBe('en');
   });
 });
+
+describe('settings: colour-blind and keys', () => {
+  it('keeps colour-blind mode and valid key overrides, dropping bad ones', () => {
+    const s = parseSettings(
+      JSON.stringify({
+        colourBlind: true,
+        keys: { sword: ['KeyU'], roll: 'Space', nope: ['KeyX'], item1: ['Key K!'], galdr: [] },
+      }),
+      'en',
+    );
+    expect(s.colourBlind).toBe(true);
+    expect(s.keys).toEqual({ sword: ['KeyU'] });
+    expect(parseSettings(null, 'en')).toMatchObject({ colourBlind: false, keys: {} });
+  });
+});

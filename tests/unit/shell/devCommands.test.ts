@@ -35,6 +35,10 @@ function bridge(): { b: DevBridge; h: Harness } {
       fishAlive: 0,
       fishJumps: 0,
       rain: 0,
+      snow: 0,
+      leaves: 0,
+      fog: 0,
+      flames: 0,
       bolts: 0,
       dark: 0,
       lights: 0,
@@ -42,6 +46,7 @@ function bridge(): { b: DevBridge; h: Harness } {
     jumpFish: () => undefined,
     tileAt: () => -1,
     menu: () => null,
+    picker: () => null,
     restart: () => undefined,
   };
   return { b, h };
@@ -142,6 +147,10 @@ describe('dev console commands', () => {
         fishAlive: 0,
         fishJumps: 0,
         rain: 0,
+        snow: 0,
+        leaves: 0,
+        fog: 0,
+        flames: 0,
         bolts: 0,
         dark: 0,
         lights: 0,
@@ -149,6 +158,7 @@ describe('dev console commands', () => {
       jumpFish: () => undefined,
       tileAt: () => -1,
       menu: () => null,
+      picker: () => null,
       restart: (state) => {
         restarted.push(state);
       },

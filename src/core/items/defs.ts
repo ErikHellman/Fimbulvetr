@@ -22,4 +22,12 @@ export interface ItemDef {
   readonly dungeon?: DungeonGift;
   /** Hearts added to the maximum (heart containers); health refills. */
   readonly hearts?: number;
+  /** Mead: seiðr restored when drunk from the menu. */
+  readonly seidr?: number;
+  /** Carried in a mead horn: all such items together never outnumber the horns. */
+  readonly horn?: boolean;
+  /** A seiðr vessel: the bar's maximum grows by this much (to 30) and fills. */
+  readonly maxSeidr?: number;
+  /** A larger purse: each one raises the silver cap a step (100 → 300 → 999). */
+  readonly purse?: boolean;
 }

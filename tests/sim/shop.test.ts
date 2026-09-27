@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { DB } from '@content/index';
 import type { ContentDb } from '@core/sim/db';
-import type { ShopDef } from '@core/story/shop';
+import { buyRow, type ShopDef } from '@core/story/shop';
+import { startScript } from '@core/sim/systems/story';
 import type { Thing } from '@core/world/screen';
 import { Harness } from './harness';
 
@@ -66,6 +67,28 @@ describe('buying', () => {
     expect(h.sim.mode).toBe('play');
   });
 
+  it('spends the press that closes the keeper’s last line on the line, not on the first row', () => {
+    const db = shopDb();
+    const talkFirst: ContentDb = {
+      ...db,
+      scripts: {
+        dev_script: {
+          steps: [
+            { k: 'say', who: null, text: { en: 'Hello.', sv: 'Hej.' } },
+            { k: 'shop', id: 'dev_shop' },
+          ],
+        },
+      },
+    };
+    const h = new Harness({ db: talkFirst, tile: [12, 9], facing: 'n' });
+    h.sim.state.hero.silver = 40;
+    h.press(['interact']);
+    for (let i = 0; i < 20 && h.sim.storyUi()?.k !== 'shop'; i++) h.press(['confirm']);
+    expect(h.sim.storyUi()).toMatchObject({ k: 'shop', last: null });
+    expect(h.sim.state.hero.silver).toBe(40);
+    expect(h.sim.state.inv.items.lantern).toBeUndefined();
+  });
+
   it('leaves on cancel', () => {
     const h = new Harness({ db: shopDb(), tile: [12, 9], facing: 'n' });
     h.press(['interact']).press(['cancel']);
@@ -110,5 +133,67 @@ describe('heart pieces', () => {
     h.sim.command({ t: 'warp', screen: 'test_a', x: 10 * 16 + 8, y: 13 * 16 + 14 });
     h.idle(2);
     expect(h.sim.actors.some((a) => a.kind === 'pickup')).toBe(false);
+  });
+});
+
+describe('wares that are not items', () => {
+  const SMITH: ShopDef = {
+    id: 'dev_shop',
+    name: { en: 'Smithy', sv: 'Smedja' },
+    stock: [
+      { weapon: 'uppvik_sword', price: 80 },
+      { armor: 'byrnie', price: 100 },
+      { galdr: 'eldr', price: 10 },
+      { item: 'mead_red', price: 20 },
+    ],
+  };
+  const smithDb = (): ContentDb => ({ ...DB, shops: { dev_shop: SMITH } });
+
+  it('sells a sword into the hand, a byrnie onto the back and a galdr into the head, once each', () => {
+    const h = new Harness({ db: smithDb() });
+    h.sim.state.hero.silver = 100;
+    expect(buyRow(h.sim, 'dev_shop', 0)).toBe('ok');
+    expect(h.sim.state.inv.weapon).toBe('uppvik_sword');
+    expect(buyRow(h.sim, 'dev_shop', 0)).toBe('owned');
+    expect(buyRow(h.sim, 'dev_shop', 1)).toBe('poor');
+    h.sim.state.hero.silver = 100;
+    expect(buyRow(h.sim, 'dev_shop', 1)).toBe('ok');
+    expect(h.sim.state.inv.armor).toBe('byrnie');
+    expect(buyRow(h.sim, 'dev_shop', 1)).toBe('owned');
+    h.sim.state.hero.silver = 50;
+    expect(buyRow(h.sim, 'dev_shop', 2)).toBe('ok');
+    expect(h.sim.state.inv.galdr).toEqual(['eldr']);
+    expect(buyRow(h.sim, 'dev_shop', 2)).toBe('owned');
+  });
+
+  it('counts better armour as owned, and mead as full without an empty horn', () => {
+    const h = new Harness({ db: smithDb() });
+    h.sim.state.hero.silver = 200;
+    h.sim.state.inv.armor = 'ember_byrnie';
+    expect(buyRow(h.sim, 'dev_shop', 1)).toBe('owned');
+    expect(buyRow(h.sim, 'dev_shop', 3)).toBe('full');
+    h.sim.state.inv.items.horn = 1;
+    expect(buyRow(h.sim, 'dev_shop', 3)).toBe('ok');
+    expect(buyRow(h.sim, 'dev_shop', 3)).toBe('full');
+    expect(h.sim.state.hero.silver).toBe(180);
+  });
+
+  it('shows every ware on the shop screen', () => {
+    const h = new Harness({
+      db: { ...smithDb(), scripts: { dev_script: { steps: [{ k: 'shop', id: 'dev_shop' }] } } },
+    });
+    h.sim.command({ t: 'setFlag', flag: 'st_intro_seen', value: true });
+    h.idle(1);
+    startScript(h.sim, 'dev_script');
+    h.idle(1);
+    expect(h.sim.storyUi()).toMatchObject({
+      k: 'shop',
+      rows: [
+        { ware: { weapon: 'uppvik_sword' }, price: 80 },
+        { ware: { armor: 'byrnie' } },
+        { ware: { galdr: 'eldr' } },
+        { item: 'mead_red', ware: { item: 'mead_red' } },
+      ],
+    });
   });
 });

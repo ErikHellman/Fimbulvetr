@@ -18,6 +18,8 @@ import { WEATHER_RULES } from './weather';
 import { raidNight } from './dialogue/util';
 import { WORLD_LAYOUT } from './world/layout';
 import { LEGEND } from './world/legend';
+import { SPAWN_TABLES } from './spawns';
+import { GALDR_DEFS } from './galdr';
 import { SCREENS } from './world/registry';
 
 export const DB: ContentDb = {
@@ -30,6 +32,7 @@ export const DB: ContentDb = {
   clock: CLOCK_RULES,
   flags: FLAGS,
   items: ITEM_DEFS,
+  galdr: GALDR_DEFS,
   quests: QUEST_DEFS,
   dialogue: DIALOGUE,
   scripts: SCRIPTS_DEFS,
@@ -41,6 +44,7 @@ export const DB: ContentDb = {
   coverOrder: COVERS,
   shops: SHOP_DEFS,
   weather: WEATHER_RULES,
+  spawns: SPAWN_TABLES,
   /** The raid night never dawns: the clock waits until it is over. */
   freezeClock: raidNight,
 };

@@ -4,11 +4,17 @@ import { createCritter } from '../../actors/critters';
 import { createProp } from '../../actors/prop';
 import { dungeonOf } from '../../state/dungeons';
 import { evalCond } from '../../story/cond';
-import { tileFeet } from '../../world/screen';
+import { isNight, seasonAt } from '../../clock/clock';
+import { fnv1a, hashInts } from '../../math/hash';
+import type { Vec } from '../../math/vec';
+import { SOLID } from '../../world/collision';
+import { TILE } from '../../world/dims';
+import { tileFeet, type TilePos } from '../../world/screen';
+import { rollSpawns } from '../../world/spawns';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
 import { refreshFixtures, spawnFixtures, stampCollision } from './fixtures';
-import { createHeart, createPiece } from './pickups';
+import { createHeart, createPiece, herbGrows } from './pickups';
 import { placeNpcs } from './npcs';
 import { holdBack } from './rooms';
 import { condCtx } from './story';
@@ -19,14 +25,47 @@ function bossDown(rt: SimRt): boolean {
   return dungeon !== undefined && dungeonOf(rt.state, dungeon).bossDead;
 }
 
-/** Builds the live actors of the current screen from its things. */
-export function spawnActors(rt: SimRt): Entity[] {
+/**
+ * Builds the live actors of the current screen from its things, then the region's rolled enemies (kept
+ * away from `heroAt`, where Ask is about to stand).
+ */
+export function spawnActors(rt: SimRt, heroAt: Vec = rt.hero.pos): Entity[] {
   rt.actors = spawnThings(rt);
   for (const e of rt.actors) holdBack(rt, e);
   placeNpcs(rt);
   refreshFixtures(rt, false);
   stampCollision(rt);
+  spawnRolled(rt, heroAt);
   return rt.actors;
+}
+
+/** Tiles of clear ground a rolled enemy keeps between itself and Ask's arrival. */
+const SPAWN_CLEARANCE = 4;
+
+/**
+ * The region's spawn table on this screen's spawn points: rolled from (seed, day, screen, night) so the
+ * same visit brings the same foes, and never from the combat RNG.
+ */
+function spawnRolled(rt: SimRt, heroAt: Vec): void {
+  const def = rt.db.screens[rt.screen.id];
+  if (!rt.rolled || def.spawns === undefined || def.dungeon !== undefined) return;
+  const table = rt.db.spawns[def.region];
+  if (table === undefined) return;
+  const c = rt.state.clock;
+  const night = isNight(c, rt.db.clock);
+  const seed = hashInts(rt.state.seed, c.day, fnv1a(rt.screen.id), night ? 1 : 0);
+  const g = rt.screen.collision;
+  const hx = Math.floor(heroAt.x / TILE);
+  const hy = Math.floor((heroAt.y - 1) / TILE);
+  const free = (p: TilePos): boolean =>
+    ((g.flags[p.y * g.cols + p.x] ?? SOLID) & SOLID) === 0 &&
+    Math.max(Math.abs(p.x - hx), Math.abs(p.y - hy)) > SPAWN_CLEARANCE;
+  const season = seasonAt(c, def.region, rt.db.clock);
+  for (const r of rollSpawns(table, season, night, def.spawns, seed, free)) {
+    const e = createEnemy(rt.newId(), rt.db.enemies[r.id], tileFeet(r.at));
+    e.mem['rolled'] = 1;
+    rt.actors.push(e);
+  }
 }
 
 function spawnThings(rt: SimRt): Entity[] {
@@ -70,6 +109,10 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'heart':
         if (!rt.state.world.opened.includes(thing.id))
           out.push(createHeart(rt.newId(), tileFeet(thing.at), index));
+        break;
+      case 'herb':
+        if (herbGrows(rt, thing))
+          out.push(createPiece(rt.newId(), tileFeet(thing.at), index, `herb_${thing.item}`));
         break;
       case 'fire':
       case 'gate':

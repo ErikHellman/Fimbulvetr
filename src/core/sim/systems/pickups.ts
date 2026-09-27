@@ -5,6 +5,8 @@ import type { Vec } from '../../math/vec';
 import { HEART, MAX_HP, PURSE_CAP, giveItem } from '../../story/effects';
 import { coverAt } from '../../world/cover';
 import { TILE } from '../../world/dims';
+import { seasonAt } from '../../clock/clock';
+import type { Thing } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { startStory } from './story';
 
@@ -30,6 +32,13 @@ export function createPiece(id: number, pos: Vec, thingIndex: number, def = 'hea
   });
   e.mem['thing'] = thingIndex;
   return e;
+}
+
+/** Whether a herb stands this season on the current screen (it is in season and not yet picked). */
+export function herbGrows(rt: SimRt, herb: Extract<Thing, { k: 'herb' }>): boolean {
+  const c = rt.state.clock;
+  const region = rt.db.screens[rt.screen.id].region;
+  return seasonAt(c, region, rt.db.clock) === herb.season && rt.state.world.vars[herb.id] !== c.epoch + 1;
 }
 
 /** A heart container lying in a room, waiting to be taken. */
@@ -67,6 +76,9 @@ export function createDrop(id: number, kind: DropKind, pos: Vec): Entity {
   return e;
 }
 
+/** Seiðr in a dropped jar. */
+export const SEIDR_JAR = 2;
+
 /**
  * Walking over a pickup collects it: a dropped heart heals a heart, silver adds one, and every fourth piece
  * of heart adds a heart and refills health. Drops that are left lying run out.
@@ -97,6 +109,12 @@ export function collectPickups(rt: SimRt): void {
       rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;
     }
+    if (e.def === 'seidr') {
+      const hero = rt.state.hero;
+      hero.seidr = Math.min(hero.maxSeidr, hero.seidr + SEIDR_JAR);
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
+      continue;
+    }
     const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
     if (thing?.k === 'heart') {
       rt.state.world.opened.push(thing.id);
@@ -104,6 +122,12 @@ export function collectPickups(rt: SimRt): void {
       rt.emit({ t: 'sfx', id: 'sfx_itemget' });
       startStory(rt, [{ k: 'say', who: null, text: rt.db.items.heart_container.found }]);
       return;
+    }
+    if (thing?.k === 'herb') {
+      rt.state.world.vars[thing.id] = rt.state.clock.epoch + 1;
+      giveItem(rt, thing.item, 1);
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
+      continue;
     }
     if (thing?.k !== 'piece') continue;
     const w = rt.state.world;

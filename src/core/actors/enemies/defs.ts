@@ -1,9 +1,10 @@
-import type { EnemyId, ItemId } from '@content/ids';
+import type { EnemyId, ItemId, PropId } from '@content/ids';
 import type { L10n } from '../../i18n/t';
 import type { Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
 import type { RngState } from '../../math/rng';
 import type { Vec } from '../../math/vec';
+import type { Element } from '../../combat/hit';
 import type { SimEvent } from '../../sim/events';
 import type { SolidAt } from '../../world/collision';
 import type { Entity } from '../entity';
@@ -40,6 +41,12 @@ export interface EnemyDef {
   readonly boss?: { readonly name: L10n };
   /** Items it cannot be beaten without (the progression solver checks them). */
   readonly needs?: readonly ItemId[];
+  /** Turns into this prop at sunrise (a troll caught by daylight is a stone). */
+  readonly petrify?: PropId;
+  /** Elements that deal it double damage (a draugr burns). */
+  readonly weak?: readonly Element[];
+  /** On the wing: walls, water and ground cover do not stop or slow it (only the screen's edge does). */
+  readonly flies?: boolean;
 }
 
 export interface AttackWindow {
@@ -59,6 +66,8 @@ export interface AttackWindow {
 export interface DropTable {
   readonly heart: number;
   readonly silver: number;
+  /** A seiðr jar (two points of seiðr). */
+  readonly seidr?: number;
   readonly none: number;
 }
 

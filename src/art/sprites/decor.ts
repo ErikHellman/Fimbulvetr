@@ -246,6 +246,113 @@ function kiln(): Raster {
   return r;
 }
 
+/** A market stall three tiles wide: a trestle of goods under a red and cream striped awning on poles. */
+function stall(): Raster {
+  const r = createRaster(50, 40);
+  rect(r, 3, 12, 2, 26, P.wood);
+  rect(r, 45, 12, 2, 26, P.wood);
+  for (let x = 1; x < 49; x += 6) {
+    rect(r, x, 4, 3, 9, P.heart);
+    rect(r, x + 3, 4, 3, 9, P.wool);
+  }
+  rect(r, 1, 12, 48, 1, P.heartShade);
+  rect(r, 2, 26, 46, 4, P.wood);
+  rect(r, 2, 30, 46, 2, P.woodShade);
+  for (const [x, c] of [
+    [6, P.barley],
+    [13, P.clay],
+    [20, P.heart],
+    [27, P.leaf],
+    [34, P.sack],
+    [41, P.clay],
+  ] as const) {
+    rect(r, x, 21, 5, 5, c);
+    rect(r, x + 3, 21, 2, 5, P.ink);
+  }
+  rect(r, 5, 32, 2, 6, P.woodShade);
+  rect(r, 43, 32, 2, 6, P.woodShade);
+  return r;
+}
+
+/** The Þing-stone: a broad grey slab with a notice board pinned to its face. */
+function thingstone(): Raster {
+  const r = createRaster(34, 30);
+  rect(r, 2, 4, 30, 24, P.rock);
+  rect(r, 24, 4, 8, 24, P.rockShade);
+  rect(r, 4, 2, 24, 2, P.rock);
+  rect(r, 6, 1, 18, 1, P.rockLight);
+  for (const [x, y] of [
+    [2, 4],
+    [31, 4],
+  ] as const)
+    setPixel(r, x, y, TRANSPARENT);
+  rect(r, 9, 8, 16, 12, P.wood);
+  rect(r, 10, 9, 14, 10, P.sack);
+  for (let y = 11; y < 18; y += 3) rect(r, 12, y, 10, 1, P.woodShade);
+  rect(r, 16, 7, 2, 2, P.ink);
+  return r;
+}
+
+/** The smith's anvil on a stump. */
+function anvil(): Raster {
+  const r = createRaster(18, 18);
+  rect(r, 5, 9, 8, 7, P.trunk);
+  rect(r, 10, 9, 3, 7, P.woodShade);
+  rect(r, 2, 4, 14, 3, P.hoop);
+  rect(r, 1, 4, 2, 2, P.hoop);
+  rect(r, 5, 7, 8, 2, P.rockShade);
+  rect(r, 3, 4, 10, 1, P.steel);
+  return r;
+}
+
+/** A clump of fen reeds with brown seed heads. */
+function reeds(): Raster {
+  const r = createRaster(16, 26);
+  const stems: ReadonlyArray<readonly [number, number]> = [
+    [3, 8],
+    [5, 3],
+    [7, 6],
+    [9, 1],
+    [11, 5],
+    [13, 9],
+  ];
+  for (const [x, top] of stems) {
+    rect(r, x, top, 1, 24 - top, P.leaf);
+    rect(r, x + 1, top + 4, 1, 20 - top, P.leafShade);
+    rect(r, x, top, 1, 4, P.trunk);
+  }
+  rect(r, 2, 22, 13, 2, P.leafShade);
+  return r;
+}
+
+/** A white birch: a slim pale trunk with black marks, a light round crown. */
+function birch(): Raster {
+  const r = createRaster(24, 44);
+  rect(r, 10, 20, 4, 22, hex('#e8e4da'));
+  rect(r, 13, 20, 1, 22, hex('#b8b2a4'));
+  for (const [x, y] of [
+    [10, 24],
+    [12, 29],
+    [10, 34],
+    [11, 38],
+  ] as const)
+    rect(r, x, y, 2, 1, INK);
+  const shade = (x: number, y: number) => (x - 12 + (y - 12) > 6 ? P.leaf : P.leafLight);
+  ellipse(r, 12, 12, 10, 11, shade);
+  ellipse(r, 8, 8, 3, 2.5, hex('#9cc878'));
+  return r;
+}
+
+/** A round boulder furred with moss. */
+function boulder(): Raster {
+  const r = createRaster(18, 18);
+  ellipse(r, 9, 10, 8, 7, (x, y) => (x - 9 + (y - 10) > 3 ? P.rockShade : P.rock));
+  ellipse(r, 7, 6, 5, 2.5, hex('#4f7a3a'));
+  rect(r, 3, 8, 3, 1, hex('#4f7a3a'));
+  rect(r, 6, 5, 3, 1, hex('#8aa860'));
+  return r;
+}
+
 export function decorFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [
     frame('decor_tree_idle_s_0', tree()),
@@ -258,6 +365,12 @@ export function decorFrames(): SpriteFrame[] {
     frame('decor_log_idle_s_0', fallenLog()),
     frame('decor_kiln_idle_s_0', kiln()),
     frame('decor_runestone_idle_s_0', runestone()),
+    frame('decor_stall_idle_s_0', stall()),
+    frame('decor_thingstone_idle_s_0', thingstone()),
+    frame('decor_anvil_idle_s_0', anvil()),
+    frame('decor_reeds_idle_s_0', reeds()),
+    frame('decor_birch_idle_s_0', birch()),
+    frame('decor_boulder_idle_s_0', boulder()),
   ];
   for (let f = 0; f < 4; f++) {
     out.push(frame(`decor_well_idle_s_${f}`, well(f)));
@@ -280,6 +393,12 @@ export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
   decor_log: STILL,
   decor_kiln: STILL,
   decor_runestone: STILL,
+  decor_stall: STILL,
+  decor_thingstone: STILL,
+  decor_anvil: STILL,
+  decor_reeds: STILL,
+  decor_birch: STILL,
+  decor_boulder: STILL,
   decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },

@@ -7,6 +7,13 @@ export const myrClearing: ScreenDef = {
   things: [
     { k: 'door', at: { x: 21, y: 8 }, dir: 'n', to: 'myr_int_hut', arrive: { x: 19, y: 15 }, facing: 'n' },
   ],
+  /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
+  spawns: [
+    { x: 6, y: 11 },
+    { x: 30, y: 16 },
+    { x: 10, y: 15 },
+    { x: 33, y: 10 },
+  ],
   map: [
     'PTPPTPTT...PPPPPPPTPPPTTTPTPPPPPPPPTPPTP',
     'PTTPPPPP...PPPTPPPPPPPPPPTPPPPPPTPTPPPPP',

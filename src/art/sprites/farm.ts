@@ -199,6 +199,8 @@ function heartFrames(): SpriteFrame[] {
 const SMALL_HEART = ['.hh.hh.', 'hlhhhhH', 'hhhhhhH', '.hhhhH.', '..hHH..', '...H...'];
 const COIN = ['.sss.', 'sSsss', 'sSsss', 'sSsss', '.sss.'];
 const COIN_PAL: GridPalette = { '.': null, s: C.shieldRim, S: C.strawShade, l: C.heartLight };
+const JAR = ['.ccc.', '..g..', '.ggg.', 'gglgG', 'ggggG', '.gGG.'];
+const JAR_PAL: GridPalette = { '.': null, c: C.wood, g: C.rune, G: '#4a9cb4', l: '#ffffff' };
 
 /** Enemy drops: a small heart and a silver coin that glints. Feet at the bottom centre. */
 function dropFrames(): SpriteFrame[] {
@@ -215,7 +217,30 @@ function dropFrames(): SpriteFrame[] {
     if (i === 1) rect(done, 3, 2, 1, 1, [255, 255, 255, 255]);
     return { name: `pickup_silver_idle_s_${i}`, raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
   });
-  return [heart, ...coins];
+  const jars = [0, 1].map((i) => {
+    const g = decodeGrid(JAR, JAR_PAL);
+    const r = createRaster(g.w + 2, g.h + 3);
+    blit(r, g, 1, 1 + i);
+    const done = outline(r, INK, 1);
+    return { name: `pickup_seidr_idle_s_${i}`, raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
+  });
+  return [heart, ...coins, ...jars];
+}
+
+/** A clump of fen-moss: pale green cushions starred with tiny white flowers. */
+function fenMoss(): SpriteFrame {
+  const r = createRaster(16, 12);
+  ellipse(r, 8, 8, 6.5, 3.5, (x, y) => (x - 8 + (y - 8) > 2 ? hex('#6f9a4e') : hex('#9cc878')));
+  ellipse(r, 5, 6, 3, 2, hex('#b4dc8c'));
+  for (const [x, y] of [
+    [4, 5],
+    [9, 6],
+    [11, 8],
+    [6, 9],
+  ] as const)
+    rect(r, x, y, 1, 1, hex('#f4f2e8'));
+  const done = outline(r, INK, 1);
+  return { name: 'pickup_herb_fen_moss_idle_s_0', raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
 }
 
 /** Soft ground shadow drawn under anything lifted off the ground. */
@@ -260,7 +285,7 @@ export function farmFrames(): SpriteFrame[] {
   out.push(propFrame('prop_pail_idle_s_0', PAIL));
   out.push(propFrame('prop_log_small_idle_s_0', LOG_SMALL));
   out.push(propFrame('prop_log_big_idle_s_0', LOG_BIG));
-  out.push(...heartFrames(), ...dropFrames(), shadowFrame());
+  out.push(...heartFrames(), ...dropFrames(), shadowFrame(), fenMoss());
   return out;
 }
 
@@ -287,5 +312,8 @@ export const FARM_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef
   pickup_heart_piece: { idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] } },
   pickup_heart: ONE_S,
   pickup_silver: { idle: { frames: 2, fps: 3, loop: true, dirs: ['s'] } },
+  /** A seiðr jar, bobbing. */
+  pickup_seidr: { idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] } },
+  pickup_herb_fen_moss: ONE_S,
   fx_shadow: ONE_S,
 };

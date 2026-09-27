@@ -37,9 +37,21 @@ describe('pause menu', () => {
     ]);
   });
 
+  it('lists mead to drink, green mead too', () => {
+    const inv = inventory();
+    inv.items = { ...inv.items, horn: 2, mead_green: 1 };
+    expect(menuItems(inv, DB.items).map((i) => i.id)).toEqual([
+      'lantern',
+      'boomerang',
+      'mead_green',
+      'flatbread',
+    ]);
+  });
+
   it('moves between tabs with left and right, wrapping, and M jumps to the map', () => {
     const items = menuItems(inventory(), DB.items);
-    expect(run(openMenu(), items, ['right']).state?.tab).toBe('map');
+    expect(run(openMenu(), items, ['right']).state?.tab).toBe('gear');
+    expect(run(openMenu(), items, ['right'], ['right']).state?.tab).toBe('map');
     expect(run(openMenu(), items, ['left']).state?.tab).toBe('system');
     expect(run(openMenu(), items, ['map']).state?.tab).toBe('map');
     expect(run(openMenu('map'), items, ['map']).state).toBeNull();
@@ -65,12 +77,21 @@ describe('pause menu', () => {
   it('asks before starting over, and a second yes starts over', () => {
     const items = menuItems(inventory(), DB.items);
     expect(run(openMenu('system'), items, ['confirm']).state).toBeNull();
-    const asked = run(openMenu('system'), items, ['down'], ['confirm']);
+    const asked = run(openMenu('system'), items, ['down'], ['down'], ['confirm']);
     expect(asked.state?.confirm).toBe(true);
-    expect(run(openMenu('system'), items, ['down'], ['confirm'], ['cancel']).state?.confirm).toBe(false);
-    expect(run(openMenu('system'), items, ['down'], ['confirm'], ['confirm']).actions).toEqual([
+    expect(run(openMenu('system'), items, ['down'], ['down'], ['confirm'], ['cancel']).state?.confirm).toBe(
+      false,
+    );
+    expect(run(openMenu('system'), items, ['down'], ['down'], ['confirm'], ['confirm']).actions).toEqual([
       { k: 'startOver' },
     ]);
+  });
+
+  it('opens the settings from the game tab', () => {
+    const items = menuItems(inventory(), DB.items);
+    const r = run(openMenu('system'), items, ['down'], ['confirm']);
+    expect(r.actions).toEqual([{ k: 'settings' }]);
+    expect(r.state?.tab).toBe('system');
   });
 
   it('does nothing on an empty items tab', () => {

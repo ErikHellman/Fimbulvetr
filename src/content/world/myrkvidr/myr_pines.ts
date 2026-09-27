@@ -8,6 +8,14 @@ export const myrPines: ScreenDef = {
     { k: 'piece', id: 'hp_myr_pines', at: { x: 12, y: 15 } },
     { k: 'enemy', id: 'vargr', at: { x: 20, y: 14 } },
   ],
+  /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
+  spawns: [
+    { x: 6, y: 9 },
+    { x: 28, y: 9 },
+    { x: 12, y: 12 },
+    { x: 25, y: 7 },
+    { x: 20, y: 16 },
+  ],
   map: [
     'PPPTPPTPPPPTTPTTPTPTPPTPP...PPPTPTTPPPPP',
     'PTTPPPPTPTPPPPPPTPPPPTPTP...PPPTTTPTPPPP',

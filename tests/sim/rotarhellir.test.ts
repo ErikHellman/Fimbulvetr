@@ -75,7 +75,7 @@ describe('Rótarhellir', () => {
       const ui = h.sim.storyUi();
       if (ui?.k === 'card' && !cards.includes(ui.text.en)) cards.push(ui.text.en);
       h.step(h.frame([])).step(h.frame([]));
-      if (ui !== null && ui.k !== 'shop' && ui.shown >= 1) h.press(['confirm']);
+      if (ui !== null && (ui.k === 'text' || ui.k === 'card') && ui.shown >= 1) h.press(['confirm']);
     }
     expect(h.sim.mode).toBe('play');
     expect(h.sim.state.flags.st_stone1_lit).toBe(true);

@@ -38,6 +38,17 @@ export const TERRAIN_IDS = [
   'roots',
   'runestone',
   'cave_mouth',
+  'planks',
+  'palisade',
+  'sand',
+  'stall',
+  'thingstone',
+  'anvil',
+  'bog',
+  'reeds',
+  'birch',
+  'moss',
+  'boulder',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -102,4 +113,26 @@ export const TERRAIN = {
   runestone: { solid: true, decor: { art: ['decor_runestone'], w: 1, h: 1 } },
   /** A dark opening in the rock; a door thing leads through it. */
   cave_mouth: { solid: false },
+  /** Uppvík's plank walks over the mud of its streets. */
+  planks: { solid: false },
+  /** The town palisade: sharpened stakes, shoulder to shoulder. */
+  palisade: { solid: true },
+  /** The bay's pale shore. */
+  sand: { solid: false },
+  /** A market stall under a striped awning, three tiles wide. */
+  stall: { solid: true, decor: { art: ['decor_stall'], w: 3, h: 1 } },
+  /** The Þing-stone of Uppvík, where notices are pinned: two tiles wide. */
+  thingstone: { solid: true, decor: { art: ['decor_thingstone'], w: 2, h: 1 } },
+  /** The smith's anvil on its block. */
+  anvil: { solid: true, decor: { art: ['decor_anvil'], w: 1, h: 1 } },
+  /** Fen ground, black water between the tussocks: walkable, slow. */
+  bog: { solid: false, slow: 0.6 },
+  /** A stand of fen reeds, too thick to push through. */
+  reeds: { solid: true, decor: { art: ['decor_reeds'], w: 1, h: 1 } },
+  /** A white birch; they ring the huldra's glade. */
+  birch: { solid: true, decor: { art: ['decor_birch'], w: 1, h: 1 } },
+  /** The troll wood's floor: deep moss where no sun reaches. */
+  moss: { solid: false },
+  /** A mossy boulder (or a troll the sun caught long ago). */
+  boulder: { solid: true, decor: { art: ['decor_boulder'], w: 1, h: 1 } },
 } as const satisfies Record<TerrainId, TerrainDef>;

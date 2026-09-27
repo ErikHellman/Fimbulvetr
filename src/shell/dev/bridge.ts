@@ -16,10 +16,18 @@ export interface ViewStats {
   readonly openWater: number;
   readonly fishAlive: number;
   readonly fishJumps: number;
-  /** Raindrops alive, lightning bolts so far, the darkness drawn and the lights cut out of it. */
+  /**
+   * Raindrops, snowflakes and blown leaves alive, lightning bolts so far, the darkness and fog drawn and
+   * the lights cut out of the dark.
+   */
   readonly rain: number;
+  readonly snow: number;
+  readonly leaves: number;
   readonly bolts: number;
   readonly dark: number;
+  readonly fog: number;
+  /** Burning cover tiles drawn. */
+  readonly flames: number;
   readonly lights: number;
 }
 
@@ -41,6 +49,8 @@ export interface DevBridge {
   restart(state: GameState): void;
   /** The open pause menu's page and cursor, or null in play. */
   menu(): { readonly tab: string; readonly cursor: number; readonly confirm: boolean } | null;
+  /** The save-slot picker, or null when none is open. */
+  picker(): { readonly cursor: number; readonly phase: string; readonly armed: boolean } | null;
 }
 
 export interface DevTools {

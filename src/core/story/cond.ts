@@ -1,6 +1,6 @@
 import type { FlagId } from '@content/flags';
 import type { ItemId, QuestId, WeaponId } from '@content/ids';
-import type { Season } from '../clock/types';
+import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
 import type { GameState } from '../state/gameState';
 import type { QuestDef } from './quests';
@@ -23,6 +23,8 @@ export type Cond =
   | { readonly k: 'season'; readonly is: Season }
   | { readonly k: 'phase'; readonly is: Phase | readonly Phase[] }
   | { readonly k: 'weapon'; readonly is: WeaponId }
+  /** The sky over the current region (indoors too: an NPC goes in because it rains outside). */
+  | { readonly k: 'weather'; readonly is: WeatherKind | readonly WeatherKind[] }
   | { readonly k: 'all'; readonly of: readonly Cond[] }
   | { readonly k: 'any'; readonly of: readonly Cond[] }
   | { readonly k: 'not'; readonly c: Cond };
@@ -30,6 +32,8 @@ export type Cond =
 export interface CondCtx {
   readonly state: GameState;
   readonly quests: Readonly<Partial<Record<QuestId, QuestDef>>>;
+  /** The sky, read lazily (only `weather` conditions pay for it); missing means clear. */
+  readonly weather?: () => WeatherKind;
 }
 
 export function phaseOf(minute: number): Phase {
@@ -69,6 +73,10 @@ export function evalCond(c: Cond | undefined, ctx: CondCtx): boolean {
     }
     case 'weapon':
       return s.inv.weapon === c.is;
+    case 'weather': {
+      const w = ctx.weather?.() ?? 'clear';
+      return typeof c.is === 'string' ? w === c.is : c.is.includes(w);
+    }
     case 'all':
       return c.of.every((x) => evalCond(x, ctx));
     case 'any':

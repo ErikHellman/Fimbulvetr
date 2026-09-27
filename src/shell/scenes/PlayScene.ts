@@ -5,9 +5,8 @@ import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
-import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
-import { daylight } from '@core/clock/clock';
+import { daylight, seasonAt } from '@core/clock/clock';
 import type { Entity } from '@core/actors/entity';
 import { InputLatch, wasPressed, type InputFrame } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
@@ -31,9 +30,15 @@ import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { menuItems, openMenu, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
 import { EntityViews } from '@shell/view/entityViews';
-import { DarknessView } from '@shell/view/darknessView';
+import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
+import { bindingsOf, keyLabel } from '@shell/input/remap';
+import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
+import { browserStorage, saveSettings } from '@shell/platform/settings';
+import type { SaveSummary } from '@shell/platform/saveStore';
+import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
+import { FireView } from '@shell/view/fireView';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -57,7 +62,9 @@ export class PlayScene extends Phaser.Scene {
   private views!: EntityViews;
   private weather!: WeatherView;
   private darkness!: DarknessView;
+  private fog!: DarknessView;
   private fx!: FxView;
+  private flames!: FireView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
   private readonly latch = new InputLatch();
@@ -67,6 +74,14 @@ export class PlayScene extends Phaser.Scene {
   private readonly stats = new FrameStats();
   private gradeKey = '';
   private menu: MenuState | null = null;
+  /** The settings menu, open over the pause menu's game tab. */
+  private settingsMenu: SettingsMenuState | null = null;
+  /** The save-slot picker, while the sim's `save` step waits. */
+  private picker: PickerState | null = null;
+  private pickerSlots: Record<'s1' | 's2' | 's3', SaveSummary | null> = { s1: null, s2: null, s3: null };
+  private pickerResult: 'saved' | 'failed' | null = null;
+  /** Keys held last frame, to find the one freshly pressed (for rebinding). */
+  private lastCodes: ReadonlySet<string> = new Set();
   private tileAnims: readonly TileAnim[] = [];
 
   constructor() {
@@ -78,10 +93,13 @@ export class PlayScene extends Phaser.Scene {
     this.acc.acc = 0;
     this.gradeKey = '';
     this.menu = null;
+    this.settingsMenu = null;
+    this.picker = null;
     this.screens.clear();
-    this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay });
+    this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay, rolled: data.rolled });
+    if (data.weather !== undefined) this.sim.weatherOverride = data.weather;
     this.tileAnims = tileAnimations(data.assets.tileset);
-    this.mapper = new InputMapper(DEFAULT_BINDINGS, this.latch, {
+    this.mapper = new InputMapper(bindingsOf(data.settings.keys), this.latch, {
       holdToggleShield: data.settings.holdShield,
     });
     this.audio = new AudioDirector(this, () => data.settings.volume, data.muted);
@@ -108,6 +126,7 @@ export class PlayScene extends Phaser.Scene {
     this.colour = cam.filters.internal.addColorMatrix();
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
+    this.flames = new FireView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
         this.audio.play(id);
@@ -115,6 +134,7 @@ export class PlayScene extends Phaser.Scene {
       flashes: () => data.settings.flash,
     });
     this.darkness = new DarknessView(this, data.assets.frames);
+    this.fog = new DarknessView(this, data.assets.frames, FOG);
     this.fadeRect = this.add
       .rectangle(0, 0, SCREEN_W, SCREEN_H, 0x000000)
       .setOrigin(0, 0)
@@ -127,13 +147,25 @@ export class PlayScene extends Phaser.Scene {
       sim: this.sim,
       frames: data.assets.frames,
       lang: () => data.settings.lang,
+      keyLabel: (action) => keyLabel(bindingsOf(data.settings.keys).kb[action][0] ?? ''),
       sfx: (id) => {
         this.audio.play(id);
       },
+      picker: () =>
+        this.picker === null
+          ? null
+          : { state: this.picker, slots: this.pickerSlots, result: this.pickerResult },
       menu: () =>
         this.menu === null
           ? null
-          : { state: this.menu, items: menuItems(this.sim.state.inv, this.services.db.items) },
+          : {
+              state: this.menu,
+              items: menuItems(this.sim.state.inv, this.services.db.items),
+              settings:
+                this.settingsMenu === null
+                  ? null
+                  : { state: this.settingsMenu, values: this.services.settings },
+            },
     };
     this.registry.set(UI_LINK, link);
     if (!this.scene.isActive('ui')) this.scene.launch('ui');
@@ -142,9 +174,20 @@ export class PlayScene extends Phaser.Scene {
   }
 
   override update(_time: number, delta: number): void {
-    this.mapper.sample(this.keys.takeCodes(), readPad(connectedPads(navigator)));
+    const codes = this.keys.takeCodes();
+    const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
+    this.lastCodes = new Set(codes);
+    this.mapper.sample(codes, readPad(connectedPads(navigator)));
+    if (this.picker === null && this.sim.storyUi()?.k === 'save') this.openPicker();
+    if (this.picker !== null) {
+      this.updatePicker(this.latch.consume());
+      this.acc.acc = 0;
+      this.draw(0);
+      return;
+    }
     if (this.menu !== null) {
-      this.updateMenu(this.latch.consume());
+      if (this.settingsMenu !== null) this.updateSettings(this.latch.consume(), fresh);
+      else this.updateMenu(this.latch.consume());
       this.acc.acc = 0;
       this.draw(0);
       return;
@@ -167,6 +210,14 @@ export class PlayScene extends Phaser.Scene {
     this.draw(alpha);
   }
 
+  /** Settings changed in a menu: keys, the shield toggle, the long day and colours take effect at once. */
+  applySettings(): void {
+    const s = this.services.settings;
+    this.mapper.configure(bindingsOf(s.keys), { holdToggleShield: s.holdShield });
+    this.sim.setLongDay(s.longDay);
+    this.gradeKey = '';
+  }
+
   private bridge(): DevBridge {
     return {
       sim: this.sim,
@@ -183,6 +234,14 @@ export class PlayScene extends Phaser.Scene {
         this.scene.restart({ ...this.services, state });
       },
       menu: () => (this.menu === null ? null : { ...this.menu }),
+      picker: () =>
+        this.picker === null
+          ? null
+          : {
+              cursor: this.picker.cursor,
+              phase: this.picker.phase,
+              armed: this.picker.phase !== 'pick' || this.picker.t >= ARM_FRAMES,
+            },
     };
   }
 
@@ -222,7 +281,10 @@ export class PlayScene extends Phaser.Scene {
     if (menu === null) return;
     const r = stepMenu(menu, frame, menuItems(this.sim.state.inv, this.services.db.items));
     for (const a of r.actions) {
-      if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
+      if (a.k === 'settings') {
+        this.settingsMenu = openSettings();
+        this.audio.play('sfx_menu_ok');
+      } else if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
       else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
       else if (a.k === 'startOver') {
         const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
@@ -235,6 +297,56 @@ export class PlayScene extends Phaser.Scene {
     if (r.state !== menu && r.state !== null && (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab))
       this.audio.play('sfx_talk');
     this.setMenu(r.state);
+  }
+
+  private openPicker(): void {
+    this.picker = openPicker();
+    this.pickerResult = null;
+    void this.services.saves.slots().then((s) => {
+      this.pickerSlots = { s1: s.s1, s2: s.s2, s3: s.s3 };
+    });
+  }
+
+  /** A frame of the save-slot picker; writing goes to IndexedDB, then the sim carries on (`saved`). */
+  private updatePicker(frame: InputFrame): void {
+    const picker = this.picker;
+    if (picker === null) return;
+    const r = stepPicker(picker, frame);
+    this.picker = r.state;
+    if (r.moved) this.audio.play('sfx_menu_move');
+    if (r.action?.k === 'close') {
+      this.picker = null;
+      this.sim.command({ t: 'saved' });
+      this.sim.flushCommands();
+    } else if (r.action?.k === 'write') {
+      const slot = r.action.slot;
+      void this.services.saves.writeSlot(slot, this.sim.snapshot()).then(async (ok) => {
+        this.pickerResult = ok ? 'saved' : 'failed';
+        if (ok) this.audio.play('sfx_save');
+        const s = await this.services.saves.slots();
+        this.pickerSlots = { s1: s.s1, s2: s.s2, s3: s.s3 };
+        if (this.picker !== null) this.picker = pickerDone(this.picker);
+      });
+    }
+  }
+
+  /** A frame of the settings menu: changes are stored and applied at once. */
+  private updateSettings(frame: InputFrame, code: string | null): void {
+    const menu = this.settingsMenu;
+    if (menu === null) return;
+    const r = stepSettings(menu, frame, this.services.settings, code);
+    this.settingsMenu = r.state;
+    if (r.changed) {
+      const scaling = this.services.settings.scaling;
+      Object.assign(this.services.settings, r.settings);
+      saveSettings(browserStorage(), this.services.settings);
+      this.applySettings();
+      document.documentElement.lang = this.services.settings.lang;
+      // attachZoom re-reads the scaling setting on resize.
+      if (scaling !== this.services.settings.scaling) window.dispatchEvent(new Event('resize'));
+    }
+    if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
+    if (r.state === null) this.audio.play('sfx_talk');
   }
 
   /** The hero's sprite follows the weapon in hand; everything else draws its own art. */
@@ -258,6 +370,7 @@ export class PlayScene extends Phaser.Scene {
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)), this.artOf);
     }
     this.fx.tick(this.sim.tick);
+    this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {
       stage.view.tick(this.sim.tick);
@@ -280,7 +393,21 @@ export class PlayScene extends Phaser.Scene {
           : { x: origin.x + l.x - cam.scrollX, y: origin.y + l.y - cam.scrollY, r: l.r },
       );
     this.darkness.draw(this.sim.darkness(), lights);
-    this.weather.update(this.sim.weather(), this.time.now);
+    const fog = this.sim.fog();
+    const clear =
+      hero === null
+        ? []
+        : [{ x: hero.x + hero.w / 2 - cam.scrollX, y: hero.y + hero.h - 12 - cam.scrollY, r: fog.r }];
+    this.fog.draw(fog.amount, [...clear, ...lights.filter((l) => l.r !== fog.r)]);
+    const def = this.services.db.screens[this.sim.screen.id];
+    this.weather.update(
+      {
+        kind: this.sim.weather(),
+        season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock),
+        wind: this.sim.wind(),
+      },
+      this.time.now,
+    );
   }
 
   private applyGrade(): void {
@@ -291,10 +418,11 @@ export class PlayScene extends Phaser.Scene {
     const light = indoor ? INDOOR_LIGHT : cave ? CAVE_LIGHT : daylight(clock, this.services.db.clock);
     const season = indoor ? 'autumn' : cave ? 'spring' : clock.season;
     const weather = this.sim.weather();
-    const key = `${season}|${Math.round(light * 200)}|${weather}`;
+    const cb = this.services.settings.colourBlind;
+    const key = `${season}|${Math.round(light * 200)}|${weather}|${cb ? 'cb' : ''}`;
     if (key === this.gradeKey) return;
     this.gradeKey = key;
-    this.appliedGrade = grade(season, light, weather);
+    this.appliedGrade = grade(season, light, weather, cb);
     this.colour.colorMatrix.set([...this.appliedGrade]);
   }
 
@@ -337,8 +465,12 @@ export class PlayScene extends Phaser.Scene {
       fishAlive: 0,
       fishJumps: 0,
       rain: this.weather.drops,
+      snow: this.weather.flakes,
+      leaves: this.weather.blown,
       bolts: this.weather.bolts,
       dark: this.darkness.shown.dark,
+      fog: this.fog.shown.dark,
+      flames: this.flames.shown,
       lights: this.darkness.shown.lights,
     };
     const out = { ...sum };

@@ -35,7 +35,12 @@ export type Step =
       readonly else?: readonly Step[];
     }
   /** Runs another script, then carries on. */
-  | { readonly k: 'run'; readonly script: ScriptId };
+  | { readonly k: 'run'; readonly script: ScriptId }
+  /**
+   * Offers the save slots (at mead halls and hofs): the shell shows its slot picker and answers with the
+   * `saved` command, whether a slot was written or the player backed out.
+   */
+  | { readonly k: 'save' };
 
 export interface ScriptDef {
   readonly steps: readonly Step[];
@@ -54,6 +59,8 @@ export interface StoryRun {
   talker: number | null;
   /** The shop screen, while a `shop` step runs. */
   shop: { cursor: number; last: BuyResult | null } | null;
+  /** Set by the `saved` command while a `save` step waits; absent otherwise (so it never changes the hash). */
+  saved?: true;
 }
 
 export const FADE_STEP_TICKS = 18;

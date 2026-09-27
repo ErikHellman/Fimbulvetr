@@ -9,9 +9,15 @@ export function collectErrors(page: Page): string[] {
   return errors;
 }
 
-/** Loads the game (optionally with a dev query string) and waits until the Play scene runs. */
+/**
+ * Loads the game (optionally with a dev query string) and waits until the Play scene runs. Rolled weather
+ * and spawn tables are pinned off (`rolled=0`) and the title screen skipped (`title=0`) unless the query
+ * names them itself.
+ */
 export async function boot(page: Page, query = ''): Promise<void> {
-  await page.goto(query === '' ? '/' : `/?${query}`);
+  const extra = [/(^|&)rolled=/.test(query) ? '' : 'rolled=0', /(^|&)title=/.test(query) ? '' : 'title=0'];
+  const q = [query, ...extra].filter((s) => s !== '').join('&');
+  await page.goto(`/?${q}`);
   await page.waitForFunction(() => window.__fimbul?.ready === true, undefined, { timeout: 20_000 });
 }
 
@@ -31,4 +37,25 @@ export async function walkUntilScreen(page: Page, key: string, screen: string): 
     { timeout: 15_000 },
   );
   await page.keyboard.up(key);
+}
+
+/** Two rendered frames: a key held across them is seen by the game however slow the machine is. */
+export const frames = (page: Page): Promise<void> =>
+  page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            resolve();
+          });
+        });
+      }),
+  );
+
+/** Presses and releases a key, each held over two rendered frames (never a fixed number of ms). */
+export async function tap(page: Page, key: string): Promise<void> {
+  await page.keyboard.down(key);
+  await frames(page);
+  await page.keyboard.up(key);
+  await frames(page);
 }

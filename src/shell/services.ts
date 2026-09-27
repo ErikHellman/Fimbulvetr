@@ -1,4 +1,5 @@
 import type { Tileset } from '@art/tiles/tileset';
+import type { WeatherKind } from '@core/clock/types';
 import type { ContentDb } from '@core/sim/db';
 import type { GameState } from '@core/state/gameState';
 import type { DevTools } from './dev/bridge';
@@ -14,8 +15,12 @@ export interface Services {
   readonly dev: DevTools | null;
   /** Dev/test `?mute`. */
   readonly muted: boolean;
-  /** The scene Boot hands over to: the game, or the dev texture gallery. */
-  readonly start: 'play' | 'gallery';
+  /** Dev/test `?rolled=0` turns rolled weather and spawn tables off. */
+  readonly rolled: boolean;
+  /** Dev/test `?weather=`: the starting weather override. */
+  readonly weather?: WeatherKind;
+  /** The scene Boot hands over to: the title screen, straight into the game, or the dev texture gallery. */
+  readonly start: 'title' | 'play' | 'gallery';
 }
 
 export interface RenderAssets {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { IDENTITY, applyMatrix, grade, multiply } from '@art/grading';
+import { COLOUR_BLIND, IDENTITY, applyMatrix, grade, multiply } from '@art/grading';
 
 const luminance = ([r, g, b]: readonly number[]): number =>
   0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0);
@@ -46,5 +46,21 @@ describe('colour grading', () => {
     const [sr, , sb] = applyMatrix(grade('summer', 1, 'clear'), grey);
     const [wr, , wb] = applyMatrix(grade('winter', 1, 'clear'), grey);
     expect(wb - wr).toBeGreaterThan(sb - sr);
+  });
+});
+
+describe('colour-blind grading', () => {
+  it('pulls reds and greens apart but leaves greys alone', () => {
+    const plain = grade('summer', 1, 'clear');
+    const cb = grade('summer', 1, 'clear', true);
+    expect(cb).not.toEqual(plain);
+    const grey: [number, number, number] = [120, 120, 120];
+    expect(applyMatrix(COLOUR_BLIND, grey)).toEqual(grey);
+    const red = applyMatrix(cb, [200, 40, 40]);
+    const green = applyMatrix(cb, [40, 200, 40]);
+    const gap = (x: readonly number[], y: readonly number[]): number => Math.abs((x[2] ?? 0) - (y[2] ?? 0));
+    expect(gap(red, green)).toBeGreaterThan(
+      gap(applyMatrix(plain, [200, 40, 40]), applyMatrix(plain, [40, 200, 40])),
+    );
   });
 });

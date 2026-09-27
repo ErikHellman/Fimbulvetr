@@ -4,7 +4,9 @@ import type {
   CritterId,
   DialogueId,
   EnemyId,
+  GaldrId,
   ItemId,
+  RegionId,
   NpcId,
   PropId,
   QuestId,
@@ -20,7 +22,7 @@ import type { PropDef } from '../actors/prop';
 import type { Tuning } from '../actors/tuning';
 import type { ClockRules } from '../clock/rules';
 import type { WeatherKind } from '../clock/types';
-import type { ItemDef } from '../items/defs';
+import type { GaldrDef, ItemDef } from '../items/defs';
 import type { FlagSpec } from '../state/flags';
 import type { Cond } from '../story/cond';
 import type { DialogueDef } from '../story/dialogue';
@@ -29,6 +31,7 @@ import type { ScriptDef } from '../story/script';
 import type { ShopDef } from '../story/shop';
 import type { CoverDef } from '../world/cover';
 import type { ScreenDef, WorldLayout } from '../world/screen';
+import type { SpawnTable } from '../world/spawns';
 import type { TerrainDef } from '../world/terrain';
 
 /** Everything the simulation reads from content. The shell passes `DB`; tests may pass variations. */
@@ -42,6 +45,7 @@ export interface ContentDb {
   readonly clock: ClockRules;
   readonly flags: Readonly<Record<FlagId, FlagSpec>>;
   readonly items: Readonly<Record<ItemId, ItemDef>>;
+  readonly galdr: Readonly<Record<GaldrId, GaldrDef>>;
   readonly quests: Readonly<Partial<Record<QuestId, QuestDef>>>;
   readonly dialogue: Readonly<Partial<Record<DialogueId, DialogueDef>>>;
   readonly scripts: Readonly<Partial<Record<ScriptId, ScriptDef>>>;
@@ -57,6 +61,8 @@ export interface ContentDb {
   readonly weather: readonly WeatherRule[];
   /** While this holds the world clock stands still (the raid night never dawns). */
   readonly freezeClock?: Cond;
+  /** Rolled enemies per region, on screens that list spawn points (only while `rolled` is on). */
+  readonly spawns: Readonly<Partial<Record<RegionId, SpawnTable>>>;
 }
 
 export interface WeatherRule {

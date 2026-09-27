@@ -333,4 +333,105 @@ export const SFX_BANK = {
     release: 0.4,
     volume: 0.45,
   },
+  /** Grinding rock: a troll turns to stone at sunrise. */
+  sfx_stone: {
+    wave: 'noise',
+    freq: 900,
+    freqEnd: 120,
+    attack: 0.02,
+    sustain: 0.35,
+    release: 0.3,
+    volume: 0.4,
+  },
+  /** A gust through the trees. */
+  sfx_wind: {
+    wave: 'noise',
+    freq: 500,
+    freqEnd: 900,
+    attack: 0.4,
+    sustain: 0.8,
+    release: 0.8,
+    volume: 0.2,
+  },
+  /** The menu cursor moving. */
+  sfx_menu_move: {
+    wave: 'square',
+    freq: 880,
+    freqEnd: 880,
+    attack: 0,
+    sustain: 0.015,
+    release: 0.02,
+    volume: 0.15,
+  },
+  /** A menu choice taken. */
+  sfx_menu_ok: {
+    wave: 'square',
+    freq: 660,
+    freqEnd: 1320,
+    attack: 0,
+    sustain: 0.04,
+    release: 0.05,
+    volume: 0.2,
+  },
+  /** A save written to a slot: a rising chime. */
+  sfx_save: {
+    wave: 'sine',
+    freq: 520,
+    freqEnd: 1040,
+    attack: 0.01,
+    sustain: 0.25,
+    release: 0.35,
+    volume: 0.3,
+  },
+  /** A long swallow from a mead horn. */
+  sfx_drink: {
+    wave: 'triangle',
+    freq: 330,
+    freqEnd: 220,
+    attack: 0.02,
+    sustain: 0.18,
+    release: 0.12,
+    volume: 0.3,
+  },
+  /** Eldr sung: a rising roar of flame. */
+  sfx_eldr: {
+    wave: 'noise',
+    freq: 600,
+    freqEnd: 2400,
+    attack: 0.02,
+    sustain: 0.18,
+    release: 0.2,
+    volume: 0.4,
+  },
+  /** A galdr without the seiðr for it: a dull puff. */
+  sfx_fizzle: {
+    wave: 'noise',
+    freq: 1200,
+    freqEnd: 300,
+    attack: 0,
+    sustain: 0.05,
+    release: 0.12,
+    volume: 0.25,
+  },
+  /** The pack leader's howl: a long rising, falling moan. */
+  sfx_howl: {
+    wave: 'triangle',
+    freq: 330,
+    freqEnd: 520,
+    attack: 0.12,
+    sustain: 0.35,
+    release: 0.3,
+    volume: 0.3,
+  },
+  /** The rime raven's shriek: harsh and high. */
+  sfx_shriek: {
+    wave: 'square',
+    freq: 1400,
+    freqEnd: 900,
+    attack: 0.01,
+    sustain: 0.18,
+    release: 0.12,
+    volume: 0.2,
+    duty: 0.2,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

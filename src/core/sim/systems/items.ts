@@ -37,13 +37,20 @@ export function equip(rt: SimRt, slot: 0 | 1, item: ItemId | null): boolean {
   return true;
 }
 
-/** Eats one of a food item: heals, uses it up. Refused at full health or without one. */
+/**
+ * Eats food or drinks mead: heals and/or restores seiðr, and uses one up. Refused without one, or when it
+ * would restore nothing (full health for food and red mead, a full bar for green mead).
+ */
 export function eat(rt: SimRt, item: ItemId): boolean {
-  const heal = rt.db.items[item].heal;
+  const def = rt.db.items[item];
   const have = rt.state.inv.items[item] ?? 0;
-  if (heal === undefined || have < 1 || rt.hero.hp >= rt.hero.maxHp) return false;
-  rt.hero.hp = Math.min(rt.hero.maxHp, rt.hero.hp + heal);
+  const hero = rt.state.hero;
+  const heals = def.heal !== undefined && rt.hero.hp < rt.hero.maxHp;
+  const fills = def.seidr !== undefined && hero.seidr < hero.maxSeidr;
+  if (have < 1 || (!heals && !fills)) return false;
+  if (def.heal !== undefined) rt.hero.hp = Math.min(rt.hero.maxHp, rt.hero.hp + def.heal);
+  if (def.seidr !== undefined) hero.seidr = Math.min(hero.maxSeidr, hero.seidr + def.seidr);
   applyEffect({ k: 'take', item }, rt);
-  rt.emit({ t: 'sfx', id: 'sfx_itemget' });
+  rt.emit({ t: 'sfx', id: def.horn === true ? 'sfx_drink' : 'sfx_itemget' });
   return true;
 }

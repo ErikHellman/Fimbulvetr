@@ -94,4 +94,146 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_uppvik: {
+    id: 'q_uppvik',
+    name: { en: 'The road north', sv: 'Vägen norrut' },
+    stages: [
+      {
+        when: flag('st_stone1_lit'),
+        text: {
+          en: 'A fallen pine blocks the road north. Önundr the woodcutter might clear it.',
+          sv: 'En fallen tall spärrar vägen norrut. Önundr vedhuggaren kan kanske röja den.',
+        },
+      },
+      {
+        when: flag('st_road_open'),
+        text: {
+          en: 'The road north is open. Follow it past the deep pines to Uppvík, the trading town.',
+          sv: 'Vägen norrut är öppen. Följ den förbi de djupa tallarna till Uppvík, handelsstaden.',
+        },
+      },
+      {
+        when: flag('st_uppvik_reached'),
+        text: {
+          en: 'Uppvík at last. Find the mead hall and its keeper.',
+          sv: 'Äntligen Uppvík. Leta upp mjödhallen och den som håller den.',
+        },
+      },
+      {
+        when: flag('w_horn_thordis'),
+        text: {
+          en: 'Þórdís gave you a mead horn. The traders and craftsmen keep shop by day.',
+          sv: 'Þórdís gav dig ett mjödhorn. Handlarna och hantverkarna håller öppet om dagen.',
+        },
+      },
+    ],
+  },
+  q_volva: {
+    id: 'q_volva',
+    name: { en: 'The völva’s brew', sv: 'Völvans brygd' },
+    stages: [
+      {
+        when: flag('q_volva_asked'),
+        text: {
+          en: 'Heiðr the völva wants three clumps of fen-moss. It grows in the fen in autumn.',
+          sv: 'Völvan Heiðr vill ha tre tuvor kärrmossa. Den växer i kärret om hösten.',
+        },
+      },
+      {
+        when: flag('q_volva_done'),
+        text: {
+          en: 'Heiðr brews blue mead now: it heals and fills the seiðr bar.',
+          sv: 'Heiðr brygger blått mjöd nu: det läker och fyller på seiðr.',
+        },
+      },
+    ],
+  },
+  q_huldra: {
+    id: 'q_huldra',
+    name: { en: 'The huldra’s bargain', sv: 'Huldrans handel' },
+    stages: [
+      {
+        when: flag('n_huldra_met'),
+        text: {
+          en: 'A woman in the birch glade offers a winter cloak for a promise, only at night.',
+          sv: 'En kvinna i björkgläntan erbjuder en vinterkappa mot ett löfte, bara om natten.',
+        },
+      },
+      {
+        when: flag('q_huldra_refused'),
+        text: {
+          en: 'You turned the huldra down. She will ask again another night.',
+          sv: 'Du sa nej till huldran. Hon frågar igen en annan natt.',
+        },
+      },
+      {
+        when: flag('q_huldra_promise'),
+        text: {
+          en: 'The huldra’s cloak keeps the snow off. One day she will come to collect your promise.',
+          sv: 'Huldrans kappa håller snön borta. En dag kommer hon för att kräva ditt löfte.',
+        },
+      },
+    ],
+  },
+  q_vargar: {
+    id: 'q_vargar',
+    name: { en: 'The vargar hunt', sv: 'Vargjakten' },
+    stages: [
+      {
+        when: flag('q_vargar_taken'),
+        text: {
+          en: 'Kill the vargr pack leader on the north road. Dagný the huntress knows the vargar.',
+          sv: 'Fäll vargflockens ledare vid norra vägen. Jägarinnan Dagný känner vargarna.',
+        },
+      },
+      {
+        when: flag('q_vargar_tracked'),
+        text: {
+          en: 'The pack leader howls its pack in: strike it mid-howl. Roll from its lunge.',
+          sv: 'Flockens ledare ylar in flocken: hugg den mitt i ylet. Rulla undan språnget.',
+        },
+      },
+      {
+        when: flag('q_vargar_alpha'),
+        text: {
+          en: 'The pack leader is dead. Bersi pays the bounty at Uppvík’s gate.',
+          sv: 'Flockens ledare är död. Bersi betalar belöningen vid Uppvíks port.',
+        },
+      },
+      {
+        when: flag('q_vargar_done'),
+        text: {
+          en: 'Bersi paid the bounty, and a purse that holds 300 silver.',
+          sv: 'Bersi betalade belöningen, och en pung som rymmer 300 silver.',
+        },
+      },
+    ],
+  },
+  q_eldr: {
+    id: 'q_eldr',
+    name: { en: 'Sölvi’s lesson', sv: 'Sölvis lektion' },
+    stages: [
+      {
+        when: flag('q_eldr_asked'),
+        text: {
+          en: 'Sölvi the rune-carver needs a stave charred in Skeggi’s kiln, in Myrkviðr.',
+          sv: 'Runristaren Sölvi behöver en stav som förkolnat i Skeggis mila i Myrkviðr.',
+        },
+      },
+      {
+        when: { k: 'item', id: 'charred_stave' },
+        text: {
+          en: 'Bring the charred stave back to Sölvi in Uppvík.',
+          sv: 'Ta med den förkolnade staven tillbaka till Sölvi i Uppvík.',
+        },
+      },
+      {
+        when: flag('st_eldr_learned'),
+        text: {
+          en: 'You know Eldr, the fire-song. Seiðr feeds it; green mead and a hof’s stone fill it again.',
+          sv: 'Du kan Eldr, eldsången. Seiðr när den; grönt mjöd och ett hovs sten fyller på igen.',
+        },
+      },
+    ],
+  },
 };

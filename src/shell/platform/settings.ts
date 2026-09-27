@@ -1,3 +1,4 @@
+import { ACTIONS, type Action } from '@core/input/actions';
 import { LANGS, type Lang } from '@core/i18n/t';
 import type { Scaling } from '@shell/scale';
 
@@ -10,6 +11,10 @@ export interface Settings {
   holdShield: boolean;
   longDay: boolean;
   textSize: 1 | 2 | 3;
+  /** Pulls reds and greens apart in the world's colours. */
+  colourBlind: boolean;
+  /** Keyboard keys per action that differ from the defaults (KeyboardEvent.code values). */
+  keys: Partial<Record<Action, readonly string[]>>;
 }
 
 export const SETTINGS_KEY = 'fimbulvetr.settings.v1';
@@ -23,15 +28,31 @@ export const DEFAULT_SETTINGS: Settings = {
   holdShield: false,
   longDay: false,
   textSize: 2,
+  colourBlind: false,
+  keys: {},
 };
 
 export type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
 
 const bool = (v: unknown, fallback: boolean): boolean => (typeof v === 'boolean' ? v : fallback);
 
+const CODE = /^[A-Za-z0-9]{1,24}$/;
+
+/** Only known actions with one to four plausible key codes survive. */
+function parseKeys(v: unknown): Settings['keys'] {
+  if (typeof v !== 'object' || v === null) return {};
+  const out: Partial<Record<Action, readonly string[]>> = {};
+  for (const action of ACTIONS) {
+    const codes = (v as Record<string, unknown>)[action];
+    if (!Array.isArray(codes) || codes.length === 0 || codes.length > 4) continue;
+    if (codes.every((c): c is string => typeof c === 'string' && CODE.test(c))) out[action] = [...codes];
+  }
+  return out;
+}
+
 /** Stored JSON merged over validated defaults; anything unusable falls back field by field. */
 export function parseSettings(raw: string | null, fallbackLang: Lang): Settings {
-  const base: Settings = { ...DEFAULT_SETTINGS, lang: fallbackLang };
+  const base: Settings = { ...DEFAULT_SETTINGS, lang: fallbackLang, keys: {} };
   if (raw === null) return base;
   let data: unknown;
   try {
@@ -56,6 +77,8 @@ export function parseSettings(raw: string | null, fallbackLang: Lang): Settings 
     holdShield: bool(d['holdShield'], base.holdShield),
     longDay: bool(d['longDay'], base.longDay),
     textSize,
+    colourBlind: bool(d['colourBlind'], base.colourBlind),
+    keys: parseKeys(d['keys']),
   };
 }
 

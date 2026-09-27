@@ -26,6 +26,7 @@ export const TUNING: Tuning = {
     carrySpeed: 1.2,
     throwTicks: 10,
     tossTicks: 10,
+    castTicks: 14,
     carryHeight: 18,
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
@@ -59,6 +60,19 @@ export const TUNING: Tuning = {
       },
       spinBox: { x: -26, y: -36, w: 52, h: 44 },
     },
+    /** The Uppvík smith's sword: a little longer than the seax, and it bites half again as deep. */
+    uppvik_sword: {
+      comboDamage: [3, 3, 6],
+      spinDamage: 6,
+      knock: 4,
+      boxes: {
+        e: { x: 2, y: -24, w: 22, h: 20 },
+        w: { x: -24, y: -24, w: 22, h: 20 },
+        n: { x: -10, y: -42, w: 20, h: 24 },
+        s: { x: -10, y: -8, w: 20, h: 22 },
+      },
+      spinBox: { x: -28, y: -38, w: 56, h: 48 },
+    },
     /** The farm hand-axe: short reach, light blows. */
     handaxe: {
       comboDamage: [1, 1, 2],
@@ -72,6 +86,14 @@ export const TUNING: Tuning = {
       },
       spinBox: { x: -22, y: -32, w: 44, h: 40 },
     },
+  },
+  fire: { burnTicks: 90, spreadAt: 50, amount: 2, knock: 3, scorch: 30 },
+  eldr: { speed: 4, range: 176, damage: 4 },
+  armor: {
+    wool_tunic: { reduce: 0 },
+    byrnie: { reduce: 0.25 },
+    ember_byrnie: { reduce: 0.4 },
+    runeplate: { reduce: 0.5 },
   },
   textCps: 45,
   enemyIframes: 6,

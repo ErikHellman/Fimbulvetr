@@ -16,6 +16,14 @@ import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
 import { FONT_KEY } from '@shell/gfx/font';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
+import type { Settings } from '@shell/platform/settings';
+import type { SettingsMenuState } from '@shell/ui/settingsMenu';
+import { settingsLines } from '@shell/ui/settingsText';
+import type { SaveSummary } from '@shell/platform/saveStore';
+import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
+import { slotName, summaryLine } from '@shell/ui/slotText';
+import { wareName } from '@shell/ui/wareText';
+import { gearLines } from '@shell/ui/gearText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -25,23 +33,43 @@ export interface UiLink {
   readonly lang: () => Lang;
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
+  /** The key bound to an action now, as the HUD labels it (K, L, I… or the player's own). */
+  readonly keyLabel: (action: 'item1' | 'item2' | 'galdr') => string;
   /** The open pause menu and what its items page lists, or null in play. */
-  readonly menu: () => { readonly state: MenuState; readonly items: readonly MenuItem[] } | null;
+  readonly menu: () => {
+    readonly state: MenuState;
+    readonly items: readonly MenuItem[];
+    /** The settings menu, when it is open over the game tab. */
+    readonly settings: { readonly state: SettingsMenuState; readonly values: Settings } | null;
+  } | null;
+  /** The save-slot picker a hof or mead hall opened, with the slots' summaries; null when closed. */
+  readonly picker: () => {
+    readonly state: PickerState;
+    readonly slots: Readonly<Record<'s1' | 's2' | 's3', SaveSummary | null>>;
+    readonly result: 'saved' | 'failed' | null;
+  } | null;
 }
 
 const TAB_LABEL = {
   items: UI.menu_items,
+  gear: UI.menu_gear,
   map: UI.menu_map,
   quests: UI.menu_quests,
   system: UI.menu_system,
 } as const;
-const SYSTEM_LABEL = { resume: UI.menu_resume, start_over: UI.menu_start_over } as const;
+const SYSTEM_LABEL = {
+  resume: UI.menu_resume,
+  settings: UI.menu_settings,
+  start_over: UI.menu_start_over,
+} as const;
 const MENU = { x: 16, y: 14, w: GAME_W - 32, h: GAME_H - 28 };
 
 export const UI_LINK = 'uiLink';
 
 const INK = 0x1b1522;
 const GOLD = 0xd9b34a;
+/** The seiðr bar's blue. */
+const SEIDR = 0x7fd8e8;
 const RED = 0xe0433f;
 const CAVE = 0x6e6258;
 const CAVE_SEEN = 0x9a8a78;
@@ -79,6 +107,11 @@ export class UiScene extends Phaser.Scene {
   private hearts: Phaser.GameObjects.Image[] = [];
   private silver!: Phaser.GameObjects.BitmapText;
   private slotIcons: Phaser.GameObjects.Image[] = [];
+  private slotLabels: Phaser.GameObjects.BitmapText[] = [];
+  private galdrBox!: Phaser.GameObjects.Graphics;
+  private galdrIcon!: Phaser.GameObjects.Image;
+  private galdrLabel!: Phaser.GameObjects.BitmapText;
+  private seidrBar!: Phaser.GameObjects.Graphics;
   private box!: Phaser.GameObjects.Graphics;
   private name!: Phaser.GameObjects.BitmapText;
   private body!: Phaser.GameObjects.BitmapText;
@@ -92,6 +125,8 @@ export class UiScene extends Phaser.Scene {
   private menuTabs: Phaser.GameObjects.BitmapText[] = [];
   private menuBody!: Phaser.GameObjects.BitmapText;
   private menuHint!: Phaser.GameObjects.BitmapText;
+  /** The second column of the settings menu. */
+  private menuValues!: Phaser.GameObjects.BitmapText;
   private menuIcons: Phaser.GameObjects.Image[] = [];
   private fallen!: Phaser.GameObjects.Rectangle;
   private fallenTitle!: Phaser.GameObjects.BitmapText;
@@ -109,6 +144,7 @@ export class UiScene extends Phaser.Scene {
     this.cameras.main.setRoundPixels(true);
     this.hearts = [];
     this.slotIcons = [];
+    this.slotLabels = [];
     const hud = this.add.graphics();
     const silverRef = this.frameRef('ui_silver_idle_s_0');
     this.add.image(6, 30, silverRef.key, silverRef.frame).setOrigin(0, 0);
@@ -125,10 +161,22 @@ export class UiScene extends Phaser.Scene {
         .fillRect(x, 6, 22, 22)
         .lineStyle(1, GOLD, 1)
         .strokeRect(x + 0.5, 6.5, 21, 21);
-      this.text(x + 8, 29, i === 0 ? 'K' : 'L', DIM);
+      this.slotLabels.push(this.text(x + 8, 29, i === 0 ? 'K' : 'L', DIM));
       const icon = this.add.image(x + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
       this.slotIcons.push(icon);
     }
+    // The galdr, once one is known: its box left of the item slots, and the seiðr bar under the hearts.
+    const gx = GAME_W - 82;
+    this.galdrBox = this.add
+      .graphics()
+      .fillStyle(INK, 0.75)
+      .fillRect(gx, 6, 22, 22)
+      .lineStyle(1, SEIDR, 1)
+      .strokeRect(gx + 0.5, 6.5, 21, 21)
+      .setVisible(false);
+    this.galdrIcon = this.add.image(gx + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
+    this.galdrLabel = this.text(gx + 8, 29, '', DIM);
+    this.seidrBar = this.add.graphics();
     this.box = this.add.graphics();
     this.name = this.text(BOX.x + 12, BOX.y - 14, '', GOLD);
     this.body = this.text(BOX.x + 12, BOX.y + 10, '', PAPER);
@@ -143,6 +191,7 @@ export class UiScene extends Phaser.Scene {
     this.menuTabs = MENU_TABS.map(() => this.text(0, 0, '', DIM));
     this.menuBody = this.text(0, 0, '', PAPER);
     this.menuHint = this.text(0, 0, '', DIM);
+    this.menuValues = this.text(0, 0, '', GOLD);
     this.menuIcons = [];
   }
 
@@ -162,6 +211,7 @@ export class UiScene extends Phaser.Scene {
     const view = this.link.menu();
     this.menuBox.clear();
     for (const icon of this.menuIcons) icon.setVisible(false);
+    this.menuValues.setText('');
     if (view === null) {
       for (const tab of this.menuTabs) tab.setText('');
       this.menuBody.setText('');
@@ -189,7 +239,16 @@ export class UiScene extends Phaser.Scene {
       .setText(t(state.tab === 'items' ? UI.menu_items_hint : UI.menu_tabs_hint, lang))
       .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
     const top = MENU.y + 36;
+    if (view.settings !== null) {
+      const { labels, values, hint } = settingsLines(view.settings.state, view.settings.values, lang);
+      this.menuBody.setText(labels.join('\n')).setPosition(MENU.x + 24, top);
+      const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
+      this.menuValues.setText(values.join('\n')).setPosition(MENU.x + 24 + column, top);
+      this.menuHint.setText(hint);
+      return;
+    }
     if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
+    else if (state.tab === 'gear') this.menuGear(top, lang);
     else if (state.tab === 'map') this.menuMap(top, lang);
     else if (state.tab === 'quests') this.menuQuests(top, lang);
     else {
@@ -222,6 +281,26 @@ export class UiScene extends Phaser.Scene {
       icon
         .setTexture(ref.key, ref.frame)
         .setPosition(MENU.x + 48, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
+        .setVisible(true)
+        .setScale(0.5);
+    });
+  }
+
+  /** What Ask carries and wears, each line with its icon. */
+  private menuGear(top: number, lang: Lang): void {
+    const lines = gearLines(this.link.sim.state, lang);
+    this.menuBody.setText(lines.map((l) => `      ${l.text}`).join('\n')).setPosition(MENU.x + 24, top);
+    lines.forEach((line, i) => {
+      if (line.icon === null) return;
+      let icon = this.menuIcons[i];
+      if (icon === undefined) {
+        icon = this.add.image(0, 0, '__MISSING').setOrigin(0.5, 0.5);
+        this.menuIcons.push(icon);
+      }
+      const ref = this.link.frames.get(`${line.icon}_idle_s_0`);
+      icon
+        .setTexture(ref.key, ref.frame)
+        .setPosition(MENU.x + 34, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
         .setVisible(true)
         .setScale(0.5);
     });
@@ -387,6 +466,8 @@ export class UiScene extends Phaser.Scene {
       img.setVisible(i < hearts).setTexture(ref.key, ref.frame);
     });
     this.silver.setText(String(sim.state.hero.silver));
+    this.drawGaldr(Math.ceil(hearts / MAX_HEARTS_PER_ROW));
+    this.slotLabels.forEach((label, i) => label.setText(this.link.keyLabel(i === 0 ? 'item1' : 'item2')));
     sim.state.inv.slots.forEach((item, i) => {
       const icon = this.slotIcons[i];
       if (icon === undefined) return;
@@ -397,6 +478,32 @@ export class UiScene extends Phaser.Scene {
       const ref = frames.get(`item_${item}_idle_s_0`);
       icon.setTexture(ref.key, ref.frame).setVisible(true);
     });
+  }
+
+  /** The galdr box and the seiðr bar (under `heartRows` rows of hearts), shown once a galdr is known. */
+  private drawGaldr(heartRows: number): void {
+    const { sim, frames } = this.link;
+    const galdr = sim.state.inv.galdr[0];
+    const known = galdr !== undefined;
+    this.galdrBox.setVisible(known);
+    this.galdrLabel.setText(known ? this.link.keyLabel('galdr') : '');
+    this.seidrBar.clear();
+    if (!known) {
+      this.galdrIcon.setVisible(false);
+      return;
+    }
+    const ref = frames.get(`galdr_${galdr}_idle_s_0`);
+    this.galdrIcon.setTexture(ref.key, ref.frame).setVisible(true);
+    const hero = sim.state.hero;
+    const y = 6 + heartRows * 10;
+    const w = hero.maxSeidr * 2;
+    this.seidrBar
+      .fillStyle(INK, 0.8)
+      .fillRect(6, y, w + 2, 5)
+      .fillStyle(SEIDR, 1)
+      .fillRect(7, y + 1, Math.round((w * hero.seidr) / Math.max(1, hero.maxSeidr)), 3)
+      .lineStyle(1, GOLD, 0.8)
+      .strokeRect(5.5, y - 0.5, w + 3, 6);
   }
 
   private speaker(who: Speaker): string {
@@ -421,6 +528,11 @@ export class UiScene extends Phaser.Scene {
     }
     if (ui.k === 'shop') {
       this.drawShop(ui, lang);
+      return;
+    }
+    if (ui.k === 'save') {
+      this.lastShown = '';
+      this.drawPicker(lang);
       return;
     }
     const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
@@ -460,7 +572,7 @@ export class UiScene extends Phaser.Scene {
 
   private drawShop(ui: Extract<StoryUi, { k: 'shop' }>, lang: Lang): void {
     const rows = ui.rows.map(
-      (r, i) => `${i === ui.cursor ? '>' : ' '} ${this.itemName(r.item, lang)} — ${String(r.price)}`,
+      (r, i) => `${i === ui.cursor ? '>' : ' '} ${wareName(r.ware, lang)} — ${String(r.price)}`,
     );
     rows.push(`${ui.cursor === ui.rows.length ? '>' : ' '} ${t(UI.shop_leave, lang)}`);
     const note = ui.last === null ? '' : t(UI[`shop_${ui.last}`], lang);
@@ -468,6 +580,32 @@ export class UiScene extends Phaser.Scene {
     const w = 300;
     const h = lines.length * LINE_HEIGHT + 14;
     const x = (GAME_W - w) / 2;
+    const y = 40;
+    this.panel(x, y, w, h);
+    this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
+  }
+
+  /** The slots a hof or mead hall offers, with what each holds now. */
+  private drawPicker(lang: Lang): void {
+    const view = this.link.picker();
+    if (view === null) return;
+    const { state } = view;
+    const rows = PICK_ROWS.map((r, i) => {
+      const mark = i === state.cursor ? '>' : ' ';
+      if (r === 'leave') return `${mark} ${t(UI.shop_leave, lang)}`;
+      return `${mark} ${slotName(r, lang)}: ${summaryLine(view.slots[r], this.link.sim.db, lang)}`;
+    });
+    const slot = PICK_ROWS[state.cursor] ?? 's1';
+    const note =
+      state.phase !== 'done'
+        ? t(UI.slot_pick_hint, lang)
+        : view.result === 'saved'
+          ? t(UI.slot_saved, lang, { detail: slot.slice(1) })
+          : t(UI.slot_failed, lang);
+    const lines = [t(UI.slot_pick, lang), '', ...rows, '', note];
+    const w = Math.max(...lines.map((l) => textWidth(l))) + 28;
+    const h = lines.length * LINE_HEIGHT + 14;
+    const x = Math.round((GAME_W - w) / 2);
     const y = 40;
     this.panel(x, y, w, h);
     this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));

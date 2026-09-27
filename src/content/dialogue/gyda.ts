@@ -31,6 +31,7 @@ const FARM_DAYS: DialogueDef = daily(
 /** Gyða, the goði, keeps the rune-records in the hof. The morning after the raid she tells the legend. */
 export const GYDA: DialogueDef = {
   entry: [
+    { when: flag('st_uppvik_reached'), node: 'uppvik' },
     { when: flag('st_stone1_lit'), node: 'stone1' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'first_halvar' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'legend' },
@@ -38,6 +39,19 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    uppvik: {
+      text: {
+        en: 'You have seen Uppvík! Is Gunnhildr still keeping the hof there? Tell her Gyða of Askdalr owes her a cheese.',
+        sv: 'Du har sett Uppvík! Sköter Gunnhildr fortfarande hovet där? Säg att Gyða från Askdalr är skyldig henne en ost.',
+      },
+      next: 'uppvik2',
+    },
+    uppvik2: {
+      text: {
+        en: 'She will know what it means. We were girls together, before the winters grew teeth.',
+        sv: 'Hon vet vad det betyder. Vi var flickor tillsammans, innan vintrarna fick tänder.',
+      },
+    },
     ...FARM_DAYS.nodes,
     stone1: {
       text: {

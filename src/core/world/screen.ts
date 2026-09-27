@@ -4,6 +4,7 @@ import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { L10n } from '../i18n/t';
 import type { Vec } from '../math/vec';
+import type { Season } from '../clock/types';
 import type { Cond } from '../story/cond';
 import type { Effect } from '../story/effects';
 import { SCREEN_H, SCREEN_W, TILE } from './dims';
@@ -146,6 +147,17 @@ export type Thing =
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
   | { readonly k: 'piece'; readonly id: string; readonly at: TilePos }
+  /**
+   * A herb that grows in one season: walking over it picks `item`, and it stays gone until that season
+   * comes round again (`world.vars[id]` holds the season epoch it was picked in, plus one).
+   */
+  | {
+      readonly k: 'herb';
+      readonly id: string;
+      readonly item: ItemId;
+      readonly at: TilePos;
+      readonly season: Season;
+    }
   /** Burning tiles (the raid): they hurt on touch and are not solid; out while `when` fails. */
   | { readonly k: 'fire'; readonly at: TilePos; readonly w: number; readonly h: number; readonly when?: Cond }
   /** A barrier of tiles, solid while `closed` holds: a palisade gate, a wall of fire, piled logs. */
@@ -183,6 +195,8 @@ export interface ScreenDef {
   readonly dark?: boolean;
   /** A dungeon room: its grid in `layout.dungeons`; the clock stops and there is no weather. */
   readonly dungeon?: DungeonId;
+  /** Where the region's spawn table may put enemies (see ContentDb.spawns). None: nothing rolled here. */
+  readonly spawns?: readonly TilePos[];
 }
 
 /** A grid of screens: the overworld, or one floor of a dungeon. */

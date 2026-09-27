@@ -68,6 +68,37 @@ function vines(): Raster {
   return outline(r, INK, 1);
 }
 
+/** A thicket of brambles across a way: dark tangled canes with thorns and a few red berries. */
+function bramble(): Raster {
+  const h = 20;
+  const r = createRaster(W, h);
+  ellipse(r, 9, 11, 8, 7.5, VINE_SHADE);
+  ellipse(r, 8, 10, 6, 5.5, hex('#3f5a2a'));
+  for (const [x0, y0, x1, y1] of [
+    [1, 15, 16, 5],
+    [2, 6, 15, 16],
+    [4, 17, 9, 3],
+    [13, 17, 8, 4],
+  ] as const)
+    line(r, x0, y0, x1, y1, WOOD_SHADE);
+  for (const [x, y] of [
+    [4, 8],
+    [12, 7],
+    [7, 13],
+    [14, 12],
+    [3, 12],
+    [10, 4],
+  ] as const)
+    rect(r, x, y, 1, 1, hex('#e8e0c8'));
+  for (const [x, y] of [
+    [6, 6],
+    [11, 11],
+    [5, 15],
+  ] as const)
+    rect(r, x, y, 2, 2, hex('#b0303a'));
+  return outline(r, INK, 1);
+}
+
 // ── Root-biter: a root with a mouth, 28×32, feet at (14, 28) ──────────────────────────────────────────
 
 /** How far the stalk stands out of the ground (0 buried … 1 up), whether it gapes, and a sideways lean. */
@@ -222,6 +253,7 @@ export function caveFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [
     propFrame('prop_root_block_idle_s_0', rootBlock()),
     propFrame('prop_vines_idle_s_0', vines()),
+    propFrame('prop_bramble_idle_s_0', bramble()),
   ];
   const b = (anim: string, i: number, raster: Raster): void => {
     out.push({ name: `enemy_root_biter_${anim}_s_${i}`, raster, ox: 14, oy: 28 });
@@ -265,6 +297,7 @@ const S = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps,
 export const CAVE_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   prop_root_block: { idle: ONE },
   prop_vines: { idle: ONE },
+  prop_bramble: { idle: ONE },
   enemy_root_biter: {
     buried: ONE,
     tell: S(2, 10),

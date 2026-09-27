@@ -6,13 +6,15 @@ import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { dungeonOf } from '../../state/dungeons';
 import { evalCond } from '../../story/cond';
-import { SOLID } from '../../world/collision';
+import { LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import { tileFeet, type Thing, type TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { hurtHero } from './combat';
 import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
+import { raining } from './weather';
+import { walkTiles } from './cover';
 import { condCtx, probeBox } from './story';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -165,6 +167,7 @@ function stepShutters(rt: SimRt, arm: boolean): void {
  */
 export function refreshFixtures(rt: SimRt, arm = true): void {
   revealThings(rt);
+  douseBraziers(rt);
   stepShutters(rt, arm);
   let changed = false;
   const sounds = new Set<'sfx_gate' | 'sfx_shutter'>();
@@ -191,6 +194,8 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
 export function stampCollision(rt: SimRt): void {
   const { base, collision } = rt.screen;
   collision.flags.set(base.flags);
+  // Ice lets Ask walk on water (and blocks nothing in flight).
+  for (const i of walkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
@@ -253,8 +258,16 @@ export function strikeSwitch(rt: SimRt, box: Box): boolean {
   return true;
 }
 
-/** Lights the cold brazier under `box` (from the lantern). Returns whether one was lit. */
+/** Rain puts out every burning brazier in the open (they stay out until lit again). */
+function douseBraziers(rt: SimRt): void {
+  const lit = rt.actors.filter((e) => e.kind === 'fixture' && e.def === 'brazier' && mem(e, 'lit') === 1);
+  if (lit.length === 0 || !raining(rt)) return;
+  for (const e of lit) e.mem['lit'] = 0;
+}
+
+/** Lights the cold brazier under `box` (from the lantern). Returns whether one was lit; never in the rain. */
 export function lightBrazier(rt: SimRt, box: Box): boolean {
+  if (raining(rt)) return false;
   const e = fixtureAt(rt, 'brazier', box, (f) => mem(f, 'lit') !== 1);
   if (e === null) return false;
   e.mem['lit'] = 1;

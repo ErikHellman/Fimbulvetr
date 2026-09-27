@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SPAWN_TABLES } from '@content/spawns';
 import { NEW_GAME } from '@content/start';
 import { TERRAIN } from '@content/terrain';
 import { WORLD_LAYOUT } from '@content/world/layout';
@@ -33,6 +34,16 @@ describe('screens', () => {
       if (!standing.has(thing.k)) continue;
       expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
     }
+  });
+
+  it.each(SCREEN_IDS)('%s puts spawn points on walkable ground outdoors, in a region with a table', (id) => {
+    const def = SCREENS[id];
+    if (def.spawns === undefined) return;
+    expect(def.indoor, `${id} is indoors`).not.toBe(true);
+    expect(def.dungeon, `${id} is in a dungeon`).toBeUndefined();
+    expect(SPAWN_TABLES[def.region], `${id}: no table for ${def.region}`).toBeDefined();
+    const ok = walkable(id);
+    for (const p of def.spawns) expect(ok(p.x, p.y), `${id} spawn point ${p.x},${p.y}`).toBe(true);
   });
 
   it.each(SCREEN_IDS)('%s lays fires and gates on walkable tiles only', (id) => {

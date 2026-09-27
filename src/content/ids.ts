@@ -37,7 +37,18 @@ export const UPGRADES = [
 ] as const;
 /** Found in dungeons; they go into that dungeon's saved state, never into the bag. */
 export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] as const;
-export const ITEMS = [...SUB_ITEMS, ...CONSUMABLES, ...UPGRADES, ...DUNGEON_ITEMS] as const;
+/** Kept for good and never used from a slot: mead horns (what mead is carried in) and the winter cloak. */
+export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
+/** Things carried for someone: a quest's token or a brew's ingredients. */
+export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
+export const ITEMS = [
+  ...SUB_ITEMS,
+  ...CONSUMABLES,
+  ...UPGRADES,
+  ...DUNGEON_ITEMS,
+  ...KEEPSAKES,
+  ...QUEST_ITEMS,
+] as const;
 export type ItemId = (typeof ITEMS)[number];
 
 export const GALDR = ['eldr', 'is', 'farvegr', 'hlif', 'skjalfti', 'ljos', 'vindr', 'bragd'] as const;
@@ -61,6 +72,9 @@ export const ENEMIES = [
   'rotvaettr',
   'rot_bulb',
   'root_spike',
+  'forest_troll',
+  'vargr_alpha',
+  'rime_raven',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -99,6 +113,16 @@ export const SFX = [
   'sfx_stun',
   'sfx_boss_hit',
   'sfx_boss_roar',
+  'sfx_stone',
+  'sfx_wind',
+  'sfx_menu_move',
+  'sfx_menu_ok',
+  'sfx_save',
+  'sfx_drink',
+  'sfx_eldr',
+  'sfx_fizzle',
+  'sfx_howl',
+  'sfx_shriek',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -122,18 +146,43 @@ export const NPCS = [
   'dagny',
   'skeggi',
   'arnbjorg',
+  // Uppvík
+  'thordis',
+  'hrafnkell',
+  'ketill',
+  'solvi',
+  'gunnhildr',
+  'bersi',
+  'jorunn',
+  'eyvindr',
+  'hjalti',
+  'glumr',
+  'ragna',
+  'steinn',
+  // Myrkviðr, deep
+  'heidr',
+  'huldra',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
 /** Quest log entries; their progress is derived from flags, never saved. */
-export const QUESTS = ['q_chores', 'q_legend', 'q_runestone_1'] as const;
+export const QUESTS = [
+  'q_chores',
+  'q_legend',
+  'q_runestone_1',
+  'q_uppvik',
+  'q_eldr',
+  'q_volva',
+  'q_huldra',
+  'q_vargar',
+] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop'] as const;
+export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr'] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
-export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat'] as const;
+export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat', 'thingstone'] as const;
 export type DialogueId = (typeof DIALOGUES)[number];
 
 /** Cutscenes and interaction scripts. */
@@ -147,17 +196,40 @@ export const SCRIPTS = [
   'raid_gate',
   'd1_enter',
   'stone1_light',
+  'hof_pray',
+  'meadhall_rest',
+  'upp_knock_in',
+  'upp_knock_out',
+  'uppvik_arrive',
+  'shop_hrafnkell',
+  'shop_ketill',
+  'shop_heidr',
+  'thing_notices',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
 /** Things that can be lifted, thrown, broken or split. */
-export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big', 'root_block', 'vines'] as const;
+export const PROPS = [
+  'pot',
+  'stone',
+  'rock',
+  'pail',
+  'log_small',
+  'log_big',
+  'root_block',
+  'vines',
+  'troll_stone',
+  'bramble',
+] as const;
 export type PropId = (typeof PROPS)[number];
 
 /** Animals with simple behaviours that are not enemies. */
 export const CRITTERS = ['sheep', 'raven'] as const;
 export type CritterId = (typeof CRITTERS)[number];
 
-/** Ground cover layered over terrain. Snow, drifts and mud join in later milestones. */
-export const COVERS = ['tall_grass', 'leaves'] as const;
+/**
+ * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
+ * grow from the terrain beneath by season (see CoverDef.grows).
+ */
+export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice'] as const;
 export type CoverId = (typeof COVERS)[number];

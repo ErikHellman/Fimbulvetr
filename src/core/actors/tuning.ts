@@ -1,4 +1,4 @@
-import type { WeaponId } from '@content/ids';
+import type { ArmorId, WeaponId } from '@content/ids';
 import type { Box } from '../math/box';
 import type { Dir4 } from '../math/dir';
 
@@ -34,6 +34,8 @@ export interface HeroTuning {
   readonly carryHeight: number;
   /** The throwing pose of a sub-item (the boomerang). */
   readonly tossTicks: number;
+  /** Singing a galdr: the hero stands still this long. */
+  readonly castTicks: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -60,6 +62,29 @@ export interface PushTuning {
   readonly slideTicks: number;
 }
 
+/** The Eldr galdr's bolt of fire. */
+export interface EldrTuning {
+  /** px per tick. */
+  readonly speed: number;
+  /** px flown before it gutters out. */
+  readonly range: number;
+  /** Quarter hearts to a foe (halved in the rain). */
+  readonly damage: number;
+}
+
+/** Burning ground cover. */
+export interface FireTuning {
+  /** Ticks a tile burns before it is ash. */
+  readonly burnTicks: number;
+  /** When a burning tile has this many ticks left it catches its neighbours. */
+  readonly spreadAt: number;
+  /** Quarter hearts dealt to what stands in the flames (through the shield). */
+  readonly amount: number;
+  readonly knock: number;
+  /** Ticks between two scorches of the same foe. */
+  readonly scorch: number;
+}
+
 export interface BoomerangTuning {
   /** px per tick, out and back. */
   readonly speed: number;
@@ -74,6 +99,10 @@ export interface Tuning {
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
+  readonly fire: FireTuning;
+  readonly eldr: EldrTuning;
+  /** Share of each blow an armour takes off (rounded; a blow always deals at least 1). */
+  readonly armor: Readonly<Record<ArmorId, { readonly reduce: number }>>;
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;

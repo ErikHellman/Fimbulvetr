@@ -5,7 +5,7 @@ import { C } from '../palette';
 import { blit, createRaster, hex, type Raster, type Rgba } from '../raster';
 import type { SpriteFrame } from './types';
 
-/** Ambient effects: a fish jumping out of the water and chimney smoke puffs. */
+/** Ambient effects: a fish jumping out of the water, chimney smoke puffs, and weather particles. */
 
 const INK = hex(C.ink);
 const WATER = hex(C.water);
@@ -66,6 +66,59 @@ function raindrop(): Raster {
   return r;
 }
 
+/** A straight streak of rain; the view slants the fall with the wind. */
+function drop(): Raster {
+  const r = createRaster(2, 10);
+  for (let i = 0; i < 10; i++) {
+    r.data.set([196, 220, 240, 110 + i * 12], i * 2 * 4);
+    if (i > 3) r.data.set([160, 190, 220, 90 + i * 8], (i * 2 + 1) * 4);
+  }
+  return r;
+}
+
+/** A snowflake: a soft white dot (small) or a little cross (large). */
+function flake(large: boolean): Raster {
+  const r = createRaster(3, 3);
+  const white: Rgba = [250, 252, 255, 235];
+  const soft: Rgba = [220, 230, 245, 170];
+  r.data.set(white, (1 * 3 + 1) * 4);
+  if (large)
+    for (const [x, y] of [
+      [0, 1],
+      [2, 1],
+      [1, 0],
+      [1, 2],
+    ] as const)
+      r.data.set(soft, (y * 3 + x) * 4);
+  return r;
+}
+
+/** A leaf tumbling on the wind, in three autumn colours. */
+function windLeaf(i: number): Raster {
+  const r = createRaster(4, 3);
+  const c = hex([C.autumn, C.autumnLight, C.ember][i] ?? C.autumn);
+  rect(r, 0, 1, 3, 1, c);
+  rect(r, 1, 0, 2, 1, c);
+  rect(r, 3, 2, 1, 1, hex(C.autumnShade));
+  return r;
+}
+
+/** Eldr's bolt: a ball of fire with a white-hot heart, flickering over three frames. */
+function eldr(i: number): Raster {
+  const r = createRaster(14, 14);
+  const flick = [0, 1, 0.5][i] ?? 0;
+  ellipse(r, 7, 7, 6 + flick * 0.5, 5.5 + flick * 0.5, hex(C.ember));
+  ellipse(r, 7, 7, 4.2, 4, hex(C.emberLight));
+  ellipse(r, 7 - flick, 6.5, 2, 2, [255, 250, 230, 255]);
+  for (const [x, y] of [
+    [1 + i, 3],
+    [12 - i, 10],
+    [3, 11 - i],
+  ] as const)
+    r.data.set(hex(C.emberLight), (y * 14 + x) * 4);
+  return r;
+}
+
 /**
  * The shape a light cuts out of the dark: a disc in three steps of strength, so the edge reads as pixel
  * art rather than a smooth gradient. White; only its alpha matters.
@@ -92,6 +145,11 @@ export function fxFrames(): SpriteFrame[] {
   });
   out.push({ name: 'fx_rain_idle_s_0', raster: raindrop(), ox: 3, oy: 7 });
   out.push({ name: 'fx_light_idle_s_0', raster: light(), ox: 64, oy: 64 });
+  out.push({ name: 'fx_drop_idle_s_0', raster: drop(), ox: 1, oy: 5 });
+  for (let i = 0; i < 3; i++) out.push({ name: `fx_eldr_fly_s_${i}`, raster: eldr(i), ox: 7, oy: 12 });
+  out.push({ name: 'fx_snow_idle_s_0', raster: flake(false), ox: 1, oy: 1 });
+  out.push({ name: 'fx_snow_idle_s_1', raster: flake(true), ox: 1, oy: 1 });
+  for (let i = 0; i < 3; i++) out.push({ name: `fx_leaf_idle_s_${i}`, raster: windLeaf(i), ox: 2, oy: 1 });
   return out;
 }
 
@@ -100,4 +158,8 @@ export const FX_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>
   fx_smoke: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
   fx_rain: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_light: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
+  fx_drop: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
+  fx_eldr: { fly: { frames: 3, fps: 14, loop: true, dirs: ['s'] } },
+  fx_snow: { idle: { frames: 2, fps: 1, loop: true, dirs: ['s'] } },
+  fx_leaf: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
 };

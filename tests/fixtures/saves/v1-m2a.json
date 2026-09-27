@@ -1,0 +1,145 @@
+{
+  "format": "fimbulvetr",
+  "v": 1,
+  "build": "fixture",
+  "savedAt": "2026-09-27T23:00:00.000Z",
+  "state": {
+    "seed": 7,
+    "rng": {
+      "s": 3031295963
+    },
+    "flags": {
+      "st_farm_day": 3,
+      "st_intro_seen": true,
+      "q_sheep_d1": true,
+      "q_water_d1": true,
+      "q_paid_d1": true,
+      "ev_embla_d1": true,
+      "q_logs": 5,
+      "q_paid_d2": true,
+      "ev_embla_d2": true,
+      "q_ravens": 5,
+      "q_paid_d3": true,
+      "ev_embla_d3": true,
+      "st_raid_begun": true,
+      "st_raid_done": true,
+      "st_seax_given": true,
+      "st_legend_told": true
+    },
+    "hero": {
+      "screen": "myr_deep",
+      "x": 168,
+      "y": 222,
+      "facing": "n",
+      "hp": 12,
+      "maxHp": 12,
+      "seidr": 10,
+      "maxSeidr": 10,
+      "silver": 5,
+      "purse": 0
+    },
+    "inv": {
+      "items": {
+        "lantern": 1
+      },
+      "slots": ["lantern", null],
+      "galdr": [],
+      "weapon": "seax",
+      "armor": "wool_tunic",
+      "ring": null,
+      "shield": true
+    },
+    "clock": {
+      "minute": 600,
+      "sub": 26,
+      "day": 1,
+      "season": "winter",
+      "seasonDay": 0,
+      "epoch": 1,
+      "policy": "cycling"
+    },
+    "world": {
+      "opened": [],
+      "pieces": [],
+      "warps": [],
+      "visited": ["ask_int_longhouse", "myr_road", "myr_deep"],
+      "cover": {
+        "myr_deep": {
+          "epoch": 1,
+          "cleared": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e000000000e"
+        }
+      },
+      "vars": {
+        "ask_pen": 31
+      }
+    },
+    "dungeons": {
+      "d1": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d2": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d3": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d4": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d5": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d6": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d7": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d8": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      }
+    },
+    "playTicks": 26
+  },
+  "sum": "76dc59aa"
+}

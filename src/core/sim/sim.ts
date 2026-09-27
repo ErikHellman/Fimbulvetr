@@ -16,8 +16,15 @@ import { giveItem } from '../story/effects';
 import type { StoryRun } from '../story/script';
 import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
-import { FIRE_RADIUS, LANTERN_RADIUS, darknessOf, type Light } from '../world/light';
-import { evalCond } from '../story/cond';
+import {
+  FIRE_RADIUS,
+  FOG_RADIUS,
+  LANTERN_FOG_RADIUS,
+  LANTERN_RADIUS,
+  darknessOf,
+  fogOf,
+  type Light,
+} from '../world/light';
 import type { CoverGrid } from '../world/cover';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -36,12 +43,16 @@ import { scheduleNpcs, stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
 import { bumpLocks, fixtureHazards, refreshFixtures, swordSwitches } from './systems/fixtures';
 import { eat, equip, useItems } from './systems/items';
+import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
 import { stepProjectiles } from './systems/projectiles';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
-import { checkInteract, checkTriggers, condCtx, stepStory, storyUi, type StoryUi } from './systems/story';
+import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
+import { petrifyAtDawn } from './systems/trolls';
+import { fireKey, fireLights, stepFire } from './systems/fire';
+import { outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
   checkEdges,
@@ -66,6 +77,11 @@ export interface BossView {
 export interface SimOptions {
   /** Accessibility "long day": world time runs at half speed. */
   readonly longDay: boolean;
+  /**
+   * Rolled weather and spawn tables (default on). Off, the world has story weather only and no rolled
+   * spawns: the tests and e2e runs written before M2 pin it off.
+   */
+  readonly rolled?: boolean;
 }
 
 /** The whole game rules engine. Deterministic: same state + same inputs ⇒ same result. */
@@ -83,11 +99,12 @@ export class Sim implements SimRt {
   god?: boolean;
   weatherOverride?: WeatherKind;
   tick = 0;
+  readonly rolled: boolean;
   private events: SimEvent[] = [];
   private readonly queue: Command[] = [];
   private nextId = 1;
   private readonly layout: LayoutIndex;
-  private readonly ticksPerMinute: number;
+  private ticksPerMinute: number;
   private readonly terrainCache = new Map<ScreenId, TerrainGrid>();
 
   constructor(
@@ -96,6 +113,7 @@ export class Sim implements SimRt {
     options: SimOptions = { longDay: false },
   ) {
     this.state = state;
+    this.rolled = options.rolled ?? true;
     // A save taken at 0 hp (it should not happen, but) loads alive, as after a Continue.
     if (state.hero.hp <= 0) state.hero.hp = Math.min(state.hero.maxHp, CONTINUE_HP);
     this.layout = indexLayout(db.layout, Object.keys(db.screens) as ScreenId[]);
@@ -113,6 +131,11 @@ export class Sim implements SimRt {
 
   get enemies(): readonly Entity[] {
     return this.actors.filter((e) => e.kind === 'enemy');
+  }
+
+  /** The "long day" setting, changed from the settings menu: world time runs at half speed. */
+  setLongDay(on: boolean): void {
+    this.ticksPerMinute = this.db.clock.ticksPerMinute * (on ? 2 : 1);
   }
 
   command(c: Command): void {
@@ -159,13 +182,19 @@ export class Sim implements SimRt {
     return storyUi(this);
   }
 
-  /** The weather on the current screen: story weather outdoors, always clear indoors. */
+  /** The weather on the current screen: the region's sky outdoors, always clear indoors and underground. */
   weather(): WeatherKind {
-    const def = this.db.screens[this.screen.id];
-    if (def.indoor === true || def.dungeon !== undefined) return 'clear';
-    if (this.weatherOverride !== undefined) return this.weatherOverride;
-    const ctx = condCtx(this);
-    return this.db.weather.find((r) => evalCond(r.when, ctx))?.kind ?? 'clear';
+    return outdoors(this) ? skyOf(this) : 'clear';
+  }
+
+  /** The sky over the current region, indoors too (what conditions and NPC places read). */
+  sky(): WeatherKind {
+    return skyOf(this);
+  }
+
+  /** The wind on the current screen, in px per tick; still indoors and underground. */
+  wind(): Vec {
+    return windOf(this);
   }
 
   /** How much of the picture the dark hides (0 … 1): night outdoors, storms, dark rooms. */
@@ -176,6 +205,17 @@ export class Sim implements SimRt {
       dark: def.dark === true,
       weather: this.weather(),
     });
+  }
+
+  /**
+   * The fog over the current screen: how thick (0 = none) and the radius of clear air around the hero
+   * (wider with the lantern).
+   */
+  fog(): { readonly amount: number; readonly r: number } {
+    const def = this.db.screens[this.screen.id];
+    const amount = fogOf({ indoor: !outdoors(this), dark: def.dark === true, weather: this.weather() });
+    if (amount === 0) return { amount: 0, r: 0 };
+    return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
   }
 
   /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
@@ -189,9 +229,12 @@ export class Sim implements SimRt {
     return null;
   }
 
-  /** What carves the dark, in screen pixels: the lantern (once owned) around the hero, fires and braziers. */
+  /**
+   * What carves the dark (and the fog), in screen pixels: the lantern (once owned) around the hero, fires and
+   * braziers.
+   */
   lights(): Light[] {
-    if (this.darkness() === 0) return [];
+    if (this.darkness() === 0 && this.fog().amount === 0) return [];
     const out: Light[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });
@@ -199,6 +242,7 @@ export class Sim implements SimRt {
     for (const e of this.actors)
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
+    out.push(...fireLights(this, FIRE_RADIUS));
     return out;
   }
 
@@ -218,6 +262,7 @@ export class Sim implements SimRt {
         entry: this.entry,
         god: this.god,
         weatherOverride: this.weatherOverride,
+        fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
       }),
@@ -267,11 +312,13 @@ export class Sim implements SimRt {
 
   private stepPlay(input: InputFrame): void {
     tickWorldClock(this, this.ticksPerMinute);
+    petrifyAtDawn(this);
     refreshCover(this);
     refreshFixtures(this);
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
     useItems(this, input);
+    castGaldr(this, input);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
     const ctx = actorCtx(this);
     runEnemies(this, ctx);
@@ -291,6 +338,7 @@ export class Sim implements SimRt {
     cutCover(this);
     resolveAttacks(this);
     fixtureHazards(this);
+    stepFire(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);
@@ -340,6 +388,9 @@ export class Sim implements SimRt {
       case 'weather':
         if (c.kind === null) delete this.weatherOverride;
         else this.weatherOverride = c.kind;
+        break;
+      case 'saved':
+        if (this.story?.cur?.k === 'save') this.story.saved = true;
         break;
       case 'killAll':
         for (const e of [...this.actors]) {

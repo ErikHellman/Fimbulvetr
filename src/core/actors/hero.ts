@@ -22,6 +22,7 @@ export type HeroMode =
   | 'carry'
   | 'throw'
   | 'toss'
+  | 'cast'
   | 'dying';
 
 export interface HeroCtx {
@@ -261,6 +262,18 @@ const toss: HeroDef = {
   },
 };
 
+/** Singing a galdr (the bolt flies on its own). */
+const cast: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'cast');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.castTicks - 1 ? 'move' : undefined;
+  },
+};
+
 /** Fallen at 0 hp. The sim is in `over` mode, which advances the clock of this state by hand. */
 const dying: HeroDef = {
   enter(e) {
@@ -288,6 +301,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   carry,
   throw: throwing,
   toss,
+  cast,
   dying,
 };
 

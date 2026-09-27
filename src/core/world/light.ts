@@ -19,6 +19,12 @@ export const STORM_DARK = 0.12;
 const DUSK_LIGHT = 0.55;
 
 export const LANTERN_RADIUS = 56;
+/** How thick fog hangs outdoors (the fog layer's opacity outside the clear circle). */
+export const FOG_THICK = 0.8;
+/** In fog Ask sees about five tiles around them… */
+export const FOG_RADIUS = 80;
+/** …and seven with the lantern. */
+export const LANTERN_FOG_RADIUS = 112;
 export const FIRE_RADIUS = 28;
 
 export interface Place {
@@ -34,4 +40,9 @@ export function darknessOf(daylight: number, place: Place): number {
   const night = Math.min(1, Math.max(0, (DUSK_LIGHT - daylight) / DUSK_LIGHT)) * NIGHT_DARK;
   if (night === 0) return 0;
   return Math.min(1, night + (place.weather === 'storm' ? STORM_DARK : 0));
+}
+
+/** How thick the fog is where the hero stands: outdoors in fog only (0 = none). */
+export function fogOf(place: Place): number {
+  return place.indoor || place.dark || place.weather !== 'fog' ? 0 : FOG_THICK;
 }

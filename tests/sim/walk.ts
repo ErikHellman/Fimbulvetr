@@ -170,7 +170,7 @@ export function interactNorth(h: Harness, tx: number, ty: number): Harness {
 }
 
 /** States in which a foe cannot be hurt (rising, buried, sinking): nothing to fight yet. */
-const UNTOUCHABLE = new Set(['rise', 'buried', 'retract']);
+const UNTOUCHABLE = new Set(['rise', 'buried', 'retract', 'circle']);
 
 /**
  * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls (armoured), the

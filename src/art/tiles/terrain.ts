@@ -108,7 +108,79 @@ function floor(p: Painter): void {
   planks(p, C.floor, C.floorShade, false);
 }
 
+/** Fen ground: dark peat, tussocks and black water in the hollows. */
+function bog(p: Painter, variant: number): void {
+  p.fill('#4a5236');
+  p.speckle('#3a4029', 0.18);
+  p.speckle('#6a7a44', 0.08);
+  const pools: ReadonlyArray<readonly [number, number, number]> = [
+    [3, 4, 3],
+    [10, 11, 4],
+    [11, 3, 2],
+    [4, 12, 2],
+  ];
+  const [x, y, w] = pools[variant % pools.length] ?? [3, 4, 3];
+  p.rect(x, y, w, 2, '#262c24');
+  p.rect(x + 1, y, Math.max(1, w - 2), 1, '#3e4a48');
+}
+
+/** The troll wood's moss: deep green, lumpy, with a few pale sprigs. */
+function moss(p: Painter): void {
+  p.fill('#355a2c');
+  p.speckle('#26441f', 0.2);
+  p.speckle('#4f7a3a', 0.08);
+  p.speckle('#8aa860', 0.015);
+}
+
+/** Pale shore sand. */
+function sand(p: Painter): void {
+  p.fill('#d6c48f');
+  p.speckle('#b8a36e', 0.12);
+  p.speckle('#eee0b0', 0.05);
+}
+
+/** Terrain added for the deep wood (M2c): the fen, the glade and the troll wood. */
+const DEEP_WOOD = {
+  bog: {
+    autotile: false,
+    variants: 4,
+    paint: (p, v) => {
+      bog(p, v.variant);
+    },
+  },
+  reeds: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      bog(p, 1);
+    },
+  },
+  birch: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+    },
+  },
+  moss: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      moss(p);
+    },
+  },
+  boulder: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      moss(p);
+      p.speckle('#1f3419', 0.2);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...DEEP_WOOD,
   grass: {
     autotile: false,
     variants: 4,
@@ -470,6 +542,59 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       p.rect(3, 1, 10, 15, C.ink);
       p.rect(2, 4, 12, 12, C.ink);
       p.rect(4, 0, 8, 1, C.ink);
+    },
+  },
+  planks: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      planks(p, C.floor, C.floorShade, v.variant === 1);
+      p.speckle(C.dirtShade, 0.03);
+    },
+  },
+  palisade: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      grass(p);
+      for (const x of [0, 4, 8, 12]) {
+        p.rect(x, 3, 4, 13, C.wood);
+        p.rect(x + 3, 3, 1, 13, C.woodShade);
+        p.rect(x + 1, 1, 2, 2, C.wood);
+        p.px(x + 1, 0, C.ink);
+        p.px(x + 2, 0, C.ink);
+        p.rect(x, 3, 1, 13, C.ink);
+      }
+      p.rect(0, 9, 16, 1, C.woodShade);
+    },
+  },
+  sand: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      sand(p);
+    },
+  },
+  stall: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.floor, C.floorShade, false);
+    },
+  },
+  thingstone: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+    },
+  },
+  anvil: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      planks(p, C.floor, C.floorShade, false);
+      p.speckle(C.ink, 0.05);
     },
   },
 };

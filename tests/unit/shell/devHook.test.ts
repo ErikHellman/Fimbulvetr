@@ -21,6 +21,10 @@ const NO_VIEW = {
   fishAlive: 0,
   fishJumps: 0,
   rain: 0,
+  snow: 0,
+  leaves: 0,
+  fog: 0,
+  flames: 0,
   bolts: 0,
   dark: 0,
   lights: 0,
@@ -55,6 +59,7 @@ describe('installHook importSaveJson', () => {
       jumpFish: () => undefined,
       tileAt: () => -1,
       menu: () => null,
+      picker: () => null,
       restart: (state) => {
         restarted.push(state);
       },
@@ -86,6 +91,7 @@ describe('installHook warp', () => {
       jumpFish: () => undefined,
       tileAt: () => -1,
       menu: () => null,
+      picker: () => null,
       restart: () => undefined,
     };
     installHook(() => b, {});

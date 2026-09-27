@@ -52,6 +52,8 @@ export const ENEMY_DEFS = {
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
     behaviour: 'draugr',
+    /** The dead burn: fire bites them twice as deep. */
+    weak: ['fire'],
     knockResist: 0.5,
     immortal: false,
     solid: false,
@@ -176,5 +178,89 @@ export const ENEMY_DEFS = {
         tags: PIERCE_SHIELD,
       },
     },
+  },
+  /**
+   * A forest troll: it roams Myrkviðr only at night and cannot be hurt; the sunrise turns it to stone.
+   */
+  forest_troll: {
+    id: 'forest_troll',
+    art: 'enemy_forest_troll',
+    hp: 99,
+    body: { x: -11, y: -12, w: 22, h: 12 },
+    hurt: { x: -14, y: -44, w: 28, h: 44 },
+    behaviour: 'troll',
+    knockResist: 1,
+    immortal: true,
+    guard: true,
+    solid: true,
+    petrify: 'troll_stone',
+    touch: { amount: 2, knock: 5, tags: HEAVY },
+    attacks: {
+      smash: {
+        from: 4,
+        to: 9,
+        boxes: around({ x: -30, y: -30, w: 60, h: 40 }),
+        amount: 6,
+        knock: 7,
+        tags: HEAVY,
+      },
+    },
+  },
+  /**
+   * The pack leader on the north road (the vargar hunt): bigger, darker, a white ruff. It howls (400 ms)
+   * and vargr come until two of its own live; its lunge staggers through a shield.
+   */
+  vargr_alpha: {
+    id: 'vargr_alpha',
+    art: 'enemy_vargr_alpha',
+    hp: 14,
+    body: { x: -9, y: -9, w: 18, h: 9 },
+    hurt: { x: -12, y: -20, w: 24, h: 20 },
+    behaviour: 'vargr_alpha',
+    knockResist: 0.5,
+    immortal: false,
+    solid: false,
+    touch: { amount: 2, knock: 3, tags: 0 },
+    attacks: {
+      lunge: {
+        from: 0,
+        to: 15,
+        boxes: around({ x: -11, y: -16, w: 22, h: 16 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 3, silver: 3, seidr: 1, none: 1 },
+  },
+  /**
+   * The Rime King's raven, abroad at night: it circles out of reach, shrieks (400 ms) when it spots Ask —
+   * a vargr answers — and dives. Strike it as it climbs back.
+   */
+  rime_raven: {
+    id: 'rime_raven',
+    art: 'enemy_rime_raven',
+    hp: 4,
+    body: { x: -5, y: -6, w: 10, h: 6 },
+    hurt: { x: -9, y: -18, w: 18, h: 14 },
+    behaviour: 'rime_raven',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    weak: ['fire'],
+    attacks: {
+      dive: {
+        from: 0,
+        to: 25,
+        boxes: around({ x: -8, y: -16, w: 16, h: 14 }),
+        amount: 2,
+        knock: 3,
+        tags: 0,
+      },
+    },
+    stunnable: 120,
+    drops: { heart: 1, silver: 2, seidr: 2, none: 3 },
   },
 } as const satisfies Record<EnemyId, EnemyDef>;
