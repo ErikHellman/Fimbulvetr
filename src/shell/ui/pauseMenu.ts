@@ -9,7 +9,7 @@ export const MENU_TABS = ['items', 'map', 'quests', 'system'] as const;
 export type MenuTab = (typeof MENU_TABS)[number];
 
 /** Rows of the system tab. */
-export const SYSTEM_ROWS = ['resume', 'start_over'] as const;
+export const SYSTEM_ROWS = ['resume', 'settings', 'start_over'] as const;
 
 export interface MenuState {
   readonly tab: MenuTab;
@@ -31,6 +31,8 @@ export type MenuAction =
   | { readonly k: 'close' }
   | { readonly k: 'equip'; readonly slot: 0 | 1; readonly item: ItemId }
   | { readonly k: 'eat'; readonly item: ItemId }
+  /** Open the settings menu (the scene runs it over the system tab). */
+  | { readonly k: 'settings' }
   | { readonly k: 'startOver' };
 
 export function openMenu(tab: MenuTab = 'items'): MenuState {
@@ -93,7 +95,9 @@ export function stepMenu(
     } else if (any(frame, ['confirm', 'interact'])) return { state, actions: [{ k: 'eat', item: item.id }] };
   }
   if (state.tab === 'system' && any(frame, ['confirm', 'interact'])) {
-    if (SYSTEM_ROWS[state.cursor] === 'resume') return close;
+    const row = SYSTEM_ROWS[state.cursor];
+    if (row === 'resume') return close;
+    if (row === 'settings') return { state, actions: [{ k: 'settings' }] };
     return { state: { ...state, confirm: true }, actions: [] };
   }
   return { state, actions: [] };

@@ -34,6 +34,8 @@ import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
 import { bindingsOf } from '@shell/input/remap';
+import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
+import { browserStorage, saveSettings } from '@shell/platform/settings';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -68,6 +70,10 @@ export class PlayScene extends Phaser.Scene {
   private readonly stats = new FrameStats();
   private gradeKey = '';
   private menu: MenuState | null = null;
+  /** The settings menu, open over the pause menu's game tab. */
+  private settingsMenu: SettingsMenuState | null = null;
+  /** Keys held last frame, to find the one freshly pressed (for rebinding). */
+  private lastCodes: ReadonlySet<string> = new Set();
   private tileAnims: readonly TileAnim[] = [];
 
   constructor() {
@@ -79,6 +85,7 @@ export class PlayScene extends Phaser.Scene {
     this.acc.acc = 0;
     this.gradeKey = '';
     this.menu = null;
+    this.settingsMenu = null;
     this.screens.clear();
     this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay, rolled: data.rolled });
     if (data.weather !== undefined) this.sim.weatherOverride = data.weather;
@@ -136,7 +143,14 @@ export class PlayScene extends Phaser.Scene {
       menu: () =>
         this.menu === null
           ? null
-          : { state: this.menu, items: menuItems(this.sim.state.inv, this.services.db.items) },
+          : {
+              state: this.menu,
+              items: menuItems(this.sim.state.inv, this.services.db.items),
+              settings:
+                this.settingsMenu === null
+                  ? null
+                  : { state: this.settingsMenu, values: this.services.settings },
+            },
     };
     this.registry.set(UI_LINK, link);
     if (!this.scene.isActive('ui')) this.scene.launch('ui');
@@ -145,9 +159,13 @@ export class PlayScene extends Phaser.Scene {
   }
 
   override update(_time: number, delta: number): void {
-    this.mapper.sample(this.keys.takeCodes(), readPad(connectedPads(navigator)));
+    const codes = this.keys.takeCodes();
+    const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
+    this.lastCodes = new Set(codes);
+    this.mapper.sample(codes, readPad(connectedPads(navigator)));
     if (this.menu !== null) {
-      this.updateMenu(this.latch.consume());
+      if (this.settingsMenu !== null) this.updateSettings(this.latch.consume(), fresh);
+      else this.updateMenu(this.latch.consume());
       this.acc.acc = 0;
       this.draw(0);
       return;
@@ -233,7 +251,10 @@ export class PlayScene extends Phaser.Scene {
     if (menu === null) return;
     const r = stepMenu(menu, frame, menuItems(this.sim.state.inv, this.services.db.items));
     for (const a of r.actions) {
-      if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
+      if (a.k === 'settings') {
+        this.settingsMenu = openSettings();
+        this.audio.play('sfx_menu_ok');
+      } else if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
       else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
       else if (a.k === 'startOver') {
         const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
@@ -246,6 +267,25 @@ export class PlayScene extends Phaser.Scene {
     if (r.state !== menu && r.state !== null && (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab))
       this.audio.play('sfx_talk');
     this.setMenu(r.state);
+  }
+
+  /** A frame of the settings menu: changes are stored and applied at once. */
+  private updateSettings(frame: InputFrame, code: string | null): void {
+    const menu = this.settingsMenu;
+    if (menu === null) return;
+    const r = stepSettings(menu, frame, this.services.settings, code);
+    this.settingsMenu = r.state;
+    if (r.changed) {
+      const scaling = this.services.settings.scaling;
+      Object.assign(this.services.settings, r.settings);
+      saveSettings(browserStorage(), this.services.settings);
+      this.applySettings();
+      document.documentElement.lang = this.services.settings.lang;
+      // attachZoom re-reads the scaling setting on resize.
+      if (scaling !== this.services.settings.scaling) window.dispatchEvent(new Event('resize'));
+    }
+    if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
+    if (r.state === null) this.audio.play('sfx_talk');
   }
 
   /** The hero's sprite follows the weapon in hand; everything else draws its own art. */

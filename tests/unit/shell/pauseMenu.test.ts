@@ -65,12 +65,21 @@ describe('pause menu', () => {
   it('asks before starting over, and a second yes starts over', () => {
     const items = menuItems(inventory(), DB.items);
     expect(run(openMenu('system'), items, ['confirm']).state).toBeNull();
-    const asked = run(openMenu('system'), items, ['down'], ['confirm']);
+    const asked = run(openMenu('system'), items, ['down'], ['down'], ['confirm']);
     expect(asked.state?.confirm).toBe(true);
-    expect(run(openMenu('system'), items, ['down'], ['confirm'], ['cancel']).state?.confirm).toBe(false);
-    expect(run(openMenu('system'), items, ['down'], ['confirm'], ['confirm']).actions).toEqual([
+    expect(run(openMenu('system'), items, ['down'], ['down'], ['confirm'], ['cancel']).state?.confirm).toBe(
+      false,
+    );
+    expect(run(openMenu('system'), items, ['down'], ['down'], ['confirm'], ['confirm']).actions).toEqual([
       { k: 'startOver' },
     ]);
+  });
+
+  it('opens the settings from the game tab', () => {
+    const items = menuItems(inventory(), DB.items);
+    const r = run(openMenu('system'), items, ['down'], ['confirm']);
+    expect(r.actions).toEqual([{ k: 'settings' }]);
+    expect(r.state?.tab).toBe('system');
   });
 
   it('does nothing on an empty items tab', () => {

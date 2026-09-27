@@ -16,6 +16,9 @@ import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
 import { FONT_KEY } from '@shell/gfx/font';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
+import type { Settings } from '@shell/platform/settings';
+import type { SettingsMenuState } from '@shell/ui/settingsMenu';
+import { settingsLines } from '@shell/ui/settingsText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -26,7 +29,12 @@ export interface UiLink {
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
   /** The open pause menu and what its items page lists, or null in play. */
-  readonly menu: () => { readonly state: MenuState; readonly items: readonly MenuItem[] } | null;
+  readonly menu: () => {
+    readonly state: MenuState;
+    readonly items: readonly MenuItem[];
+    /** The settings menu, when it is open over the game tab. */
+    readonly settings: { readonly state: SettingsMenuState; readonly values: Settings } | null;
+  } | null;
 }
 
 const TAB_LABEL = {
@@ -35,7 +43,11 @@ const TAB_LABEL = {
   quests: UI.menu_quests,
   system: UI.menu_system,
 } as const;
-const SYSTEM_LABEL = { resume: UI.menu_resume, start_over: UI.menu_start_over } as const;
+const SYSTEM_LABEL = {
+  resume: UI.menu_resume,
+  settings: UI.menu_settings,
+  start_over: UI.menu_start_over,
+} as const;
 const MENU = { x: 16, y: 14, w: GAME_W - 32, h: GAME_H - 28 };
 
 export const UI_LINK = 'uiLink';
@@ -92,6 +104,8 @@ export class UiScene extends Phaser.Scene {
   private menuTabs: Phaser.GameObjects.BitmapText[] = [];
   private menuBody!: Phaser.GameObjects.BitmapText;
   private menuHint!: Phaser.GameObjects.BitmapText;
+  /** The second column of the settings menu. */
+  private menuValues!: Phaser.GameObjects.BitmapText;
   private menuIcons: Phaser.GameObjects.Image[] = [];
   private fallen!: Phaser.GameObjects.Rectangle;
   private fallenTitle!: Phaser.GameObjects.BitmapText;
@@ -143,6 +157,7 @@ export class UiScene extends Phaser.Scene {
     this.menuTabs = MENU_TABS.map(() => this.text(0, 0, '', DIM));
     this.menuBody = this.text(0, 0, '', PAPER);
     this.menuHint = this.text(0, 0, '', DIM);
+    this.menuValues = this.text(0, 0, '', GOLD);
     this.menuIcons = [];
   }
 
@@ -162,6 +177,7 @@ export class UiScene extends Phaser.Scene {
     const view = this.link.menu();
     this.menuBox.clear();
     for (const icon of this.menuIcons) icon.setVisible(false);
+    this.menuValues.setText('');
     if (view === null) {
       for (const tab of this.menuTabs) tab.setText('');
       this.menuBody.setText('');
@@ -189,6 +205,14 @@ export class UiScene extends Phaser.Scene {
       .setText(t(state.tab === 'items' ? UI.menu_items_hint : UI.menu_tabs_hint, lang))
       .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
     const top = MENU.y + 36;
+    if (view.settings !== null) {
+      const { labels, values, hint } = settingsLines(view.settings.state, view.settings.values, lang);
+      this.menuBody.setText(labels.join('\n')).setPosition(MENU.x + 24, top);
+      const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
+      this.menuValues.setText(values.join('\n')).setPosition(MENU.x + 24 + column, top);
+      this.menuHint.setText(hint);
+      return;
+    }
     if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
     else if (state.tab === 'map') this.menuMap(top, lang);
     else if (state.tab === 'quests') this.menuQuests(top, lang);
