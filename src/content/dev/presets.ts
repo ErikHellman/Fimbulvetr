@@ -78,6 +78,27 @@ export const DEV_PRESETS = {
     flags: { ...DAY3_DONE, st_raid_begun: true, st_raid_done: true },
     vars: { ask_pen: 31 },
   },
+  /** Myrkviðr after the legend: seax and shield, the lantern, the clock turning. */
+  myr: {
+    screen: 'myr_road_s',
+    tile: [19, 18],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 9 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 5,
+    ...LANTERN,
+    flags: {
+      ...DAY3_DONE,
+      st_raid_begun: true,
+      st_raid_done: true,
+      st_seax_given: true,
+      st_legend_told: true,
+    },
+    vars: { ask_pen: 31 },
+  },
 } as const satisfies Record<string, DevPreset>;
 
 export type DevPresetId = keyof typeof DEV_PRESETS;

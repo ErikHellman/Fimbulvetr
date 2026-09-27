@@ -15,6 +15,16 @@ export const SCREEN_IDS = [
   'ask_int_longhouse',
   'ask_int_trader',
   'ask_int_hof',
+  'myr_road_s',
+  'myr_road',
+  'myr_deep',
+  'myr_brook',
+  'myr_clearing',
+  'myr_hollow',
+  'myr_pines',
+  'myr_charcoal',
+  'myr_roots',
+  'myr_int_hut',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

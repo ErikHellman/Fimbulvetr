@@ -9,6 +9,16 @@ import { askRidge } from './askdalr/ask_ridge';
 import { askIntLonghouse } from './askdalr/ask_int_longhouse';
 import { askIntTrader } from './askdalr/ask_int_trader';
 import { askIntHof } from './askdalr/ask_int_hof';
+import { myrRoadS } from './myrkvidr/myr_road_s';
+import { myrRoad } from './myrkvidr/myr_road';
+import { myrDeep } from './myrkvidr/myr_deep';
+import { myrBrook } from './myrkvidr/myr_brook';
+import { myrClearing } from './myrkvidr/myr_clearing';
+import { myrHollow } from './myrkvidr/myr_hollow';
+import { myrPines } from './myrkvidr/myr_pines';
+import { myrCharcoal } from './myrkvidr/myr_charcoal';
+import { myrRoots } from './myrkvidr/myr_roots';
+import { myrIntHut } from './myrkvidr/myr_int_hut';
 import type { ScreenDef } from '@core/world/screen';
 import type { ScreenId } from './screens';
 import { testA } from './testlands/test_a';
@@ -32,4 +42,14 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   ask_int_longhouse: askIntLonghouse,
   ask_int_trader: askIntTrader,
   ask_int_hof: askIntHof,
+  myr_road_s: myrRoadS,
+  myr_road: myrRoad,
+  myr_deep: myrDeep,
+  myr_brook: myrBrook,
+  myr_clearing: myrClearing,
+  myr_hollow: myrHollow,
+  myr_pines: myrPines,
+  myr_charcoal: myrCharcoal,
+  myr_roots: myrRoots,
+  myr_int_hut: myrIntHut,
 };
