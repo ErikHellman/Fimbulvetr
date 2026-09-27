@@ -35,6 +35,8 @@ export const FLAGS = {
   st_d1_boss_dead: { t: 'bool' },
   /** The first runestone burns again. */
   st_stone1_lit: { t: 'bool' },
+  /** Önundr has sawn through the pine across the road north: Uppvík lies open. */
+  st_road_open: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

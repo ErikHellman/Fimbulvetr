@@ -19,6 +19,7 @@ import { myrPines } from './myrkvidr/myr_pines';
 import { myrCharcoal } from './myrkvidr/myr_charcoal';
 import { myrRoots } from './myrkvidr/myr_roots';
 import { myrIntHut } from './myrkvidr/myr_int_hut';
+import { myrNorth } from './myrkvidr/myr_north';
 import { d1R01 } from './rotarhellir/d1_r01';
 import { d1R02 } from './rotarhellir/d1_r02';
 import { d1R03 } from './rotarhellir/d1_r03';
@@ -64,6 +65,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   myr_charcoal: myrCharcoal,
   myr_roots: myrRoots,
   myr_int_hut: myrIntHut,
+  myr_north: myrNorth,
   d1_r01: d1R01,
   d1_r02: d1R02,
   d1_r03: d1R03,

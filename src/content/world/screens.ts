@@ -25,6 +25,7 @@ export const SCREEN_IDS = [
   'myr_charcoal',
   'myr_roots',
   'myr_int_hut',
+  'myr_north',
   'd1_r01',
   'd1_r02',
   'd1_r03',

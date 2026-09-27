@@ -8,6 +8,7 @@ export const WORLD_LAYOUT: WorldLayout = {
     test_a: [0, 0],
     test_b: [1, 0],
     test_c: [1, 1],
+    myr_north: [4, 5],
     myr_hollow: [3, 6],
     myr_deep: [4, 6],
     myr_roots: [5, 6],
