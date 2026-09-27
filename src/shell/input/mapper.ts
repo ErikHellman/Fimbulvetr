@@ -12,10 +12,17 @@ export class InputMapper {
   private shieldWasDown = false;
 
   constructor(
-    private readonly bindings: Bindings,
+    private bindings: Bindings,
     private readonly latch: InputLatch,
-    private readonly options: MapperOptions,
+    private options: MapperOptions,
   ) {}
+
+  /** New bindings or options from the settings menu take effect at once. */
+  configure(bindings: Bindings, options: MapperOptions): void {
+    this.bindings = bindings;
+    this.options = options;
+    if (!options.holdToggleShield) this.shieldOn = false;
+  }
 
   sample(keys: ReadonlySet<string>, pad: PadSnapshot | null): void {
     let held = 0;

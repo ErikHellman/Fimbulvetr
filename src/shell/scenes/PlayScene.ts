@@ -5,7 +5,6 @@ import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
-import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
 import { daylight, seasonAt } from '@core/clock/clock';
 import type { Entity } from '@core/actors/entity';
@@ -34,6 +33,7 @@ import { EntityViews } from '@shell/view/entityViews';
 import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
+import { bindingsOf } from '@shell/input/remap';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -83,7 +83,7 @@ export class PlayScene extends Phaser.Scene {
     this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay, rolled: data.rolled });
     if (data.weather !== undefined) this.sim.weatherOverride = data.weather;
     this.tileAnims = tileAnimations(data.assets.tileset);
-    this.mapper = new InputMapper(DEFAULT_BINDINGS, this.latch, {
+    this.mapper = new InputMapper(bindingsOf(data.settings.keys), this.latch, {
       holdToggleShield: data.settings.holdShield,
     });
     this.audio = new AudioDirector(this, () => data.settings.volume, data.muted);
@@ -168,6 +168,14 @@ export class PlayScene extends Phaser.Scene {
     this.audio.handle(events);
     this.services.dev?.onEvents(events);
     this.draw(alpha);
+  }
+
+  /** Settings changed in a menu: keys, the shield toggle, the long day and colours take effect at once. */
+  applySettings(): void {
+    const s = this.services.settings;
+    this.mapper.configure(bindingsOf(s.keys), { holdToggleShield: s.holdShield });
+    this.sim.setLongDay(s.longDay);
+    this.gradeKey = '';
   }
 
   private bridge(): DevBridge {
@@ -308,10 +316,11 @@ export class PlayScene extends Phaser.Scene {
     const light = indoor ? INDOOR_LIGHT : cave ? CAVE_LIGHT : daylight(clock, this.services.db.clock);
     const season = indoor ? 'autumn' : cave ? 'spring' : clock.season;
     const weather = this.sim.weather();
-    const key = `${season}|${Math.round(light * 200)}|${weather}`;
+    const cb = this.services.settings.colourBlind;
+    const key = `${season}|${Math.round(light * 200)}|${weather}|${cb ? 'cb' : ''}`;
     if (key === this.gradeKey) return;
     this.gradeKey = key;
-    this.appliedGrade = grade(season, light, weather);
+    this.appliedGrade = grade(season, light, weather, cb);
     this.colour.colorMatrix.set([...this.appliedGrade]);
   }
 

@@ -102,7 +102,7 @@ export class Sim implements SimRt {
   private readonly queue: Command[] = [];
   private nextId = 1;
   private readonly layout: LayoutIndex;
-  private readonly ticksPerMinute: number;
+  private ticksPerMinute: number;
   private readonly terrainCache = new Map<ScreenId, TerrainGrid>();
 
   constructor(
@@ -129,6 +129,11 @@ export class Sim implements SimRt {
 
   get enemies(): readonly Entity[] {
     return this.actors.filter((e) => e.kind === 'enemy');
+  }
+
+  /** The "long day" setting, changed from the settings menu: world time runs at half speed. */
+  setLongDay(on: boolean): void {
+    this.ticksPerMinute = this.db.clock.ticksPerMinute * (on ? 2 : 1);
   }
 
   command(c: Command): void {
