@@ -170,7 +170,7 @@ export class PlayScene extends Phaser.Scene {
       this.cameras.main.setScroll(origin.x, origin.y);
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)));
     }
-    const hero = this.views.bounds(this.sim.hero.id);
+    const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {
       stage.view.tick(this.sim.tick);
       stage.view.fadeBehind(hero);

@@ -7,7 +7,7 @@ import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import { TILESET_KEY } from '@shell/gfx/textures';
 import { animateTiles } from '@shell/gfx/tileAnims';
-import { overlaps, type Bounds } from './bounds';
+import { overlapsRect, type Bounds } from './bounds';
 
 /** How far decor fades when it stands between the camera and the hero. */
 const BEHIND_ALPHA = 0.6;
@@ -108,23 +108,14 @@ export class ScreenView {
     }
   }
 
-  /** Fades any decor that overlaps the hero from in front, so the hero never vanishes behind a canopy. */
+  /** Fades any decor that covers the hero's body from in front, so the hero never vanishes behind a canopy. */
   fadeBehind(hero: Bounds | null): void {
     for (const d of this.decor) {
       const img = d.image;
       const behind =
         hero !== null &&
         img.depth > hero.depth &&
-        overlaps(
-          {
-            x: img.x - img.displayOriginX,
-            y: img.y - img.displayOriginY,
-            w: img.width,
-            h: img.height,
-            depth: img.depth,
-          },
-          hero,
-        );
+        overlapsRect(img.x - img.displayOriginX, img.y - img.displayOriginY, img.width, img.height, hero);
       img.setAlpha(behind ? BEHIND_ALPHA : 1);
     }
   }
