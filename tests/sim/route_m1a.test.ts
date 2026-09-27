@@ -178,6 +178,9 @@ describe('M1a route', () => {
     expect(h.sim.enemies.map((e) => e.def)).toEqual(['draugr']);
     expect(h.sim.state.hero.silver).toBe(5);
     expect(h.sim.state.inv.slots).toContain('lantern');
+    console.log(
+      `M1a route: ${String(h.sim.tick)} ticks (${(h.sim.tick / 3600).toFixed(1)} min of perfect play)`,
+    );
   }, 60_000);
 
   it('replays identically', () => {

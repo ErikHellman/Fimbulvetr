@@ -18,8 +18,11 @@ export const ROTVAETTR = {
   ],
   /** Health at or below which each later phase begins (24 → phase 1 at 16, phase 2 at 8). */
   phaseAt: [16, 8],
-  /** How long a stunned bulb stays shut, by phase: they recover faster as the fight goes on. */
-  bulbStun: [400, 300, 240],
+  /**
+   * How long a stunned bulb stays shut, by phase: they recover faster as the fight goes on. Three throws
+   * from the middle of the lair take about 250 ticks by hand, so even the last phase leaves a little room.
+   */
+  bulbStun: [450, 360, 300],
   /** The core stays open this long once every bulb is shut. */
   openTicks: 150,
   roarTicks: 50,

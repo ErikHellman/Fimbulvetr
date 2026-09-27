@@ -153,7 +153,7 @@ export const ENEMY_DEFS = {
     knockResist: 1,
     immortal: true,
     solid: true,
-    stunnable: 400,
+    stunnable: 450,
   },
   /** A spike of root bursting up under Ask after the ground cracks (400 ms); a shield is no help. */
   root_spike: {
