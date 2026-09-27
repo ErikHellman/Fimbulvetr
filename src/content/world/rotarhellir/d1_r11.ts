@@ -1,0 +1,43 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R11: ScreenDef = {
+  id: 'd1_r11',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  purpose:
+    'Before the lair: two switches on islands of sap open the great door; a root block stands in the way of the western one.',
+  things: [
+    { k: 'lock', id: 'd1_lock_a', at: { x: 19, y: 21 }, w: 2, h: 1 },
+    { k: 'shutter', id: 'd1_sh_r07', at: { x: 0, y: 10 }, w: 1, h: 2 },
+    { k: 'shutter', id: 'd1_sh_boss', at: { x: 19, y: 0 }, w: 2, h: 1, opens: 'switches' },
+    { k: 'switch', at: { x: 11, y: 4 } },
+    { k: 'switch', at: { x: 28, y: 4 } },
+    { k: 'prop', id: 'root_block', at: { x: 11, y: 9 } },
+    { k: 'enemy', id: 'root_biter', at: { x: 8, y: 14 } },
+    { k: 'enemy', id: 'root_biter', at: { x: 31, y: 14 } },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQrrrrzzzzzzzzzzzzQccQzzzzzzzzzzzzrrrrQQ',
+    'QQrrrrzzzzzzzzzzzzQccQzzzzzzzzzzzzrrrrQQ',
+    'QQrrrrzzzzzczzzzzzQccQzzzzzzczzzzzrrrrQQ',
+    'QQrrrrzzzzzzzzzzzzQccQzzzzzzzzzzzzrrrrQQ',
+    'QQrrrrzzzzzzzzzzzzQccQzzzzzzzzzzzzrrrrQQ',
+    'QQrrrrzzzzzzzzzzzzQccQzzzzzzzzzzzzrrrrQQ',
+    'QQcccczzzzzzzzzzzzQccQzzzzzzzzzzzzccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'ccccccccccccccccccccccccccccccccccccccQQ',
+    'ccccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

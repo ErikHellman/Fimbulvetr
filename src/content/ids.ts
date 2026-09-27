@@ -145,6 +145,7 @@ export const SCRIPTS = [
   'raid_begins',
   'shop_sigrun',
   'raid_gate',
+  'd1_enter',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

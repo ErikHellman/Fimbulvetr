@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R05: ScreenDef = {
+  id: 'd1_r05',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  purpose:
+    'Clear the room: the shutter drops behind Ask, and the fallen give up the second small key. Lock B to the north.',
+  things: [
+    { k: 'shutter', id: 'd1_sh_r05', at: { x: 39, y: 10 }, w: 1, h: 2, opens: 'clear' },
+    { k: 'lock', id: 'd1_lock_b', at: { x: 19, y: 0 }, w: 2, h: 1 },
+    { k: 'enemy', id: 'root_biter', at: { x: 14, y: 5 } },
+    { k: 'enemy', id: 'root_biter', at: { x: 25, y: 15 } },
+    { k: 'enemy', id: 'draugr', at: { x: 20, y: 8 } },
+    { k: 'chest', id: 'd1_c_key2', at: { x: 20, y: 14 }, gives: { item: 'small_key' }, appear: 'clear' },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQcccccccQQccccccccccccccccccQQcccccccQQ',
+    'QQcccccccQQccccccccccccccccccQQccccccccc',
+    'QQcccccccQQccccccccccccccccccQQccccccccc',
+    'QQcccccccQQccccccccccccccccccQQcccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

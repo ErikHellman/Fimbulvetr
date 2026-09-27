@@ -1,0 +1,47 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R01: ScreenDef = {
+  id: 'd1_r01',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  purpose:
+    "Rótarhellir's mouth: a safe first room, the way back out to Yggdrasil's roots, and three ways on.",
+  things: [
+    { k: 'door', at: { x: 19, y: 20 }, dir: 's', to: 'myr_roots', arrive: { x: 19, y: 3 }, facing: 's' },
+    { k: 'door', at: { x: 20, y: 20 }, dir: 's', to: 'myr_roots', arrive: { x: 20, y: 3 }, facing: 's' },
+    {
+      k: 'trigger',
+      at: { x: 16, y: 16 },
+      w: 8,
+      h: 4,
+      script: 'd1_enter',
+      when: { k: 'not', c: { k: 'flag', id: 'st_d1_entered' } },
+    },
+    { k: 'brazier', at: { x: 15, y: 14 }, lit: true },
+    { k: 'brazier', at: { x: 24, y: 14 }, lit: true },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQrrrrrcccccQQQccccccccccQQQcccccrrrrrQQ',
+    'QQrrrrrcccccQQQccccccccccQQQcccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'cccccccccccccccccccccccccccccccccccccccc',
+    'cccccccccccccccccccccccccccccccccccccccc',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQrrrrccccccccccccccccccccccccccccrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQVVQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

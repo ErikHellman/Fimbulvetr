@@ -1,0 +1,50 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R10: ScreenDef = {
+  id: 'd1_r10',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  dark: true,
+  purpose: 'Optional and dark: light both braziers from the lantern and the cache opens.',
+  things: [
+    { k: 'brazier', at: { x: 14, y: 9 } },
+    { k: 'brazier', at: { x: 25, y: 9 } },
+    { k: 'shutter', id: 'd1_sh_r10', at: { x: 18, y: 5 }, w: 4, h: 1, opens: 'braziers' },
+    {
+      k: 'chest',
+      id: 'd1_c_cache',
+      at: { x: 19, y: 3 },
+      gives: {
+        silver: 50,
+        text: {
+          en: 'You found fifty pieces of silver, hidden in the dark.',
+          sv: 'Du hittade femtio silverbitar, gömda i mörkret.',
+        },
+      },
+    },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQccccQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQccccQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQccccQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQccccQQQQQQQQQQQQQQQQQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

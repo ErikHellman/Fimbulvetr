@@ -12,6 +12,15 @@ const DAY3_DONE = { ...DAY2_DONE, st_farm_day: 3, q_ravens: 5, q_paid_d3: true, 
 /** The prologue as the M1a route leaves it: silver spent on the lantern, which hangs in slot K. */
 const LANTERN = { items: { lantern: 1 }, slots: ['lantern', null] } as const;
 
+/** Where the M1b route leaves Ask: the raid over, the legend told, the gate north open. */
+const MYR_FLAGS = {
+  ...DAY3_DONE,
+  st_raid_begun: true,
+  st_raid_done: true,
+  st_seax_given: true,
+  st_legend_told: true,
+} as const;
+
 /** Dev starting points for `?preset=`. Content milestones add story presets (day2, night3, …). */
 export const DEV_PRESETS = {
   /** The M0 test kit: seax and shield in the test lands. */
@@ -90,14 +99,48 @@ export const DEV_PRESETS = {
     policy: 'cycling',
     silver: 5,
     ...LANTERN,
-    flags: {
-      ...DAY3_DONE,
-      st_raid_begun: true,
-      st_raid_done: true,
-      st_seax_given: true,
-      st_legend_told: true,
-    },
+    flags: MYR_FLAGS,
     vars: { ask_pen: 31 },
+  },
+  /** At the mouth of Rótarhellir, just inside: seax, shield and the lantern. */
+  d1: {
+    screen: 'd1_r01',
+    tile: [19, 18],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 9 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 5,
+    ...LANTERN,
+    flags: { ...MYR_FLAGS, st_d1_entered: true },
+    vars: { ask_pen: 31 },
+  },
+  /** At the door of Rótvættr's lair with everything D1 gives: the boomerang in slot K, the way open. */
+  d1boss: {
+    screen: 'd1_r11',
+    tile: [19, 3],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 9 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 25,
+    items: { lantern: 1, boomerang: 1 },
+    slots: ['boomerang', 'lantern'],
+    flags: { ...MYR_FLAGS, st_d1_entered: true },
+    vars: { ask_pen: 31 },
+    opened: ['d1_c_key1', 'd1_c_key2', 'd1_c_map', 'd1_c_compass', 'd1_c_boomerang'],
+    dungeons: {
+      d1: {
+        keys: 1,
+        map: true,
+        compass: true,
+        doors: ['d1_sh_r04', 'd1_sh_r05', 'd1_lock_b', 'd1_sh_r07', 'd1_sh_boss'],
+      },
+    },
   },
 } as const satisfies Record<string, DevPreset>;
 

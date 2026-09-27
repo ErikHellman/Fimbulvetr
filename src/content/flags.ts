@@ -29,6 +29,12 @@ export const FLAGS = {
   n_dagny_met: { t: 'bool' },
   n_skeggi_met: { t: 'bool' },
   n_arnbjorg_met: { t: 'bool' },
+  /** Ask has stepped into Rótarhellir. */
+  st_d1_entered: { t: 'bool' },
+  /** Rótvættr is dead. */
+  st_d1_boss_dead: { t: 'bool' },
+  /** The first runestone burns again. */
+  st_stone1_lit: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

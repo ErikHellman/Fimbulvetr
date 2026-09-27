@@ -147,12 +147,14 @@ function stepShutters(rt: SimRt, arm: boolean): void {
     const thing = thingOf(rt, e);
     if (thing?.k !== 'shutter') continue;
     const saved = thing.id !== undefined && doors !== null;
-    if ((saved && doors.includes(thing.id)) || roomSignal(rt, thing.opens)) {
+    if ((saved && doors.includes(thing.id)) || (thing.opens !== undefined && roomSignal(rt, thing.opens))) {
       e.mem['done'] = 1;
       if (saved && !doors.includes(thing.id)) doors.push(thing.id);
       continue;
     }
-    if (arm && mem(e, 'armed') !== 1 && !overlaps(hero, tileRect(thing))) e.mem['armed'] = 1;
+    // The far side of another room's shutter is simply shut; nobody comes through it until it opens.
+    if (thing.opens === undefined) e.mem['armed'] = 1;
+    else if (arm && mem(e, 'armed') !== 1 && !overlaps(hero, tileRect(thing))) e.mem['armed'] = 1;
   }
 }
 

@@ -128,7 +128,8 @@ export type Thing =
   | { readonly k: 'lock'; readonly id: string; readonly at: TilePos; readonly w: number; readonly h: number }
   /**
    * Bars that slam shut once Ask has stepped clear of them, and open when the room gives `opens`. While
-   * `when` fails they stay open. With an `id` the opening is saved in the dungeon's doors, for good.
+   * `when` fails they stay open. With an `id` the opening is saved in the dungeon's doors, for good; one
+   * with an id and no `opens` is the far side of a shutter in the next room, open once that one is.
    */
   | {
       readonly k: 'shutter';
@@ -136,7 +137,7 @@ export type Thing =
       readonly at: TilePos;
       readonly w: number;
       readonly h: number;
-      readonly opens: RoomSignal;
+      readonly opens?: RoomSignal;
       readonly when?: Cond;
     }
   /** A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. */

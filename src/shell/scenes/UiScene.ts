@@ -45,7 +45,8 @@ const GOLD = 0xd9b34a;
 const RED = 0xe0433f;
 const CAVE = 0x6e6258;
 const CAVE_SEEN = 0x9a8a78;
-const BOSS_BAR = { w: 160, h: 6, y: 8 };
+/** Along the bottom edge, clear of the HUD and of whatever the room keeps at its top. */
+const BOSS_BAR = { w: 160, h: 6, y: GAME_H - 14 };
 const PAPER = 0xf2ead8;
 const DIM = 0x9c9486;
 const BOX = { x: 20, y: GAME_H - 84, w: GAME_W - 40, h: 76 };
@@ -343,7 +344,7 @@ export class UiScene extends Phaser.Scene {
     return ref ?? { key: '__MISSING', frame: '' };
   }
 
-  /** A boss's name and health across the top while one is on screen. */
+  /** A boss's name and health along the bottom while one is on screen. */
   private drawBoss(): void {
     const b = this.link.sim.boss();
     this.bossBar.clear();
@@ -363,7 +364,7 @@ export class UiScene extends Phaser.Scene {
     const name = t(b.name, this.link.lang());
     this.bossName
       .setText(name)
-      .setPosition(Math.round((GAME_W - textWidth(name)) / 2), BOSS_BAR.y + BOSS_BAR.h + 3);
+      .setPosition(Math.round((GAME_W - textWidth(name)) / 2), BOSS_BAR.y - LINE_HEIGHT - 1);
   }
 
   private drawHud(): void {

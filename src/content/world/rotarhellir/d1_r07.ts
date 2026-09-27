@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d1R07: ScreenDef = {
+  id: 'd1_r07',
+  region: 'myrkvidr',
+  dungeon: 'd1',
+  purpose:
+    'The boomerang, mid-dungeon; its first use lights the switch across the sap and opens the way east to the lair.',
+  things: [
+    { k: 'lock', id: 'd1_lock_b', at: { x: 19, y: 21 }, w: 2, h: 1 },
+    { k: 'shutter', id: 'd1_sh_r07', at: { x: 39, y: 10 }, w: 1, h: 2, opens: 'switches' },
+    { k: 'switch', at: { x: 33, y: 4 } },
+    { k: 'chest', id: 'd1_c_boomerang', at: { x: 14, y: 10 }, gives: { item: 'boomerang' } },
+    { k: 'enemy', id: 'root_biter', at: { x: 10, y: 14 } },
+    { k: 'enemy', id: 'root_biter', at: { x: 26, y: 12 } },
+  ],
+  map: [
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQrrrrrcccccccccccccccccccczzzzzzzzzzzQQ',
+    'QQrrrrrcccccccccccccccccccczzzzzzzzzzzQQ',
+    'QQrrrrrcccccccccccccccccccczzzzzzczzzzQQ',
+    'QQrrrrrcccccccccccccccccccczzzzzzzzzzzQQ',
+    'QQrrrrrcccccccccccccccccccczzzzzzzzzzzQQ',
+    'QQccccccccccccccccccccccccczzzzzzzzzzzQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQcccccccccccccccccccccccccccccccccccccc',
+    'QQcccccccccccccccccccccccccccccccccccccc',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQccccccccccccccccccccccccccccccccccccQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQrrrrrccccccccccccccccccccccccccrrrrrQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+    'QQQQQQQQQQQQQQQQQQQccQQQQQQQQQQQQQQQQQQQ',
+  ],
+};

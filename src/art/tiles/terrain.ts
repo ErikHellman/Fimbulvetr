@@ -439,14 +439,14 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 0,
     paint: (p, v) => {
       caveFloor(p);
-      region(p, v.mask, 0, C.rootShade, C.ink, C.root, 0.18);
+      region(p, v.mask, 0, C.rootShade, C.ink, C.caveWall, 0.12);
       for (let k = 0; k < 3; k++) {
         const x0 = nextInt(p.rng, 0, 16);
         for (let y = 0; y < 16; y++) {
           const x = (x0 + Math.floor(y / 3)) % 16;
           if (insideBlob(v.mask, x, y, 1) && !onBlobEdge(v.mask, x, y, 1)) {
             p.px(x, y, C.root);
-            if (insideBlob(v.mask, x + 1, y, 1) && !onBlobEdge(v.mask, x + 1, y, 1))
+            if (y % 4 === 0 && insideBlob(v.mask, x + 1, y, 1) && !onBlobEdge(v.mask, x + 1, y, 1))
               p.px(x + 1, y, C.rootLight);
           }
         }

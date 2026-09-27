@@ -25,6 +25,18 @@ export const SCREEN_IDS = [
   'myr_charcoal',
   'myr_roots',
   'myr_int_hut',
+  'd1_r01',
+  'd1_r02',
+  'd1_r03',
+  'd1_r04',
+  'd1_r05',
+  'd1_r06',
+  'd1_r07',
+  'd1_r08',
+  'd1_r09',
+  'd1_r10',
+  'd1_r11',
+  'd1_r12',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

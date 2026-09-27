@@ -3,10 +3,10 @@ import type { ScreenDef } from '@core/world/screen';
 export const myrRoots: ScreenDef = {
   id: 'myr_roots',
   region: 'myrkvidr',
-  purpose:
-    "Yggdrasil's roots and the mouth of Rótarhellir (dungeon 1), barred by fallen logs until M1c. Arnbjörg the pilgrim keeps vigil.",
+  purpose: "Yggdrasil's roots and the mouth of Rótarhellir (dungeon 1). Arnbjörg the pilgrim keeps vigil.",
   things: [
-    { k: 'gate', at: { x: 19, y: 6 }, w: 2, h: 1, art: 'logs', closed: { k: 'all', of: [] } },
+    { k: 'door', at: { x: 19, y: 2 }, dir: 'n', to: 'd1_r01', arrive: { x: 19, y: 19 }, facing: 'n' },
+    { k: 'door', at: { x: 20, y: 2 }, dir: 'n', to: 'd1_r01', arrive: { x: 20, y: 19 }, facing: 'n' },
     {
       k: 'sign',
       at: { x: 23, y: 7 },
@@ -19,7 +19,7 @@ export const myrRoots: ScreenDef = {
   map: [
     'PPTTPTTPPPPPPTPTPTPPTPPPPPPPPPPTPPTPPPPT',
     'PPTPPTTPPPPP#################PPTPPTTPTPP',
-    'PPTPPPPPPPTP#################PTPTTPPTPTT',
+    'PPTPPPPPPPTP#######VV########PTPTTPPTPTT',
     'PPPPTTPTPPPP#######,,########PPPPTPTPPTT',
     'PPPPTPPPPTPT#######,,########PPPPPTPPTTP',
     'PPTTPPPPPPPT#######,,########TTPPPPPPPTP',
