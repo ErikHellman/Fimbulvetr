@@ -15,6 +15,7 @@ import { damageActor } from './combat';
 import { critterDef } from './critters';
 import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
+import { createDrop } from './pickups';
 import { applyAll, probeBox } from './story';
 
 export const propDef = (rt: SimRt, e: Entity): PropDef => rt.db.props[e.def as PropId];
@@ -29,11 +30,28 @@ function remove(rt: SimRt, e: Entity): void {
   if (rt.hero.mem['carrying'] === e.id) rt.hero.mem['carrying'] = 0;
 }
 
+/** Where loot lands around a broken prop, in px (up to eight pieces). */
+const LOOT_SPREAD: readonly { x: number; y: number }[] = [
+  { x: -12, y: 0 },
+  { x: 12, y: 0 },
+  { x: 0, y: 10 },
+  { x: -8, y: 12 },
+  { x: 8, y: 12 },
+  { x: 0, y: -2 },
+  { x: -16, y: 8 },
+  { x: 16, y: 8 },
+];
+
 function breakProp(rt: SimRt, e: Entity): void {
   const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
+  const def = propDef(rt, e);
   remove(rt, e);
-  if (propDef(rt, e).wall === true) stampCollision(rt);
+  if (def.wall === true) stampCollision(rt);
   rt.emit({ t: 'sfx', id: 'sfx_break' });
+  (def.loot ?? []).forEach((kind, i) => {
+    const d = LOOT_SPREAD[i % LOOT_SPREAD.length] ?? { x: 0, y: 0 };
+    rt.actors.push(createDrop(rt.newId(), kind, { x: e.pos.x + d.x, y: e.pos.y + d.y }));
+  });
   if (thing?.k === 'prop') applyAll(rt, thing.onBreak ?? []);
 }
 

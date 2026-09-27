@@ -72,6 +72,7 @@ export const ENEMIES = [
   'rotvaettr',
   'rot_bulb',
   'root_spike',
+  'forest_troll',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -110,6 +111,7 @@ export const SFX = [
   'sfx_stun',
   'sfx_boss_hit',
   'sfx_boss_roar',
+  'sfx_stone',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -162,7 +164,17 @@ export const SCRIPTS = [
 export type ScriptId = (typeof SCRIPTS)[number];
 
 /** Things that can be lifted, thrown, broken or split. */
-export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big', 'root_block', 'vines'] as const;
+export const PROPS = [
+  'pot',
+  'stone',
+  'rock',
+  'pail',
+  'log_small',
+  'log_big',
+  'root_block',
+  'vines',
+  'troll_stone',
+] as const;
 export type PropId = (typeof PROPS)[number];
 
 /** Animals with simple behaviours that are not enemies. */

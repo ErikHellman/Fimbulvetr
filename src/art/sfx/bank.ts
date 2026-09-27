@@ -333,4 +333,14 @@ export const SFX_BANK = {
     release: 0.4,
     volume: 0.45,
   },
+  /** Grinding rock: a troll turns to stone at sunrise. */
+  sfx_stone: {
+    wave: 'noise',
+    freq: 900,
+    freqEnd: 120,
+    attack: 0.02,
+    sustain: 0.35,
+    release: 0.3,
+    volume: 0.4,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

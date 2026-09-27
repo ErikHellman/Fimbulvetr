@@ -49,6 +49,7 @@ import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
+import { petrifyAtDawn } from './systems/trolls';
 import { outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
@@ -302,6 +303,7 @@ export class Sim implements SimRt {
 
   private stepPlay(input: InputFrame): void {
     tickWorldClock(this, this.ticksPerMinute);
+    petrifyAtDawn(this);
     refreshCover(this);
     refreshFixtures(this);
     if (checkInteract(this, input)) return;

@@ -183,6 +183,8 @@ export interface ScreenDef {
   readonly dark?: boolean;
   /** A dungeon room: its grid in `layout.dungeons`; the clock stops and there is no weather. */
   readonly dungeon?: DungeonId;
+  /** Where the region's spawn table may put enemies (see ContentDb.spawns). None: nothing rolled here. */
+  readonly spawns?: readonly TilePos[];
 }
 
 /** A grid of screens: the overworld, or one floor of a dungeon. */

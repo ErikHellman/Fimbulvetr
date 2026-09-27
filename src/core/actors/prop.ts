@@ -1,4 +1,5 @@
 import type { PropId } from '@content/ids';
+import type { DropKind } from '../combat/drops';
 import type { Box } from '../math/box';
 import type { Vec } from '../math/vec';
 import { createEntity, type Entity } from './entity';
@@ -21,6 +22,8 @@ export interface PropDef {
   readonly wall?: boolean;
   /** Slides a tile when Ask pushes against it steadily (a root block); back in place on the next visit. */
   readonly pushable?: boolean;
+  /** What spills out when it breaks (a troll stone's hoard). */
+  readonly loot?: readonly DropKind[];
 }
 
 export function createProp(id: number, def: PropDef, pos: Vec, thingIndex: number): Entity {

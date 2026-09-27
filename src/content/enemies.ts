@@ -177,4 +177,31 @@ export const ENEMY_DEFS = {
       },
     },
   },
+  /**
+   * A forest troll: it roams Myrkviðr only at night and cannot be hurt; the sunrise turns it to stone.
+   */
+  forest_troll: {
+    id: 'forest_troll',
+    art: 'enemy_forest_troll',
+    hp: 99,
+    body: { x: -11, y: -12, w: 22, h: 12 },
+    hurt: { x: -14, y: -44, w: 28, h: 44 },
+    behaviour: 'troll',
+    knockResist: 1,
+    immortal: true,
+    guard: true,
+    solid: true,
+    petrify: 'troll_stone',
+    touch: { amount: 2, knock: 5, tags: HEAVY },
+    attacks: {
+      smash: {
+        from: 4,
+        to: 9,
+        boxes: around({ x: -30, y: -30, w: 60, h: 40 }),
+        amount: 6,
+        knock: 7,
+        tags: HEAVY,
+      },
+    },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

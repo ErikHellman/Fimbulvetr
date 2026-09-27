@@ -3,7 +3,7 @@ import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
 import { outline } from '../outline';
 import { C } from '../palette';
-import { createRaster, flipX, hex, type Raster } from '../raster';
+import { createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { drawPerson, type Look, type Side } from './people';
 import type { SpriteFrame } from './types';
 
@@ -126,86 +126,123 @@ function risen(side: Side, sink: number): Raster {
 
 // ── Troll: 48×56, feet at (24, 54) ───────────────────────────────────────────────────────────────────
 
-const HIDE = hex('#7f8c64');
-const HIDE_SHADE = hex('#5a6645');
-const HIDE_LIGHT = hex('#a2ad84');
-const MOSS = hex('#48602f');
-const LOIN = hex(C.wood);
-const TUSK = hex('#efe8d0');
-const TROLL_EYE = hex('#f0c040');
-const CLUB = hex(C.woodShade);
+/** A troll's colours: the raid troll, the mossier forest troll, and the grey of one turned to stone. */
+interface TrollPal {
+  readonly hide: Rgba;
+  readonly shade: Rgba;
+  readonly light: Rgba;
+  readonly moss: Rgba;
+  readonly loin: Rgba;
+  readonly tusk: Rgba;
+  readonly eye: Rgba;
+  readonly club: Rgba;
+}
+
+const RAID_TROLL: TrollPal = {
+  hide: hex('#7f8c64'),
+  shade: hex('#5a6645'),
+  light: hex('#a2ad84'),
+  moss: hex('#48602f'),
+  loin: hex(C.wood),
+  tusk: hex('#efe8d0'),
+  eye: hex('#f0c040'),
+  club: hex(C.woodShade),
+};
+
+const FOREST_TROLL: TrollPal = {
+  hide: hex('#6b6a4e'),
+  shade: hex('#4a4a34'),
+  light: hex('#8e8c68'),
+  moss: hex('#3d6a2c'),
+  loin: hex('#5a4630'),
+  tusk: hex('#e8dcc0'),
+  eye: hex('#e8a030'),
+  club: hex('#4a3524'),
+};
+
+/** Stone keeps the shape and loses the life: no eyes shine in it. */
+const STONE_TROLL: TrollPal = {
+  hide: hex(C.rock),
+  shade: hex(C.rockShade),
+  light: hex(C.rockLight),
+  moss: hex('#5d7a4a'),
+  loin: hex(C.rockShade),
+  tusk: hex(C.rockLight),
+  eye: hex(C.rockShade),
+  club: hex(C.rockShade),
+};
 
 type Club = 'down' | 'up' | 'smash';
 
-function trollFront(phase: number, club: Club, back: boolean): Raster {
+function trollFront(P: TrollPal, phase: number, club: Club, back: boolean): Raster {
   const r = createRaster(48, 56);
   const liftL = phase === 1 ? 2 : 0;
   const liftR = phase === 3 ? 2 : 0;
-  rect(r, 15, 44, 7, 10 - liftL, HIDE);
-  rect(r, 26, 44, 7, 10 - liftR, HIDE_SHADE);
-  rect(r, 14, 52 - liftL, 9, 2, HIDE_SHADE);
-  rect(r, 25, 52 - liftR, 9, 2, HIDE_SHADE);
-  ellipse(r, 24, 31, 14, 13, (x) => (x > 30 ? HIDE_SHADE : HIDE));
-  if (!back) ellipse(r, 24, 35, 8, 7, HIDE_LIGHT);
-  rect(r, 14, 40, 20, 5, LOIN);
+  rect(r, 15, 44, 7, 10 - liftL, P.hide);
+  rect(r, 26, 44, 7, 10 - liftR, P.shade);
+  rect(r, 14, 52 - liftL, 9, 2, P.shade);
+  rect(r, 25, 52 - liftR, 9, 2, P.shade);
+  ellipse(r, 24, 31, 14, 13, (x) => (x > 30 ? P.shade : P.hide));
+  if (!back) ellipse(r, 24, 35, 8, 7, P.light);
+  rect(r, 14, 40, 20, 5, P.loin);
   // Arms: the left hangs, the right holds the club.
-  rect(r, 7, 24, 5, 18, HIDE);
-  rect(r, 6, 41, 6, 4, HIDE_SHADE);
+  rect(r, 7, 24, 5, 18, P.hide);
+  rect(r, 6, 41, 6, 4, P.shade);
   if (club === 'up') {
-    rect(r, 36, 10, 5, 18, HIDE_SHADE);
-    rect(r, 36, 6, 6, 5, HIDE_SHADE);
-    rect(r, 37, 3, 5, 5, CLUB);
-    rect(r, 36, 2, 7, 3, CLUB);
+    rect(r, 36, 10, 5, 18, P.shade);
+    rect(r, 36, 6, 6, 5, P.shade);
+    rect(r, 37, 3, 5, 5, P.club);
+    rect(r, 36, 2, 7, 3, P.club);
   } else if (club === 'smash') {
-    rect(r, 36, 26, 5, 16, HIDE_SHADE);
-    rect(r, 10, 46, 30, 5, CLUB);
-    rect(r, 8, 45, 8, 7, CLUB);
+    rect(r, 36, 26, 5, 16, P.shade);
+    rect(r, 10, 46, 30, 5, P.club);
+    rect(r, 8, 45, 8, 7, P.club);
   } else {
-    rect(r, 36, 24, 5, 18, HIDE_SHADE);
-    rect(r, 37, 40, 5, 13, CLUB);
-    rect(r, 36, 47, 7, 6, CLUB);
+    rect(r, 36, 24, 5, 18, P.shade);
+    rect(r, 37, 40, 5, 13, P.club);
+    rect(r, 36, 47, 7, 6, P.club);
   }
   // Head, low between the shoulders.
-  ellipse(r, 24, 15, 7, 6, (x) => (x > 27 ? HIDE_SHADE : HIDE));
-  rect(r, 18, 8, 12, 3, MOSS);
+  ellipse(r, 24, 15, 7, 6, (x) => (x > 27 ? P.shade : P.hide));
+  rect(r, 18, 8, 12, 3, P.moss);
   if (!back) {
-    ellipse(r, 24, 17, 2.5, 3, HIDE_SHADE);
-    rect(r, 21, 13, 1, 2, TROLL_EYE);
-    rect(r, 27, 13, 1, 2, TROLL_EYE);
-    rect(r, 21, 20, 1, 2, TUSK);
-    rect(r, 27, 20, 1, 2, TUSK);
-  } else rect(r, 17, 11, 14, 4, MOSS);
+    ellipse(r, 24, 17, 2.5, 3, P.shade);
+    rect(r, 21, 13, 1, 2, P.eye);
+    rect(r, 27, 13, 1, 2, P.eye);
+    rect(r, 21, 20, 1, 2, P.tusk);
+    rect(r, 27, 20, 1, 2, P.tusk);
+  } else rect(r, 17, 11, 14, 4, P.moss);
   return outline(r, INK, 2);
 }
 
-function trollSide(phase: number, club: Club): Raster {
+function trollSide(P: TrollPal, phase: number, club: Club): Raster {
   const r = createRaster(48, 56);
   const step = [0, 2, 0, -2][phase] ?? 0;
-  rect(r, 22 + step, 44, 6, 10, HIDE_SHADE);
-  rect(r, 30 - step, 44, 6, 10, HIDE);
-  ellipse(r, 27, 32, 13, 13, (x) => (x > 32 ? HIDE_SHADE : HIDE));
-  rect(r, 17, 40, 20, 5, LOIN);
-  ellipse(r, 15, 22, 6, 5, (x) => (x > 17 ? HIDE_SHADE : HIDE));
-  rect(r, 12, 17, 9, 3, MOSS);
-  ellipse(r, 10, 24, 2.5, 3, HIDE_SHADE);
-  rect(r, 12, 21, 1, 2, TROLL_EYE);
-  rect(r, 11, 27, 1, 2, TUSK);
+  rect(r, 22 + step, 44, 6, 10, P.shade);
+  rect(r, 30 - step, 44, 6, 10, P.hide);
+  ellipse(r, 27, 32, 13, 13, (x) => (x > 32 ? P.shade : P.hide));
+  rect(r, 17, 40, 20, 5, P.loin);
+  ellipse(r, 15, 22, 6, 5, (x) => (x > 17 ? P.shade : P.hide));
+  rect(r, 12, 17, 9, 3, P.moss);
+  ellipse(r, 10, 24, 2.5, 3, P.shade);
+  rect(r, 12, 21, 1, 2, P.eye);
+  rect(r, 11, 27, 1, 2, P.tusk);
   if (club === 'up') {
-    rect(r, 20, 8, 5, 20, HIDE_SHADE);
-    rect(r, 17, 3, 6, 8, CLUB);
+    rect(r, 20, 8, 5, 20, P.shade);
+    rect(r, 17, 3, 6, 8, P.club);
   } else if (club === 'smash') {
-    rect(r, 10, 30, 6, 12, HIDE_SHADE);
-    rect(r, 3, 44, 14, 6, CLUB);
+    rect(r, 10, 30, 6, 12, P.shade);
+    rect(r, 3, 44, 14, 6, P.club);
   } else {
-    rect(r, 13, 30, 5, 14, HIDE_SHADE);
-    rect(r, 12, 42, 5, 11, CLUB);
+    rect(r, 13, 30, 5, 14, P.shade);
+    rect(r, 12, 42, 5, 11, P.club);
   }
   return outline(r, INK, 2);
 }
 
-function troll(side: Side, phase: number, club: Club): Raster {
-  if (side === 'w') return trollSide(phase, club);
-  return trollFront(phase, club, side === 'n');
+function troll(side: Side, phase: number, club: Club, P: TrollPal = RAID_TROLL): Raster {
+  if (side === 'w') return trollSide(P, phase, club);
+  return trollFront(P, phase, club, side === 'n');
 }
 
 // ── A puff of smoke where an enemy dies ──────────────────────────────────────────────────────────────
@@ -277,7 +314,19 @@ export function enemyFrames(): SpriteFrame[] {
     t('tell', 1, troll(side, 2, 'up'));
     t('smash', 0, troll(side, 0, 'smash'));
     t('smash', 1, troll(side, 2, 'smash'));
+
+    const f = (anim: string, i: number, r: Raster): void => {
+      add('enemy_forest_troll', anim, side, i, r, 24, 54);
+    };
+    f('idle', 0, troll(side, 0, 'down', FOREST_TROLL));
+    for (let i = 0; i < 4; i++) f('walk', i, troll(side, i, 'down', FOREST_TROLL));
+    f('tell', 0, troll(side, 0, 'up', FOREST_TROLL));
+    f('tell', 1, troll(side, 2, 'up', FOREST_TROLL));
+    f('smash', 0, troll(side, 0, 'smash', FOREST_TROLL));
+    f('smash', 1, troll(side, 2, 'smash', FOREST_TROLL));
   }
+  // A troll the sun caught, hunched over its club; one frame, facing the viewer.
+  out.push({ name: 'prop_troll_stone_idle_s_0', raster: troll('s', 0, 'down', STONE_TROLL), ox: 24, oy: 54 });
   for (let i = 0; i < 4; i++) out.push({ name: `fx_poof_idle_s_${i}`, raster: poof(i), ox: 12, oy: 18 });
   return out;
 }
@@ -296,5 +345,7 @@ export const ENEMY_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
     swing: a(2, 12, false),
   },
   enemy_troll: { idle: a(1, 1), walk: a(4, 4), tell: a(2, 5), smash: a(2, 10, false) },
+  enemy_forest_troll: { idle: a(1, 1), walk: a(4, 4), tell: a(2, 5), smash: a(2, 10, false) },
+  prop_troll_stone: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_poof: { idle: { frames: 4, fps: 12, loop: false, dirs: ['s'] } },
 };
