@@ -1,10 +1,12 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { evening, flag, not } from './util';
+import { all, evening, flag, not } from './util';
 
 /** Bersi keeps Uppvík's gate: open by day, barred at night, whatever the weather. */
 export const BERSI: DialogueDef = {
   entry: [
     { when: not(flag('n_bersi_met')), node: 'meet' },
+    { when: all(flag('q_vargar_alpha'), not(flag('q_vargar_done'))), node: 'bounty' },
+    { when: flag('q_vargar_done'), node: 'after' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { when: evening, node: 'evening' },
     { node: 'day' },
@@ -22,6 +24,23 @@ export const BERSI: DialogueDef = {
       text: {
         en: 'The gate is barred at night. Knock and I will open it, grumbling. Knock twice and I bite.',
         sv: 'Porten är bommad om natten. Knacka så öppnar jag, med knot. Knacka två gånger så biter jag.',
+      },
+    },
+    bounty: {
+      text: {
+        en: 'The black one, dead? By your hand? Hm. The bounty, then, and a bigger purse to carry it in. You will need it.',
+        sv: 'Den svarta, död? För din hand? Hm. Belöningen, då, och en större pung att bära den i. Du kommer att behöva den.',
+      },
+      do: [
+        { k: 'give', item: 'purse' },
+        { k: 'silver', n: 60 },
+        { k: 'set', flag: 'q_vargar_done', value: true },
+      ],
+    },
+    after: {
+      text: {
+        en: 'The north road has been quieter since you went hunting. Quieter. Not quiet.',
+        sv: 'Norra vägen har varit lugnare sedan du var ute och jagade. Lugnare. Inte lugn.',
       },
     },
     day: {

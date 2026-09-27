@@ -175,6 +175,40 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_vargar: {
+    id: 'q_vargar',
+    name: { en: 'The vargar hunt', sv: 'Vargjakten' },
+    stages: [
+      {
+        when: flag('q_vargar_taken'),
+        text: {
+          en: 'Kill the vargr pack leader on the north road. Dagný the huntress knows the vargar.',
+          sv: 'Fäll vargflockens ledare vid norra vägen. Jägarinnan Dagný känner vargarna.',
+        },
+      },
+      {
+        when: flag('q_vargar_tracked'),
+        text: {
+          en: 'The pack leader howls its pack in: strike it mid-howl. Roll from its lunge.',
+          sv: 'Flockens ledare ylar in flocken: hugg den mitt i ylet. Rulla undan språnget.',
+        },
+      },
+      {
+        when: flag('q_vargar_alpha'),
+        text: {
+          en: 'The pack leader is dead. Bersi pays the bounty at Uppvík’s gate.',
+          sv: 'Flockens ledare är död. Bersi betalar belöningen vid Uppvíks port.',
+        },
+      },
+      {
+        when: flag('q_vargar_done'),
+        text: {
+          en: 'Bersi paid the bounty, and a purse that holds 300 silver.',
+          sv: 'Bersi betalade belöningen, och en pung som rymmer 300 silver.',
+        },
+      },
+    ],
+  },
   q_eldr: {
     id: 'q_eldr',
     name: { en: 'Sölvi’s lesson', sv: 'Sölvis lektion' },

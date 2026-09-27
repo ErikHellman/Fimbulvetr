@@ -98,7 +98,11 @@ const shopKetill: ScriptDef = {
   ],
 };
 
+/** Reading the notices on the Þing-stone (and taking the hunters' one). */
+const thingNotices: ScriptDef = { steps: [{ k: 'talk', dialogue: 'thingstone' }] };
+
 export const UPPVIK_SCRIPTS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
+  thing_notices: thingNotices,
   uppvik_arrive: arrive,
   shop_hrafnkell: shopHrafnkell,
   shop_ketill: shopKetill,

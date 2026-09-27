@@ -29,6 +29,7 @@ import { SKEGGI } from './skeggi';
 import { SOLVI } from './solvi';
 import { STEINN } from './steinn';
 import { THORDIS } from './thordis';
+import { THINGSTONE } from './thingstone';
 import { THORKELL } from './thorkell';
 import { TOFA } from './tofa';
 import { ULF } from './ulf';
@@ -67,4 +68,5 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   steinn: STEINN,
   heidr: HEIDR,
   huldra: HULDRA,
+  thingstone: THINGSTONE,
 };

@@ -7,15 +7,8 @@ export const uppSquare: ScreenDef = {
     "Uppvík's market square: Hrafnkell's trading house (door), the Þing-stone where notices are pinned, the well and two stalls.",
   things: [
     { k: 'door', at: { x: 8, y: 6 }, dir: 'n', to: 'upp_int_trader', arrive: { x: 19, y: 15 }, facing: 'n' },
-    {
-      k: 'sign',
-      at: { x: 26, y: 12 },
-      w: 2,
-      text: {
-        en: 'The Þing-stone. Notices: “Lost: one grey goat.” “Wanted: hunters for the vargr pack on the north road. Ask Bersi at the gate.”',
-        sv: 'Tingstenen. Anslag: ”Borttappad: en grå get.” ”Jägare sökes för vargflocken vid norra vägen. Fråga Bersi vid porten.”',
-      },
-    },
+    /** The Þing-stone: its notices, and the hunt for the vargr pack leader. */
+    { k: 'use', at: { x: 26, y: 12 }, w: 2, script: 'thing_notices' },
     {
       k: 'sign',
       at: { x: 5, y: 14 },

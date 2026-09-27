@@ -70,6 +70,14 @@ export const FLAGS = {
   q_huldra_promise: { t: 'bool' },
   /** Ask turned her bargain down (she asks again). */
   q_huldra_refused: { t: 'bool' },
+  /** Ask took the hunters' notice from the Þing-stone: the vargr pack leader, on the north road. */
+  q_vargar_taken: { t: 'bool' },
+  /** Dagný told Ask how the pack leader fights. */
+  q_vargar_tracked: { t: 'bool' },
+  /** The pack leader is dead (set by its death). */
+  q_vargar_alpha: { t: 'bool' },
+  /** Bersi paid the bounty, a bigger purse. */
+  q_vargar_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

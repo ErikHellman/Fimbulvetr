@@ -174,6 +174,7 @@ export const QUESTS = [
   'q_eldr',
   'q_volva',
   'q_huldra',
+  'q_vargar',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -181,7 +182,7 @@ export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr'] as c
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
-export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat'] as const;
+export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat', 'thingstone'] as const;
 export type DialogueId = (typeof DIALOGUES)[number];
 
 /** Cutscenes and interaction scripts. */
@@ -203,6 +204,7 @@ export const SCRIPTS = [
   'shop_hrafnkell',
   'shop_ketill',
   'shop_heidr',
+  'thing_notices',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
