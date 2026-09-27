@@ -143,6 +143,46 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     legs: 'skirt',
     bottom: '#256d6a',
   },
+  /** The woodcutter: big, red-bearded, in a work shirt. */
+  onundr: {
+    skin: TAN,
+    hair: '#8a4a2a',
+    hairStyle: 'short',
+    beard: '#9a5a32',
+    top: '#8a3b2a',
+    legs: 'pants',
+    bottom: '#4a3b2a',
+  },
+  /** The huntress: dark braid, leathers. */
+  dagny: {
+    skin: SKIN,
+    hair: '#2a2024',
+    hairStyle: 'braid',
+    top: '#6b5a3a',
+    legs: 'pants',
+    bottom: '#4a4030',
+  },
+  /** The charcoal-burner, soot to the elbows. */
+  skeggi: {
+    skin: '#b8957a',
+    hair: '#6a6a6a',
+    hairStyle: 'short',
+    beard: '#7a7a7a',
+    top: '#3f3f3f',
+    legs: 'pants',
+    bottom: '#2f2f2f',
+    apron: '#5a4a3a',
+  },
+  /** An old pilgrim woman in a grey hood. */
+  arnbjorg: {
+    skin: SKIN,
+    hair: '#d8d8d0',
+    hairStyle: 'kerchief',
+    scarf: '#8a8a7a',
+    top: '#7a6a5a',
+    legs: 'skirt',
+    bottom: '#5a4a3a',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

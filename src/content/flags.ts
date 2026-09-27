@@ -24,6 +24,11 @@ export const FLAGS = {
   st_seax_given: { t: 'bool' },
   /** Gyða told the legend of the Rime King; the gate north opens and the seasons turn again. */
   st_legend_told: { t: 'bool' },
+  /** First meetings in Myrkviðr. */
+  n_onundr_met: { t: 'bool' },
+  n_dagny_met: { t: 'bool' },
+  n_skeggi_met: { t: 'bool' },
+  n_arnbjorg_met: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -97,6 +97,10 @@ export const NPCS = [
   'thorkell',
   'rannveig',
   'kolbeinn',
+  'onundr',
+  'dagny',
+  'skeggi',
+  'arnbjorg',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 

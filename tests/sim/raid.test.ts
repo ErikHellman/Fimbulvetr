@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { DEV_PRESETS } from '@content/dev/presets';
-import { NPCS } from '@content/ids';
 import { SOLID } from '@core/world/collision';
 import { placeOf } from '@core/sim/systems/npcs';
 import { Harness, frameOf } from './harness';
@@ -77,9 +76,17 @@ describe('the raid night', () => {
     expect(h.sim.actors.filter((a) => a.kind === 'npc').map((a) => a.def)).toEqual(['halvar']);
     h.idle(600);
     expect(s.clock.minute).toBeGreaterThan(7 * 60);
-    const taken = NPCS.filter(
-      (id) => id !== 'kolbeinn' && !['halvar', 'gyda', 'sigrun', 'grimr'].includes(id),
-    );
+    const taken = [
+      'embla',
+      'asa',
+      'bjarni',
+      'ulf',
+      'tofa',
+      'oddr',
+      'hallbera',
+      'thorkell',
+      'rannveig',
+    ] as const;
     for (const id of taken) {
       s.clock.minute = 12 * 60;
       const def = h.sim.db.npcs[id];

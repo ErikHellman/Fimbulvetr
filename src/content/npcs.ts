@@ -20,6 +20,10 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   thorkell: { en: 'Þorkell', sv: 'Þorkell' },
   rannveig: { en: 'Rannveig', sv: 'Rannveig' },
   kolbeinn: { en: 'Kolbeinn', sv: 'Kolbeinn' },
+  onundr: { en: 'Önundr', sv: 'Önundr' },
+  dagny: { en: 'Dagný', sv: 'Dagný' },
+  skeggi: { en: 'Skeggi', sv: 'Skeggi' },
+  arnbjorg: { en: 'Arnbjörg', sv: 'Arnbjörg' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -78,4 +82,12 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   rannveig: npc('rannveig', [{ when: up, screen: 'ask_village', at: { x: 34, y: 14 }, facing: 'w' }]),
   /** The seiðmaðr who leads the raid. Only seen in cutscenes. */
   kolbeinn: npc('kolbeinn', [{ when: raidNight, screen: 'ask_gate', at: { x: 20, y: 6 }, facing: 's' }]),
+  /** Myrkviðr. Önundr sleeps in his hut; the others keep to their fires all night. */
+  onundr: npc('onundr', [
+    { when: evening, screen: 'myr_int_hut', at: { x: 19, y: 12 }, facing: 's' },
+    { screen: 'myr_clearing', at: { x: 23, y: 10 }, facing: 's' },
+  ]),
+  dagny: npc('dagny', [{ screen: 'myr_road', at: { x: 28, y: 7 }, facing: 'w' }]),
+  skeggi: npc('skeggi', [{ screen: 'myr_charcoal', at: { x: 18, y: 11 }, facing: 'e' }]),
+  arnbjorg: npc('arnbjorg', [{ screen: 'myr_roots', at: { x: 17, y: 9 }, facing: 'n' }]),
 };
