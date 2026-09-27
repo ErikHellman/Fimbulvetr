@@ -37,8 +37,12 @@ export class EntityViews {
       const p = place(e);
       sprite.setPosition(Math.round(p.x), Math.round(p.y - (e.mem['z'] ?? 0)));
       sprite.setDepth(p.y);
+      const stun = e.mem['stun'] ?? 0;
       if (e.flash > 0 && Math.floor(e.flash / 2) % 2 === 0)
         sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
+      // Stunned: a cold blue cast, flickering off in the last second before it wears off.
+      else if (stun > 0 && (stun > 60 || Math.floor(stun / 6) % 2 === 0))
+        sprite.setTint(0x8fb0ff).setTintMode(Phaser.TintModes.MULTIPLY);
       else sprite.clearTint();
       const blink =
         e.kind === 'hero' && e.iframes > 0 && e.anim !== 'roll' && Math.floor(e.iframes / 4) % 2 === 0;

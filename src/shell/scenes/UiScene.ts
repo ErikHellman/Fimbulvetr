@@ -3,13 +3,14 @@ import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
 import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
-import { REGION_COLOURS, REGION_NAMES } from '@content/regions';
-import type { ItemId } from '@content/ids';
+import { DUNGEON_NAMES, REGION_COLOURS, REGION_NAMES } from '@content/regions';
+import type { DungeonId, ItemId } from '@content/ids';
 import { t, type L10n, type Lang } from '@core/i18n/t';
 import { CONTINUE_DELAY } from '@core/sim/systems/death';
 import { condCtx } from '@core/sim/systems/story';
 import { questLog } from '@core/story/quests';
-import { overworldMap } from '@core/world/mapModel';
+import { peekDungeon } from '@core/state/dungeons';
+import { dungeonMap, overworldMap } from '@core/world/mapModel';
 import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
@@ -41,6 +42,10 @@ export const UI_LINK = 'uiLink';
 
 const INK = 0x1b1522;
 const GOLD = 0xd9b34a;
+const RED = 0xe0433f;
+const CAVE = 0x6e6258;
+const CAVE_SEEN = 0x9a8a78;
+const BOSS_BAR = { w: 160, h: 6, y: 8 };
 const PAPER = 0xf2ead8;
 const DIM = 0x9c9486;
 const BOX = { x: 20, y: GAME_H - 84, w: GAME_W - 40, h: 76 };
@@ -90,6 +95,10 @@ export class UiScene extends Phaser.Scene {
   private fallen!: Phaser.GameObjects.Rectangle;
   private fallenTitle!: Phaser.GameObjects.BitmapText;
   private fallenPrompt!: Phaser.GameObjects.BitmapText;
+  private keyIcon!: Phaser.GameObjects.Image;
+  private keyText!: Phaser.GameObjects.BitmapText;
+  private bossBar!: Phaser.GameObjects.Graphics;
+  private bossName!: Phaser.GameObjects.BitmapText;
 
   constructor() {
     super('ui');
@@ -103,6 +112,11 @@ export class UiScene extends Phaser.Scene {
     const silverRef = this.frameRef('ui_silver_idle_s_0');
     this.add.image(6, 30, silverRef.key, silverRef.frame).setOrigin(0, 0);
     this.silver = this.text(16, 29, '', PAPER);
+    const keyRef = this.frameRef('item_small_key_idle_s_0');
+    this.keyIcon = this.add.image(5, 41, keyRef.key, keyRef.frame).setOrigin(0, 0).setVisible(false);
+    this.keyText = this.text(16, 41, '', PAPER);
+    this.bossBar = this.add.graphics();
+    this.bossName = this.text(0, 0, '', PAPER);
     for (let i = 0; i < 2; i++) {
       const x = GAME_W - 56 + i * 26;
       hud
@@ -136,6 +150,7 @@ export class UiScene extends Phaser.Scene {
     if (link === undefined) return;
     this.link = link;
     this.drawHud();
+    this.drawBoss();
     this.drawStory(link.sim.storyUi());
     this.drawGameOver();
     this.drawMenu();
@@ -214,6 +229,11 @@ export class UiScene extends Phaser.Scene {
   /** The overworld as coloured cells: visited screens by region, the hero's cell framed in gold. */
   private menuMap(top: number, lang: Lang): void {
     const { sim } = this.link;
+    const dungeon = sim.db.screens[sim.screen.id].dungeon;
+    if (dungeon !== undefined) {
+      this.menuDungeonMap(dungeon, top, lang);
+      return;
+    }
     const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id);
     const cw = 22;
     const ch = 13;
@@ -234,6 +254,44 @@ export class UiScene extends Phaser.Scene {
     const label =
       here === undefined ? '' : `${t(REGION_NAMES[here.region], lang)} — ${t(UI.menu_here, lang)}`;
     this.menuBody.setText(label).setPosition(MENU.x + 24, top);
+  }
+
+  /**
+   * A dungeon floor: rooms walked through (every room with the map), the room Ask is in framed in gold, and
+   * with the compass a red mark on the lair and a gold one on each room with a shut chest.
+   */
+  private menuDungeonMap(dungeon: DungeonId, top: number, lang: Lang): void {
+    const { sim } = this.link;
+    const m = dungeonMap(sim.db.layout, sim.db.screens, sim.db.enemies, sim.state, dungeon, sim.screen.id);
+    if (m === null) return;
+    const cw = 30;
+    const ch = 18;
+    const ox = Math.round(MENU.x + (MENU.w - m.cols * cw) / 2);
+    const oy = top + 22;
+    for (const c of m.cells) {
+      if (!c.shown) continue;
+      const cx = ox + c.gx * cw;
+      const cy = oy + c.gy * ch;
+      this.menuBox.fillStyle(c.visited ? CAVE_SEEN : CAVE, 1).fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      if (c.boss) this.menuBox.fillStyle(RED, 1).fillRect(cx + cw / 2 - 3, cy + ch / 2 - 3, 6, 6);
+      if (c.chest) this.menuBox.fillStyle(GOLD, 1).fillRect(cx + 4, cy + 4, 4, 4);
+      if (c.here) this.menuBox.lineStyle(2, GOLD, 1).strokeRect(cx + 1, cy + 1, cw - 2, ch - 2);
+    }
+    this.menuBox.lineStyle(1, DIM, 1).strokeRect(ox - 3.5, oy - 3.5, m.cols * cw + 7, m.rows * ch + 7);
+    const lines = [`${t(DUNGEON_NAMES[dungeon], lang)} — ${t(UI.menu_keys, lang, { detail: m.keys })}`];
+    while (top + lines.length * LINE_HEIGHT < oy + m.rows * ch + 8) lines.push('');
+    if (m.compass) {
+      // The legend: a red mark for the lair, a gold one for chests, each before its word.
+      const y = top + lines.length * LINE_HEIGHT;
+      const lair = `   ${t(UI.menu_lair, lang)}`;
+      const space = textWidth('  ') - textWidth(' ');
+      const gap = Math.max(2, Math.round((96 - textWidth(lair)) / space));
+      this.menuBox.fillStyle(RED, 1).fillRect(MENU.x + 24, y + 2, 6, 6);
+      this.menuBox.fillStyle(GOLD, 1).fillRect(MENU.x + 24 + textWidth(lair) + gap * space, y + 3, 4, 4);
+      lines.push(`${lair}${' '.repeat(gap)}   ${t(UI.menu_chest, lang)}`);
+    }
+    if (!m.map) lines.push(t(UI.menu_no_map, lang));
+    this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
   }
 
   private menuQuests(top: number, lang: Lang): void {
@@ -285,8 +343,34 @@ export class UiScene extends Phaser.Scene {
     return ref ?? { key: '__MISSING', frame: '' };
   }
 
+  /** A boss's name and health across the top while one is on screen. */
+  private drawBoss(): void {
+    const b = this.link.sim.boss();
+    this.bossBar.clear();
+    if (b === null) {
+      this.bossName.setText('');
+      return;
+    }
+    const x = Math.round((GAME_W - BOSS_BAR.w) / 2);
+    const fill = Math.round(((BOSS_BAR.w - 2) * Math.max(0, b.hp)) / b.maxHp);
+    this.bossBar
+      .fillStyle(INK, 0.85)
+      .fillRect(x - 1, BOSS_BAR.y - 1, BOSS_BAR.w + 2, BOSS_BAR.h + 2)
+      .fillStyle(RED, 1)
+      .fillRect(x, BOSS_BAR.y, fill, BOSS_BAR.h)
+      .lineStyle(1, GOLD, 1)
+      .strokeRect(x - 0.5, BOSS_BAR.y - 0.5, BOSS_BAR.w + 1, BOSS_BAR.h + 1);
+    const name = t(b.name, this.link.lang());
+    this.bossName
+      .setText(name)
+      .setPosition(Math.round((GAME_W - textWidth(name)) / 2), BOSS_BAR.y + BOSS_BAR.h + 3);
+  }
+
   private drawHud(): void {
     const { sim, frames } = this.link;
+    const dungeon = sim.db.screens[sim.screen.id].dungeon;
+    this.keyIcon.setVisible(dungeon !== undefined);
+    this.keyText.setText(dungeon === undefined ? '' : String(peekDungeon(sim.state, dungeon).keys));
     const hp = sim.hero.hp;
     const hearts = Math.ceil(sim.hero.maxHp / 4);
     while (this.hearts.length < hearts) {

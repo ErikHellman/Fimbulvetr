@@ -58,6 +58,13 @@ export const UI = {
   menu_no_quests: { en: 'Nothing to do yet.', sv: 'Inget att göra än.' },
   menu_quest_done: { en: 'done', sv: 'klart' },
   menu_here: { en: 'You are here', sv: 'Du är här' },
+  menu_keys: { en: 'Keys: {detail}', sv: 'Nycklar: {detail}' },
+  menu_no_map: {
+    en: 'Only the rooms you have walked through. The map would show the rest.',
+    sv: 'Bara rummen du har gått igenom. Kartan skulle visa resten.',
+  },
+  menu_lair: { en: 'Lair', sv: 'Lya' },
+  menu_chest: { en: 'Chest', sv: 'Kista' },
   menu_resume: { en: 'Back to the game', sv: 'Tillbaka till spelet' },
   menu_start_over: { en: 'Start a new game', sv: 'Börja ett nytt spel' },
   menu_start_over_confirm: {
