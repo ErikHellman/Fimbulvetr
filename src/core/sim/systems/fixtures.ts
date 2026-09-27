@@ -13,7 +13,7 @@ import type { SimRt } from '../rt';
 import { hurtHero } from './combat';
 import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
-import { outdoors, skyOf } from './weather';
+import { raining } from './weather';
 import { walkTiles } from './cover';
 import { condCtx, probeBox } from './story';
 
@@ -256,13 +256,6 @@ export function strikeSwitch(rt: SimRt, box: Box): boolean {
   e.mem['lit'] = 1;
   rt.emit({ t: 'sfx', id: 'sfx_switch' });
   return true;
-}
-
-/** Rain and storms outdoors: nothing stays lit in the open. */
-function raining(rt: SimRt): boolean {
-  if (!outdoors(rt)) return false;
-  const sky = skyOf(rt);
-  return sky === 'rain' || sky === 'storm';
 }
 
 /** Rain puts out every burning brazier in the open (they stay out until lit again). */

@@ -4,6 +4,7 @@ import type { Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
 import type { RngState } from '../../math/rng';
 import type { Vec } from '../../math/vec';
+import type { Element } from '../../combat/hit';
 import type { SimEvent } from '../../sim/events';
 import type { SolidAt } from '../../world/collision';
 import type { Entity } from '../entity';
@@ -42,6 +43,8 @@ export interface EnemyDef {
   readonly needs?: readonly ItemId[];
   /** Turns into this prop at sunrise (a troll caught by daylight is a stone). */
   readonly petrify?: PropId;
+  /** Elements that deal it double damage (a draugr burns). */
+  readonly weak?: readonly Element[];
 }
 
 export interface AttackWindow {

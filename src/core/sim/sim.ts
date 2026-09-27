@@ -50,6 +50,7 @@ import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
 import { petrifyAtDawn } from './systems/trolls';
+import { fireKey, fireLights, stepFire } from './systems/fire';
 import { outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
@@ -240,6 +241,7 @@ export class Sim implements SimRt {
     for (const e of this.actors)
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
+    out.push(...fireLights(this, FIRE_RADIUS));
     return out;
   }
 
@@ -259,6 +261,7 @@ export class Sim implements SimRt {
         entry: this.entry,
         god: this.god,
         weatherOverride: this.weatherOverride,
+        fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
       }),
@@ -333,6 +336,7 @@ export class Sim implements SimRt {
     cutCover(this);
     resolveAttacks(this);
     fixtureHazards(this);
+    stepFire(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);

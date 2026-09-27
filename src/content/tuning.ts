@@ -86,6 +86,7 @@ export const TUNING: Tuning = {
       spinBox: { x: -22, y: -32, w: 44, h: 40 },
     },
   },
+  fire: { burnTicks: 90, spreadAt: 50, amount: 2, knock: 3, scorch: 30 },
   armor: {
     wool_tunic: { reduce: 0 },
     byrnie: { reduce: 0.25 },

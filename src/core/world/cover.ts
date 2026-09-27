@@ -30,6 +30,8 @@ export interface CoverDef {
   readonly walk?: boolean;
   /** The winter cloak halves how much it slows Ask. */
   readonly cloak?: boolean;
+  /** Catches fire (Eldr, burning neighbours): it burns down to a cleared tile. */
+  readonly burns?: boolean;
 }
 
 /** What derived cover needs to know about a screen. */
@@ -50,6 +52,10 @@ export interface CoverGrid {
   readonly epoch: number;
   /** Whether it was built for a wet day (mud stands). */
   readonly wet: boolean;
+  /** Ticks each tile has left to burn (0: not burning). Never saved; what burns out is `cleared`. */
+  readonly burn: Uint8Array;
+  /** How many tiles are burning (so an idle screen costs nothing). */
+  burning: number;
 }
 
 /** Whether a tile or one of its eight neighbours is one of `kinds`. */
@@ -112,7 +118,16 @@ export function buildCover(
     save !== undefined && save.epoch === epoch
       ? decodeBits(save.cleared, cols * rows)
       : new Uint8Array(cols * rows);
-  return { cols, rows, kind, cleared, epoch, wet: derive?.wet ?? false };
+  return {
+    cols,
+    rows,
+    kind,
+    cleared,
+    epoch,
+    wet: derive?.wet ?? false,
+    burn: new Uint8Array(cols * rows),
+    burning: 0,
+  };
 }
 
 /** The cover standing (uncut) on a tile, or null. */

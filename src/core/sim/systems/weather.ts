@@ -44,3 +44,10 @@ export function windOf(rt: SimRt): Vec {
   if (!outdoors(rt)) return { x: 0, y: 0 };
   return windAt(rt.state.seed, rt.state.clock.day, rt.db.screens[rt.screen.id].region, skyOf(rt));
 }
+
+/** Rain or a storm over the current screen, outdoors: fire neither spreads nor stays lit in it. */
+export function raining(rt: SimRt): boolean {
+  if (!outdoors(rt)) return false;
+  const sky = skyOf(rt);
+  return sky === 'rain' || sky === 'storm';
+}

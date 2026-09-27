@@ -6,9 +6,9 @@ import type { TerrainId } from './terrain';
 const GROUND: readonly TerrainId[] = ['grass', 'path', 'field', 'yard', 'mound'];
 
 export const COVER_DEFS = {
-  tall_grass: { id: 'tall_grass', seasons: ['summer'], slow: 0.6 },
+  tall_grass: { id: 'tall_grass', seasons: ['summer'], slow: 0.6, burns: true },
   /** Autumn leaf piles under the trees: they hide what lies beneath until cut or blown away. */
-  leaves: { id: 'leaves', seasons: ['autumn'], slow: 0.8, hides: true, blown: true },
+  leaves: { id: 'leaves', seasons: ['autumn'], slow: 0.8, hides: true, blown: true, burns: true },
   /** Winter snow over all open ground outdoors; the sword clears a path. */
   snow: { id: 'snow', seasons: ['winter'], slow: 0.7, grows: { on: GROUND }, cloak: true },
   /** Deep drifts, drawn on the map (`^`): no blade clears them; fire melts them (Eldr, M2b). */
