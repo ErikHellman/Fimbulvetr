@@ -1,4 +1,4 @@
-import type { EnemyId } from '@content/ids';
+import type { EnemyId, PropId } from '@content/ids';
 import { mem, type Entity } from '../../actors/entity';
 import { at, overlaps } from '../../math/box';
 import { evalCond } from '../../story/cond';
@@ -16,6 +16,10 @@ const SIGNALS: Readonly<Record<RoomSignal, (rt: SimRt) => boolean>> = {
   clear: (rt) => !rt.actors.some((a) => a.kind === 'enemy' && !rt.db.enemies[a.def as EnemyId].immortal),
   switches: (rt) => allLit(rt, 'switch'),
   braziers: (rt) => allLit(rt, 'brazier'),
+  blocks: (rt) => {
+    const all = rt.actors.filter((a) => a.kind === 'prop' && rt.db.props[a.def as PropId].pushable === true);
+    return all.length > 0 && all.every((a) => mem(a, 'moved') === 1);
+  },
 };
 
 /** Whether a room-wide signal holds right now. */

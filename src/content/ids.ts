@@ -85,6 +85,7 @@ export const SFX = [
   'sfx_unlock',
   'sfx_shutter',
   'sfx_switch',
+  'sfx_push',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -135,7 +136,7 @@ export const SCRIPTS = [
 export type ScriptId = (typeof SCRIPTS)[number];
 
 /** Things that can be lifted, thrown, broken or split. */
-export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big'] as const;
+export const PROPS = ['pot', 'stone', 'rock', 'pail', 'log_small', 'log_big', 'root_block', 'vines'] as const;
 export type PropId = (typeof PROPS)[number];
 
 /** Animals with simple behaviours that are not enemies. */

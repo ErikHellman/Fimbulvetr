@@ -17,6 +17,10 @@ export interface PropDef {
   readonly breakBy?: 'sword' | 'spin';
   /** Quarter hearts dealt when thrown into something. */
   readonly throwDamage: number;
+  /** Fills its tile like a wall (stamped into collision, so enemies are stopped too). */
+  readonly wall?: boolean;
+  /** Slides a tile when Ask pushes against it steadily (a root block); back in place on the next visit. */
+  readonly pushable?: boolean;
 }
 
 export function createProp(id: number, def: PropDef, pos: Vec, thingIndex: number): Entity {

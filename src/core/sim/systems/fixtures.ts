@@ -11,6 +11,7 @@ import { TILE } from '../../world/dims';
 import { tileFeet, type Thing, type TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { hurtHero } from './combat';
+import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
 import { condCtx, probeBox } from './story';
 
@@ -181,10 +182,17 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
   if (changed) stampCollision(rt);
 }
 
-/** collision = base terrain + the tiles of solid fixtures: closed gates, locks and shutters, chests in sight. */
+/**
+ * collision = base terrain + the tiles of solid fixtures (closed gates, locks and shutters, chests in
+ * sight, switches, braziers) + wall props (root blocks, vines).
+ */
 export function stampCollision(rt: SimRt): void {
   const { base, collision } = rt.screen;
   collision.flags.set(base.flags);
+  for (const t of wallTiles(rt)) {
+    const i = t.y * collision.cols + t.x;
+    collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
+  }
   for (const e of rt.actors) {
     if (e.kind !== 'fixture') continue;
     const solid = KINDS[e.def]?.solid;

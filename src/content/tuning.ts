@@ -42,6 +42,7 @@ export const TUNING: Tuning = {
     spinBox: { x: -26, y: -36, w: 52, h: 44 },
   },
   throw: { speed: 4, flightTicks: 20 },
+  push: { ticks: 16, slideTicks: 16 },
   weapons: {
     /** The pitchfork of the raid night: long reach, light blows. */
     pitchfork: {

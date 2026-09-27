@@ -5,6 +5,8 @@ const SMALL = { x: -6, y: -8, w: 12, h: 8 };
 const SMALL_HURT = { x: -7, y: -14, w: 14, h: 14 };
 const LARGE = { x: -7, y: -10, w: 14, h: 10 };
 const LARGE_HURT = { x: -8, y: -16, w: 16, h: 16 };
+/** Exactly one tile. */
+const TILE_BOX = { x: -8, y: -14, w: 16, h: 16 };
 
 export const PROP_DEFS = {
   pot: {
@@ -62,5 +64,29 @@ export const PROP_DEFS = {
     fragile: false,
     breakBy: 'spin',
     throwDamage: 0,
+  },
+  /** A knot of root in Rótarhellir: pushed, it slides a tile. */
+  root_block: {
+    id: 'root_block',
+    art: 'prop_root_block',
+    body: TILE_BOX,
+    hurt: TILE_BOX,
+    liftable: false,
+    fragile: false,
+    throwDamage: 0,
+    wall: true,
+    pushable: true,
+  },
+  /** A curtain of vines across a passage; any swing cuts it. */
+  vines: {
+    id: 'vines',
+    art: 'prop_vines',
+    body: TILE_BOX,
+    hurt: TILE_BOX,
+    liftable: false,
+    fragile: false,
+    breakBy: 'sword',
+    throwDamage: 0,
+    wall: true,
   },
 } as const satisfies Record<PropId, PropDef>;

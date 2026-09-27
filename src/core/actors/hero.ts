@@ -60,7 +60,8 @@ const move: HeroDef = {
     if (wasPressed(c.input, 'sword') && c.armed) return 'attack';
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
     steer(e, c, c.tuning.hero.walkSpeed, true);
-    setAnim(e, moving(e) ? 'walk' : 'idle');
+    // `push` counts ticks of leaning on a block (the props system keeps it).
+    setAnim(e, mem(e, 'push') > 0 ? 'push' : moving(e) ? 'walk' : 'idle');
     return pushingLedge(e, c) ? 'hop' : undefined;
   },
 };

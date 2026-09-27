@@ -282,4 +282,14 @@ export const SFX_BANK = {
     release: 0.15,
     volume: 0.3,
   },
+  /** A root block scraping a tile along the floor. */
+  sfx_push: {
+    wave: 'noise',
+    freq: 260,
+    freqEnd: 180,
+    attack: 0.04,
+    sustain: 0.18,
+    release: 0.1,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

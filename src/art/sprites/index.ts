@@ -1,4 +1,5 @@
 import type { AnimTable } from '../anims';
+import { CAVE_ANIMS, caveFrames } from './cave';
 import { DECOR_ANIMS, decorFrames } from './decor';
 import { DUMMY_ANIMS, dummyFrames } from './dummy';
 import { ENEMY_ANIMS, enemyFrames } from './enemies';
@@ -25,6 +26,7 @@ export const ANIMS: AnimTable = {
   ...UI_ANIMS,
   ...ENEMY_ANIMS,
   ...FIXTURE_ANIMS,
+  ...CAVE_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -38,6 +40,7 @@ export function buildSprites(): SpriteFrame[] {
     ...uiFrames(),
     ...enemyFrames(),
     ...fixtureFrames(),
+    ...caveFrames(),
     missingFrame(),
   ];
 }

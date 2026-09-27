@@ -25,10 +25,10 @@ export interface DoorThing {
 
 /**
  * A room-wide condition, worked out from the live actors each tick: `clear` once no mortal enemy is left,
- * `switches` once every switch is lit, `braziers` once every brazier burns. Things that wait on one latch
- * when it first holds, until the room is entered again.
+ * `switches` once every switch is lit, `braziers` once every brazier burns, `blocks` once every pushable
+ * block has been moved. Things that wait on one latch when it first holds, until the room is entered again.
  */
-export type RoomSignal = 'clear' | 'switches' | 'braziers';
+export type RoomSignal = 'clear' | 'switches' | 'braziers' | 'blocks';
 
 /** What a chest holds: an item (dungeon items go into the dungeon's state), or silver with its own line. */
 export type ChestGift =

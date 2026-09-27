@@ -51,9 +51,17 @@ export interface ThrowTuning {
   readonly flightTicks: number;
 }
 
+export interface PushTuning {
+  /** Ticks of steady pushing before a block moves. */
+  readonly ticks: number;
+  /** Ticks a block takes to slide one tile. */
+  readonly slideTicks: number;
+}
+
 export interface Tuning {
   readonly hero: HeroTuning;
   readonly throw: ThrowTuning;
+  readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
   /** Typewriter speed, characters per second. */

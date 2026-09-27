@@ -68,5 +68,11 @@ export const C = {
   blanket: '#9c3b34',
   blanketShade: '#72291f',
   stubble: '#9ab86a',
+  root: '#8a6a48',
+  rootShade: '#5a4230',
+  rootLight: '#b08e62',
+  vine: '#4f8a3f',
+  vineShade: '#33602c',
+  vineLight: '#7ab05a',
   missing: '#ff00ff',
 } as const;
