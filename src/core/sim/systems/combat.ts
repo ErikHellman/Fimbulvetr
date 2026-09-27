@@ -5,15 +5,16 @@ import { changeState } from '../../actors/fsm';
 import { swordOf } from '../../actors/tuning';
 import { HERO_MACHINE, heroSwordBox, heroSwordDamage } from '../../actors/hero';
 import { rollDrop } from '../../combat/drops';
-import { resolveHit, type HitData, type HitResult } from '../../combat/hit';
+import { STUN, resolveHit, type HitData, type HitResult } from '../../combat/hit';
 import { EMPTY_FRAME } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
-import { normalize, sub } from '../../math/vec';
+import { normalize, scale, sub } from '../../math/vec';
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
 import { enemyDef } from './movement';
 import { createDrop } from './pickups';
+import { applyAll } from './story';
 
 /**
  * Applies a hero-side hit to an actor: the one damage path for the sword, thrown props and projectiles.
@@ -21,6 +22,16 @@ import { createDrop } from './pickups';
  */
 export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult {
   const def = target.kind === 'enemy' ? enemyDef(rt, target) : undefined;
+  if (mem(target, 'guard') === 1 && target.faction !== hit.faction && target.iframes === 0) {
+    // A guarded weak point (a closed core): the blow clinks off.
+    target.knock = scale(hit.dir, hit.knock / 2);
+    rt.emit({ t: 'hit', target: target.id, blocked: true, dealt: 0 });
+    return { outcome: 'blocked', dealt: 0 };
+  }
+  if (def?.stunnable !== undefined && (hit.tags & STUN) !== 0 && target.faction !== hit.faction) {
+    target.mem['stun'] = def.stunnable;
+    target.vel = { x: 0, y: 0 };
+  }
   const result = resolveHit(target, hit, {
     shielding: false,
     iframes: rt.db.tuning.enemyIframes,
@@ -39,6 +50,10 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
 export function killEnemy(rt: SimRt, e: Entity, def: EnemyDef): void {
   rt.actors = rt.actors.filter((a) => a !== e);
   rt.emit({ t: 'killed', id: e.id, def: e.def as EnemyId, x: e.pos.x, y: e.pos.y });
+  if (mem(e, 'summoned') === 0 && e.mem['thing'] !== undefined) {
+    const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
+    if (thing?.k === 'enemy' && thing.onDeath !== undefined) applyAll(rt, thing.onDeath);
+  }
   if (def.drops === undefined) return;
   const drop = rollDrop(rt.state.rng, def.drops);
   if (drop !== null) rt.actors.push(createDrop(rt.newId(), drop, e.pos));
@@ -70,32 +85,41 @@ export function resolveSword(rt: SimRt): void {
   }
 }
 
-/** Enemies with contact damage hurt the hero when their hurt boxes touch. */
-export function resolveContact(rt: SimRt): void {
-  const { hero, db } = rt;
+/** Enemies hurt the hero by touch (contact damage) and by the blows of their attack windows. */
+export function resolveAttacks(rt: SimRt): void {
+  const { hero } = rt;
   const heroBox = at(hero.hurt, hero.pos);
   for (const e of rt.actors) {
-    if (e.kind !== 'enemy') continue;
-    const touch = enemyDef(rt, e).touch;
-    if (touch === undefined || !overlaps(heroBox, at(e.hurt, e.pos))) continue;
-    const away = normalize(sub(hero.pos, e.pos));
-    const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
-    const result = resolveHit(
-      hero,
-      {
-        amount: touch.amount,
-        element: 'none',
-        knock: touch.knock,
-        dir,
-        faction: e.faction,
-        tags: touch.tags,
-      },
-      { shielding: mem(hero, 'shielding') === 1, iframes: db.tuning.hero.hurtIframes, knockResist: 0 },
-    );
-    if (result.outcome === 'ignored') continue;
-    rt.emit({ t: 'hit', target: hero.id, blocked: result.outcome === 'blocked', dealt: result.dealt });
-    rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : 'sfx_hurt' });
-    if (result.outcome !== 'blocked') changeState(HERO_MACHINE, hero, 'hurt', heroCtx(rt, EMPTY_FRAME));
-    return;
+    if (e.kind !== 'enemy' || mem(e, 'stun') > 0) continue;
+    const def = enemyDef(rt, e);
+    const w = def.attacks?.[e.fsm.s];
+    const blow =
+      w !== undefined &&
+      e.fsm.t >= w.from &&
+      e.fsm.t <= w.to &&
+      overlaps(heroBox, at(w.boxes[e.facing], e.pos))
+        ? w
+        : undefined;
+    const touch = def.touch !== undefined && overlaps(heroBox, at(e.hurt, e.pos)) ? def.touch : undefined;
+    const hit = blow ?? touch;
+    if (hit !== undefined && hurtHero(rt, e, hit.amount, hit.knock, hit.tags)) return;
   }
+}
+
+/** One hit on the hero from `source`; returns whether it landed or was blocked (not ignored). */
+export function hurtHero(rt: SimRt, source: Entity, amount: number, knock: number, tags: number): boolean {
+  const { hero, db } = rt;
+  const away = normalize(sub(hero.pos, source.pos));
+  const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
+  const result = resolveHit(
+    hero,
+    { amount, element: 'none', knock, dir, faction: source.faction, tags },
+    { shielding: mem(hero, 'shielding') === 1, iframes: db.tuning.hero.hurtIframes, knockResist: 0 },
+  );
+  if (result.outcome === 'ignored') return false;
+  rt.emit({ t: 'hit', target: hero.id, blocked: result.outcome === 'blocked', dealt: result.dealt });
+  rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : 'sfx_hurt' });
+  if (result.outcome !== 'blocked' && hero.hp > 0)
+    changeState(HERO_MACHINE, hero, 'hurt', heroCtx(rt, EMPTY_FRAME));
+  return true;
 }

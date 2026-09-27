@@ -1,8 +1,6 @@
 import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
 import { runFsm } from '../actors/fsm';
-import { BEHAVIOURS } from '../actors/enemies';
-import type { ActorCtx } from '../actors/enemies/defs';
 import { HERO_MACHINE, createHero, heroPreTick } from '../actors/hero';
 import { setMinute, setSeason } from '../clock/clock';
 import type { InputFrame } from '../input/actions';
@@ -14,7 +12,7 @@ import { canonicalJson, cloneState } from '../state/save';
 import { giveItem } from '../story/effects';
 import type { StoryRun } from '../story/script';
 import { buy } from '../story/shop';
-import { buildCollision, gridSolidAt } from '../world/collision';
+import { buildCollision } from '../world/collision';
 import type { CoverGrid } from '../world/cover';
 import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -23,10 +21,11 @@ import type { ContentDb } from './db';
 import type { SimEvent } from './events';
 import type { Entry, LoadedScreen, Mode, SimRt, Transition } from './rt';
 import { tickWorldClock } from './systems/clock';
-import { resolveContact, resolveSword } from './systems/combat';
+import { resolveAttacks, resolveSword } from './systems/combat';
 import { coverFor, cutCover, refreshCover } from './systems/cover';
+import { actorCtx, runEnemies } from './systems/enemies';
 import { heroCtx, syncHero } from './systems/hero';
-import { enemyDef, moveAll } from './systems/movement';
+import { moveAll } from './systems/movement';
 import { runCritters, settleCritters } from './systems/critters';
 import { stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
@@ -198,18 +197,8 @@ export class Sim implements SimRt {
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
-    const ctx: ActorCtx = {
-      tuning: this.db.tuning,
-      rng: this.state.rng,
-      hero: this.hero.pos,
-      heroVel: this.hero.vel,
-      solidAt: gridSolidAt(this.screen.collision, () => true),
-      emit: (ev) => {
-        this.emit(ev);
-      },
-    };
-    for (const e of this.actors)
-      if (e.kind === 'enemy') runFsm(BEHAVIOURS[enemyDef(this, e).behaviour], e, ctx);
+    const ctx = actorCtx(this);
+    runEnemies(this, ctx);
     runCritters(this, ctx);
     stepNpcs(this);
     moveAll(this);
@@ -219,7 +208,7 @@ export class Sim implements SimRt {
     resolveSword(this);
     swordProps(this);
     cutCover(this);
-    resolveContact(this);
+    resolveAttacks(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);

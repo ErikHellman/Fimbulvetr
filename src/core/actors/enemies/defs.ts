@@ -1,9 +1,12 @@
 import type { EnemyId } from '@content/ids';
+import type { L10n } from '../../i18n/t';
 import type { Box } from '../../math/box';
+import type { Dir4 } from '../../math/dir';
 import type { RngState } from '../../math/rng';
 import type { Vec } from '../../math/vec';
 import type { SimEvent } from '../../sim/events';
 import type { SolidAt } from '../../world/collision';
+import type { Entity } from '../entity';
 import type { Tuning } from '../tuning';
 import type { BehaviourId } from './index';
 
@@ -24,6 +27,28 @@ export interface EnemyDef {
   readonly touch?: ContactDamage;
   /** What it may leave behind when killed, as relative weights. */
   readonly drops?: DropTable;
+  /**
+   * Attack windows by state machine state: while the enemy is in that state and its state clock is in
+   * `from`…`to`, the box for its facing hurts the hero. The ticks before `from` are the telegraph.
+   */
+  readonly attacks?: Readonly<Partial<Record<string, AttackWindow>>>;
+  /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */
+  readonly stunnable?: number;
+  /** A boss: named on the health bar. */
+  readonly boss?: { readonly name: L10n };
+}
+
+export interface AttackWindow {
+  /** State-clock ticks (inclusive) during which the blow lands. */
+  readonly from: number;
+  readonly to: number;
+  /** Hit boxes relative to the feet, by facing. */
+  readonly boxes: Readonly<Record<Dir4, Box>>;
+  /** Quarter hearts. */
+  readonly amount: number;
+  readonly knock: number;
+  /** Hit tags (HEAVY staggers through the shield). */
+  readonly tags: number;
 }
 
 /** Relative weights of what a killed enemy leaves: a heart (heals one heart), one silver, or nothing. */
@@ -50,7 +75,14 @@ export interface ActorCtx {
   readonly hero: Readonly<Vec>;
   /** The hero's intended movement this tick (px per tick). */
   readonly heroVel: Readonly<Vec>;
+  /** The hero's state machine state (`attack`, `roll`, `shield`…) and facing. */
+  readonly heroFsm: string;
+  readonly heroFacing: Dir4;
   /** Wall lookup for the current screen (off-screen tiles are solid). */
   readonly solidAt: SolidAt;
+  /** Everything else live on the screen (pack members, bulbs, props). Read only. */
+  readonly others: readonly Readonly<Entity>[];
   emit(event: SimEvent): void;
+  /** Summons an enemy (a spike, a whelp); it acts from the next tick and never counts as a screen thing. */
+  spawn(id: EnemyId, pos: Vec, facing: Dir4): Entity;
 }

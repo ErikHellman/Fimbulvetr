@@ -25,7 +25,14 @@ export interface DoorThing {
 
 /** Things placed on a screen. The union grows with each milestone. */
 export type Thing =
-  | { readonly k: 'enemy'; readonly id: EnemyId; readonly at: TilePos }
+  /** An enemy, present while `when` holds (night-only draugr); `onDeath` applies when it is killed. */
+  | {
+      readonly k: 'enemy';
+      readonly id: EnemyId;
+      readonly at: TilePos;
+      readonly when?: Cond;
+      readonly onDeath?: readonly Effect[];
+    }
   | DoorThing
   /** Read with interact while facing its tile, or any tile of its `w`×`h` block (a 2×2 well). */
   | {

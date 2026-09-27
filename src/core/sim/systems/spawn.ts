@@ -22,9 +22,14 @@ function spawnThings(rt: SimRt): Entity[] {
   const ctx = condCtx(rt);
   rt.db.screens[rt.screen.id].things.forEach((thing, index) => {
     switch (thing.k) {
-      case 'enemy':
-        out.push(createEnemy(rt.newId(), rt.db.enemies[thing.id], tileFeet(thing.at)));
+      case 'enemy': {
+        if (!evalCond(thing.when, ctx)) break;
+        const e = createEnemy(rt.newId(), rt.db.enemies[thing.id], tileFeet(thing.at));
+        // The thing index is only kept for enemies that do something when they die.
+        if (thing.onDeath !== undefined) e.mem['thing'] = index;
+        out.push(e);
         break;
+      }
       case 'prop':
         if (evalCond(thing.when, ctx))
           out.push(createProp(rt.newId(), rt.db.props[thing.id], tileFeet(thing.at), index));
