@@ -3,7 +3,8 @@ import type { ScreenDef } from '@core/world/screen';
 export const myrHollow: ScreenDef = {
   id: 'myr_hollow',
   region: 'myrkvidr',
-  purpose: 'A dark hollow of old grave mounds; at night draugr climb out of them.',
+  purpose:
+    'A dark hollow of old grave mounds; at night draugr climb out of them. A path leads north into the fen.',
   things: [
     {
       k: 'sign',
@@ -25,10 +26,10 @@ export const myrHollow: ScreenDef = {
     { x: 6, y: 10 },
   ],
   map: [
-    'TPPPTTPPTPPPPPPTPPPTTPPTPPPPTPTPPTPPPPPP',
-    'PPPPPPTTPTPPTPPTPPTTTTPPPPPPPTPPPPTTPPTP',
-    'PPPPPTTPPTPTPPPPPPTPPPPPTPPPPPPTPPPPPTPP',
-    'TTTPPPTTPPTPPPPPPPPPPTTPPPTTTPTTPPPPPPTP',
+    'TPPPTTPPTP...PPTPPPTTPPTPPPPTPTPPTPPPPPP',
+    'PPPPPPTTPT...PPTPPTTTTPPPPPPPTPPPPTTPPTP',
+    'PPPPPTTPPT...PPPPPTPPPPPTPPPPPPTPPPPPTPP',
+    'TTTPPPTTPP...PPPPPPPPTTPPPTTTPTTPPPPPPTP',
     'PPPP%..%.P..%..PP.%.PT.P.%P.%P%PT%%PTTPP',
     'PPPPP....................%P.........PPPP',
     'PTPTP%.......%P.....m.....%.P.T%T...PPTP',

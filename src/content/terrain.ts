@@ -44,6 +44,11 @@ export const TERRAIN_IDS = [
   'stall',
   'thingstone',
   'anvil',
+  'bog',
+  'reeds',
+  'birch',
+  'moss',
+  'boulder',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -120,4 +125,14 @@ export const TERRAIN = {
   thingstone: { solid: true, decor: { art: ['decor_thingstone'], w: 2, h: 1 } },
   /** The smith's anvil on its block. */
   anvil: { solid: true, decor: { art: ['decor_anvil'], w: 1, h: 1 } },
+  /** Fen ground, black water between the tussocks: walkable, slow. */
+  bog: { solid: false, slow: 0.6 },
+  /** A stand of fen reeds, too thick to push through. */
+  reeds: { solid: true, decor: { art: ['decor_reeds'], w: 1, h: 1 } },
+  /** A white birch; they ring the huldra's glade. */
+  birch: { solid: true, decor: { art: ['decor_birch'], w: 1, h: 1 } },
+  /** The troll wood's floor: deep moss where no sun reaches. */
+  moss: { solid: false },
+  /** A mossy boulder (or a troll the sun caught long ago). */
+  boulder: { solid: true, decor: { art: ['decor_boulder'], w: 1, h: 1 } },
 } as const satisfies Record<TerrainId, TerrainDef>;

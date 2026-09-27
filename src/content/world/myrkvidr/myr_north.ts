@@ -4,7 +4,7 @@ export const myrNorth: ScreenDef = {
   id: 'myr_north',
   region: 'myrkvidr',
   purpose:
-    'The old north road out of Myrkviðr to Uppvík, between two clearings; a waystone. The vargr pack hunts here (the vargar hunt, M2c).',
+    'The old north road out of Myrkviðr to Uppvík, between two clearings; a waystone. The fen lies west, the glade east. The vargr pack hunts here (the vargar hunt).',
   things: [
     {
       k: 'sign',
@@ -33,10 +33,10 @@ export const myrNorth: ScreenDef = {
     'PPP.............PT,,,,TP.....%...%...PPT',
     'PPP..%..........PT,,,,PT.M...........PTP',
     'PPP..........%..TP,,,,...............PPP',
-    'PTP.............TP,,,,...............PPP',
-    'PPP.......P.......,,,,............P..PPP',
-    'TPT...............,,,,...............PTP',
-    'PPP...............,,,,TT.............PPT',
+    'PTP.............TP,,,,..................',
+    '..........P.......,,,,............P.....',
+    '..................,,,,..................',
+    '..................,,,,TT.............PPT',
     'PTT.............PP,,,,PP...%.........PPT',
     'PPP......%......TP,,,,TP.............PPT',
     'PPP.............PT,,,,TT..P........%.TTP',

@@ -108,6 +108,30 @@ function floor(p: Painter): void {
   planks(p, C.floor, C.floorShade, false);
 }
 
+/** Fen ground: dark peat, tussocks and black water in the hollows. */
+function bog(p: Painter, variant: number): void {
+  p.fill('#4a5236');
+  p.speckle('#3a4029', 0.18);
+  p.speckle('#6a7a44', 0.08);
+  const pools: ReadonlyArray<readonly [number, number, number]> = [
+    [3, 4, 3],
+    [10, 11, 4],
+    [11, 3, 2],
+    [4, 12, 2],
+  ];
+  const [x, y, w] = pools[variant % pools.length] ?? [3, 4, 3];
+  p.rect(x, y, w, 2, '#262c24');
+  p.rect(x + 1, y, Math.max(1, w - 2), 1, '#3e4a48');
+}
+
+/** The troll wood's moss: deep green, lumpy, with a few pale sprigs. */
+function moss(p: Painter): void {
+  p.fill('#355a2c');
+  p.speckle('#26441f', 0.2);
+  p.speckle('#4f7a3a', 0.08);
+  p.speckle('#8aa860', 0.015);
+}
+
 /** Pale shore sand. */
 function sand(p: Painter): void {
   p.fill('#d6c48f');
@@ -115,7 +139,48 @@ function sand(p: Painter): void {
   p.speckle('#eee0b0', 0.05);
 }
 
+/** Terrain added for the deep wood (M2c): the fen, the glade and the troll wood. */
+const DEEP_WOOD = {
+  bog: {
+    autotile: false,
+    variants: 4,
+    paint: (p, v) => {
+      bog(p, v.variant);
+    },
+  },
+  reeds: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      bog(p, 1);
+    },
+  },
+  birch: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
+    },
+  },
+  moss: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      moss(p);
+    },
+  },
+  boulder: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      moss(p);
+      p.speckle('#1f3419', 0.2);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...DEEP_WOOD,
   grass: {
     autotile: false,
     variants: 4,

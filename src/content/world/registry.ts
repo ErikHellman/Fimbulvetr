@@ -20,6 +20,10 @@ import { myrCharcoal } from './myrkvidr/myr_charcoal';
 import { myrRoots } from './myrkvidr/myr_roots';
 import { myrIntHut } from './myrkvidr/myr_int_hut';
 import { myrNorth } from './myrkvidr/myr_north';
+import { myrFen } from './myrkvidr/myr_fen';
+import { myrIntVolva } from './myrkvidr/myr_int_volva';
+import { myrGlade } from './myrkvidr/myr_glade';
+import { myrTrollskog } from './myrkvidr/myr_trollskog';
 import { uppGate } from './uppvik/upp_gate';
 import { uppSquare } from './uppvik/upp_square';
 import { uppHall } from './uppvik/upp_hall';
@@ -75,6 +79,10 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   myr_roots: myrRoots,
   myr_int_hut: myrIntHut,
   myr_north: myrNorth,
+  myr_fen: myrFen,
+  myr_int_volva: myrIntVolva,
+  myr_glade: myrGlade,
+  myr_trollskog: myrTrollskog,
   upp_gate: uppGate,
   upp_square: uppSquare,
   upp_hall: uppHall,

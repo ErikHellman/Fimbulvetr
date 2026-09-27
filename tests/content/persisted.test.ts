@@ -30,6 +30,9 @@ const PERSISTED = [
   'd1_sh_r07',
   'd1_sh_r10',
   'd1_sh_boss',
+  // M2c
+  'hp_myr_fen',
+  'hp_myr_trollskog',
 ] as const;
 
 function contentIds(): Set<string> {
