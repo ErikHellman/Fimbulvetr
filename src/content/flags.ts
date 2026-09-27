@@ -58,6 +58,12 @@ export const FLAGS = {
   q_eldr_asked: { t: 'bool' },
   /** Sölvi taught Ask Eldr, the first galdr. */
   st_eldr_learned: { t: 'bool' },
+  /** Heiðr the völva, in her fen hut. */
+  n_heidr_met: { t: 'bool' },
+  /** Heiðr asked for three clumps of fen-moss. */
+  q_volva_asked: { t: 'bool' },
+  /** Heiðr has the moss and brews blue mead. */
+  q_volva_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

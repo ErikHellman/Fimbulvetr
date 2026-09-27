@@ -36,6 +36,7 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   glumr: { en: 'Glúmr', sv: 'Glúmr' },
   ragna: { en: 'Ragna', sv: 'Ragna' },
   steinn: { en: 'Steinn', sv: 'Steinn' },
+  heidr: { en: 'Heiðr', sv: 'Heiðr' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -152,4 +153,6 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { screen: 'upp_smiths', at: { x: 24, y: 16 }, facing: 'e' },
   ]),
   steinn: npc('steinn', [{ screen: 'upp_int_meadhall', at: { x: 18, y: 10 }, facing: 'e' }]),
+  /** The völva keeps to her hut in the fen, behind her brewing table. */
+  heidr: npc('heidr', [{ screen: 'myr_int_volva', at: { x: 22, y: 11 }, facing: 's' }]),
 };

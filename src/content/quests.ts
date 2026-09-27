@@ -128,6 +128,26 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_volva: {
+    id: 'q_volva',
+    name: { en: 'The völva’s brew', sv: 'Völvans brygd' },
+    stages: [
+      {
+        when: flag('q_volva_asked'),
+        text: {
+          en: 'Heiðr the völva wants three clumps of fen-moss. It grows in the fen in autumn.',
+          sv: 'Völvan Heiðr vill ha tre tuvor kärrmossa. Den växer i kärret om hösten.',
+        },
+      },
+      {
+        when: flag('q_volva_done'),
+        text: {
+          en: 'Heiðr brews blue mead now: it heals and fills the seiðr bar.',
+          sv: 'Heiðr brygger blått mjöd nu: det läker och fyller på seiðr.',
+        },
+      },
+    ],
+  },
   q_eldr: {
     id: 'q_eldr',
     name: { en: 'Sölvi’s lesson', sv: 'Sölvis lektion' },

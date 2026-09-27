@@ -22,6 +22,16 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'horn', price: 40, when: { k: 'not', c: { k: 'item', id: 'horn', gte: 2 } } },
     ],
   },
+  /** The völva's brews: blue mead once she has her fen-moss. */
+  heidr: {
+    id: 'heidr',
+    name: { en: 'Heiðr’s brews', sv: 'Heiðrs brygder' },
+    stock: [
+      { item: 'mead_red', price: 20 },
+      { item: 'mead_green', price: 25 },
+      { item: 'mead_blue', price: 40, when: { k: 'flag', id: 'q_volva_done' } },
+    ],
+  },
   ketill: {
     id: 'ketill',
     name: { en: 'Ketill’s anvil', sv: 'Ketills städ' },

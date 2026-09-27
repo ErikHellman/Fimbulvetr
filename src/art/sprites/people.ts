@@ -306,6 +306,16 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     legs: 'pants',
     bottom: '#4a4038',
   },
+  /** Heiðr the völva: white hair under a deep blue hood, a long mantle. */
+  heidr: {
+    skin: '#e0c8b0',
+    hair: '#e8e4dc',
+    hairStyle: 'kerchief',
+    scarf: '#2a3a6a',
+    top: '#34487a',
+    legs: 'skirt',
+    bottom: '#222e52',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

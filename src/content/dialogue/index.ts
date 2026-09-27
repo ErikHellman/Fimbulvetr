@@ -13,6 +13,7 @@ import { GUNNHILDR } from './gunnhildr';
 import { GYDA } from './gyda';
 import { HALLBERA } from './hallbera';
 import { HALVAR } from './halvar';
+import { HEIDR } from './heidr';
 import { HJALTI } from './hjalti';
 import { HRAFNKELL } from './hrafnkell';
 import { JORUNN } from './jorunn';
@@ -63,4 +64,5 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   glumr: GLUMR,
   ragna: RAGNA,
   steinn: STEINN,
+  heidr: HEIDR,
 };
