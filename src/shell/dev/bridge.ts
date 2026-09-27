@@ -16,10 +16,16 @@ export interface ViewStats {
   readonly openWater: number;
   readonly fishAlive: number;
   readonly fishJumps: number;
-  /** Raindrops alive, lightning bolts so far, the darkness drawn and the lights cut out of it. */
+  /**
+   * Raindrops, snowflakes and blown leaves alive, lightning bolts so far, the darkness and fog drawn and
+   * the lights cut out of the dark.
+   */
   readonly rain: number;
+  readonly snow: number;
+  readonly leaves: number;
   readonly bolts: number;
   readonly dark: number;
+  readonly fog: number;
   readonly lights: number;
 }
 

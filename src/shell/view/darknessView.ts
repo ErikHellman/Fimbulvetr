@@ -9,9 +9,22 @@ export const DARK_DEPTH = 500_000;
 /** Half the light frame's size: a light of radius r is the frame scaled by r / 64. */
 const LIGHT_HALF = 64;
 
+/** Fog hangs over the weather but under the dark. */
+export const FOG_DEPTH = 450_000;
+
+export interface VeilStyle {
+  readonly colour: number;
+  readonly depth: number;
+}
+
+const NIGHT: VeilStyle = { colour: 0x05040c, depth: DARK_DEPTH };
+/** Pale fog. */
+export const FOG: VeilStyle = { colour: 0xc9ced8, depth: FOG_DEPTH };
+
 /**
- * The visibility layer: black at the sim's darkness, with the lights (the lantern, fires) erased out of
- * it. Redrawn every frame it is visible, which also survives a lost WebGL context.
+ * A visibility layer: black at the sim's darkness (or pale fog at its thickness), with the lights (the
+ * lantern, fires, the clear air around Ask in fog) erased out of it. Redrawn every frame it is visible,
+ * which also survives a lost WebGL context.
  */
 export class DarknessView {
   private readonly rt: Phaser.GameObjects.RenderTexture;
@@ -19,12 +32,16 @@ export class DarknessView {
   /** What was drawn last (for the dev hook). */
   shown = { dark: 0, lights: 0 };
 
-  constructor(scene: Phaser.Scene, frames: FrameIndex) {
+  constructor(
+    scene: Phaser.Scene,
+    frames: FrameIndex,
+    private readonly style: VeilStyle = NIGHT,
+  ) {
     this.rt = scene.add
       .renderTexture(0, 0, GAME_W, PLAY_H)
       .setOrigin(0, 0)
       .setScrollFactor(0)
-      .setDepth(DARK_DEPTH)
+      .setDepth(style.depth)
       .setVisible(false);
     const ref = frames.get('fx_light_idle_s_0');
     this.light = { key: ref.key, frame: ref.frame };
@@ -39,7 +56,7 @@ export class DarknessView {
     }
     this.rt.setVisible(true);
     this.rt.clear();
-    this.rt.fill(0x05040c, darkness);
+    this.rt.fill(this.style.colour, darkness);
     for (const l of lights)
       this.rt.stamp(this.light.key, this.light.frame, Math.round(l.x), Math.round(l.y), {
         scale: l.r / LIGHT_HALF,

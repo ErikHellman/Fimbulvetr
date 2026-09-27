@@ -7,7 +7,7 @@ import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
-import { daylight } from '@core/clock/clock';
+import { daylight, seasonAt } from '@core/clock/clock';
 import type { Entity } from '@core/actors/entity';
 import { InputLatch, wasPressed, type InputFrame } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
@@ -31,7 +31,7 @@ import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { menuItems, openMenu, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
 import { EntityViews } from '@shell/view/entityViews';
-import { DarknessView } from '@shell/view/darknessView';
+import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
 import { ScreenView } from '@shell/view/screenView';
@@ -57,6 +57,7 @@ export class PlayScene extends Phaser.Scene {
   private views!: EntityViews;
   private weather!: WeatherView;
   private darkness!: DarknessView;
+  private fog!: DarknessView;
   private fx!: FxView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
@@ -116,6 +117,7 @@ export class PlayScene extends Phaser.Scene {
       flashes: () => data.settings.flash,
     });
     this.darkness = new DarknessView(this, data.assets.frames);
+    this.fog = new DarknessView(this, data.assets.frames, FOG);
     this.fadeRect = this.add
       .rectangle(0, 0, SCREEN_W, SCREEN_H, 0x000000)
       .setOrigin(0, 0)
@@ -281,7 +283,21 @@ export class PlayScene extends Phaser.Scene {
           : { x: origin.x + l.x - cam.scrollX, y: origin.y + l.y - cam.scrollY, r: l.r },
       );
     this.darkness.draw(this.sim.darkness(), lights);
-    this.weather.update(this.sim.weather(), this.time.now);
+    const fog = this.sim.fog();
+    const clear =
+      hero === null
+        ? []
+        : [{ x: hero.x + hero.w / 2 - cam.scrollX, y: hero.y + hero.h - 12 - cam.scrollY, r: fog.r }];
+    this.fog.draw(fog.amount, [...clear, ...lights.filter((l) => l.r !== fog.r)]);
+    const def = this.services.db.screens[this.sim.screen.id];
+    this.weather.update(
+      {
+        kind: this.sim.weather(),
+        season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock),
+        wind: this.sim.wind(),
+      },
+      this.time.now,
+    );
   }
 
   private applyGrade(): void {
@@ -338,8 +354,11 @@ export class PlayScene extends Phaser.Scene {
       fishAlive: 0,
       fishJumps: 0,
       rain: this.weather.drops,
+      snow: this.weather.flakes,
+      leaves: this.weather.blown,
       bolts: this.weather.bolts,
       dark: this.darkness.shown.dark,
+      fog: this.fog.shown.dark,
       lights: this.darkness.shown.lights,
     };
     const out = { ...sum };
