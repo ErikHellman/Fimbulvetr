@@ -2,6 +2,7 @@ import type { Entity } from '../../actors/entity';
 import { createEnemy } from '../../actors/enemies';
 import { createCritter } from '../../actors/critters';
 import { createProp } from '../../actors/prop';
+import { dungeonOf } from '../../state/dungeons';
 import { evalCond } from '../../story/cond';
 import { tileFeet } from '../../world/screen';
 import type { SimRt } from '../rt';
@@ -11,6 +12,12 @@ import { createHeart, createPiece } from './pickups';
 import { placeNpcs } from './npcs';
 import { holdBack } from './rooms';
 import { condCtx } from './story';
+
+/** Whether the current room's dungeon has lost its boss (who then never comes back). */
+function bossDown(rt: SimRt): boolean {
+  const dungeon = rt.db.screens[rt.screen.id].dungeon;
+  return dungeon !== undefined && dungeonOf(rt.state, dungeon).bossDead;
+}
 
 /** Builds the live actors of the current screen from its things. */
 export function spawnActors(rt: SimRt): Entity[] {
@@ -28,8 +35,9 @@ function spawnThings(rt: SimRt): Entity[] {
   rt.db.screens[rt.screen.id].things.forEach((thing, index) => {
     switch (thing.k) {
       case 'enemy': {
-        if (!evalCond(thing.when, ctx)) break;
-        const e = createEnemy(rt.newId(), rt.db.enemies[thing.id], tileFeet(thing.at));
+        const def = rt.db.enemies[thing.id];
+        if (!evalCond(thing.when, ctx) || (def.boss !== undefined && bossDown(rt))) break;
+        const e = createEnemy(rt.newId(), def, tileFeet(thing.at));
         // The thing index is only kept for enemies that do something when they die.
         if (thing.onDeath !== undefined) e.mem['thing'] = index;
         out.push(e);

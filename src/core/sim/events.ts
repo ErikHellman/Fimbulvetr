@@ -24,4 +24,8 @@ export type SimEvent =
   /** A safe moment to autosave: back in play after a screen change or a finished script. */
   | { readonly t: 'autosave' }
   /** The hero's fall has ended: show the game-over panel (Continue after `CONTINUE_DELAY`). */
-  | { readonly t: 'gameOver' };
+  | { readonly t: 'gameOver' }
+  /** The screen should shake (a boss stamping or falling); the shell honours the shake setting. */
+  | { readonly t: 'shake'; readonly amount: number }
+  /** The boss of the room has fallen (its summons went with it). */
+  | { readonly t: 'bossDead' };

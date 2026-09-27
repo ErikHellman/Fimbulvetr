@@ -1,6 +1,7 @@
 import type { EnemyId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
-import type { Entity } from '../actors/entity';
+import { mem, type Entity } from '../actors/entity';
+import type { L10n } from '../i18n/t';
 import { runFsm } from '../actors/fsm';
 import { HERO_MACHINE, createHero, heroPreTick } from '../actors/hero';
 import { daylight, setMinute, setSeason } from '../clock/clock';
@@ -53,6 +54,14 @@ import {
 export type { Entry, LoadedScreen, Mode, Transition } from './rt';
 export type { StoryUi } from './systems/story';
 export { FADE_TICKS, TRANSITION_TICKS, entryPoint } from './systems/transition';
+
+/** What the boss bar shows. `phase` counts from 0. */
+export interface BossView {
+  readonly name: L10n;
+  readonly hp: number;
+  readonly maxHp: number;
+  readonly phase: number;
+}
 
 export interface SimOptions {
   /** Accessibility "long day": world time runs at half speed. */
@@ -167,6 +176,17 @@ export class Sim implements SimRt {
       dark: def.dark === true,
       weather: this.weather(),
     });
+  }
+
+  /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
+  boss(): BossView | null {
+    for (const e of this.actors) {
+      if (e.kind !== 'enemy') continue;
+      const def = this.db.enemies[e.def as EnemyId];
+      if (def.boss !== undefined)
+        return { name: def.boss.name, hp: e.hp, maxHp: e.maxHp, phase: mem(e, 'phase') };
+    }
+    return null;
   }
 
   /** What carves the dark, in screen pixels: the lantern (once owned) around the hero, fires and braziers. */

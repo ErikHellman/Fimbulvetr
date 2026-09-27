@@ -192,6 +192,9 @@ export class PlayScene extends Phaser.Scene {
       this.fx.poof({ x: origin.x + ev.x, y: origin.y + ev.y - 6 }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
+    } else if (ev.t === 'shake') {
+      // `amount` is in pixels; Phaser's intensity is a share of the view.
+      if (this.services.settings.shake) this.cameras.main.shake(240, ev.amount / this.scale.width);
     } else if (ev.t === 'screenTransition') this.showScreen(ev.to);
     else if (ev.t === 'coverChanged') this.screens.get(ev.screen)?.view.setCover(this.coverTiles(ev.screen));
     else if (ev.t === 'screenEntered') {

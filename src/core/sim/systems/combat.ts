@@ -10,6 +10,7 @@ import { EMPTY_FRAME } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { normalize, scale, sub } from '../../math/vec';
+import { dungeonOf } from '../../state/dungeons';
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
 import { enemyDef } from './movement';
@@ -47,11 +48,22 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
   return result;
 }
 
-/** Removes a dead enemy, announces it and rolls its drop. */
+/**
+ * Removes a dead enemy, announces it and rolls its drop. A boss takes its summons with it and is marked
+ * dead in its dungeon for good.
+ */
 export function killEnemy(rt: SimRt, e: Entity, def: EnemyDef): void {
   rt.actors = rt.actors.filter((a) => a !== e);
   rt.emit({ t: 'killed', id: e.id, def: e.def as EnemyId, x: e.pos.x, y: e.pos.y });
   rt.emit({ t: 'sfx', id: 'sfx_poof' });
+  if (def.boss !== undefined) {
+    for (const a of [...rt.actors])
+      if (a.kind === 'enemy' && mem(a, 'summoned') === 1) killEnemy(rt, a, enemyDef(rt, a));
+    const dungeon = rt.db.screens[rt.screen.id].dungeon;
+    if (dungeon !== undefined) dungeonOf(rt.state, dungeon).bossDead = true;
+    rt.emit({ t: 'shake', amount: 6 });
+    rt.emit({ t: 'bossDead' });
+  }
   if (mem(e, 'summoned') === 0 && e.mem['thing'] !== undefined) {
     const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
     if (thing?.k === 'enemy' && thing.onDeath !== undefined) applyAll(rt, thing.onDeath);
