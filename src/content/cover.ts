@@ -12,7 +12,7 @@ export const COVER_DEFS = {
   /** Winter snow over all open ground outdoors; the sword clears a path. */
   snow: { id: 'snow', seasons: ['winter'], slow: 0.7, grows: { on: GROUND }, cloak: true },
   /** Deep drifts, drawn on the map (`^`): no blade clears them; fire melts them (Eldr, M2b). */
-  drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false, cloak: true },
+  drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false, cloak: true, melts: true },
   /** Spring mud along the water on wet days; it cannot be cleared, only waited out. */
   mud: {
     id: 'mud',
@@ -23,7 +23,15 @@ export const COVER_DEFS = {
     cut: false,
   },
   /** Winter ice on open water: walkable, and fire melts it. */
-  ice: { id: 'ice', seasons: ['winter'], slow: 1, grows: { on: ['water'] }, cut: false, walk: true },
+  ice: {
+    id: 'ice',
+    seasons: ['winter'],
+    slow: 1,
+    grows: { on: ['water'] },
+    cut: false,
+    walk: true,
+    melts: true,
+  },
 } as const satisfies Record<CoverId, CoverDef>;
 
 /** Map characters that also grow cover. LEGEND maps the same characters to the terrain beneath. */

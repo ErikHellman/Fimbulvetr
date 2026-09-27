@@ -52,6 +52,8 @@ export const ENEMY_DEFS = {
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
     behaviour: 'draugr',
+    /** The dead burn: fire bites them twice as deep. */
+    weak: ['fire'],
     knockResist: 0.5,
     immortal: false,
     solid: false,

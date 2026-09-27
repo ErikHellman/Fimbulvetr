@@ -338,6 +338,10 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
     // Sending a sub-item off (the boomerang): wind up, let go.
     add('toss', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
     add('toss', side, 1, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'forward' }, SMALL));
+    // Singing a galdr: hands raised, then flung forward as the song leaves them.
+    add('cast', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
+    add('cast', side, 1, drawPose({ side, phase: 1, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
+    add('cast', side, 2, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'forward' }, SMALL));
     add(
       'charge',
       side,
@@ -396,6 +400,7 @@ export const HERO_ANIMS = {
   throw: { frames: 2, fps: 12, loop: false, dirs: ALL },
   push: { frames: 2, fps: 4, loop: true, dirs: ALL },
   toss: { frames: 2, fps: 12, loop: false, dirs: ALL },
+  cast: { frames: 3, fps: 10, loop: false, dirs: ALL },
   /** Spins through the four facings and falls; held on the last frame. */
   dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },
 } satisfies Record<string, AnimDef>;

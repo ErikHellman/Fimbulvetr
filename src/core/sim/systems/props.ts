@@ -30,6 +30,14 @@ function remove(rt: SimRt, e: Entity): void {
   if (rt.hero.mem['carrying'] === e.id) rt.hero.mem['carrying'] = 0;
 }
 
+/** Fire takes a burnable prop (brambles): it goes the way a broken one does. */
+export function burnProp(rt: SimRt, e: Entity): boolean {
+  if (propDef(rt, e).burns !== true) return false;
+  breakProp(rt, e);
+  rt.emit({ t: 'sfx', id: 'sfx_fire' });
+  return true;
+}
+
 /** Where loot lands around a broken prop, in px (up to eight pieces). */
 const LOOT_SPREAD: readonly { x: number; y: number }[] = [
   { x: -12, y: 0 },

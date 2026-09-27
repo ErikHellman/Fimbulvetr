@@ -34,6 +34,8 @@ export interface HeroTuning {
   readonly carryHeight: number;
   /** The throwing pose of a sub-item (the boomerang). */
   readonly tossTicks: number;
+  /** Singing a galdr: the hero stands still this long. */
+  readonly castTicks: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -58,6 +60,16 @@ export interface PushTuning {
   readonly ticks: number;
   /** Ticks a block takes to slide one tile. */
   readonly slideTicks: number;
+}
+
+/** The Eldr galdr's bolt of fire. */
+export interface EldrTuning {
+  /** px per tick. */
+  readonly speed: number;
+  /** px flown before it gutters out. */
+  readonly range: number;
+  /** Quarter hearts to a foe (halved in the rain). */
+  readonly damage: number;
 }
 
 /** Burning ground cover. */
@@ -88,6 +100,7 @@ export interface Tuning {
   /** Per-weapon swings; weapons not listed swing like `sword`. */
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
   readonly fire: FireTuning;
+  readonly eldr: EldrTuning;
   /** Share of each blow an armour takes off (rounded; a blow always deals at least 1). */
   readonly armor: Readonly<Record<ArmorId, { readonly reduce: number }>>;
   /** Typewriter speed, characters per second. */

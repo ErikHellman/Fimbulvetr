@@ -32,6 +32,8 @@ export interface CoverDef {
   readonly cloak?: boolean;
   /** Catches fire (Eldr, burning neighbours): it burns down to a cleared tile. */
   readonly burns?: boolean;
+  /** Fire melts it away (Eldr on drifts and ice). */
+  readonly melts?: boolean;
 }
 
 /** What derived cover needs to know about a screen. */

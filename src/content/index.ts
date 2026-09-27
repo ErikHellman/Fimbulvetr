@@ -19,6 +19,7 @@ import { raidNight } from './dialogue/util';
 import { WORLD_LAYOUT } from './world/layout';
 import { LEGEND } from './world/legend';
 import { SPAWN_TABLES } from './spawns';
+import { GALDR_DEFS } from './galdr';
 import { SCREENS } from './world/registry';
 
 export const DB: ContentDb = {
@@ -31,6 +32,7 @@ export const DB: ContentDb = {
   clock: CLOCK_RULES,
   flags: FLAGS,
   items: ITEM_DEFS,
+  galdr: GALDR_DEFS,
   quests: QUEST_DEFS,
   dialogue: DIALOGUE,
   scripts: SCRIPTS_DEFS,

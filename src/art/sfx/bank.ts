@@ -393,4 +393,24 @@ export const SFX_BANK = {
     release: 0.12,
     volume: 0.3,
   },
+  /** Eldr sung: a rising roar of flame. */
+  sfx_eldr: {
+    wave: 'noise',
+    freq: 600,
+    freqEnd: 2400,
+    attack: 0.02,
+    sustain: 0.18,
+    release: 0.2,
+    volume: 0.4,
+  },
+  /** A galdr without the seiðr for it: a dull puff. */
+  sfx_fizzle: {
+    wave: 'noise',
+    freq: 1200,
+    freqEnd: 300,
+    attack: 0,
+    sustain: 0.05,
+    release: 0.12,
+    volume: 0.25,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

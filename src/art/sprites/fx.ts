@@ -103,6 +103,22 @@ function windLeaf(i: number): Raster {
   return r;
 }
 
+/** Eldr's bolt: a ball of fire with a white-hot heart, flickering over three frames. */
+function eldr(i: number): Raster {
+  const r = createRaster(14, 14);
+  const flick = [0, 1, 0.5][i] ?? 0;
+  ellipse(r, 7, 7, 6 + flick * 0.5, 5.5 + flick * 0.5, hex(C.ember));
+  ellipse(r, 7, 7, 4.2, 4, hex(C.emberLight));
+  ellipse(r, 7 - flick, 6.5, 2, 2, [255, 250, 230, 255]);
+  for (const [x, y] of [
+    [1 + i, 3],
+    [12 - i, 10],
+    [3, 11 - i],
+  ] as const)
+    r.data.set(hex(C.emberLight), (y * 14 + x) * 4);
+  return r;
+}
+
 /**
  * The shape a light cuts out of the dark: a disc in three steps of strength, so the edge reads as pixel
  * art rather than a smooth gradient. White; only its alpha matters.
@@ -130,6 +146,7 @@ export function fxFrames(): SpriteFrame[] {
   out.push({ name: 'fx_rain_idle_s_0', raster: raindrop(), ox: 3, oy: 7 });
   out.push({ name: 'fx_light_idle_s_0', raster: light(), ox: 64, oy: 64 });
   out.push({ name: 'fx_drop_idle_s_0', raster: drop(), ox: 1, oy: 5 });
+  for (let i = 0; i < 3; i++) out.push({ name: `fx_eldr_fly_s_${i}`, raster: eldr(i), ox: 7, oy: 12 });
   out.push({ name: 'fx_snow_idle_s_0', raster: flake(false), ox: 1, oy: 1 });
   out.push({ name: 'fx_snow_idle_s_1', raster: flake(true), ox: 1, oy: 1 });
   for (let i = 0; i < 3; i++) out.push({ name: `fx_leaf_idle_s_${i}`, raster: windLeaf(i), ox: 2, oy: 1 });
@@ -142,6 +159,7 @@ export const FX_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>
   fx_rain: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_light: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_drop: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
+  fx_eldr: { fly: { frames: 3, fps: 14, loop: true, dirs: ['s'] } },
   fx_snow: { idle: { frames: 2, fps: 1, loop: true, dirs: ['s'] } },
   fx_leaf: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
 };

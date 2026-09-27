@@ -117,6 +117,8 @@ export const SFX = [
   'sfx_menu_ok',
   'sfx_save',
   'sfx_drink',
+  'sfx_eldr',
+  'sfx_fizzle',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -180,6 +182,7 @@ export const PROPS = [
   'root_block',
   'vines',
   'troll_stone',
+  'bramble',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 

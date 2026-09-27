@@ -24,6 +24,8 @@ export interface PropDef {
   readonly pushable?: boolean;
   /** What spills out when it breaks (a troll stone's hoard). */
   readonly loot?: readonly DropKind[];
+  /** Fire burns it away (brambles); the sword does not. */
+  readonly burns?: boolean;
 }
 
 export function createProp(id: number, def: PropDef, pos: Vec, thingIndex: number): Entity {

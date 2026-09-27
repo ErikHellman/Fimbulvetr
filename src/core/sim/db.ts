@@ -4,6 +4,7 @@ import type {
   CritterId,
   DialogueId,
   EnemyId,
+  GaldrId,
   ItemId,
   RegionId,
   NpcId,
@@ -21,7 +22,7 @@ import type { PropDef } from '../actors/prop';
 import type { Tuning } from '../actors/tuning';
 import type { ClockRules } from '../clock/rules';
 import type { WeatherKind } from '../clock/types';
-import type { ItemDef } from '../items/defs';
+import type { GaldrDef, ItemDef } from '../items/defs';
 import type { FlagSpec } from '../state/flags';
 import type { Cond } from '../story/cond';
 import type { DialogueDef } from '../story/dialogue';
@@ -44,6 +45,7 @@ export interface ContentDb {
   readonly clock: ClockRules;
   readonly flags: Readonly<Record<FlagId, FlagSpec>>;
   readonly items: Readonly<Record<ItemId, ItemDef>>;
+  readonly galdr: Readonly<Record<GaldrId, GaldrDef>>;
   readonly quests: Readonly<Partial<Record<QuestId, QuestDef>>>;
   readonly dialogue: Readonly<Partial<Record<DialogueId, DialogueDef>>>;
   readonly scripts: Readonly<Partial<Record<ScriptId, ScriptDef>>>;

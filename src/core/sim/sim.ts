@@ -43,6 +43,7 @@ import { scheduleNpcs, stepNpcs } from './systems/npcs';
 import { CONTINUE_HP, checkDeath, stepOver } from './systems/death';
 import { bumpLocks, fixtureHazards, refreshFixtures, swordSwitches } from './systems/fixtures';
 import { eat, equip, useItems } from './systems/items';
+import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
 import { stepProjectiles } from './systems/projectiles';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
@@ -317,6 +318,7 @@ export class Sim implements SimRt {
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);
     useItems(this, input);
+    castGaldr(this, input);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
     const ctx = actorCtx(this);
     runEnemies(this, ctx);

@@ -14,6 +14,7 @@ import { blowCover } from './cover';
 import { strikeSwitch } from './fixtures';
 import { heroCtx } from './hero';
 import { windOf } from './weather';
+import { stepEldr } from './eldr';
 import { enemyDef } from './movement';
 
 /** The boomerang's box around its ground point; it is drawn `FLY_Z` px up, at hand height. */
@@ -74,6 +75,7 @@ export function stepProjectiles(rt: SimRt): void {
   const wind = windOf(rt);
   for (const e of flying) {
     if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
+    else if (e.def === 'eldr') stepEldr(rt, e, wind);
   }
 }
 

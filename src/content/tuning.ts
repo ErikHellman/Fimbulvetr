@@ -26,6 +26,7 @@ export const TUNING: Tuning = {
     carrySpeed: 1.2,
     throwTicks: 10,
     tossTicks: 10,
+    castTicks: 14,
     carryHeight: 18,
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
@@ -87,6 +88,7 @@ export const TUNING: Tuning = {
     },
   },
   fire: { burnTicks: 90, spreadAt: 50, amount: 2, knock: 3, scorch: 30 },
+  eldr: { speed: 4, range: 176, damage: 4 },
   armor: {
     wool_tunic: { reduce: 0 },
     byrnie: { reduce: 0.25 },

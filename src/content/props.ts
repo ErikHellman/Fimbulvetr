@@ -100,4 +100,16 @@ export const PROP_DEFS = {
     throwDamage: 8,
     loot: ['silver', 'silver', 'silver', 'silver', 'silver', 'heart'],
   },
+  /** A thicket of thorns across a way: the blade only tangles in it; fire burns it off. */
+  bramble: {
+    id: 'bramble',
+    art: 'prop_bramble',
+    body: TILE_BOX,
+    hurt: TILE_BOX,
+    liftable: false,
+    fragile: false,
+    throwDamage: 0,
+    wall: true,
+    burns: true,
+  },
 } as const satisfies Record<PropId, PropDef>;
