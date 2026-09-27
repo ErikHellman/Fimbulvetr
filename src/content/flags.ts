@@ -20,6 +20,10 @@ export const FLAGS = {
   st_raid_begun: { t: 'bool' },
   /** The raid night is over: Embla and eight villagers are gone, Halvar is wounded. */
   st_raid_done: { t: 'bool' },
+  /** Halvar gave Ask his old seax and round shield. */
+  st_seax_given: { t: 'bool' },
+  /** Gyða told the legend of the Rime King; the gate north opens and the seasons turn again. */
+  st_legend_told: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

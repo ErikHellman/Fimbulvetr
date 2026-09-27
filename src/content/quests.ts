@@ -1,5 +1,5 @@
 import type { QuestDef } from '@core/story/quests';
-import { all, atLeast, choresDone, day, eve, flag, paid } from './dialogue/util';
+import { afterRaid, all, atLeast, choresDone, day, eve, flag, paid } from './dialogue/util';
 import type { QuestId } from './ids';
 
 const home = { en: 'Evening. Go home to the longhouse.', sv: 'Kväll. Gå hem till långhuset.' };
@@ -36,6 +36,40 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       {
         when: flag('st_raid_begun'),
         text: { en: 'A horn in the night. Something is wrong.', sv: 'Ett horn i natten. Något är fel.' },
+      },
+    ],
+  },
+  q_legend: {
+    id: 'q_legend',
+    name: { en: 'The raid', sv: 'Räden' },
+    stages: [
+      {
+        when: afterRaid,
+        text: { en: 'Halvar is asking for you.', sv: 'Halvar frågar efter dig.' },
+      },
+      {
+        when: flag('st_seax_given'),
+        text: { en: 'Go to the hof and hear what Gyða knows.', sv: 'Gå till hovet och hör vad Gyða vet.' },
+      },
+      {
+        when: flag('st_legend_told'),
+        text: {
+          en: 'Kolbeinn took Embla and eight villagers for the Rime King.',
+          sv: 'Kolbeinn tog Embla och åtta bybor åt Rimkungen.',
+        },
+      },
+    ],
+  },
+  q_runestone_1: {
+    id: 'q_runestone_1',
+    name: { en: 'The first runestone', sv: 'Den första runstenen' },
+    stages: [
+      {
+        when: flag('st_legend_told'),
+        text: {
+          en: 'Find Rótarhellir, the root cave in Myrkviðr, and light the first runestone again.',
+          sv: 'Hitta Rótarhellir, rotgrottan i Myrkviðr, och tänd den första runstenen igen.',
+        },
       },
     ],
   },

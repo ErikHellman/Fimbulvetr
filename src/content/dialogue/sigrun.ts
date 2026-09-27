@@ -1,10 +1,11 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { raid } from './util';
+import { afterRaid, raidNight } from './util';
 
 /** Sigrún the trader, across her counter. The shop opens after she has spoken. */
 export const SIGRUN: DialogueDef = {
   entry: [
-    { when: raid, node: 'raid' },
+    { when: raidNight, node: 'raid' },
+    { when: afterRaid, node: 'after' },
     { when: { k: 'item', id: 'lantern' }, node: 'regular' },
     { node: 'hello' },
   ],
@@ -20,6 +21,12 @@ export const SIGRUN: DialogueDef = {
       text: {
         en: 'A lantern would be wise. The nights are getting longer, whatever the calendar says.',
         sv: 'En lykta vore klokt. Nätterna blir längre, vad almanackan än säger.',
+      },
+    },
+    after: {
+      text: {
+        en: 'They took Bjarni. They took the children. I kept the shop open; I did not know what else to do.',
+        sv: 'De tog Bjarni. De tog barnen. Jag höll butiken öppen, jag visste inte vad annat jag skulle göra.',
       },
     },
     regular: {

@@ -4,7 +4,9 @@ import { NPCS } from '@content/ids';
 import { SOLID } from '@core/world/collision';
 import { placeOf } from '@core/sim/systems/npcs';
 import { Harness, frameOf } from './harness';
-import { crossTo, finishStory, walkTo } from './walk';
+import { crossTo, finishStory, talkTo, walkTo } from './walk';
+import { condCtx } from '@core/sim/systems/story';
+import { questLog } from '@core/story/quests';
 
 const solid = (h: Harness, x: number, y: number): boolean =>
   ((h.sim.screen.collision.flags[y * 40 + x] ?? 0) & SOLID) !== 0;
@@ -95,5 +97,37 @@ describe('the raid night', () => {
     expect(h.sim.screen.id).toBe('ask_farmyard');
     expect(h.sim.hero.pos).toEqual({ x: 9 * 16 + 8, y: 8 * 16 + 14 });
     expect(h.sim.state.flags.st_raid_done).toBeUndefined();
+  });
+});
+
+describe('the morning after', () => {
+  it('Halvar gives the seax and shield, Gyða tells the legend, and the gate north opens', () => {
+    const h = new Harness({ preset: DEV_PRESETS.morning });
+    talkTo(h, 'halvar');
+    expect(h.sim.state.inv).toMatchObject({ weapon: 'seax', shield: true });
+    expect(h.sim.state.flags.st_seax_given).toBe(true);
+    const log = () => questLog(h.sim.db.quests, condCtx(h.sim)).map((q) => [q.id, q.text.en]);
+    expect(log()).toContainEqual(['q_legend', 'Go to the hof and hear what Gyða knows.']);
+
+    h.sim.command({ t: 'warp', screen: 'ask_int_hof', x: 20 * 16 + 8, y: 14 * 16 + 14 });
+    h.idle(1);
+    talkTo(h, 'gyda');
+    expect(h.sim.state.flags.st_legend_told).toBe(true);
+    expect(h.sim.state.clock.policy).toBe('cycling');
+    expect(log().map(([id]) => id)).toContain('q_runestone_1');
+
+    h.sim.command({ t: 'warp', screen: 'ask_gate', x: 20 * 16 + 8, y: 8 * 16 + 14 });
+    h.idle(1);
+    expect(solid(h, 19, 3)).toBe(false);
+    expect(
+      h.sim.actors.filter((a) => a.kind === 'fixture' && a.def === 'gate').every((g) => g.anim === 'open'),
+    ).toBe(true);
+  });
+
+  it('keeps the gate barred before the legend', () => {
+    const h = new Harness({ preset: DEV_PRESETS.morning });
+    h.sim.command({ t: 'warp', screen: 'ask_gate', x: 20 * 16 + 8, y: 8 * 16 + 14 });
+    h.idle(1);
+    expect(solid(h, 19, 3)).toBe(true);
   });
 });
