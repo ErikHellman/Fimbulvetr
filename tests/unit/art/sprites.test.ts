@@ -68,11 +68,14 @@ describe('sprites', () => {
   it('keeps drawn pixels clear of the frame edge so outlines are never clipped', () => {
     const inkColor = hex(C.ink);
     for (const f of frames) {
-      const margin = f.name.startsWith('hero_')
-        ? 2
-        : f.name.startsWith('prop_dummy_') || f.name.startsWith('decor_') || f.name.startsWith('fx_fish_')
-          ? 1
-          : 0;
+      const margin =
+        f.name.startsWith('hero_') || f.name.startsWith('enemy_')
+          ? 2
+          : ['prop_dummy_', 'decor_', 'fx_fish_', 'fix_', 'fx_poof_', 'pickup_'].some((p) =>
+                f.name.startsWith(p),
+              )
+            ? 1
+            : 0;
       if (margin === 0) continue; // skip missing frame
       const r = f.raster;
       for (let y = 0; y < r.h; y++) {
@@ -96,6 +99,39 @@ describe('sprites', () => {
         }
       }
     }
+  });
+});
+
+describe('enemies', () => {
+  it('draw a telegraph that reads differently from standing still', () => {
+    for (const art of ['enemy_vargr', 'enemy_draugr', 'enemy_troll'])
+      for (const dir of ['s', 'w', 'n'])
+        expect(
+          rastersEqual(frame(`${art}_tell_${dir}_0`).raster, frame(`${art}_idle_${dir}_0`).raster),
+          art,
+        ).toBe(false);
+  });
+
+  it('draw every animation their behaviours use', () => {
+    const used: Readonly<Record<string, readonly string[]>> = {
+      enemy_vargr: ['idle', 'walk', 'tell', 'lunge', 'hurt'],
+      enemy_draugr: ['idle', 'walk', 'rise', 'tell', 'swing', 'hurt'],
+      enemy_troll: ['idle', 'walk', 'tell', 'smash'],
+      fix_fire: ['burn', 'out', 'closed', 'open'],
+      fix_palisade: ['closed', 'open'],
+      fix_logs: ['closed', 'open'],
+      pickup_heart: ['idle'],
+      pickup_silver: ['idle'],
+      fx_poof: ['idle'],
+    };
+    for (const [art, anims] of Object.entries(used))
+      for (const anim of anims) expect(ANIMS[art]?.[anim], `${art} ${anim}`).toBeDefined();
+  });
+
+  it('shows the draugr rising out of the ground', () => {
+    const buried = countOpaque(frame('enemy_draugr_rise_s_0').raster);
+    const up = countOpaque(frame('enemy_draugr_rise_s_3').raster);
+    expect(buried).toBeLessThan(up);
   });
 });
 

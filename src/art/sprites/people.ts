@@ -145,8 +145,18 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
   },
 };
 
-type Side = 's' | 'n' | 'w';
+export type Side = 's' | 'n' | 'w';
 const SIZE = 32;
+
+/** Extra pose options for people-shaped sprites (draugr, Kolbeinn's cutscene poses). */
+export interface PersonPose {
+  /** `up`: both arms raised above the head; `forward`: reaching out in front. */
+  readonly arms?: 'down' | 'up' | 'forward';
+  /** Rows sunk into the ground (rising from a grave); the sunk part is cut off. */
+  readonly sink?: number;
+  /** Eye colour instead of ink (the dead have pale, glowing eyes). */
+  readonly eyes?: string;
+}
 const INK = hex(C.ink);
 
 /** A darker shade of a colour for the cel shadow side. */
@@ -155,8 +165,9 @@ function shade(colour: string, f = 0.72): Rgba {
   return [Math.round(r * f), Math.round(g * f), Math.round(b * f), 255];
 }
 
-function drawPerson(look: Look, side: Side, phase: number): Raster {
+export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPose = {}): Raster {
   const r = createRaster(SIZE, SIZE);
+  const arms = pose.arms ?? 'down';
   const drop = look.child === true ? 5 : 0;
   const bob = phase === 1 || phase === 3 ? 1 : 0;
   const b = drop + bob;
@@ -195,7 +206,10 @@ function drawPerson(look: Look, side: Side, phase: number): Raster {
 
   // Torso and arms.
   const torsoH = look.child === true ? 7 : 9;
-  if (side === 'w') {
+  if (arms !== 'down') {
+    rect(r, side === 'w' ? 11 : 10, b + 15, side === 'w' ? 10 : 12, torsoH, top);
+    rect(r, side === 'w' ? 18 : 19, b + 15, 3, torsoH, topS);
+  } else if (side === 'w') {
     const swing = ARM_SWING_SIDE[phase] ?? 0;
     rect(r, 11, b + 15, 10, torsoH, top);
     rect(r, 18, b + 15, 3, torsoH, topS);
@@ -231,11 +245,12 @@ function drawPerson(look: Look, side: Side, phase: number): Raster {
     if (cap) return dx > 3 ? capS : capH;
     return dx > 2.5 ? skinS : skin;
   });
+  const eye = pose.eyes === undefined ? INK : hex(pose.eyes);
   if (side === 's') {
-    rect(r, 13, b + 9, 1, 2, INK);
-    rect(r, 18, b + 9, 1, 2, INK);
+    rect(r, 13, b + 9, 1, 2, eye);
+    rect(r, 18, b + 9, 1, 2, eye);
   }
-  if (side === 'w') rect(r, 11, b + 9, 1, 2, INK);
+  if (side === 'w') rect(r, 11, b + 9, 1, 2, eye);
   if (look.beard !== undefined && side !== 'n') {
     const beard = hex(look.beard);
     if (side === 's') rect(r, 12, b + 12, 8, 4, beard);
@@ -251,6 +266,41 @@ function drawPerson(look: Look, side: Side, phase: number): Raster {
   if (look.hairStyle === 'braid') {
     if (side === 'n') rect(r, 15, b + 12, 2, 9, hair);
     else if (side === 'w') rect(r, 19, b + 12, 2, 7, hairS);
+  }
+  if (arms === 'up') {
+    // Both arms raised over the head, hands at the top.
+    if (side === 'w') {
+      rect(r, 13, b + 4, 3, 12, topS);
+      rect(r, 13, b + 2, 3, 2, skin);
+    } else {
+      rect(r, 8, b + 4, 2, 12, top);
+      rect(r, 22, b + 4, 2, 12, topS);
+      rect(r, 8, b + 2, 2, 2, skin);
+      rect(r, 22, b + 2, 2, 2, skinS);
+    }
+  } else if (arms === 'forward') {
+    // Reaching out: toward the viewer (hands low and wide), or ahead to the west.
+    if (side === 'w') {
+      rect(r, 6, b + 17, 9, 3, topS);
+      rect(r, 4, b + 17, 2, 3, skin);
+    } else if (side === 's') {
+      rect(r, 7, b + 18, 3, 8, top);
+      rect(r, 22, b + 18, 3, 8, topS);
+      rect(r, 7, b + 26, 3, 2, skin);
+      rect(r, 22, b + 26, 3, 2, skinS);
+    }
+  }
+  const sink = pose.sink ?? 0;
+  if (sink > 0) {
+    // Shift the figure down into the ground and cut off what is below it.
+    const sunk = createRaster(SIZE, SIZE);
+    for (let y = 0; y + sink < 30; y++)
+      for (let x = 0; x < SIZE; x++) {
+        const i = (y * SIZE + x) * 4;
+        const j = ((y + sink) * SIZE + x) * 4;
+        for (let k = 0; k < 4; k++) sunk.data[j + k] = r.data[i + k] ?? 0;
+      }
+    return outline(sunk, INK, 2);
   }
   return outline(r, INK, 2);
 }
