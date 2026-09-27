@@ -46,6 +46,7 @@ function bridge(): { b: DevBridge; h: Harness } {
     jumpFish: () => undefined,
     tileAt: () => -1,
     menu: () => null,
+    picker: () => null,
     restart: () => undefined,
   };
   return { b, h };
@@ -157,6 +158,7 @@ describe('dev console commands', () => {
       jumpFish: () => undefined,
       tileAt: () => -1,
       menu: () => null,
+      picker: () => null,
       restart: (state) => {
         restarted.push(state);
       },

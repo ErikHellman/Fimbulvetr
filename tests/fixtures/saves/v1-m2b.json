@@ -1,0 +1,177 @@
+{
+  "format": "fimbulvetr",
+  "v": 1,
+  "build": "fixture",
+  "savedAt": "2026-09-27T12:00:00.000Z",
+  "state": {
+    "seed": 5,
+    "rng": {
+      "s": 3719496528
+    },
+    "flags": {
+      "st_farm_day": 3,
+      "st_intro_seen": true,
+      "q_sheep_d1": true,
+      "q_water_d1": true,
+      "q_paid_d1": true,
+      "ev_embla_d1": true,
+      "q_logs": 5,
+      "q_paid_d2": true,
+      "ev_embla_d2": true,
+      "q_ravens": 5,
+      "q_paid_d3": true,
+      "ev_embla_d3": true,
+      "st_raid_begun": true,
+      "st_raid_done": true,
+      "st_seax_given": true,
+      "st_legend_told": true,
+      "n_onundr_met": true,
+      "st_d1_entered": true,
+      "st_d1_boss_dead": true,
+      "st_stone1_lit": true,
+      "st_road_open": true,
+      "st_uppvik_reached": true,
+      "n_thordis_met": true,
+      "w_horn_thordis": true,
+      "n_hrafnkell_met": true,
+      "n_solvi_met": true,
+      "q_eldr_asked": true,
+      "n_skeggi_met": true,
+      "st_eldr_learned": true
+    },
+    "hero": {
+      "screen": "myr_north",
+      "x": 138.72007481288296,
+      "y": 175.1449033227159,
+      "facing": "s",
+      "hp": 11,
+      "maxHp": 16,
+      "seidr": 8,
+      "maxSeidr": 10,
+      "silver": 10,
+      "purse": 0
+    },
+    "inv": {
+      "items": {
+        "lantern": 1,
+        "boomerang": 1,
+        "horn": 1,
+        "mead_red": 1
+      },
+      "slots": ["lantern", "boomerang"],
+      "galdr": ["eldr"],
+      "weapon": "seax",
+      "armor": "wool_tunic",
+      "ring": null,
+      "shield": true
+    },
+    "clock": {
+      "minute": 752,
+      "sub": 10,
+      "day": 1,
+      "season": "autumn",
+      "seasonDay": 0,
+      "epoch": 1,
+      "policy": "cycling"
+    },
+    "world": {
+      "opened": ["d1_hc"],
+      "pieces": ["hp_d1_r09"],
+      "warps": [],
+      "visited": [
+        "ask_int_longhouse",
+        "myr_clearing",
+        "myr_road",
+        "myr_deep",
+        "myr_north",
+        "upp_gate",
+        "upp_square",
+        "upp_hall",
+        "upp_int_meadhall",
+        "upp_int_trader",
+        "upp_smiths",
+        "upp_int_runehall",
+        "myr_roots",
+        "myr_pines",
+        "myr_charcoal"
+      ],
+      "cover": {
+        "myr_north": {
+          "epoch": 1,
+          "cleared": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002"
+        }
+      },
+      "vars": {
+        "ask_pen": 31
+      }
+    },
+    "dungeons": {
+      "d1": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": true,
+        "doors": []
+      },
+      "d2": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d3": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d4": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d5": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d6": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d7": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d8": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      }
+    },
+    "playTicks": 10305
+  },
+  "sum": "b327cc63"
+}

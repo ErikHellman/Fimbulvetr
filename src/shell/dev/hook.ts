@@ -58,6 +58,8 @@ export interface FimbulHook {
   flags(): Readonly<Record<string, boolean | number>>;
   silver(): number;
   items(): Readonly<Record<string, number>>;
+  /** What Ask wields and knows: weapon, armour, galdr and the seiðr bar. */
+  gear(): { weapon: string; armor: string; galdr: string[]; seidr: number; maxSeidr: number };
   actors(): { kind: string; def: string; x: number; y: number; fsm: string }[];
   /** Every screen id, for smoke tests. */
   screens(): string[];
@@ -65,6 +67,8 @@ export interface FimbulHook {
   setHp(hp: number): void;
   /** The open pause menu's page and cursor, or null in play. */
   menu(): { tab: string; cursor: number; confirm: boolean } | null;
+  /** The save-slot picker (armed once it takes input), or null when none is open. */
+  picker(): { cursor: number; phase: string; armed: boolean } | null;
   /** What sits in item slots K and L. */
   slots(): (string | null)[];
   /** The boss bar: its name in English, health and phase; null when no boss is on screen. */
@@ -113,6 +117,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     },
     enemies: () => bridge().sim.enemies.map((e) => ({ def: e.def, hp: e.hp, flash: e.flash })),
     menu: () => bridge().menu(),
+    picker: () => bridge().picker(),
     slots: () => [...bridge().sim.state.inv.slots],
     boss: () => {
       const b = bridge().sim.boss();
@@ -203,6 +208,16 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     flags: () => ({ ...bridge().sim.state.flags }),
     silver: () => bridge().sim.state.hero.silver,
     items: () => ({ ...bridge().sim.state.inv.items }),
+    gear: () => {
+      const { inv, hero } = bridge().sim.state;
+      return {
+        weapon: inv.weapon,
+        armor: inv.armor,
+        galdr: [...inv.galdr],
+        seidr: hero.seidr,
+        maxSeidr: hero.maxSeidr,
+      };
+    },
     screens: () => [...SCREEN_IDS],
     actors: () =>
       bridge().sim.actors.map((a) => ({ kind: a.kind, def: a.def, x: a.pos.x, y: a.pos.y, fsm: a.fsm.s })),

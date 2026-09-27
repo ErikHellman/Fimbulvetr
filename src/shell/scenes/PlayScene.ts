@@ -37,7 +37,7 @@ import { bindingsOf, keyLabel } from '@shell/input/remap';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary } from '@shell/platform/saveStore';
-import { openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
+import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { FireView } from '@shell/view/fireView';
 import { ScreenView } from '@shell/view/screenView';
 
@@ -234,6 +234,14 @@ export class PlayScene extends Phaser.Scene {
         this.scene.restart({ ...this.services, state });
       },
       menu: () => (this.menu === null ? null : { ...this.menu }),
+      picker: () =>
+        this.picker === null
+          ? null
+          : {
+              cursor: this.picker.cursor,
+              phase: this.picker.phase,
+              armed: this.picker.phase !== 'pick' || this.picker.t >= ARM_FRAMES,
+            },
     };
   }
 

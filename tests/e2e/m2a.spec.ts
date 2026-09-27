@@ -25,6 +25,9 @@ const tap = async (page: Page, key: string): Promise<void> => {
 
 const story = (page: Page) => page.evaluate(() => window.__fimbul?.story()?.k ?? null);
 const mode = (page: Page) => page.evaluate(() => window.__fimbul?.mode());
+/** Waits until the save-slot picker takes input (it ignores the first frames after opening). */
+const armed = (page: Page) =>
+  page.waitForFunction(() => window.__fimbul?.picker()?.armed === true, undefined, { timeout: 5_000 });
 
 test('the title screen starts a new game in the longhouse', async ({ page }) => {
   const errors = collectErrors(page);
@@ -85,10 +88,11 @@ test('praying at the hof saves to a slot that the title screen loads', async ({ 
   await tap(page, 'KeyE');
   for (let i = 0; i < 40 && (await story(page)) !== 'save'; i++) await tap(page, 'Enter');
   expect(await story(page)).toBe('save');
-  await page.waitForTimeout(250);
+  await armed(page);
   await tap(page, 'ArrowDown');
+  await expect.poll(async () => (await page.evaluate(() => window.__fimbul?.picker()))?.cursor).toBe(1);
   await tap(page, 'Enter');
-  await page.waitForTimeout(400);
+  await expect.poll(async () => (await page.evaluate(() => window.__fimbul?.picker()))?.phase).toBe('done');
   await tap(page, 'Enter');
   for (let i = 0; i < 20 && (await mode(page)) !== 'play'; i++) await tap(page, 'Enter');
   expect(await mode(page)).toBe('play');

@@ -49,6 +49,8 @@ export interface DevBridge {
   restart(state: GameState): void;
   /** The open pause menu's page and cursor, or null in play. */
   menu(): { readonly tab: string; readonly cursor: number; readonly confirm: boolean } | null;
+  /** The save-slot picker, or null when none is open. */
+  picker(): { readonly cursor: number; readonly phase: string; readonly armed: boolean } | null;
 }
 
 export interface DevTools {
