@@ -289,7 +289,8 @@ export function storyUi(rt: SimRt): StoryUi {
       cursor: 0,
     };
   }
-  if (step.k === 'save') return { k: 'save' };
+  // Once answered, the picker is gone even before the step ends on the next tick.
+  if (step.k === 'save') return run.saved === true ? null : { k: 'save' };
   if (step.k === 'shop' && run.shop !== null) {
     const shop = rt.db.shops[step.id];
     if (shop === undefined) return null;

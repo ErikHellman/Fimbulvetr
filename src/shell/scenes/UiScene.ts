@@ -19,6 +19,9 @@ import type { FrameIndex } from '@shell/gfx/frameIndex';
 import type { Settings } from '@shell/platform/settings';
 import type { SettingsMenuState } from '@shell/ui/settingsMenu';
 import { settingsLines } from '@shell/ui/settingsText';
+import type { SaveSummary } from '@shell/platform/saveStore';
+import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
+import { slotName, summaryLine } from '@shell/ui/slotText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -34,6 +37,12 @@ export interface UiLink {
     readonly items: readonly MenuItem[];
     /** The settings menu, when it is open over the game tab. */
     readonly settings: { readonly state: SettingsMenuState; readonly values: Settings } | null;
+  } | null;
+  /** The save-slot picker a hof or mead hall opened, with the slots' summaries; null when closed. */
+  readonly picker: () => {
+    readonly state: PickerState;
+    readonly slots: Readonly<Record<'s1' | 's2' | 's3', SaveSummary | null>>;
+    readonly result: 'saved' | 'failed' | null;
   } | null;
 }
 
@@ -449,6 +458,7 @@ export class UiScene extends Phaser.Scene {
     }
     if (ui.k === 'save') {
       this.lastShown = '';
+      this.drawPicker(lang);
       return;
     }
     const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
@@ -496,6 +506,32 @@ export class UiScene extends Phaser.Scene {
     const w = 300;
     const h = lines.length * LINE_HEIGHT + 14;
     const x = (GAME_W - w) / 2;
+    const y = 40;
+    this.panel(x, y, w, h);
+    this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
+  }
+
+  /** The slots a hof or mead hall offers, with what each holds now. */
+  private drawPicker(lang: Lang): void {
+    const view = this.link.picker();
+    if (view === null) return;
+    const { state } = view;
+    const rows = PICK_ROWS.map((r, i) => {
+      const mark = i === state.cursor ? '>' : ' ';
+      if (r === 'leave') return `${mark} ${t(UI.shop_leave, lang)}`;
+      return `${mark} ${slotName(r, lang)}: ${summaryLine(view.slots[r], this.link.sim.db, lang)}`;
+    });
+    const slot = PICK_ROWS[state.cursor] ?? 's1';
+    const note =
+      state.phase !== 'done'
+        ? t(UI.slot_pick_hint, lang)
+        : view.result === 'saved'
+          ? t(UI.slot_saved, lang, { detail: slot.slice(1) })
+          : t(UI.slot_failed, lang);
+    const lines = [t(UI.slot_pick, lang), '', ...rows, '', note];
+    const w = Math.max(...lines.map((l) => textWidth(l))) + 28;
+    const h = lines.length * LINE_HEIGHT + 14;
+    const x = Math.round((GAME_W - w) / 2);
     const y = 40;
     this.panel(x, y, w, h);
     this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));

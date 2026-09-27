@@ -4,6 +4,7 @@ import type { ScriptId } from '../ids';
 import { PROLOGUE_SCRIPTS } from './prologue';
 import { D1_SCRIPTS } from './d1';
 import { RAID_SCRIPTS } from './raid';
+import { HOF_SCRIPTS } from './hofs';
 
 /** Cutscenes and interaction scripts by id. */
 export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
@@ -11,4 +12,5 @@ export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ...PROLOGUE_SCRIPTS,
   ...RAID_SCRIPTS,
   ...D1_SCRIPTS,
+  ...HOF_SCRIPTS,
 };

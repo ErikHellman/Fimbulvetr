@@ -36,6 +36,8 @@ import { WeatherView } from '@shell/view/weatherView';
 import { bindingsOf } from '@shell/input/remap';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
+import type { SaveSummary } from '@shell/platform/saveStore';
+import { openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -72,6 +74,10 @@ export class PlayScene extends Phaser.Scene {
   private menu: MenuState | null = null;
   /** The settings menu, open over the pause menu's game tab. */
   private settingsMenu: SettingsMenuState | null = null;
+  /** The save-slot picker, while the sim's `save` step waits. */
+  private picker: PickerState | null = null;
+  private pickerSlots: Record<'s1' | 's2' | 's3', SaveSummary | null> = { s1: null, s2: null, s3: null };
+  private pickerResult: 'saved' | 'failed' | null = null;
   /** Keys held last frame, to find the one freshly pressed (for rebinding). */
   private lastCodes: ReadonlySet<string> = new Set();
   private tileAnims: readonly TileAnim[] = [];
@@ -86,6 +92,7 @@ export class PlayScene extends Phaser.Scene {
     this.gradeKey = '';
     this.menu = null;
     this.settingsMenu = null;
+    this.picker = null;
     this.screens.clear();
     this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay, rolled: data.rolled });
     if (data.weather !== undefined) this.sim.weatherOverride = data.weather;
@@ -140,6 +147,10 @@ export class PlayScene extends Phaser.Scene {
       sfx: (id) => {
         this.audio.play(id);
       },
+      picker: () =>
+        this.picker === null
+          ? null
+          : { state: this.picker, slots: this.pickerSlots, result: this.pickerResult },
       menu: () =>
         this.menu === null
           ? null
@@ -163,6 +174,13 @@ export class PlayScene extends Phaser.Scene {
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
     this.mapper.sample(codes, readPad(connectedPads(navigator)));
+    if (this.picker === null && this.sim.storyUi()?.k === 'save') this.openPicker();
+    if (this.picker !== null) {
+      this.updatePicker(this.latch.consume());
+      this.acc.acc = 0;
+      this.draw(0);
+      return;
+    }
     if (this.menu !== null) {
       if (this.settingsMenu !== null) this.updateSettings(this.latch.consume(), fresh);
       else this.updateMenu(this.latch.consume());
@@ -267,6 +285,37 @@ export class PlayScene extends Phaser.Scene {
     if (r.state !== menu && r.state !== null && (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab))
       this.audio.play('sfx_talk');
     this.setMenu(r.state);
+  }
+
+  private openPicker(): void {
+    this.picker = openPicker();
+    this.pickerResult = null;
+    void this.services.saves.slots().then((s) => {
+      this.pickerSlots = { s1: s.s1, s2: s.s2, s3: s.s3 };
+    });
+  }
+
+  /** A frame of the save-slot picker; writing goes to IndexedDB, then the sim carries on (`saved`). */
+  private updatePicker(frame: InputFrame): void {
+    const picker = this.picker;
+    if (picker === null) return;
+    const r = stepPicker(picker, frame);
+    this.picker = r.state;
+    if (r.moved) this.audio.play('sfx_menu_move');
+    if (r.action?.k === 'close') {
+      this.picker = null;
+      this.sim.command({ t: 'saved' });
+      this.sim.flushCommands();
+    } else if (r.action?.k === 'write') {
+      const slot = r.action.slot;
+      void this.services.saves.writeSlot(slot, this.sim.snapshot()).then(async (ok) => {
+        this.pickerResult = ok ? 'saved' : 'failed';
+        if (ok) this.audio.play('sfx_save');
+        const s = await this.services.saves.slots();
+        this.pickerSlots = { s1: s.s1, s2: s.s2, s3: s.s3 };
+        if (this.picker !== null) this.picker = pickerDone(this.picker);
+      });
+    }
   }
 
   /** A frame of the settings menu: changes are stored and applied at once. */

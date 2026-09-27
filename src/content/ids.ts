@@ -164,6 +164,7 @@ export const SCRIPTS = [
   'raid_gate',
   'd1_enter',
   'stone1_light',
+  'hof_pray',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

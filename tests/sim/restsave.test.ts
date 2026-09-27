@@ -3,7 +3,8 @@ import { DB } from '@content/index';
 import type { ContentDb } from '@core/sim/db';
 import { makeSave, loadSave } from '@core/state/save';
 import { Sim } from '@core/sim/sim';
-import { Harness } from './harness';
+import { DEV_PRESETS } from '@content/dev/presets';
+import { Harness, frameOf } from './harness';
 
 /** test_a with an altar (a `use` at 20,8) whose script heals, offers the slots, then speaks. */
 function hofDb(): ContentDb {
@@ -43,6 +44,9 @@ describe('the save step', () => {
     expect(h.sim.storyUi()).toEqual({ k: 'save' });
     expect(h.sim.state.hero.hp).toBe(h.sim.state.hero.maxHp);
     h.sim.command({ t: 'saved' });
+    // Answered: the picker is gone at once, before the step ends.
+    h.sim.flushCommands();
+    expect(h.sim.storyUi()).toBeNull();
     h.idle(1);
     expect(h.sim.storyUi()?.k).toBe('text');
   });
@@ -65,5 +69,19 @@ describe('the save step', () => {
     expect(again.mode).toBe('play');
     expect(again.screen.id).toBe('test_a');
     expect(again.state.hero.hp).toBe(again.state.hero.maxHp);
+  });
+});
+
+describe("Gyða's hof", () => {
+  it('heals Ask at the rune-stone and offers the save slots', () => {
+    const h = new Harness({ preset: DEV_PRESETS.day2, screen: 'ask_int_hof', tile: [20, 9], facing: 'n' });
+    h.sim.hero.hp = 3;
+    h.press(['interact']);
+    for (let i = 0; i < 300 && h.sim.storyUi()?.k !== 'save'; i++) h.step(frameOf([], ['confirm'])).idle(2);
+    expect(h.sim.storyUi()).toEqual({ k: 'save' });
+    expect(h.sim.hero.hp).toBe(h.sim.hero.maxHp);
+    h.sim.command({ t: 'saved' });
+    for (let i = 0; i < 300 && h.sim.mode !== 'play'; i++) h.step(frameOf([], ['confirm'])).idle(2);
+    expect(h.sim.mode).toBe('play');
   });
 });
