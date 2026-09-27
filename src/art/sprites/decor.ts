@@ -168,6 +168,29 @@ function menhir(): Raster {
   return r;
 }
 
+/** The first runestone: a tall grey slab cut with a serpent band and runes that glow once it is lit. */
+function runestone(): Raster {
+  const r = createRaster(18, 34);
+  rect(r, 3, 3, 12, 29, P.rock);
+  rect(r, 11, 3, 4, 29, P.rockShade);
+  rect(r, 4, 2, 10, 1, P.rock);
+  rect(r, 5, 1, 7, 1, P.rockLight);
+  for (const [x, y] of [
+    [3, 3],
+    [14, 3],
+  ] as const)
+    setPixel(r, x, y, TRANSPARENT);
+  // The serpent band: a ring of ink down both sides, closing over the top.
+  rect(r, 5, 6, 1, 22, INK);
+  rect(r, 12, 6, 1, 22, INK);
+  rect(r, 6, 5, 6, 1, INK);
+  for (let y = 9; y < 26; y += 4) {
+    rect(r, 8, y, 1, 3, P.rune);
+    rect(r, 7, y + 1, 3, 1, P.rune);
+  }
+  return r;
+}
+
 /** An old pine of Myrkviðr: taller, darker and ragged, four tiers. */
 function oldPine(): Raster {
   const r = createRaster(28, 54);
@@ -234,6 +257,7 @@ export function decorFrames(): SpriteFrame[] {
     frame('decor_pine_old_idle_s_0', oldPine()),
     frame('decor_log_idle_s_0', fallenLog()),
     frame('decor_kiln_idle_s_0', kiln()),
+    frame('decor_runestone_idle_s_0', runestone()),
   ];
   for (let f = 0; f < 4; f++) {
     out.push(frame(`decor_well_idle_s_${f}`, well(f)));
@@ -255,6 +279,7 @@ export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
   decor_pine_old: STILL,
   decor_log: STILL,
   decor_kiln: STILL,
+  decor_runestone: STILL,
   decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },

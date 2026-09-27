@@ -32,6 +32,12 @@ export const TERRAIN_IDS = [
   'log',
   'mound',
   'kiln',
+  'cave_floor',
+  'cave_wall',
+  'sap',
+  'roots',
+  'runestone',
+  'cave_mouth',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -84,4 +90,16 @@ export const TERRAIN = {
   mound: { solid: false },
   /** A charcoal-burner's earth kiln; the shell smokes its vent. */
   kiln: { solid: true, decor: { art: ['decor_kiln'], w: 3, h: 2 } },
+  /** Rótarhellir's packed-earth floor. */
+  cave_floor: { solid: false },
+  /** Rock walls of the cave. */
+  cave_wall: { solid: true },
+  /** A pool of sticky sap: no footing, but the boomerang flies over it. */
+  sap: { solid: true, low: true },
+  /** Yggdrasil's own roots, too thick to cut: a wall. */
+  roots: { solid: true },
+  /** The first of the eight runestones. */
+  runestone: { solid: true, decor: { art: ['decor_runestone'], w: 1, h: 1 } },
+  /** A dark opening in the rock; a door thing leads through it. */
+  cave_mouth: { solid: false },
 } as const satisfies Record<TerrainId, TerrainDef>;
