@@ -6,6 +6,7 @@ import { LEGEND } from '@content/world/legend';
 import { SCREENS } from '@content/world/registry';
 import { SCREEN_IDS, type ScreenId } from '@content/world/screens';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
+import { decorPlacements } from '@core/world/decor';
 import { indexLayout, neighbourOf } from '@core/world/screen';
 import { cellAt, parseTextMap, type TerrainGrid } from '@core/world/textmap';
 
@@ -96,6 +97,12 @@ describe('buildings', () => {
         `${id} jetty at ${x},${y}`,
       ).toBe(true);
     }
+  });
+});
+
+describe('decor', () => {
+  it.each(SCREEN_IDS)('%s draws every object on a complete footprint', (id) => {
+    expect(() => decorPlacements(parseTextMap(SCREENS[id].map, LEGEND), TERRAIN)).not.toThrow();
   });
 });
 

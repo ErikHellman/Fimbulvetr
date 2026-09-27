@@ -78,9 +78,9 @@ describe('decorArt', () => {
     const seen = new Set<string>();
     for (let x = 0; x < 40; x++) {
       const p = { terrain: 'tree' as const, x, y: 0, w: 1, h: 1 };
-      const art = decorArt(p, def, 7);
+      const art = decorArt(p, TERRAIN, 7);
       expect(def.art).toContain(art);
-      expect(decorArt(p, def, 7)).toBe(art);
+      expect(decorArt(p, TERRAIN, 7)).toBe(art);
       seen.add(art);
     }
     expect(seen.size).toBe(def.art.length);

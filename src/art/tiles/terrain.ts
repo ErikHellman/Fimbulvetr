@@ -67,26 +67,16 @@ function roof(p: Painter, mask: number): void {
         p.px(x, y, C.leafShade);
 }
 
-function tree(p: Painter, variant: number): void {
+/** The ground under a decor sprite: grass with a denser shade speckle as its shadow. */
+function groundBase(p: Painter): void {
   grass(p);
-  p.rect(7, 12, 2, 4, C.trunk);
-  const cx = 7.5;
-  const cy = 6.5;
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      const dx = x + 0.5 - cx;
-      const dy = y + 0.5 - cy;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      if (d > 7) continue;
-      if (d > 6) p.px(x, y, C.ink);
-      else if (dx + dy > 2) p.px(x, y, C.leafShade);
-      else p.px(x, y, C.leaf);
-    }
-  }
-  const hx = 5 + variant;
-  p.px(hx, 4, C.leafLight);
-  p.px(hx + 1, 4, C.leafLight);
-  p.px(hx, 5, C.leafLight);
+  p.speckle(C.grassShade, 0.22);
+}
+
+/** The floor under indoor decor. */
+function floorBase(p: Painter): void {
+  floor(p);
+  p.speckle(C.floorShade, 0.22);
 }
 
 /** Grass on top, a short earth bank below: reads as "you can drop down here". */
@@ -96,22 +86,6 @@ function ledge(p: Painter): void {
   p.rect(0, 11, 16, 5, C.dirtShade);
   p.speckle(C.grassShade, 0.02);
   for (let x = 1; x < 16; x += 4) p.px(x, 13, C.dirt);
-}
-
-function disc(
-  p: Painter,
-  cx: number,
-  cy: number,
-  rad: number,
-  colour: (dx: number, dy: number) => string,
-): void {
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      const dx = x + 0.5 - cx;
-      const dy = y + 0.5 - cy;
-      if (dx * dx + dy * dy <= rad * rad) p.px(x, y, colour(dx, dy));
-    }
-  }
 }
 
 function planks(p: Painter, fill: string, line: string, vertical: boolean): void {
@@ -125,11 +99,6 @@ function planks(p: Painter, fill: string, line: string, vertical: boolean): void
 
 function floor(p: Painter): void {
   planks(p, C.floor, C.floorShade, false);
-}
-
-function furniture(p: Painter, draw: () => void): void {
-  floor(p);
-  draw();
 }
 
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
@@ -170,9 +139,9 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   },
   tree: {
     autotile: false,
-    variants: 2,
-    paint: (p, v) => {
-      tree(p, v.variant);
+    variants: 1,
+    paint: (p) => {
+      groundBase(p);
     },
   },
   ledge: {
@@ -286,80 +255,49 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      disc(p, 8, 8, 7.5, (dx, dy) => (dx * dx + dy * dy > 49 ? C.ink : dx + dy > 3 ? C.rockShade : C.rock));
-      disc(p, 8, 8, 4, () => C.ink);
-      disc(p, 8, 8, 3, (dx) => (dx > 1 ? C.waterShade : C.water));
+      groundBase(p);
     },
   },
   trough: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      p.rect(0, 4, 16, 9, C.ink);
-      p.rect(1, 5, 14, 7, C.wood);
-      p.rect(2, 6, 12, 3, C.water);
-      p.rect(1, 10, 14, 2, C.woodShade);
+      groundBase(p);
     },
   },
   stump: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      disc(p, 8, 9, 6.5, (dx, dy) => (dx * dx + dy * dy > 36 ? C.ink : dy > 2 ? C.woodShade : C.straw));
-      disc(p, 8, 8, 2, () => C.strawShade);
+      groundBase(p);
     },
   },
   bed: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      furniture(p, () => {
-        p.rect(1, 1, 14, 15, C.ink);
-        p.rect(2, 2, 12, 13, C.straw);
-        p.rect(3, 3, 10, 3, C.sack);
-        p.rect(2, 7, 12, 8, C.blanket);
-        p.rect(2, 13, 12, 2, C.blanketShade);
-      });
+      floorBase(p);
     },
   },
   hearth: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      furniture(p, () => {
-        disc(p, 8, 8, 7.5, (dx, dy) => (dx * dx + dy * dy > 42 ? C.rockShade : C.rock));
-        disc(p, 8, 8, 4.5, () => C.ink);
-        disc(p, 8, 9, 3, (dx, dy) => (dy < -1 ? C.emberLight : C.ember));
-      });
+      floorBase(p);
     },
   },
   table: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      furniture(p, () => {
-        p.rect(1, 3, 14, 11, C.ink);
-        p.rect(2, 4, 12, 8, C.wood);
-        p.rect(2, 12, 12, 1, C.woodShade);
-        p.rect(4, 6, 3, 2, C.clay);
-        p.rect(9, 7, 2, 2, C.straw);
-      });
+      floorBase(p);
     },
   },
   menhir: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      grass(p);
-      p.rect(4, 0, 8, 16, C.ink);
-      p.rect(5, 1, 6, 14, C.rock);
-      p.rect(9, 1, 2, 14, C.rockShade);
-      p.rect(6, 4, 1, 3, C.ink);
-      p.rect(7, 5, 2, 1, C.ink);
-      p.rect(7, 9, 1, 4, C.ink);
+      groundBase(p);
     },
   },
   door_shut: {

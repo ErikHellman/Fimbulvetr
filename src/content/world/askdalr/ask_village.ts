@@ -10,6 +10,8 @@ export const askVillage: ScreenDef = {
     {
       k: 'sign',
       at: { x: 14, y: 12 },
+      w: 2,
+      h: 2,
       text: {
         en: 'The village well. Someone has carved a sheep on it.',
         sv: 'Byns brunn. Någon har ristat ett får i den.',
@@ -29,8 +31,8 @@ export const askVillage: ScreenDef = {
     ',;;;;;;;;;;;;;;;;;,,,,;;;;;;;;;;;;;;;;;,',
     ',;;;;;;;;;;;;;;;;;,,,,;;;;;;;;;;;;;;;;;,',
     ',;;;;;;;;;;;;;;;;;,,,,;;;;;;;;;;;;;;;;;,',
-    ',;;;;;;;;;;;;;O;;;,,,,;;;;;;;;;;;;;;;;;,',
-    'T.;;;;;;;;;;;;;;;;,,,,;;;;;;;;;;;;;;;;.T',
+    ',;;;;;;;;;;;;;OO;;,,,,;;;;;;;;;;;;;;;;;,',
+    'T.;;;;;;;;;;;;OO;;,,,,;;;;;;;;;;;;;;;;.T',
     'T.................,,,,.................T',
     'T...RRRRRRRR......,,,,.....RRRRRRRRR...T',
     'T...RRCRRRRR......,,,,.....RRRRRRCRR...T',

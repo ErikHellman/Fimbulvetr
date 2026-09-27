@@ -3,6 +3,7 @@ import { grade } from '@art/grading';
 import { ANIMS } from '@art/sprites';
 import { coverIndices } from '@art/tiles/coverIndices';
 import { tileIndices } from '@art/tiles/indices';
+import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import { DEFAULT_BINDINGS } from '@content/bindings';
 import type { ScreenId } from '@content/world/screens';
 import { daylight } from '@core/clock/clock';
@@ -13,6 +14,7 @@ import type { SimEvent } from '@core/sim/events';
 import { advance, type Accumulator } from '@core/sim/loop';
 import { Sim } from '@core/sim/sim';
 import type { GameState } from '@core/state/gameState';
+import { decorArt, decorPlacements } from '@core/world/decor';
 import { SCREEN_H, SCREEN_W } from '@core/world/dims';
 import { AudioDirector } from '@shell/audio/sfx';
 import type { DevBridge } from '@shell/dev/bridge';
@@ -45,6 +47,7 @@ export class PlayScene extends Phaser.Scene {
   private readonly screens = new Map<ScreenId, ScreenView>();
   private readonly stats = new FrameStats();
   private gradeKey = '';
+  private tileAnims: readonly TileAnim[] = [];
 
   constructor() {
     super('play');
@@ -56,6 +59,7 @@ export class PlayScene extends Phaser.Scene {
     this.gradeKey = '';
     this.screens.clear();
     this.sim = new Sim(data.db, data.state, { longDay: data.settings.longDay });
+    this.tileAnims = tileAnimations(data.assets.tileset);
     this.mapper = new InputMapper(DEFAULT_BINDINGS, this.latch, {
       holdToggleShield: data.settings.holdShield,
     });
@@ -157,6 +161,11 @@ export class PlayScene extends Phaser.Scene {
       this.cameras.main.setScroll(origin.x, origin.y);
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)));
     }
+    const hero = this.views.bounds(this.sim.hero.id);
+    for (const view of this.screens.values()) {
+      view.tick(this.sim.tick);
+      view.fadeBehind(hero);
+    }
     this.applyGrade();
   }
 
@@ -174,8 +183,22 @@ export class PlayScene extends Phaser.Scene {
 
   private showScreen(id: ScreenId): void {
     if (this.screens.has(id)) return;
-    const indices = tileIndices(this.sim.terrainOf(id), this.services.assets.tileset, fnv1a(id));
-    this.screens.set(id, new ScreenView(this, this.sim.originOf(id), indices, this.coverTiles(id)));
+    const grid = this.sim.terrainOf(id);
+    const salt = fnv1a(id);
+    const terrain = this.services.db.terrain;
+    const decor = decorPlacements(grid, terrain).map((p) => ({ ...p, art: decorArt(p, terrain, salt) }));
+    this.screens.set(
+      id,
+      new ScreenView(this, {
+        origin: this.sim.originOf(id),
+        indices: tileIndices(grid, this.services.assets.tileset, salt),
+        cover: this.coverTiles(id),
+        tileAnims: this.tileAnims,
+        decor,
+        frames: this.services.assets.frames,
+        anims: ANIMS,
+      }),
+    );
   }
 
   private coverTiles(id: ScreenId): number[] {

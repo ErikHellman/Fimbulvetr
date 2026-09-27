@@ -96,6 +96,29 @@ describe('tileset', () => {
     expect(byStack[4]).toBe(ts.entries.chimney.start);
   });
 
+  it('paints only the ground under decor, leaving the object to its sprite', async () => {
+    const { C } = await import('@art/palette');
+    const { hex } = await import('@art/raster');
+    const has = (r: Raster, colour: string): boolean => {
+      const c = hex(colour);
+      for (let y = 0; y < r.h; y++)
+        for (let x = 0; x < r.w; x++) {
+          const p = getPixel(r, x, y);
+          if (p[0] === c[0] && p[1] === c[1] && p[2] === c[2] && p[3] === 255) return true;
+        }
+      return false;
+    };
+    const first = (id: TerrainId): Raster => tile(ts, ts.entries[id].start);
+    expect(has(first('well'), C.water)).toBe(false);
+    expect(has(first('trough'), C.water)).toBe(false);
+    expect(has(first('hearth'), C.ember)).toBe(false);
+    expect(has(first('tree'), C.leaf)).toBe(false);
+    expect(has(first('bed'), C.blanket)).toBe(false);
+    expect(has(first('menhir'), C.rock)).toBe(false);
+    expect(has(first('bed'), C.floor)).toBe(true);
+    expect(has(first('tree'), C.grass)).toBe(true);
+  });
+
   it('is deterministic', () => {
     const again = buildTileset();
     expect(ts.tiles.every((t, i) => rastersEqual(t, again.tiles[i] ?? t))).toBe(true);

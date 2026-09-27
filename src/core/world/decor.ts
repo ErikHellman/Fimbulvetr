@@ -58,9 +58,14 @@ export function decorFeet(p: DecorPlacement): Vec {
   return { x: (p.x + p.w / 2) * TILE, y: (p.y + p.h) * TILE - 2 };
 }
 
-/** The art key for a block: a stable pick among the definition's variants, salted per screen. */
-export function decorArt(p: DecorPlacement, def: DecorDef, salt: number): string {
-  const art = def.art[hashInts(p.x, p.y, salt) % def.art.length];
+/** The art key for a block: a stable pick among its terrain's variants, salted per screen. */
+export function decorArt(
+  p: DecorPlacement,
+  defs: Readonly<Record<TerrainId, TerrainDef>>,
+  salt: number,
+): string {
+  const def: DecorDef | undefined = defs[p.terrain].decor;
+  const art = def?.art[hashInts(p.x, p.y, salt) % def.art.length];
   if (art === undefined) throw new Error(`decor ${p.terrain} has no art`);
   return art;
 }
