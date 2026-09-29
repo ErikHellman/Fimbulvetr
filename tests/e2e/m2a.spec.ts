@@ -16,6 +16,43 @@ test('the title screen starts a new game in the longhouse', async ({ page }) => 
   await tap(page, 'Space');
   await expect(page.locator('body[data-title="main"]')).toBeAttached();
   await tap(page, 'Enter');
+  // The introduction lists the controls; Enter begins.
+  await expect(page.locator('body[data-title="intro"]')).toBeAttached();
+  await tap(page, 'Enter');
+  await page.waitForFunction(() => window.__fimbul?.ready === true);
+  expect(await screenId(page)).toBe('ask_int_longhouse');
+  expect(errors).toEqual([]);
+});
+
+test('"don’t show this again" keeps the introduction away from later new games', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('/?title=1&rolled=0');
+  await expect(page.locator('body[data-title="press"]')).toBeAttached({ timeout: 20_000 });
+  await tap(page, 'Space');
+  await tap(page, 'Enter');
+  await expect(page.locator('body[data-title="intro"]')).toBeAttached();
+  // Up to the box, tick it, down to Begin.
+  await tap(page, 'ArrowUp');
+  await tap(page, 'Enter');
+  await tap(page, 'ArrowDown');
+  await tap(page, 'Enter');
+  await page.waitForFunction(() => window.__fimbul?.ready === true);
+  const stored: unknown = JSON.parse(
+    (await page.evaluate(() => localStorage.getItem('fimbulvetr.settings.v1'))) ?? '{}',
+  );
+  expect(stored).toMatchObject({ showIntro: false });
+  await page.goto('/?title=1&rolled=0');
+  await expect(page.locator('body[data-title="press"]')).toBeAttached({ timeout: 20_000 });
+  await tap(page, 'Space');
+  await expect(page.locator('body[data-title="main"]')).toBeAttached();
+  const rows = (await page.locator('body').getAttribute('data-title-rows'))?.split(',') ?? [];
+  for (let i = 0; i < rows.indexOf('new'); i++) await tap(page, 'ArrowDown');
+  await tap(page, 'Enter');
+  // With an autosave the title asks first; either way the game starts without the introduction.
+  if (rows.includes('continue')) {
+    await expect(page.locator('body[data-title="confirmNew"]')).toBeAttached();
+    await tap(page, 'Enter');
+  }
   await page.waitForFunction(() => window.__fimbul?.ready === true);
   expect(await screenId(page)).toBe('ask_int_longhouse');
   expect(errors).toEqual([]);
@@ -35,7 +72,8 @@ test('settings change at once and survive a reload: colour-blind aid and a remap
   // Down to the colour-blind aid and switch it on.
   for (let i = 0; i < 7; i++) await tap(page, 'ArrowDown');
   await tap(page, 'Enter');
-  // Controls…: the sword (fifth row) to U.
+  // Past the introduction toggle to Controls…: the sword (fifth row) to U.
+  await tap(page, 'ArrowDown');
   await tap(page, 'ArrowDown');
   await tap(page, 'Enter');
   for (let i = 0; i < 4; i++) await tap(page, 'ArrowDown');

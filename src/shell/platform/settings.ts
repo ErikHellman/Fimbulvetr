@@ -13,6 +13,8 @@ export interface Settings {
   textSize: 1 | 2 | 3;
   /** Pulls reds and greens apart in the world's colours. */
   colourBlind: boolean;
+  /** Shows the controls page before a new game; its "don't show this again" box turns it off. */
+  showIntro: boolean;
   /** Keyboard keys per action that differ from the defaults (KeyboardEvent.code values). */
   keys: Partial<Record<Action, readonly string[]>>;
 }
@@ -29,6 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   longDay: false,
   textSize: 2,
   colourBlind: false,
+  showIntro: true,
   keys: {},
 };
 
@@ -78,6 +81,7 @@ export function parseSettings(raw: string | null, fallbackLang: Lang): Settings 
     longDay: bool(d['longDay'], base.longDay),
     textSize,
     colourBlind: bool(d['colourBlind'], base.colourBlind),
+    showIntro: bool(d['showIntro'], base.showIntro),
     keys: parseKeys(d['keys']),
   };
 }

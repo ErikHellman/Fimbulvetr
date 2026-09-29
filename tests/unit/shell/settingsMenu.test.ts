@@ -46,6 +46,8 @@ describe('settings menu', () => {
     expect(r.settings.colourBlind).toBe(true);
     const shake = run(DEFAULT_SETTINGS, ...down(rowOf('shake')), ['left']);
     expect(shake.settings.shake).toBe(false);
+    const intro = run(DEFAULT_SETTINGS, ...down(rowOf('showIntro')), ['confirm']);
+    expect(intro.settings.showIntro).toBe(false);
   });
 
   it('closes with cancel or on the back row, and wraps the cursor', () => {

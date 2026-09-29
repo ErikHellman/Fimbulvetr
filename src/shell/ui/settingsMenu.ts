@@ -17,6 +17,7 @@ export const SETTING_ROWS = [
   'holdShield',
   'longDay',
   'colourBlind',
+  'showIntro',
   'controls',
   'back',
 ] as const;
@@ -68,6 +69,7 @@ function nudge(s: Settings, row: SettingRow, dir: 1 | -1): Settings {
     case 'holdShield':
     case 'longDay':
     case 'colourBlind':
+    case 'showIntro':
       return { ...s, [row]: !s[row] };
     case 'controls':
     case 'back':

@@ -15,11 +15,12 @@ const ROW_LABEL = {
   holdShield: UI.set_hold_shield,
   longDay: UI.set_long_day,
   colourBlind: UI.set_colour_blind,
+  showIntro: UI.set_show_intro,
   controls: UI.set_controls,
   back: UI.set_back,
 } as const;
 
-const ACTION_LABEL = {
+export const ACTION_LABEL = {
   up: UI.act_up,
   down: UI.act_down,
   left: UI.act_left,
@@ -49,6 +50,7 @@ function value(row: SettingRow, s: Settings, lang: Lang): string {
     case 'holdShield':
     case 'longDay':
     case 'colourBlind':
+    case 'showIntro':
       return onOff(s[row]);
     case 'controls':
     case 'back':
