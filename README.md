@@ -1,5 +1,7 @@
 # Fimbulvetr
 
+![Ask, armed with a seax, is stalked by three wolves in the rain-lashed pine forest of Myrkviðr at dusk](docs/images/screenshot.png)
+
 A top-down action-adventure in the mould of _A Link to the Past_, set in a Norse-myth world. It runs entirely in the browser.
 
 **[Play it in your browser](https://erikhellman.github.io/Fimbulvetr/)**, deployed on GitHub Pages.
