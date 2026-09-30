@@ -24,6 +24,7 @@ import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
 import { slotName, summaryLine } from '@shell/ui/slotText';
 import { wareName } from '@shell/ui/wareText';
 import { gearLines } from '@shell/ui/gearText';
+import { fishPanel, type FishUi } from '@shell/ui/fishText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -537,6 +538,7 @@ export class UiScene extends Phaser.Scene {
     }
     if (ui.k === 'fish') {
       this.lastShown = '';
+      this.drawFish(ui, lang);
       return;
     }
     const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
@@ -618,6 +620,36 @@ export class UiScene extends Phaser.Scene {
   private itemName(item: ItemId, lang: Lang): string {
     const name: L10n = ITEM_NAMES[item];
     return t(name, lang);
+  }
+
+  /** Fishing: what to do now, and while reeling the line's tension against its safe band and how far out. */
+  private drawFish(ui: FishUi, lang: Lang): void {
+    const p = fishPanel(ui, this.link.sim.db, lang);
+    this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
+    this.body.setText(p.text);
+    const x = BOX.x + 12;
+    const w = BOX.w - 24;
+    if (p.tension !== null) {
+      const y = BOX.y + 34;
+      const [a, b] = p.tension.band;
+      this.box
+        .fillStyle(INK, 1)
+        .fillRect(x, y, w, 8)
+        .fillStyle(0x4f8a3f, 1)
+        .fillRect(Math.round(x + a * w), y + 1, Math.round((b - a) * w), 6)
+        .fillStyle(p.tension.danger ? RED : GOLD, 1)
+        .fillRect(Math.round(x + p.tension.at * w) - 1, y - 2, 3, 12)
+        .lineStyle(1, DIM, 1)
+        .strokeRect(x - 0.5, y - 0.5, w + 1, 9);
+    }
+    if (p.dist !== null) {
+      const y = BOX.y + 54;
+      this.box
+        .fillStyle(INK, 1)
+        .fillRect(x, y, w, 4)
+        .fillStyle(PAPER, 1)
+        .fillRect(x, y, Math.round(p.dist * w), 4);
+    }
   }
 
   private panel(x: number, y: number, w: number, h: number): void {

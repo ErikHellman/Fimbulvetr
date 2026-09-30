@@ -39,6 +39,7 @@ import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { FireView } from '@shell/view/fireView';
+import { FishView } from '@shell/view/fishView';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -65,6 +66,7 @@ export class PlayScene extends Phaser.Scene {
   private fog!: DarknessView;
   private fx!: FxView;
   private flames!: FireView;
+  private fishing!: FishView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
   private readonly latch = new InputLatch();
@@ -127,6 +129,7 @@ export class PlayScene extends Phaser.Scene {
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
     this.flames = new FireView(this, data.assets.frames, ANIMS);
+    this.fishing = new FishView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
         this.audio.play(id);
@@ -371,6 +374,17 @@ export class PlayScene extends Phaser.Scene {
     }
     this.fx.tick(this.sim.tick);
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
+    {
+      const ui = this.sim.storyUi();
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fishing.draw(
+        ui?.k === 'fish' ? ui : null,
+        add(origin, this.sim.hero.pos),
+        this.sim.hero.facing,
+        origin,
+        this.sim.tick,
+      );
+    }
     const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {
       stage.view.tick(this.sim.tick);

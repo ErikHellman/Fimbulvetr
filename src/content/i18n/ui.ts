@@ -155,6 +155,23 @@ export const UI = {
     sv: 'Börja om från första dagen? Tryck E igen för att bekräfta.',
   },
   game_over_continue: { en: 'Rise again: E or Enter', sv: 'Res dig igen: E eller Enter' },
+  fish_idle: {
+    en: 'Cast: E or Enter   Put the rod down: Esc',
+    sv: 'Kasta: E eller Enter   Lägg ifrån dig spöet: Esc',
+  },
+  fish_cast: { en: 'The line flies out…', sv: 'Linan flyger ut …' },
+  fish_wait: { en: 'Wait for the float to go under.', sv: 'Vänta tills flötet dras under.' },
+  fish_bite: { en: 'Now! Strike!', sv: 'Nu! Mothugg!' },
+  fish_reel: {
+    en: 'Hold E to reel in. Let go when the line strains.',
+    sv: 'Håll E för att veva in. Släpp när linan spänns.',
+  },
+  fish_surge: { en: 'It pulls! Let it run!', sv: 'Den drar! Låt den löpa!' },
+  fish_spooked: { en: 'Too soon. The fish is gone.', sv: 'För tidigt. Fisken försvann.' },
+  fish_missed: { en: 'Too slow. It took the bait.', sv: 'För långsamt. Den tog betet.' },
+  fish_snapped: { en: 'Snap! The line broke.', sv: 'Pang! Linan brast.' },
+  fish_slipped: { en: 'It slipped the hook.', sv: 'Den slet sig från kroken.' },
+  fish_landed: { en: '{fish}! Kári pays {silver} silver.', sv: '{fish}! Kári betalar {silver} silver.' },
 } as const satisfies Record<string, L10n>;
 
 export type UiKey = keyof typeof UI;

@@ -73,6 +73,15 @@ export interface FimbulHook {
   slots(): (string | null)[];
   /** The boss bar: its name in English, health and phase; null when no boss is on screen. */
   boss(): { name: string; hp: number; maxHp: number; phase: number } | null;
+  /** While Ask fishes: the phase, the line's tension, how far out the fish is, and how it ended. */
+  fish(): {
+    phase: string;
+    tension: number;
+    dist: number;
+    fish: string | null;
+    result: string | null;
+    surging: boolean;
+  } | null;
   /** The saved state of the dungeon Ask is in, or null outside dungeons. */
   dungeon(): {
     id: string;
@@ -119,6 +128,18 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     menu: () => bridge().menu(),
     picker: () => bridge().picker(),
     slots: () => [...bridge().sim.state.inv.slots],
+    fish: () => {
+      const ui = bridge().sim.storyUi();
+      if (ui?.k !== 'fish') return null;
+      return {
+        phase: ui.phase,
+        tension: ui.tension,
+        dist: ui.dist,
+        fish: ui.fish,
+        result: ui.result,
+        surging: ui.surging,
+      };
+    },
     boss: () => {
       const b = bridge().sim.boss();
       return b === null ? null : { name: b.name.en, hp: b.hp, maxHp: b.maxHp, phase: b.phase };
