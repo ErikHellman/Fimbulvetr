@@ -47,6 +47,10 @@ export interface EnemyDef {
   readonly weak?: readonly Element[];
   /** On the wing: walls, water and ground cover do not stop or slow it (only the screen's edge does). */
   readonly flies?: boolean;
+  /** Lives in the water and never leaves it (placed on a water tile; a water-worm). */
+  readonly swims?: boolean;
+  /** Gives off light in the dark, this many px around it (a bog-light). */
+  readonly glow?: number;
 }
 
 export interface AttackWindow {
@@ -98,4 +102,9 @@ export interface ActorCtx {
   emit(event: SimEvent): void;
   /** Summons an enemy (a spike, a whelp); it acts from the next tick and never counts as a screen thing. */
   spawn(id: EnemyId, pos: Vec, facing: Dir4): Entity;
+  /** Looses a shot (a gob of spit) from `pos` along `dir`. */
+  shoot(def: ShotId, pos: Vec, dir: Vec): void;
 }
+
+/** Things enemies throw or spit. */
+export type ShotId = 'spit';

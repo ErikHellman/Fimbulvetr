@@ -434,4 +434,14 @@ export const SFX_BANK = {
     volume: 0.2,
     duty: 0.2,
   },
+  /** A water-worm spitting: a wet, falling pop. */
+  sfx_spit: {
+    wave: 'noise',
+    freq: 900,
+    freqEnd: 250,
+    attack: 0.005,
+    sustain: 0.05,
+    release: 0.1,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

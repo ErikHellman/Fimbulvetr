@@ -263,4 +263,51 @@ export const ENEMY_DEFS = {
     stunnable: 120,
     drops: { heart: 1, silver: 2, seidr: 2, none: 3 },
   },
+  /**
+   * A water-worm in a pool: out of reach under the water, it rears up (400 ms), spits a gob of mud the
+   * shield stops, and stays up a while, open to a blow from the bank; the boomerang holds it up.
+   */
+  vatnormr: {
+    id: 'vatnormr',
+    art: 'enemy_vatnormr',
+    hp: 3,
+    body: { x: -6, y: -6, w: 12, h: 6 },
+    hurt: { x: -8, y: -20, w: 16, h: 20 },
+    behaviour: 'vatnormr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    swims: true,
+    stunnable: 120,
+    drops: { heart: 2, silver: 3, none: 3 },
+  },
+  /**
+   * A bog-light: a cold flame over the fen at night. It drifts, fades out of reach now and then, flares
+   * (400 ms) and darts. It lights the dark around it.
+   */
+  myrljos: {
+    id: 'myrljos',
+    art: 'enemy_myrljos',
+    hp: 2,
+    body: { x: -4, y: -4, w: 8, h: 4 },
+    hurt: { x: -7, y: -20, w: 14, h: 14 },
+    behaviour: 'myrljos',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    glow: 48,
+    attacks: {
+      dart: {
+        from: 0,
+        to: 19,
+        boxes: around({ x: -7, y: -18, w: 14, h: 14 }),
+        amount: 2,
+        knock: 3,
+        tags: 0,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 1, silver: 1, seidr: 3, none: 3 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

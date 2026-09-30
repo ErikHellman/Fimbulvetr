@@ -33,12 +33,19 @@ describe('screens', () => {
     expect(() => parseTextMap(def.map, LEGEND)).not.toThrow();
   });
 
-  it.each(SCREEN_IDS)('%s places things that stand somewhere on walkable tiles', (id) => {
+  it.each(SCREEN_IDS)('%s places things that stand somewhere on walkable tiles (swimmers in water)', (id) => {
     const ok = walkable(id);
+    const grid = parseTextMap(SCREENS[id].map, LEGEND);
     const standing = new Set(['enemy', 'prop', 'critter', 'piece', 'door']);
     for (const thing of SCREENS[id].things) {
       if (!standing.has(thing.k)) continue;
-      expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
+      const where = `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`;
+      if (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) {
+        const t = cellAt(grid, thing.at.x, thing.at.y);
+        expect(t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t], where).toBe(true);
+        continue;
+      }
+      expect(ok(thing.at.x, thing.at.y), where).toBe(true);
     }
   });
 

@@ -243,6 +243,11 @@ export class Sim implements SimRt {
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
     out.push(...fireLights(this, FIRE_RADIUS));
+    // Bog-lights shine.
+    for (const e of this.actors) {
+      const glow = e.kind === 'enemy' ? this.db.enemies[e.def as EnemyId].glow : undefined;
+      if (glow !== undefined) out.push({ x: e.pos.x, y: e.pos.y - 12, r: glow });
+    }
     return out;
   }
 
