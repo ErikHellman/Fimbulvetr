@@ -45,6 +45,8 @@ export interface DevBridge {
   jumpFish(): void;
   /** The tile index drawn at a cell of the current screen (animated tiles change over time). */
   tileAt(x: number, y: number): number;
+  /** The cover layer's tile at a cell of the current screen, or -1. */
+  coverAt(x: number, y: number): number;
   /** Restarts play from another state (used by import). */
   restart(state: GameState): void;
   /** The open pause menu's page and cursor, or null in play. */

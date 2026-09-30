@@ -92,8 +92,17 @@ function steer(h: Harness, x: number, y: number, extra: readonly Action[] = []):
   return false;
 }
 
-/** Walks to a tile on the current screen, re-planning as NPCs and sheep move. */
-export function walkTo(h: Harness, tx: number, ty: number, budget = 2400): Harness {
+/**
+ * Walks to a tile on the current screen, re-planning as NPCs and sheep move. `extra` actions are held all
+ * the way (the shield, to walk shield-first without turning).
+ */
+export function walkTo(
+  h: Harness,
+  tx: number,
+  ty: number,
+  budget = 2400,
+  extra: readonly Action[] = [],
+): Harness {
   for (let spent = 0; spent < budget;) {
     if (h.sim.mode !== 'play') {
       h.idle(1);
@@ -103,7 +112,7 @@ export function walkTo(h: Harness, tx: number, ty: number, budget = 2400): Harne
     const here = heroTile(h.sim);
     if (here[0] === tx && here[1] === ty) {
       const f = tileFeet({ x: tx, y: ty });
-      for (let i = 0; i < 40 && !steer(h, f.x, f.y); i++) spent++;
+      for (let i = 0; i < 40 && !steer(h, f.x, f.y, extra); i++) spent++;
       return h;
     }
     const route = path(h.sim, here, [tx, ty]);
@@ -112,7 +121,7 @@ export function walkTo(h: Harness, tx: number, ty: number, budget = 2400): Harne
     const next = route[0];
     if (next === undefined) return h;
     const f = tileFeet({ x: next[0], y: next[1] });
-    for (let i = 0; i < 24 && !steer(h, f.x, f.y); i++) spent++;
+    for (let i = 0; i < 24 && !steer(h, f.x, f.y, extra); i++) spent++;
     spent++;
   }
   throw new Error(
@@ -173,16 +182,18 @@ export function interactNorth(h: Harness, tx: number, ty: number): Harness {
 const UNTOUCHABLE = new Set(['rise', 'buried', 'retract', 'circle', 'fade']);
 
 /**
- * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls (armoured), the
- * immortal (bulbs, spikes) and bosses (fought by hand) are left alone.
+ * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls and whole shells
+ * (armoured), the immortal (bulbs, spikes) and bosses (fought by hand) are left alone.
  */
 function nearestFoe(sim: Sim): { e: Sim['actors'][number]; d: number } | null {
   let best: { e: Sim['actors'][number]; d: number } | null = null;
   for (const e of sim.actors) {
     if (e.kind !== 'enemy') continue;
     const def = sim.db.enemies[e.def as EnemyId];
-    // Water-worms are left in their pools: the walker passes them by.
-    if (def.guard === true || def.immortal || def.boss !== undefined || def.swims === true) continue;
+    // Water-worms are left in their pools: the walker passes them by. Armour is left alone until a bomb
+    // has cracked it (a mud-crab's shell).
+    const armoured = def.guard === true && e.mem['cracked'] !== 1;
+    if (armoured || def.immortal || def.boss !== undefined || def.swims === true) continue;
     if (UNTOUCHABLE.has(e.fsm.s)) continue;
     const d = Math.sqrt((e.pos.x - sim.hero.pos.x) ** 2 + (e.pos.y - sim.hero.pos.y) ** 2);
     if (best === null || d < best.d) best = { e, d };

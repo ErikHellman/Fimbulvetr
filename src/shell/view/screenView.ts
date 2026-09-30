@@ -96,6 +96,11 @@ export class ScreenView {
   }
 
   /** The tile index drawn at a cell right now: animated water cycles through its frames. Dev tools only. */
+  /** The cover layer's tile at a cell (ground cover or the water level's overlay), or -1 when bare. */
+  coverTile(x: number, y: number): number {
+    return this.cover.getTileAt(x, y, true).index;
+  }
+
   displayedTile(x: number, y: number): number {
     const tile = this.ground.getTileAt(x, y, true);
     // Phaser 4.2.1 has getAnimatedTileId (the renderer uses it) but the typings omit it.

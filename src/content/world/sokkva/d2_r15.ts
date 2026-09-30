@@ -11,7 +11,7 @@ export const d2R15: ScreenDef = {
     { k: 'lock', id: 'd2_lock_big', at: { x: 19, y: 21 }, w: 2, h: 1, big: true },
     {
       k: 'shutter',
-      at: { x: 19, y: 20 },
+      at: { x: 19, y: 21 },
       w: 2,
       h: 1,
       opens: 'clear',

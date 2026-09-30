@@ -152,6 +152,21 @@ describe('Lindormr', () => {
     expect(ticksUntil(h, () => moundAt(h, 2) !== undefined)).toBeGreaterThanOrEqual(LINDORMR.regrowTicks - 2);
   });
 
+  it('never grows a mound back under Ask', () => {
+    const h = fight();
+    const m = moundAt(h, 2);
+    if (m === undefined) throw new Error('no mound');
+    const spot = { ...m.pos };
+    blast(h.sim, spot);
+    h.idle(1);
+    h.sim.hero.pos = { ...spot };
+    h.idle(LINDORMR.regrowTicks + 20);
+    expect(moundAt(h, 2)).toBeUndefined();
+    h.sim.hero.pos = { x: spot.x, y: spot.y + 48 };
+    h.idle(2);
+    expect(moundAt(h, 2)?.pos).toEqual(spot);
+  });
+
   it('takes its mounds with it when it dies', () => {
     const h = fight();
     flush(h);

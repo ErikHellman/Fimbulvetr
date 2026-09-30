@@ -19,8 +19,11 @@ export const LINDORMR = {
   ],
   /** Health at or below which each later phase begins (24 → phase 1 at 16, phase 2 at 8). */
   phaseAt: [16, 8],
-  /** Hidden this long between rearings. */
-  hideTicks: 120,
+  /**
+   * Hidden this long between rearings: long enough to walk from the middle of the pond to a mound and
+   * let a bomb's fuse (96 ticks) burn down before it rears and moves on.
+   */
+  hideTicks: 180,
   /** Reared up out of the mud before it spits (400 ms), then up a while longer. */
   rearTell: 24,
   rearTicks: 48,
@@ -38,8 +41,9 @@ export const LINDORMR = {
   dazedTicks: 90,
   roarTicks: 50,
   burrowTicks: 30,
-  /** A broken mound grows back this long after it was blown apart. */
+  /** A broken mound grows back this long after it was blown apart, once Ask is this far (px) from it. */
   regrowTicks: 240,
+  regrowClear: 28,
 } as const;
 
 const MOUND_IDS = ['m0', 'm1', 'm2', 'm3'] as const;
@@ -73,14 +77,15 @@ function raise(e: Entity, c: ActorCtx, i: number): void {
   e.mem[GROW_IDS[i] ?? 'g0'] = 0;
 }
 
-/** Blown-apart mounds grow back after a while. */
+/** Blown-apart mounds grow back after a while, but never up under Ask's feet. */
 function regrow(e: Entity, c: ActorCtx): void {
   LINDORMR.mounds.forEach((_, i) => {
     if (moundAt(e, c, i) !== undefined) return;
     const key = GROW_IDS[i] ?? 'g0';
-    const t = mem(e, key) + 1;
+    const t = Math.min(LINDORMR.regrowTicks, mem(e, key) + 1);
     e.mem[key] = t;
-    if (t >= LINDORMR.regrowTicks) raise(e, c, i);
+    if (t >= LINDORMR.regrowTicks && length(sub(spotPos(e, i), c.hero)) > LINDORMR.regrowClear)
+      raise(e, c, i);
   });
 }
 
@@ -104,7 +109,7 @@ function spit(e: Entity, c: ActorCtx): void {
 
 /**
  * Lindormr, the serpent in the mill's mud. It hides in one of its four mud mounds, which bubbles, and
- * every two seconds rears up (400 ms) and spits. The mounds turn the blade; a bomb blows one apart, and
+ * every three seconds rears up (400 ms) and spits. The mounds turn the blade; a bomb blows one apart, and
  * blowing up the one it hides in flushes it out, stunned (2.5 s) and open to the sword, before it burrows
  * into another. Blown mounds grow back. At two thirds of its health it moves underground after every
  * spit (a ripple), another mound bubbles as a decoy, and it spits twice; at the last third, once

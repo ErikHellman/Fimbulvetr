@@ -9,7 +9,7 @@ export const d2R07: ScreenDef = {
     'The powder store. The doors slam behind Ask; once the draugr fall, the bombs appear. Bomb pots line the walls, and a cracked stretch of the south wall opens onto a ledge down into the mill-race.',
   things: [
     { k: 'lock', id: 'd2_lock_a', at: { x: 0, y: 10 }, w: 1, h: 2 },
-    { k: 'shutter', id: 'd2_sh_r07w', at: { x: 1, y: 10 }, w: 1, h: 2, opens: 'clear' },
+    { k: 'shutter', id: 'd2_sh_r07w', at: { x: 0, y: 10 }, w: 1, h: 2, opens: 'clear' },
     { k: 'shutter', id: 'd2_sh_r07', at: { x: 39, y: 10 }, w: 1, h: 2, opens: 'clear' },
     { k: 'enemy', id: 'draugr', at: { x: 12, y: 6 } },
     { k: 'enemy', id: 'draugr', at: { x: 28, y: 13 } },

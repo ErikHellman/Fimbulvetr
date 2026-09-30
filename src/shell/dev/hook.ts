@@ -43,6 +43,10 @@ export interface FimbulHook {
   view(): ViewStats;
   jumpFish(): void;
   tileAt(x: number, y: number): number;
+  /** The cover layer's tile at a cell of the current screen (the water overlay, snow), or -1. */
+  coverAt(x: number, y: number): number;
+  /** Chests, heart containers and cracks opened for good. */
+  opened(): string[];
   exportSaveJson(): string;
   importSaveJson(json: string): UiKey;
   flushSave(): Promise<void>;
@@ -203,6 +207,8 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       bridge().jumpFish();
     },
     tileAt: (x, y) => bridge().tileAt(x, y),
+    coverAt: (x, y) => bridge().coverAt(x, y),
+    opened: () => [...bridge().sim.state.world.opened],
     exportSaveJson: () => {
       const b = bridge();
       return b.saves.exportJson(b.sim.snapshot());

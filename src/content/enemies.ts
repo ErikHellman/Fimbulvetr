@@ -327,7 +327,6 @@ export const ENEMY_DEFS = {
     guard: true,
     cracks: 'force',
     needs: ['bombs'],
-    touch: { amount: 1, knock: 2, tags: 0 },
     attacks: {
       pinch: {
         from: 0,
