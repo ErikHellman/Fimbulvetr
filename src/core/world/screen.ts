@@ -181,6 +181,11 @@ export type Thing =
    * that would change the footing under Ask. It shows turned while the water stands at its level.
    */
   | { readonly k: 'wheel'; readonly at: TilePos; readonly level: 0 | 1 | 2 }
+  /**
+   * A warp stone: interact wakes it for good (its region goes into `world.warps`); Farvegr's song brings
+   * Ask back to `arrive`. Always solid.
+   */
+  | { readonly k: 'warp'; readonly region: RegionId; readonly at: TilePos; readonly arrive: TilePos }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */

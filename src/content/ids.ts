@@ -137,6 +137,9 @@ export const SFX = [
   'sfx_fuse',
   'sfx_wheel',
   'sfx_water',
+  'sfx_warp',
+  'sfx_thrust',
+  'sfx_parry',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -232,6 +235,7 @@ export const SCRIPTS = [
   'widow_rest',
   'd2_enter',
   'stone2_light',
+  'warp_stone',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

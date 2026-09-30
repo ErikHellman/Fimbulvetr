@@ -15,7 +15,7 @@ import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
 import { raining } from './weather';
 import { sinkTiles, walkTiles } from './cover';
-import { condCtx, probeBox } from './story';
+import { condCtx, probeBox, startScript } from './story';
 import { footingHolds, levelTiles, waterLevel } from './water';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -46,6 +46,7 @@ const KINDS: Readonly<
   shutter: { solid: 'on', anims: ['closed', 'open'] },
   switch: { solid: 'always', anims: ['on', 'off'] },
   wheel: { solid: 'always', anims: ['on', 'off'] },
+  warp: { solid: 'always', anims: ['awake', 'dormant'] },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -90,6 +91,9 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     }
     case 'wheel':
       out.push(fixture(rt.newId(), 'wheel', 'fix_wheel', thing.at, index));
+      return;
+    case 'warp':
+      out.push(fixture(rt.newId(), 'warp', 'fix_warp', thing.at, index));
       return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
@@ -151,6 +155,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return !rt.state.world.opened.includes(thing.id);
     case 'wheel':
       return waterLevel(rt) === thing.level;
+    case 'warp':
+      return rt.state.world.warps.includes(thing.region);
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -350,6 +356,26 @@ export function strikeWheel(rt: SimRt, box: Box): boolean {
   }
   rt.state.flags[flag] = thing.level;
   rt.emit({ t: 'sfx', id: 'sfx_wheel' });
+  return true;
+}
+
+/** The script a warp stone runs when touched (its line about Farvegr). */
+const WARP_SCRIPT = 'warp_stone' as const;
+
+/**
+ * Wakes the warp stone under `probe` (interact): its region is woken for good, once. Either way the stone
+ * speaks. Returns whether there was a stone.
+ */
+export function touchWarp(rt: SimRt, probe: Box): boolean {
+  const e = fixtureAt(rt, 'warp', probe, () => true);
+  const thing = e === null ? undefined : thingOf(rt, e);
+  if (thing?.k !== 'warp') return false;
+  if (!rt.state.world.warps.includes(thing.region)) {
+    rt.state.world.warps.push(thing.region);
+    rt.emit({ t: 'sfx', id: 'sfx_warp' });
+    refreshFixtures(rt);
+  }
+  startScript(rt, WARP_SCRIPT);
   return true;
 }
 
