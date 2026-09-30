@@ -63,6 +63,7 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Art: cover tiles, weather particles, forest troll and troll stone, SFX
     - [x] Shell: weather and fog views, settings model and menu with remapping and colour-blind aid, title screen with 3 slots, slot picker, Gyða's hof
     - [x] Myrkviðr turns (spawn points, drifts, preset `turning`), exit tests, e2e, v1-m2a fixture, docs
+    - [x] Title intro: the basic controls before a new game, with "don't show this again" and a settings toggle
     - [ ] User playtest and Swedish proofread
   - [ ] M2b Uppvík: the road north, the hub, economy, gear, galdr/seiðr/Eldr, fire, mead
     - [x] Seiðr, mead in horns and the purse; armour and the Uppvík sword; shops selling weapons, armour and galdr

@@ -17,6 +17,8 @@ import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary, SlotId } from '@shell/platform/saveStore';
 import { GAME_H, GAME_W } from '@shell/scale';
 import type { PlayData } from '@shell/services';
+import { openIntro, stepIntro, type IntroState } from '@shell/ui/intro';
+import { INTRO_LEFT, introColumn, introLines } from '@shell/ui/introText';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { settingsLines } from '@shell/ui/settingsText';
 import { slotName, summaryLine } from '@shell/ui/slotText';
@@ -54,13 +56,16 @@ const EMPTY: Record<SlotId, SaveSummary | null> = {
 
 /**
  * The title screen: "press any key" (which also lets the browser play sound), then Continue, New game,
- * Load (three slots and the backup autosave), Import, Export and Settings. Dev queries that name a screen
- * or preset skip it.
+ * Load (three slots and the backup autosave), Import, Export and Settings. A new game first shows the
+ * introduction (the basic controls) until the player ticks "don't show this again". Dev queries that name a
+ * screen or preset skip the title screen.
  */
 export class TitleScene extends Phaser.Scene {
   private services!: PlayData;
   private state: TitleState = openTitle();
   private settingsMenu: SettingsMenuState | null = null;
+  /** The introduction, open between New game and the longhouse. */
+  private intro: IntroState | null = null;
   private slots: Record<SlotId, SaveSummary | null> = EMPTY;
   private readonly latch = new InputLatch();
   private readonly keys = new KeyboardState();
@@ -83,6 +88,7 @@ export class TitleScene extends Phaser.Scene {
     this.services = data;
     this.state = openTitle();
     this.settingsMenu = null;
+    this.intro = null;
     this.busy = false;
     this.message = '';
     this.mapper = new InputMapper(bindingsOf(data.settings.keys), this.latch, {
@@ -152,6 +158,7 @@ export class TitleScene extends Phaser.Scene {
     const frame = this.latch.consume();
     if (!this.busy) {
       if (this.settingsMenu !== null) this.stepSettings(frame, fresh);
+      else if (this.intro !== null) this.stepIntro(frame);
       else {
         const anyKey = fresh !== null || (pad?.buttons.size ?? 0) > 0 || frame.pressed !== 0;
         const r = stepTitle(this.state, frame, this.info(), anyKey);
@@ -183,6 +190,26 @@ export class TitleScene extends Phaser.Scene {
     if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
   }
 
+  private stepIntro(frame: ReturnType<InputLatch['consume']>): void {
+    const intro = this.intro;
+    if (intro === null) return;
+    const r = stepIntro(intro, frame);
+    this.intro = r.state;
+    if (r.moved) this.audio.play(r.action === null ? 'sfx_menu_move' : 'sfx_menu_ok');
+    if (r.action?.k === 'back') this.intro = null;
+    else if (r.action?.k === 'begin') {
+      if (r.action.dontShow) {
+        this.services.settings.showIntro = false;
+        saveSettings(browserStorage(), this.services.settings);
+      }
+      this.startNew();
+    }
+  }
+
+  private startNew(): void {
+    this.play(newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME));
+  }
+
   private async act(action: TitleAction): Promise<void> {
     const lang = this.services.settings.lang;
     this.busy = true;
@@ -194,7 +221,8 @@ export class TitleScene extends Phaser.Scene {
           break;
         }
         case 'new':
-          this.play(newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME));
+          if (this.services.settings.showIntro) this.intro = openIntro();
+          else this.startNew();
           break;
         case 'load': {
           const state = await this.services.saves.loadSlot(action.slot);
@@ -242,6 +270,15 @@ export class TitleScene extends Phaser.Scene {
       this.body.setText(labels.join('\n')).setPosition(left, 130);
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
       this.values.setText(values.join('\n')).setPosition(left + column, 130);
+      this.hint.setText(hint).setX(this.centre(hint));
+      return;
+    }
+    if (this.intro !== null) {
+      document.body.dataset.title = 'intro';
+      const { heading, labels, values, hint } = introLines(this.intro, this.services.settings, lang);
+      this.subtitle.setText(heading).setX(this.centre(heading));
+      this.body.setText(labels.join('\n')).setPosition(INTRO_LEFT, 130);
+      this.values.setText(values.join('\n')).setPosition(INTRO_LEFT + introColumn(labels, values), 130);
       this.hint.setText(hint).setX(this.centre(hint));
       return;
     }

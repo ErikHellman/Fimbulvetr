@@ -88,3 +88,11 @@ describe('settings: colour-blind and keys', () => {
     expect(parseSettings(null, 'en')).toMatchObject({ colourBlind: false, keys: {} });
   });
 });
+
+describe('settings: the introduction', () => {
+  it('shows the intro unless the player turned it off, falling back on bad values', () => {
+    expect(parseSettings(null, 'en').showIntro).toBe(true);
+    expect(parseSettings(JSON.stringify({ showIntro: false }), 'en').showIntro).toBe(false);
+    expect(parseSettings(JSON.stringify({ showIntro: 'no' }), 'en').showIntro).toBe(true);
+  });
+});

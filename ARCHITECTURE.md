@@ -15,7 +15,7 @@ keyboard/gamepad ─► InputMapper ─► InputLatch ──► Sim.step(frame) 
                   pause menu, settings menu and save-slot picker state · dev hook
        UiScene (untinted): HUD (keys, boss bar), text boxes, choices, cards, shop, slot picker, game over,
                            pause menu with settings ◄── sim.storyUi(), sim.boss()
-       Boot ─► TitleScene (press any key; continue, new, load a slot, import, export, settings) ─► PlayScene
+       Boot ─► TitleScene (press any key; continue, new (→ intro), load a slot, import, export, settings) ─► PlayScene
 ```
 
 - **Modes.** `Sim.mode` is `play`, `transition` (a 30-tick slide across an edge, or a 36-tick fade through a door that swaps screens at the midpoint), `story` (a script is running: play and the clock are frozen) or `over` (the hero fell: only the fall advances; confirm continues at `Sim.entry` with three hearts).
@@ -87,10 +87,10 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - East frames are baked mirrors of west.
   - The tileset stores animated terrain (water, the ford) frame-major after its variants; `tileAnimations` lists them for Phaser's animated tiles. Terrains in one auto-tile `group` (water/ford/jetty, roof/chimney) join without a bank.
 - **`src/shell/scenes/BootScene.ts`** — packs generated frames into canvas textures, builds the tileset and renders the SFX.
-- **`src/shell/ui/*`** — menus as pure models, drawn by the scenes: `pauseMenu.ts` (tabs Items, Gear, Map, Quests, Game; `stepMenu` returns the next state and actions; `gearText.ts` lists weapon, armour, galdr, seiðr, horns, cloak and purse; `wareText.ts` names shop wares), `settingsMenu.ts` (+ `settingsText.ts`: language, volume, picture, shake, flashes, shield toggle, long days, colour-blind aid, and the controls page that rebinds keys through `shell/input/remap.ts`), `titleMenu.ts` and `slotPicker.ts` (+ `slotText.ts` for slot summaries). Settings changes apply at once (`PlayScene.applySettings`, `InputMapper.configure`, `Sim.setLongDay`) and are stored straight away.
+- **`src/shell/ui/*`** — menus as pure models, drawn by the scenes: `pauseMenu.ts` (tabs Items, Gear, Map, Quests, Game; `stepMenu` returns the next state and actions; `gearText.ts` lists weapon, armour, galdr, seiðr, horns, cloak and purse; `wareText.ts` names shop wares), `settingsMenu.ts` (+ `settingsText.ts`: language, volume, picture, shake, flashes, shield toggle, long days, colour-blind aid, the introduction toggle, and the controls page that rebinds keys through `shell/input/remap.ts`), `titleMenu.ts`, `intro.ts` (+ `introText.ts`: the controls page shown between New game and the longhouse, naming the player's own keys, with a "don't show this again" box that clears `showIntro`) and `slotPicker.ts` (+ `slotText.ts` for slot summaries). Settings changes apply at once (`PlayScene.applySettings`, `InputMapper.configure`, `Sim.setLongDay`) and are stored straight away.
 - **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio, autosave triggers and the pause menu. The hero's sprite follows the weapon in hand (`heroArtFor`: `hero`, `hero_axe`, `hero_fork`). Each shown screen is a stage: a `ScreenView` (tile layers plus decor sprites, ticked from `sim.tick` and faded when they hide the hero) and an `AmbientView` (a smoke emitter per chimney, fish jumps in open water). A `FireView` draws a pooled flame on every burning cover tile. Once a galdr is known the HUD shows the galdr box by the K/L slots and the seiðr bar under the hearts.
 - **`src/shell/platform/*`**:
-  - Settings in `localStorage['fimbulvetr.settings.v1']` (with `colourBlind` and `keys`, the keyboard overrides).
+  - Settings in `localStorage['fimbulvetr.settings.v1']` (with `colourBlind`, `showIntro` and `keys`, the keyboard overrides). The intro choice lives here, not in a save, so it holds for every new game in the browser.
   - IndexedDB `fimbulvetr` (stores `saves`: auto, auto_prev, s1–s3; and `meta`).
   - Export/import as JSON, a Web Locks single-tab guard, and the PWA service worker.
 
