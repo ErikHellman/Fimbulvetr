@@ -359,6 +359,41 @@ export const DEV_PRESETS = {
     dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
   },
   /**
+   * The barrow-watch about to begin: before the King's Barrow at 23:00, Styrr's word given and both his
+   * lessons learned.
+   */
+  watch: {
+    screen: 'hau_king',
+    tile: [20, 19],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 23 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 20,
+    items: { lantern: 1, boomerang: 1, horn: 2, mead_red: 2, purse: 1, bombs: 9 },
+    slots: ['bombs', 'boomerang'],
+    galdr: ['eldr'],
+    flags: {
+      ...MYL_FLAGS,
+      st_d2_entered: true,
+      st_d2_boss_dead: true,
+      st_stone2_lit: true,
+      st_haugar_reached: true,
+      n_styrr_met: true,
+      q_rs3_watch: true,
+      t_dash: true,
+      t_parry: true,
+    },
+    vars: { ask_pen: 31 },
+    maxHp: 20,
+    hp: 20,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc', 'd2_hc', 'd2_c_bombs', 'hau_k_gully'],
+    dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).
