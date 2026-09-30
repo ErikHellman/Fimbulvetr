@@ -18,7 +18,7 @@ export const COVER_DEFS = {
     id: 'mud',
     seasons: ['spring'],
     slow: 0.75,
-    grows: { on: GROUND, by: ['water', 'ford'] },
+    grows: { on: GROUND, by: ['water', 'ford', 'shoal', 'rapids', 'spring'] },
     wet: true,
     cut: false,
   },
@@ -31,6 +31,15 @@ export const COVER_DEFS = {
     cut: false,
     walk: true,
     melts: true,
+  },
+  /** Spring meltwater over a shoal: the river swells and the crossing is gone until summer. */
+  flood: {
+    id: 'flood',
+    seasons: ['spring'],
+    slow: 1,
+    grows: { on: ['shoal'] },
+    cut: false,
+    sink: true,
   },
 } as const satisfies Record<CoverId, CoverDef>;
 

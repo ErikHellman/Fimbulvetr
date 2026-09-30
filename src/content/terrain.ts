@@ -49,6 +49,9 @@ export const TERRAIN_IDS = [
   'birch',
   'moss',
   'boulder',
+  'rapids',
+  'spring',
+  'shoal',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -135,4 +138,10 @@ export const TERRAIN = {
   moss: { solid: false },
   /** A mossy boulder (or a troll the sun caught long ago). */
   boulder: { solid: true, decor: { art: ['decor_boulder'], w: 1, h: 1 } },
+  /** White water over stones: too fast to wade, and it never freezes (the boomerang flies over it). */
+  rapids: { solid: true, low: true },
+  /** Warm spring water, steaming: no footing, and no winter ever freezes it. */
+  spring: { solid: true, low: true },
+  /** A gravel shoal across a river: wadeable, slow, and under the spring flood (see COVER_DEFS.flood). */
+  shoal: { solid: false, slow: 0.7 },
 } as const satisfies Record<TerrainId, TerrainDef>;

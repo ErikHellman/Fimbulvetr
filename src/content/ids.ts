@@ -231,5 +231,5 @@ export type CritterId = (typeof CRITTERS)[number];
  * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
  * grow from the terrain beneath by season (see CoverDef.grows).
  */
-export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice'] as const;
+export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood'] as const;
 export type CoverId = (typeof COVERS)[number];

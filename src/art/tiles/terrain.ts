@@ -179,8 +179,53 @@ const DEEP_WOOD = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Mýrland's waters: white rapids, steaming warm springs, and gravel shoals across the river. */
+const MYRLAND_WATERS = {
+  rapids: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 90,
+    group: 'water',
+    paint: (p, v) => {
+      grass(p);
+      region(p, v.mask, 3, C.waterShade, C.foam, C.water, 0.2);
+      flow(p, v.mask, v.frame, 3, C.foam);
+      flow(p, v.mask, (v.frame + 2) % 4, 3, C.waterLight);
+    },
+  },
+  spring: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 240,
+    group: 'water',
+    paint: (p, v) => {
+      grass(p);
+      region(p, v.mask, 3, C.spring, C.springLight, C.springShade, 0.1);
+      // Bubbles rising: one pixel per tile that climbs a row each frame.
+      const bx = nextInt(p.rng, 5, 11);
+      const by = 12 - v.frame * 2;
+      if (insideBlob(v.mask, bx, by, 4)) p.px(bx, by, C.springLight);
+    },
+  },
+  shoal: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 150,
+    group: 'water',
+    paint: (p, v) => {
+      grass(p);
+      region(p, v.mask, 2, C.waterLight, C.water, C.rock, 0.16);
+      flow(p, v.mask, v.frame, 2, C.rockLight);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ...DEEP_WOOD,
+  ...MYRLAND_WATERS,
   grass: {
     autotile: false,
     variants: 4,

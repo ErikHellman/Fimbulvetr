@@ -28,6 +28,8 @@ export interface CoverDef {
   readonly cut?: false;
   /** Walkable: it takes the SOLID and LOW off the tile beneath while it stands (ice on water). */
   readonly walk?: boolean;
+  /** Impassable: it puts SOLID and LOW on the tile beneath while it stands (a spring flood over a shoal). */
+  readonly sink?: boolean;
   /** The winter cloak halves how much it slows Ask. */
   readonly cloak?: boolean;
   /** Catches fire (Eldr, burning neighbours): it burns down to a cleared tile. */

@@ -14,7 +14,7 @@ import { hurtHero } from './combat';
 import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
 import { raining } from './weather';
-import { walkTiles } from './cover';
+import { sinkTiles, walkTiles } from './cover';
 import { condCtx, probeBox } from './story';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -196,6 +196,8 @@ export function stampCollision(rt: SimRt): void {
   collision.flags.set(base.flags);
   // Ice lets Ask walk on water (and blocks nothing in flight).
   for (const i of walkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
+  // A spring flood over a shoal: as open water.
+  for (const i of sinkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) | SOLID | LOW;
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;

@@ -13,6 +13,7 @@ import { tileFeet, type TilePos } from '../../world/screen';
 import { rollSpawns } from '../../world/spawns';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
+import { holdFloodOff } from './cover';
 import { refreshFixtures, spawnFixtures, stampCollision } from './fixtures';
 import { createHeart, createPiece, herbGrows } from './pickups';
 import { placeNpcs } from './npcs';
@@ -34,6 +35,7 @@ export function spawnActors(rt: SimRt, heroAt: Vec = rt.hero.pos): Entity[] {
   for (const e of rt.actors) holdBack(rt, e);
   placeNpcs(rt);
   refreshFixtures(rt, false);
+  holdFloodOff(rt, rt.screen.cover, heroAt);
   stampCollision(rt);
   spawnRolled(rt, heroAt);
   return rt.actors;

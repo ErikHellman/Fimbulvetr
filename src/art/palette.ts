@@ -92,5 +92,9 @@ export const C = {
   mud: '#6b4f36',
   mudShade: '#4f3a27',
   mudLight: '#8a6a4a',
+  spring: '#4f9fa8',
+  springShade: '#3a7a84',
+  springLight: '#b8e6e0',
+  foam: '#e8f4f8',
   missing: '#ff00ff',
 } as const;
