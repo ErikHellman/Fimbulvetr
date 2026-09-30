@@ -1,4 +1,4 @@
-import type { FishId, ItemId, NpcId, ShopId } from '@content/ids';
+import type { FishId, ItemId, NpcId, RegionId, ShopId } from '@content/ids';
 import { seasonAt } from '../../clock/clock';
 import { setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
@@ -10,6 +10,7 @@ import { DIR_VEC, dirFromVec } from '../../math/dir';
 import { length, sub, type Vec } from '../../math/vec';
 import { TILE } from '../../world/dims';
 import { tileFeet, type TilePos } from '../../world/screen';
+import type { ScreenId } from '@content/world/screens';
 import { evalCond, phaseOf, type CondCtx } from '../../story/cond';
 import {
   nodeOf,
@@ -92,6 +93,8 @@ export type StoryUi =
       readonly fish: FishId | null;
       readonly result: FishResult | null;
     }
+  /** Farvegr's picker: the woken stones by region, then one more row for "stay". */
+  | { readonly k: 'warps'; readonly rows: readonly RegionId[]; readonly cursor: number }
   | null;
 
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
@@ -219,6 +222,9 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
       run.fish = newFishRun(step.float);
       setAnim(rt.hero, 'fish');
       return true;
+    case 'farvegr':
+      run.warps = { cursor: 0 };
+      return true;
     case 'say':
     case 'card':
     case 'move':
@@ -264,6 +270,8 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
       return false;
     case 'fish':
       return stepFish(rt, run, step, input);
+    case 'farvegr':
+      return stepFarvegr(rt, run, input);
     case 'do':
     case 'face':
     case 'warp':
@@ -293,6 +301,41 @@ function stepShop(rt: SimRt, run: StoryRun, id: ShopId, input: InputFrame): bool
   }
   ui.last = buyRow(rt, id, ui.cursor);
   return true;
+}
+
+/** Where Farvegr brings Ask for a region: its warp stone's screen and arrival tile. */
+function stoneOf(rt: SimRt, region: RegionId): { screen: ScreenId; at: TilePos } | null {
+  for (const def of Object.values(rt.db.screens))
+    for (const t of def.things)
+      if (t.k === 'warp' && t.region === region) return { screen: def.id, at: t.arrive };
+  return null;
+}
+
+function stepFarvegr(rt: SimRt, run: StoryRun, input: InputFrame): boolean {
+  const ui = run.warps;
+  if (ui === undefined) return false;
+  const rows = rt.state.world.warps;
+  const n = rows.length + 1;
+  const done = (): boolean => {
+    delete run.warps;
+    return false;
+  };
+  if (wasPressed(input, 'up')) ui.cursor = (ui.cursor + n - 1) % n;
+  if (wasPressed(input, 'down')) ui.cursor = (ui.cursor + 1) % n;
+  if (wasPressed(input, 'cancel')) return done();
+  if (!wasPressed(input, 'confirm') && !wasPressed(input, 'interact')) return true;
+  const region = rows[ui.cursor];
+  const stone = region === undefined ? null : stoneOf(rt, region);
+  const cost = rt.db.galdr.farvegr.cost;
+  if (stone === null || rt.state.hero.seidr < cost) return done();
+  rt.state.hero.seidr -= cost;
+  rt.emit({ t: 'sfx', id: 'sfx_warp' });
+  run.queue.unshift(
+    { k: 'fade', out: true },
+    { k: 'warp', screen: stone.screen, at: stone.at, facing: 's' },
+    { k: 'fade', out: false },
+  );
+  return done();
 }
 
 /** The fish that bite here and now: the season of this region, the part of the day. */
@@ -383,6 +426,8 @@ export function storyUi(rt: SimRt): StoryUi {
       result: f.result,
     };
   }
+  if (step.k === 'farvegr' && run.warps !== undefined)
+    return { k: 'warps', rows: [...rt.state.world.warps], cursor: run.warps.cursor };
   // Once answered, the picker is gone even before the step ends on the next tick.
   if (step.k === 'save') return run.saved === true ? null : { k: 'save' };
   if (step.k === 'shop' && run.shop !== null) {

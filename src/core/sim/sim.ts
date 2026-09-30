@@ -410,6 +410,11 @@ export class Sim implements SimRt {
       case 'eat':
         eat(this, c.item);
         break;
+      case 'ready': {
+        const known = this.state.inv.galdr;
+        if (known.includes(c.galdr)) this.state.inv.galdr = [c.galdr, ...known.filter((g) => g !== c.galdr)];
+        break;
+      }
       case 'setHp':
         this.hero.hp = Math.max(0, Math.min(this.hero.maxHp, Math.floor(c.hp)));
         break;

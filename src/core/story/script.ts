@@ -46,7 +46,12 @@ export type Step =
    * Fishing from where Ask stands, the float at `float`, until they put the rod down (cancel). `each` is
    * applied for every fish landed (after its silver and its own `onLand`).
    */
-  | { readonly k: 'fish'; readonly float: TilePos; readonly each?: readonly Effect[] };
+  | { readonly k: 'fish'; readonly float: TilePos; readonly each?: readonly Effect[] }
+  /**
+   * Farvegr's picker: the woken warp stones and "stay". Choosing a stone pays the galdr's seiðr and
+   * carries Ask there through a fade; cancelling costs nothing.
+   */
+  | { readonly k: 'farvegr' };
 
 export interface ScriptDef {
   readonly steps: readonly Step[];
@@ -69,6 +74,8 @@ export interface StoryRun {
   saved?: true;
   /** The fishing session, while a `fish` step runs; absent otherwise (so it never changes the hash). */
   fish?: FishRun;
+  /** Farvegr's picker cursor, while a `farvegr` step runs; absent otherwise. */
+  warps?: { cursor: number };
 }
 
 export const FADE_STEP_TICKS = 18;

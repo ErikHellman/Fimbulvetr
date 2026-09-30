@@ -98,3 +98,17 @@ describe('pause menu', () => {
     expect(run(openMenu(), [], ['down'], ['confirm'], ['item1']).actions).toEqual([]);
   });
 });
+
+describe('galdr in the pause menu', () => {
+  it('lists the galdr known after the items, the first one ready, and confirm readies another', () => {
+    const inv = inventory();
+    inv.galdr = ['eldr', 'farvegr'];
+    const items = menuItems(inv, DB.items);
+    expect(items.slice(-2).map((i) => [i.id, i.kind, i.kind === 'galdr' && i.ready])).toEqual([
+      ['eldr', 'galdr', true],
+      ['farvegr', 'galdr', false],
+    ]);
+    const r = run({ ...openMenu('items'), cursor: items.length - 1 }, items, ['confirm']);
+    expect(r.actions).toEqual([{ k: 'ready', galdr: 'farvegr' }]);
+  });
+});

@@ -297,6 +297,7 @@ export class PlayScene extends Phaser.Scene {
         this.audio.play('sfx_menu_ok');
       } else if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
       else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
+      else if (a.k === 'ready') this.sim.command({ t: 'ready', galdr: a.galdr });
       else if (a.k === 'startOver') {
         const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
         this.services.saves.autosaver.request(state);

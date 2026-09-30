@@ -242,6 +242,8 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       if (ui === null) return null;
       if (ui.k === 'save') return { k: 'save', who: null, text: '', shown: 1, choices: [], cursor: 0 };
       if (ui.k === 'fish') return { k: 'fish', who: null, text: ui.phase, shown: 1, choices: [], cursor: 0 };
+      if (ui.k === 'warps')
+        return { k: 'warps', who: null, text: '', shown: 1, choices: [...ui.rows], cursor: ui.cursor };
       if (ui.k === 'shop')
         return {
           k: 'shop',

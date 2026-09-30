@@ -202,6 +202,17 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '.iiiiii.',
     '........',
   ],
+  /** Farvegr: a path of runes winding to a standing stone. */
+  galdr_farvegr: [
+    '......i.',
+    '.....iui',
+    '.....iii',
+    '...u.iii',
+    '..u..iii',
+    '.u...iii',
+    'u..u....',
+    '.uu.....',
+  ],
   galdr_eldr: [
     '...y....',
     '..yY....',

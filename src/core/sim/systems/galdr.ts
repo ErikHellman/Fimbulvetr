@@ -5,10 +5,29 @@ import { wasPressed, type InputFrame } from '../../input/actions';
 import type { SimRt } from '../rt';
 import { castEldr } from './eldr';
 import { heroCtx } from './hero';
+import { startStory } from './story';
 
-/** What each galdr does when sung; M2 knows Eldr only. */
-const SONGS: Partial<Record<GaldrId, (rt: SimRt, input: InputFrame) => void>> = {
-  eldr: castEldr,
+/**
+ * What each galdr does when sung. A song returns `pay` to have its seiðr taken now and the cast pose
+ * struck, `later` when it takes the seiðr itself (Farvegr, once a stone is chosen), or `fizzle`.
+ */
+type Song = (rt: SimRt, input: InputFrame) => 'pay' | 'later' | 'fizzle';
+
+/** Farvegr is sung under the open sky of the overworld: then it opens the picker of woken stones. */
+function farvegr(rt: SimRt): 'later' | 'fizzle' {
+  const def = rt.db.screens[rt.screen.id];
+  if (def.indoor === true || def.dungeon !== undefined || rt.db.layout.at[rt.screen.id] === undefined)
+    return 'fizzle';
+  startStory(rt, [{ k: 'farvegr' }]);
+  return 'later';
+}
+
+const SONGS: Partial<Record<GaldrId, Song>> = {
+  eldr: (rt, input) => {
+    castEldr(rt, input);
+    return 'pay';
+  },
+  farvegr,
 };
 
 /**
@@ -28,7 +47,12 @@ export function castGaldr(rt: SimRt, input: InputFrame): void {
     rt.emit({ t: 'sfx', id: 'sfx_fizzle' });
     return;
   }
+  const paid = song(rt, input);
+  if (paid === 'fizzle') {
+    rt.emit({ t: 'sfx', id: 'sfx_fizzle' });
+    return;
+  }
+  if (paid === 'later') return;
   hero.seidr -= cost;
-  song(rt, input);
   changeState(HERO_MACHINE, rt.hero, 'cast', heroCtx(rt, input));
 }

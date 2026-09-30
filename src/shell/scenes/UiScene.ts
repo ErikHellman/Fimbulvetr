@@ -1,3 +1,4 @@
+import { GALDR_DEFS } from '@content/galdr';
 import * as Phaser from 'phaser';
 import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
@@ -25,6 +26,7 @@ import { slotName, summaryLine } from '@shell/ui/slotText';
 import { wareName } from '@shell/ui/wareText';
 import { gearLines } from '@shell/ui/gearText';
 import { fishPanel, type FishUi } from '@shell/ui/fishText';
+import { warpLines } from '@shell/ui/warpText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -271,9 +273,14 @@ export class UiScene extends Phaser.Scene {
       return;
     }
     const lines = items.map((item, i) => {
+      const mark = i === state.cursor ? '>' : ' ';
+      if (item.kind === 'galdr') {
+        const ready = item.ready ? `  ${t(UI.menu_ready, lang)}` : '';
+        return `${mark}     ${t(GALDR_DEFS[item.id].name, lang)}${ready}`;
+      }
       const slot = item.slot === 0 ? '  [K]' : item.slot === 1 ? '  [L]' : '';
       const count = item.kind === 'food' ? `  x${String(item.count)}` : '';
-      return `${i === state.cursor ? '>' : ' '}     ${this.itemName(item.id, lang)}${count}${slot}`;
+      return `${mark}     ${this.itemName(item.id, lang)}${count}${slot}`;
     });
     this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
     items.forEach((item, i) => {
@@ -282,7 +289,9 @@ export class UiScene extends Phaser.Scene {
         icon = this.add.image(0, 0, '__MISSING').setOrigin(0.5, 0.5);
         this.menuIcons.push(icon);
       }
-      const ref = this.link.frames.get(`item_${item.id}_idle_s_0`);
+      const ref = this.link.frames.get(
+        item.kind === 'galdr' ? `galdr_${item.id}_idle_s_0` : `item_${item.id}_idle_s_0`,
+      );
       icon
         .setTexture(ref.key, ref.frame)
         .setPosition(MENU.x + 48, Math.round(top + i * LINE_HEIGHT + LINE_HEIGHT / 2))
@@ -548,6 +557,17 @@ export class UiScene extends Phaser.Scene {
     if (ui.k === 'fish') {
       this.lastShown = '';
       this.drawFish(ui, lang);
+      return;
+    }
+    if (ui.k === 'warps') {
+      this.lastShown = '';
+      const lines = warpLines(ui, this.link.sim.db.galdr.farvegr.cost, lang);
+      const w = Math.max(...lines.map((l) => textWidth(l))) + 28;
+      const h = lines.length * LINE_HEIGHT + 14;
+      const x = Math.round((GAME_W - w) / 2);
+      const y = 40;
+      this.panel(x, y, w, h);
+      this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
       return;
     }
     const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
