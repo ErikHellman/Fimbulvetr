@@ -32,8 +32,8 @@ describe('parseTextMap', () => {
   });
 
   it('names the row and column of an unknown character', () => {
-    expect(() => parseTextMap(map(['', '...&']), LEGEND)).toThrow(
-      new MapError("row 2, col 4: unknown map character '&'"),
+    expect(() => parseTextMap(map(['', '...!']), LEGEND)).toThrow(
+      new MapError("row 2, col 4: unknown map character '!'"),
     );
   });
 

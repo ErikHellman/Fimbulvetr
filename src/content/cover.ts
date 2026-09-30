@@ -3,7 +3,7 @@ import type { CoverId } from './ids';
 import type { TerrainId } from './terrain';
 
 /** Open ground where snow lies and mud gathers. */
-const GROUND: readonly TerrainId[] = ['grass', 'path', 'field', 'yard', 'mound'];
+const GROUND: readonly TerrainId[] = ['grass', 'path', 'field', 'yard', 'mound', 'heath', 'flagstone'];
 
 export const COVER_DEFS = {
   tall_grass: { id: 'tall_grass', seasons: ['summer'], slow: 0.6, burns: true },

@@ -222,7 +222,8 @@ export type Thing =
       readonly do: readonly Effect[];
     };
 
-export type GateArt = 'palisade' | 'fire' | 'logs';
+/** A gate's look: `slab` is a barrow's stone door, `seal` one of the pass's three rune seals (lit = open). */
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'seal';
 
 export interface ScreenDef {
   readonly id: ScreenId;

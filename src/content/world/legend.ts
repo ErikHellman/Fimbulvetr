@@ -64,6 +64,13 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   F: 'boards',
   H: 'mill_wall',
   l: 'silt',
+  /** Haugar (M4a). */
+  E: 'heath',
+  N: 'barrow',
+  i: 'cairn',
+  j: 'flagstone',
+  $: 'drystone',
+  '&': 'tent',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

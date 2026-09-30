@@ -335,8 +335,71 @@ const MILL_WATERS = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Heather: grass gone purple-brown, with sprigs of bloom. */
+function heath(p: Painter): void {
+  p.fill('#6f6a44');
+  p.speckle('#57533a', 0.2);
+  p.speckle('#8a5a7a', 0.1);
+  p.speckle('#b07aa0', 0.03);
+}
+
+/** Terrain added for Haugar (M4a): heather, grave-hills, cairns, paving and dry-stone walls. */
+const HAUGAR = {
+  heath: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      heath(p);
+    },
+  },
+  /** A grave-hill's flank: turf over the mound, a pale rim where it meets the ground. */
+  barrow: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      heath(p);
+      region(p, v.mask, 1, C.turf, C.turfShade, C.turfLight, 0.14);
+    },
+  },
+  cairn: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      heath(p);
+    },
+  },
+  flagstone: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      p.fill(C.rock);
+      p.speckle(C.rockLight, 0.06);
+      p.rect(0, 7 + (v.variant % 2), 16, 1, C.rockShade);
+      p.rect(5 + v.variant * 3, 0, 1, 8, C.rockShade);
+      p.rect((10 + v.variant * 4) % 16, 8, 1, 8, C.rockShade);
+      p.speckle('#8a9a5a', 0.03);
+    },
+  },
+  drystone: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      heath(p);
+      region(p, v.mask, 1, C.rockShade, C.ink, C.rock, 0.3);
+    },
+  },
+  tent: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      heath(p);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ...DEEP_WOOD,
+  ...HAUGAR,
   ...MYRLAND_WATERS,
   ...MILL_WATERS,
   grass: {

@@ -104,6 +104,47 @@ function wight(side: Side, phase: number, pose: WightPose, sink = 0): Raster {
   return r;
 }
 
+// ── Gates of stone: a barrow's slab door and the pass's rune seals (one tile each) ────────────────────
+
+const GATE_H = 34;
+
+/** A standing slab of the barrow's door, carved with a knot; `open`, only the sill and the dark beyond. */
+function slab(open: boolean): Raster {
+  const r = createRaster(18, GATE_H);
+  const base = GATE_H - 3;
+  if (open) {
+    rect(r, 1, base - 3, 16, 3, ROCK_SHADE);
+    rect(r, 1, base - 3, 16, 1, ROCK_LIGHT);
+    return outline(r, INK, 1);
+  }
+  rect(r, 1, 4, 16, base - 3, ROCK);
+  rect(r, 13, 4, 4, base - 3, ROCK_SHADE);
+  rect(r, 1, 4, 16, 2, ROCK_LIGHT);
+  ellipse(r, 9, 16, 4, 4, ROCK_SHADE);
+  ellipse(r, 9, 16, 2.5, 2.5, ROCK);
+  line(r, 5, 12, 13, 20, ROCK_SHADE);
+  line(r, 13, 12, 5, 20, ROCK_SHADE);
+  return outline(r, INK, 1);
+}
+
+/** One of the pass's three seals: a squat pillar whose rune burns once its stone is lit. */
+function seal(lit: boolean): Raster {
+  const r = createRaster(18, GATE_H);
+  const base = GATE_H - 3;
+  rect(r, 3, 12, 12, base - 11, ROCK_SHADE);
+  rect(r, 3, 12, 9, base - 11, ROCK);
+  rect(r, 2, 10, 14, 3, ROCK_LIGHT);
+  const c = lit ? RUNE : RUNE_DIM;
+  line(r, 9, 16, 9, 26, c);
+  line(r, 6, 19, 9, 16, c);
+  line(r, 12, 19, 9, 16, c);
+  if (lit) {
+    ellipse(r, 9, 6, 4, 4, hex('#3f6a74'));
+    ellipse(r, 9, 6, 2, 2, RUNE);
+  }
+  return outline(r, INK, 1);
+}
+
 export function haugarFrames(): SpriteFrame[] {
   const fixture = (name: string, raster: Raster): SpriteFrame => ({ name, raster, ox: 9, oy: raster.h - 3 });
   const wights: SpriteFrame[] = [];
@@ -127,6 +168,10 @@ export function haugarFrames(): SpriteFrame[] {
     ...wights,
     fixture('fix_warp_dormant_s_0', warpStone(false)),
     fixture('fix_warp_awake_s_0', warpStone(true)),
+    fixture('fix_slab_closed_s_0', slab(false)),
+    fixture('fix_slab_open_s_0', slab(true)),
+    fixture('fix_seal_closed_s_0', seal(false)),
+    fixture('fix_seal_open_s_0', seal(true)),
   ];
 }
 
@@ -136,6 +181,8 @@ const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fp
 
 export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fix_warp: { dormant: one(1, 1), awake: one(1, 1) },
+  fix_slab: { closed: one(1, 1), open: one(1, 1) },
+  fix_seal: { closed: one(1, 1), open: one(1, 1) },
   enemy_haugbui: {
     idle: all(1, 1),
     walk: all(4, 5),

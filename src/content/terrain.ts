@@ -62,6 +62,12 @@ export const TERRAIN_IDS = [
   'boards',
   'mill_wall',
   'silt',
+  'heath',
+  'barrow',
+  'cairn',
+  'flagstone',
+  'drystone',
+  'tent',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -174,4 +180,16 @@ export const TERRAIN = {
   mill_wall: { solid: true },
   /** Grey silt at the bottom of the millpond, where Lindormr lies: soft and slow. */
   silt: { solid: false, slow: 0.8 },
+  /** Haugar's heather moor: purple-brown and springy underfoot. */
+  heath: { solid: false },
+  /** The flank of a great grave-hill: steep turf, not to be climbed. */
+  barrow: { solid: true },
+  /** A cairn of piled stones over the old dead. */
+  cairn: { solid: true, decor: { art: ['decor_cairn'], w: 1, h: 1 } },
+  /** Old paving: the stone circle's floor, the watchtower's yard. */
+  flagstone: { solid: false },
+  /** A dry-stone wall, shoulder high. */
+  drystone: { solid: true },
+  /** Geirmundr's tent of patched hides, three tiles wide and two deep. */
+  tent: { solid: true, decor: { art: ['decor_tent'], w: 3, h: 2 } },
 } as const satisfies Record<TerrainId, TerrainDef>;
