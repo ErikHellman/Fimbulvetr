@@ -386,4 +386,39 @@ export const ENEMY_DEFS = {
     cracks: 'force',
     drops: { heart: 0, silver: 0, bombs: 1, none: 0 },
   },
+  /**
+   * A barrow-wight of Haugar: a draugr in mail behind a round shield. Blows from the front clink off; it
+   * raises its blade (400 ms) and cuts, and its guard is down until it recovers. Flank it, wait out the cut,
+   * or pierce the shield with a dash thrust.
+   */
+  haugbui: {
+    id: 'haugbui',
+    art: 'enemy_haugbui',
+    hp: 8,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -8, y: -28, w: 16, h: 28 },
+    behaviour: 'haugbui',
+    weak: ['fire'],
+    knockResist: 0.4,
+    immortal: false,
+    solid: false,
+    shield: true,
+    attacks: {
+      cut: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -26, w: 22, h: 24 },
+          w: { x: -22, y: -26, w: 22, h: 24 },
+          s: { x: -12, y: -12, w: 24, h: 22 },
+          n: { x: -12, y: -36, w: 24, h: 24 },
+        },
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 2, silver: 4, none: 3 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

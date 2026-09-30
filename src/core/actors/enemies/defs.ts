@@ -35,6 +35,11 @@ export interface EnemyDef {
   readonly attacks?: Readonly<Partial<Record<string, AttackWindow>>>;
   /** Armoured: every blow clinks off (a raid troll). Behaviours can also guard for a while (`mem.guard`). */
   readonly guard?: boolean;
+  /**
+   * Carries a shield: blows from the front clink off, unless they pierce (the dash thrust), are heavy (a
+   * blast), or land while its own guard is down (`mem.open`, set by its behaviour while it swings).
+   */
+  readonly shield?: boolean;
   /** The element that breaks its `guard` for good (a bomb's force cracks a mud-crab's shell). */
   readonly cracks?: Element;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */

@@ -5,7 +5,15 @@ import { changeState } from '../../actors/fsm';
 import { swordOf } from '../../actors/tuning';
 import { HERO_MACHINE, heroSwordBox, heroSwordDamage } from '../../actors/hero';
 import { rollDrop } from '../../combat/drops';
-import { PIERCE, PIERCE_SHIELD, STUN, resolveHit, type HitData, type HitResult } from '../../combat/hit';
+import {
+  HEAVY,
+  PIERCE,
+  PIERCE_SHIELD,
+  STUN,
+  resolveHit,
+  type HitData,
+  type HitResult,
+} from '../../combat/hit';
 import { EMPTY_FRAME } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
@@ -35,7 +43,12 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
     target.mem['cracked'] = 1;
     rt.emit({ t: 'sfx', id: 'sfx_break' });
   }
-  const guarded = (armoured && mem(target, 'cracked') !== 1) || mem(target, 'guard') === 1;
+  const shielded =
+    def?.shield === true &&
+    mem(target, 'open') !== 1 &&
+    (hit.tags & (PIERCE | HEAVY)) === 0 &&
+    dot(hit.dir, DIR_VEC[target.facing]) < -0.3;
+  const guarded = (armoured && mem(target, 'cracked') !== 1) || mem(target, 'guard') === 1 || shielded;
   if (guarded && target.faction !== hit.faction && target.iframes === 0) {
     // A guarded weak point (a closed core): the blow clinks off.
     target.knock = scale(hit.dir, (hit.knock / 2) * (1 - (def?.knockResist ?? 0)));
