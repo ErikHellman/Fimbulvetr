@@ -1,0 +1,178 @@
+{
+  "format": "fimbulvetr",
+  "v": 1,
+  "build": "fixture",
+  "savedAt": "2026-09-30T12:00:00.000Z",
+  "state": {
+    "seed": 5,
+    "rng": {
+      "s": 3975261316
+    },
+    "flags": {
+      "st_farm_day": 3,
+      "st_intro_seen": true,
+      "q_sheep_d1": true,
+      "q_water_d1": true,
+      "q_paid_d1": true,
+      "ev_embla_d1": true,
+      "q_logs": 5,
+      "q_paid_d2": true,
+      "ev_embla_d2": true,
+      "q_ravens": 5,
+      "q_paid_d3": true,
+      "ev_embla_d3": true,
+      "st_raid_begun": true,
+      "st_raid_done": true,
+      "st_seax_given": true,
+      "st_legend_told": true,
+      "n_onundr_met": true,
+      "n_dagny_met": true,
+      "n_skeggi_met": true,
+      "n_thordis_met": true,
+      "n_hrafnkell_met": true,
+      "n_solvi_met": true,
+      "n_bersi_met": true,
+      "st_d1_entered": true,
+      "st_d1_boss_dead": true,
+      "st_stone1_lit": true,
+      "st_road_open": true,
+      "st_uppvik_reached": true,
+      "w_horn_thordis": true,
+      "q_eldr_asked": true,
+      "st_eldr_learned": true,
+      "q_vargar_taken": true,
+      "q_vargar_tracked": true,
+      "q_vargar_alpha": true,
+      "q_vargar_done": true,
+      "w_myl_bridge": true,
+      "st_myrland_reached": true,
+      "n_thuridr_met": true,
+      "q_rs2_mill": true,
+      "n_kari_met": true,
+      "q_fish_caught": 1
+    },
+    "hero": {
+      "screen": "myl_fisher",
+      "x": 328.5,
+      "y": 61.5,
+      "facing": "n",
+      "hp": 16,
+      "maxHp": 16,
+      "seidr": 10,
+      "maxSeidr": 10,
+      "silver": 73,
+      "purse": 0
+    },
+    "inv": {
+      "items": {
+        "lantern": 1,
+        "boomerang": 1,
+        "horn": 1,
+        "mead_red": 1,
+        "purse": 1
+      },
+      "slots": ["boomerang", "lantern"],
+      "galdr": ["eldr"],
+      "weapon": "seax",
+      "armor": "wool_tunic",
+      "ring": null,
+      "shield": true
+    },
+    "clock": {
+      "minute": 639,
+      "sub": 13,
+      "day": 1,
+      "season": "autumn",
+      "seasonDay": 0,
+      "epoch": 1,
+      "policy": "cycling"
+    },
+    "world": {
+      "opened": ["d1_hc"],
+      "pieces": ["hp_d1_r09"],
+      "warps": [],
+      "visited": [
+        "ask_int_longhouse",
+        "myr_brook",
+        "myl_weir",
+        "myl_ford",
+        "myl_river",
+        "myl_mill",
+        "myl_int_widow",
+        "myl_fisher"
+      ],
+      "cover": {},
+      "vars": {
+        "ask_pen": 31
+      }
+    },
+    "dungeons": {
+      "d1": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": true,
+        "doors": []
+      },
+      "d2": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d3": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d4": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d5": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d6": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d7": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d8": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      }
+    },
+    "playTicks": 5313
+  },
+  "sum": "baf4f7f6"
+}
