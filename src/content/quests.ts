@@ -196,8 +196,29 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       {
         when: flag('q_rs2_mill'),
         text: {
-          en: 'The stone lies in the cellar of Sökkva Kvern, the drowned mill. Its door is barred and the water stands to the eaves.',
-          sv: 'Stenen ligger i källaren under Sökkva Kvern, den drunknade kvarnen. Dörren är bommad och vattnet står upp till takfoten.',
+          en: 'The stone lies in the cellar of Sökkva Kvern, the drowned mill. The plank walk on the millpond leads to its door.',
+          sv: 'Stenen ligger i källaren under Sökkva Kvern, den drunknade kvarnen. Plankgången på kvarndammen leder till dess dörr.',
+        },
+      },
+      {
+        when: flag('st_d2_entered'),
+        text: {
+          en: 'Turn the mill’s wheels to raise and lower the water, and find the way down to the stone.',
+          sv: 'Vrid kvarnens hjul för att höja och sänka vattnet, och hitta vägen ner till stenen.',
+        },
+      },
+      {
+        when: flag('st_d2_boss_dead'),
+        text: {
+          en: 'Lindormr is dead. Lay a hand on the runestone beyond its pond.',
+          sv: 'Lindormr är död. Lägg handen på runstenen bortom dess damm.',
+        },
+      },
+      {
+        when: flag('st_stone2_lit'),
+        text: {
+          en: 'The second runestone burns again. One remains dark.',
+          sv: 'Den andra runstenen brinner igen. En är fortfarande mörk.',
         },
       },
     ],

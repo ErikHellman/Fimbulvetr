@@ -8,6 +8,7 @@ import { HOF_SCRIPTS } from './hofs';
 import { UPPVIK_SCRIPTS } from './uppvik';
 import { DEEPWOOD_SCRIPTS } from './deepwood';
 import { MYRLAND_SCRIPTS } from './myrland';
+import { D2_SCRIPTS } from './d2';
 
 /** Cutscenes and interaction scripts by id. */
 export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
@@ -19,4 +20,5 @@ export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ...UPPVIK_SCRIPTS,
   ...DEEPWOOD_SCRIPTS,
   ...MYRLAND_SCRIPTS,
+  ...D2_SCRIPTS,
 };

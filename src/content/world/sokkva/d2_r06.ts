@@ -1,0 +1,42 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d2R06: ScreenDef = {
+  id: 'd2_r06',
+  region: 'myrland',
+  dungeon: 'd2',
+  water: 'w_d2_level',
+  purpose:
+    'The millstone hall, the hub: the great stone in the middle, lock A east to the powder store, lock B north to the great wheel.',
+  things: [
+    { k: 'lock', id: 'd2_lock_a', at: { x: 39, y: 10 }, w: 1, h: 2 },
+    { k: 'lock', id: 'd2_lock_b', at: { x: 19, y: 0 }, w: 2, h: 1 },
+    { k: 'enemy', id: 'draugr', at: { x: 10, y: 5 } },
+    { k: 'enemy', id: 'draugr', at: { x: 30, y: 15 } },
+    { k: 'prop', id: 'pot', at: { x: 3, y: 3 } },
+    { k: 'prop', id: 'pot', at: { x: 36, y: 18 } },
+  ],
+  map: [
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFF######FFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFF######FFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFF######FFFFFFFFFFFFFFFFF',
+    'HHFFFFFFFFFFFFFFF######FFFFFFFFFFFFFFFFF',
+    'HHFFFFFFFFFFFFFFF######FFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+  ],
+};

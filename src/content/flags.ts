@@ -100,6 +100,12 @@ export const FLAGS = {
   q_fish_gamli: { t: 'bool' },
   /** Sökkva Kvern's water: 0 low (as found: the fleeing miller opened the sluices), 1 or 2. */
   w_d2_level: { t: 'int', max: 2 },
+  /** Ask went down into Sökkva Kvern. */
+  st_d2_entered: { t: 'bool' },
+  /** Lindormr is dead (set by its death). */
+  st_d2_boss_dead: { t: 'bool' },
+  /** The second runestone is lit: M3's goal. */
+  st_stone2_lit: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

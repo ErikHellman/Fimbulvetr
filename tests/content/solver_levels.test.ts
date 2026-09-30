@@ -45,10 +45,14 @@ const chest = (id: string, x: number, y: number): Thing => ({
 });
 
 describe('the solver with water levels', () => {
-  it('turns a wheel to float the planks to a chest, but only when searching levels', () => {
+  it('turns a wheel to float the planks to a chest', () => {
     const db = room([{ k: 'wheel', at: { x: 8, y: 5 }, level: 1 }, chest('c_pocket', 4, 19)]);
-    expect(solve(db, start(), nothing, { within: ['test_a'] }).opened).not.toContain('c_pocket');
     expect(solve(db, start(), nothing, LEVELS).opened).toContain('c_pocket');
+  });
+
+  it('leaves screens with water out unless searching levels', () => {
+    const db = room([]);
+    expect(() => solve(db, start(), nothing, { within: ['test_a'] })).toThrow(/levels/);
   });
 
   it('catches Ask stranded by a wheel that floods the only way back', () => {

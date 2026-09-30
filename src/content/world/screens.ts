@@ -63,6 +63,22 @@ export const SCREEN_IDS = [
   'd1_r10',
   'd1_r11',
   'd1_r12',
+  'd2_r01',
+  'd2_r02',
+  'd2_r03',
+  'd2_r04',
+  'd2_r05',
+  'd2_r06',
+  'd2_r07',
+  'd2_r08',
+  'd2_r09',
+  'd2_r10',
+  'd2_r11',
+  'd2_r12',
+  'd2_r13',
+  'd2_r14',
+  'd2_r15',
+  'd2_r16',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

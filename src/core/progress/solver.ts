@@ -36,7 +36,8 @@ export interface SolveOptions {
   /**
    * Search water levels too: Ask may turn any mill wheel they can strike (beside it, or by boomerang) when
    * the footing under them stays the same, so the reach is a (tile × level) graph. Without it, screens with
-   * water stay at the state's level and wheels are only in the way.
+   * water are left out altogether (a dungeon of them is a dead end off the overworld), so whole-world
+   * solves cost what they did; a dungeon's own proofs pass `within` and `levels`.
    */
   readonly levels?: boolean;
 }
@@ -119,7 +120,8 @@ class World {
     within?: readonly ScreenId[],
     levels = false,
   ) {
-    this.ids = within ?? (Object.keys(db.screens) as ScreenId[]);
+    const all = within ?? (Object.keys(db.screens) as ScreenId[]);
+    this.ids = levels ? all : all.filter((id) => db.screens[id].water === undefined);
     this.ids.forEach((id, i) => this.idx.set(id, i));
     this.grids = this.ids.map((id) => parseTextMap(db.screens[id].map, db.legend));
     this.layout = indexLayout(db.layout, this.ids);
@@ -187,6 +189,7 @@ export function solve(
   opts: SolveOptions = {},
 ): SolveResult {
   const w = new World(db, opts.season, opts.within, opts.levels);
+  if (!w.has(start.hero.screen)) throw new Error(`solver: ${start.hero.screen} is not searched (levels?)`);
   const origin = w.tile(
     start.hero.screen,
     Math.floor(start.hero.x / TILE),
@@ -549,8 +552,19 @@ function signal(
   if (!roomReached(w, reach, id)) return false;
   const things = w.db.screens[id].things;
   switch (s) {
-    case 'clear':
-      return !bossAlive(w, state, id);
+    case 'clear': {
+      // Foes are beaten with the sword, except those that need more (a mud-crab's shell needs bombs).
+      const ctx = ctxOf(w, state);
+      return (
+        !bossAlive(w, state, id) &&
+        things.every(
+          (t) =>
+            t.k !== 'enemy' ||
+            !evalCond(t.when, ctx) ||
+            (w.db.enemies[t.id].needs ?? []).every((item) => owns(state.inv.items, item)),
+        )
+      );
+    }
     case 'blocks':
       return true;
     case 'switches':

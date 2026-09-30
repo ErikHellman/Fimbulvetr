@@ -46,6 +46,15 @@ const AFTER_M2 = {
   q_vargar_done: true,
 } as const;
 
+/** And what M3a sets: over the weir into Mýrland, and Þuríðr's tale of the drowned mill heard. */
+const MYL_FLAGS = {
+  ...AFTER_M2,
+  w_myl_bridge: true,
+  st_myrland_reached: true,
+  n_thuridr_met: true,
+  q_rs2_mill: true,
+} as const;
+
 export const DEV_PRESETS = {
   /** The M0 test kit: seax and shield in the test lands. */
   m0: { screen: 'test_a', tile: [10, 11], weapon: 'seax', shield: true },
@@ -300,6 +309,68 @@ export const DEV_PRESETS = {
     pieces: ['hp_d1_r09'],
     opened: ['d1_hc'],
     dungeons: { d1: { bossDead: true } },
+  },
+
+  /** Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low. */
+  d2: {
+    screen: 'd2_r01',
+    tile: [19, 18],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1 },
+    slots: ['boomerang', 'lantern'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true },
+    vars: { ask_pen: 31 },
+    maxHp: 16,
+    hp: 16,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc'],
+    dungeons: { d1: { bossDead: true } },
+  },
+  /** Before Lindormr's big lock with everything D2 gives: bombs in slot K, the boomerang in L, the big key. */
+  d2boss: {
+    screen: 'd2_r11',
+    tile: [19, 3],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1, bombs: 10 },
+    slots: ['bombs', 'boomerang'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true, w_d2_level: 2 },
+    vars: { ask_pen: 31 },
+    maxHp: 16,
+    hp: 16,
+    pieces: ['hp_d1_r09'],
+    opened: [
+      'd1_hc',
+      'd2_c_key1',
+      'd2_c_key2',
+      'd2_c_key3',
+      'd2_c_map',
+      'd2_c_compass',
+      'd2_c_bombs',
+      'd2_c_bigkey',
+    ],
+    dungeons: {
+      d1: { bossDead: true },
+      d2: {
+        bigKey: true,
+        map: true,
+        compass: true,
+        doors: ['d2_lock_a', 'd2_lock_b', 'd2_lock_c', 'd2_sh_r07', 'd2_sh_r07w'],
+      },
+    },
   },
 
   /** At the mouth of Rótarhellir, just inside: seax, shield and the lantern. */

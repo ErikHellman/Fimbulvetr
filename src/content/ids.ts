@@ -230,6 +230,8 @@ export const SCRIPTS = [
   'myl_arrive',
   'fish_jetty',
   'widow_rest',
+  'd2_enter',
+  'stone2_light',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

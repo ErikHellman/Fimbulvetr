@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d2R04: ScreenDef = {
+  id: 'd2_r04',
+  region: 'myrland',
+  dungeon: 'd2',
+  water: 'w_d2_level',
+  purpose:
+    "The sump, a combination room: drain the water with the landing's wheel, walk the dry sluice and drop into the compass nook, then boomerang the level-1 wheel from the nook to float the planks back. A cracked wall north opens onto the crab pen.",
+  things: [
+    { k: 'wheel', at: { x: 5, y: 6 }, level: 0 },
+    { k: 'wheel', at: { x: 21, y: 10 }, level: 1 },
+    { k: 'chest', id: 'd2_c_compass', at: { x: 31, y: 12 }, gives: { item: 'compass' } },
+    { k: 'crack', id: 'd2_k_r04', at: { x: 19, y: 0 }, w: 2, h: 1, art: 'wall' },
+    { k: 'enemy', id: 'vatnormr', at: { x: 20, y: 17 } },
+  ],
+  map: [
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHFFFFFFFFFFFFFFFFFFF~~~~~~~~~~~~~~~~~HH',
+    'HHFFFFFFFFFFFFFFFFFFF~~~~~~~~~~~~~~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HHFFFFFFFFFFFF11111111111111FFF~~~~~~~HH',
+    'HHFFFFFFFFFFFF11111111111111FFF~~~~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~~~___~~~~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~FFFFFFFF~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~FFFFFFFF~~~~HH',
+    'FFFFFFFFFFFFFF~~~~~~~~~~~~FFFFFFFF~~~~HH',
+    'FFFFFFFFFFFFFF~~~~~~~~~~~~FFFFFFFF~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~FFFFFFFF~~~~HH',
+    'HHFFFFFFFFFFFF333333333333FFFFFFFF~~~~HH',
+    'HHFFFFFFFFFFFF333333333333FFFFFFFF~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~FFFFFFFF~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HHFFFFFFFFFFFF~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+  ],
+};

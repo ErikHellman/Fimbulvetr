@@ -1,0 +1,42 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d2R10: ScreenDef = {
+  id: 'd2_r10',
+  region: 'myrland',
+  dungeon: 'd2',
+  water: 'w_d2_level',
+  purpose:
+    'The great wheel, hanging over the pit where no blade reaches: only the boomerang turns it, and the water rises to the top (2). A walk crosses the pit to a cracked wall north (the cache).',
+  things: [
+    { k: 'lock', id: 'd2_lock_b', at: { x: 19, y: 21 }, w: 2, h: 1 },
+    { k: 'wheel', at: { x: 30, y: 4 }, level: 2 },
+    { k: 'crack', id: 'd2_k_r14', at: { x: 19, y: 0 }, w: 2, h: 1, art: 'wall' },
+    { k: 'enemy', id: 'draugr', at: { x: 10, y: 14 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 17, y: 10 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 22, y: 10 } },
+  ],
+  map: [
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~FF~~~~~~~~~~~~~~~~~HH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+  ],
+};

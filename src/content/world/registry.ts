@@ -57,6 +57,22 @@ import { d1R09 } from './rotarhellir/d1_r09';
 import { d1R10 } from './rotarhellir/d1_r10';
 import { d1R11 } from './rotarhellir/d1_r11';
 import { d1R12 } from './rotarhellir/d1_r12';
+import { d2R01 } from './sokkva/d2_r01';
+import { d2R02 } from './sokkva/d2_r02';
+import { d2R03 } from './sokkva/d2_r03';
+import { d2R04 } from './sokkva/d2_r04';
+import { d2R05 } from './sokkva/d2_r05';
+import { d2R06 } from './sokkva/d2_r06';
+import { d2R07 } from './sokkva/d2_r07';
+import { d2R08 } from './sokkva/d2_r08';
+import { d2R09 } from './sokkva/d2_r09';
+import { d2R10 } from './sokkva/d2_r10';
+import { d2R11 } from './sokkva/d2_r11';
+import { d2R12 } from './sokkva/d2_r12';
+import { d2R13 } from './sokkva/d2_r13';
+import { d2R14 } from './sokkva/d2_r14';
+import { d2R15 } from './sokkva/d2_r15';
+import { d2R16 } from './sokkva/d2_r16';
 import type { ScreenDef } from '@core/world/screen';
 import type { ScreenId } from './screens';
 import { testA } from './testlands/test_a';
@@ -128,4 +144,20 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d1_r10: d1R10,
   d1_r11: d1R11,
   d1_r12: d1R12,
+  d2_r01: d2R01,
+  d2_r02: d2R02,
+  d2_r03: d2R03,
+  d2_r04: d2R04,
+  d2_r05: d2R05,
+  d2_r06: d2R06,
+  d2_r07: d2R07,
+  d2_r08: d2R08,
+  d2_r09: d2R09,
+  d2_r10: d2R10,
+  d2_r11: d2R11,
+  d2_r12: d2R12,
+  d2_r13: d2R13,
+  d2_r14: d2R14,
+  d2_r15: d2R15,
+  d2_r16: d2R16,
 };

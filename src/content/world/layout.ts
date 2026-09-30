@@ -64,5 +64,28 @@ export const WORLD_LAYOUT: WorldLayout = {
         d1_r03: [2, 3],
       },
     },
+    /** Sökkva Kvern, the drowned mill under the millpond: entered from myl_mill into d2_r01. */
+    d2: {
+      cols: 4,
+      rows: 4,
+      at: {
+        d2_r13: [0, 0],
+        d2_r14: [1, 0],
+        d2_r15: [2, 0],
+        d2_r16: [3, 0],
+        d2_r09: [0, 1],
+        d2_r10: [1, 1],
+        d2_r11: [2, 1],
+        d2_r12: [3, 1],
+        d2_r05: [0, 2],
+        d2_r06: [1, 2],
+        d2_r07: [2, 2],
+        d2_r08: [3, 2],
+        d2_r03: [0, 3],
+        d2_r01: [1, 3],
+        d2_r02: [2, 3],
+        d2_r04: [3, 3],
+      },
+    },
   },
 };

@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d2R05: ScreenDef = {
+  id: 'd2_r05',
+  region: 'myrland',
+  dungeon: 'd2',
+  water: 'w_d2_level',
+  purpose:
+    'The grain loft, its floor under water. Two switches stand on platforms out of reach: the boomerang lights both and the shutter to key 1 opens.',
+  things: [
+    { k: 'switch', at: { x: 12, y: 5 } },
+    { k: 'switch', at: { x: 27, y: 5 } },
+    { k: 'shutter', at: { x: 33, y: 14 }, w: 1, h: 1, opens: 'switches' },
+    { k: 'chest', id: 'd2_c_key1', at: { x: 35, y: 14 }, gives: { item: 'small_key' } },
+    { k: 'enemy', id: 'draugr', at: { x: 10, y: 16 } },
+  ],
+  map: [
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~FFFFF~~~~~~~~~~FFFFF~~~~~~~~HH',
+    'HH~~~~~~~~FFFFF~~~~~~~~~~FFFFF~~~~~~~~HH',
+    'HH~~~~~~~~FFFFF~~~~~~~~~~FFFFF~~~~~~~~HH',
+    'HH~~~~~~~~FFFFF~~~~~~~~~~FFFFF~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHHHHHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHFFFHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHFFFHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHHHHHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHHHHHHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+  ],
+};

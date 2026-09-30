@@ -16,7 +16,7 @@ export const REGION_NAMES = {
 /** Dungeon names for the map and the HUD. Old Norse names are kept in both languages. */
 export const DUNGEON_NAMES = {
   d1: { en: 'Rótarhellir', sv: 'Rótarhellir' },
-  d2: { en: 'The second hall', sv: 'Den andra salen' },
+  d2: { en: 'Sökkva Kvern', sv: 'Sökkva Kvern' },
   d3: { en: 'The third hall', sv: 'Den tredje salen' },
   d4: { en: 'The fourth hall', sv: 'Den fjärde salen' },
   d5: { en: 'The fifth hall', sv: 'Den femte salen' },

@@ -6,6 +6,7 @@ export const THURIDR: DialogueDef = {
   entry: [
     { when: not(flag('n_thuridr_met')), node: 'meet' },
     { when: not(flag('q_rs2_mill')), node: 'mill' },
+    { when: flag('st_stone2_lit'), node: 'lit' },
     { when: evening, node: 'night' },
     { node: 'waiting' },
   ],
@@ -34,15 +35,21 @@ export const THURIDR: DialogueDef = {
     },
     mill3: {
       text: {
-        en: 'The door is barred and the water stands to the eaves. Somebody would have to let the water out, and the sluices are inside. Rest here when you need to.',
-        sv: 'Dörren är bommad och vattnet står upp till takfoten. Någon skulle behöva släppa ut vattnet, och dammluckorna sitter inne. Vila här när du behöver.',
+        en: 'The door at the end of the plank walk still opens, if you dare it. The wheels inside let the water in and out. Rest here when you need to.',
+        sv: 'Dörren vid plankgångens ände går fortfarande att öppna, om du vågar. Hjulen där inne släpper in och ut vattnet. Vila här när du behöver.',
       },
       do: [{ k: 'set', flag: 'q_rs2_mill', value: true }],
     },
     waiting: {
       text: {
-        en: 'The water is still up to the eaves. My husband always said there was more mill under the pond than above it.',
-        sv: 'Vattnet står fortfarande upp till takfoten. Min man sa alltid att det fanns mer kvarn under dammen än ovanför.',
+        en: 'Mind the wheels down there. My husband always said there was more mill under the pond than above it.',
+        sv: 'Akta dig för hjulen där nere. Min man sa alltid att det fanns mer kvarn under dammen än ovanför.',
+      },
+    },
+    lit: {
+      text: {
+        en: 'The pond went still last night, and the mud is quiet. Whatever you did down there, I slept.',
+        sv: 'Dammen blev stilla i natt, och dyn är tyst. Vad du än gjorde där nere, så sov jag.',
       },
     },
     night: {
