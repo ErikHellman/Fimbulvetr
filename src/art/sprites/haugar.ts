@@ -145,6 +145,22 @@ function seal(lit: boolean): Raster {
   return outline(r, INK, 1);
 }
 
+/** A parry's spark: a four-pointed star that flares and fades (16×16, centred low). */
+function spark(i: number): Raster {
+  const r = createRaster(16, 16);
+  const n = [3, 6, 5, 3][i] ?? 3;
+  const c = i < 2 ? hex('#fff6c8') : hex('#e8c860');
+  ellipse(r, 8, 8, 2.5, 2.5, hex('#e8c860'));
+  rect(r, 8 - n, 7, 2 * n + 1, 2, c);
+  rect(r, 7, 8 - n, 2, 2 * n + 1, c);
+  if (i < 3) {
+    const d = Math.max(1, n - 3);
+    line(r, 8 - d, 8 - d, 8 + d, 8 + d, c);
+    line(r, 8 - d, 8 + d, 8 + d, 8 - d, c);
+  }
+  return r;
+}
+
 export function haugarFrames(): SpriteFrame[] {
   const fixture = (name: string, raster: Raster): SpriteFrame => ({ name, raster, ox: 9, oy: raster.h - 3 });
   const wights: SpriteFrame[] = [];
@@ -164,7 +180,14 @@ export function haugarFrames(): SpriteFrame[] {
       add('rise', i, wight(side, 0, 'rest', sink));
     });
   }
+  const sparks = Array.from({ length: 4 }, (_, i) => ({
+    name: `fx_spark_idle_s_${String(i)}`,
+    raster: spark(i),
+    ox: 8,
+    oy: 8,
+  }));
   return [
+    ...sparks,
     ...wights,
     fixture('fix_warp_dormant_s_0', warpStone(false)),
     fixture('fix_warp_awake_s_0', warpStone(true)),
@@ -180,6 +203,7 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  fx_spark: { idle: { frames: 4, fps: 16, loop: false, dirs: ['s'] } },
   fix_warp: { dormant: one(1, 1), awake: one(1, 1) },
   fix_slab: { closed: one(1, 1), open: one(1, 1) },
   fix_seal: { closed: one(1, 1), open: one(1, 1) },

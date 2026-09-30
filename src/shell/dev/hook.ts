@@ -91,6 +91,8 @@ export interface FimbulHook {
   water(): { level: number; flag: string } | null;
   /** Bombs in the bag, and how many it holds. */
   ammo(): { bombs: number; max: number; owned: boolean };
+  /** The regions whose warp stones are awake, in the order they were woken. */
+  warps(): string[];
   /** The saved state of the dungeon Ask is in, or null outside dungeons. */
   dungeon(): {
     id: string;
@@ -169,6 +171,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
         owned: owns(have, 'bombs'),
       };
     },
+    warps: () => [...bridge().sim.state.world.warps],
     dungeon: () => {
       const sim = bridge().sim;
       const id = sim.db.screens[sim.screen.id].dungeon;

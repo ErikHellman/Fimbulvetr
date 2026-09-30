@@ -21,6 +21,7 @@ import {
   FOG_RADIUS,
   LANTERN_FOG_RADIUS,
   LANTERN_RADIUS,
+  WARP_RADIUS,
   darknessOf,
   fogOf,
   type Light,
@@ -245,6 +246,10 @@ export class Sim implements SimRt {
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
     out.push(...fireLights(this, FIRE_RADIUS));
+    // Awake warp stones glow faintly.
+    for (const e of this.actors)
+      if (e.kind === 'fixture' && e.def === 'warp' && e.mem['on'] === 1)
+        out.push({ x: e.pos.x, y: e.pos.y - 16, r: WARP_RADIUS });
     // Bog-lights shine.
     for (const e of this.actors) {
       const glow = e.kind === 'enemy' ? this.db.enemies[e.def as EnemyId].glow : undefined;

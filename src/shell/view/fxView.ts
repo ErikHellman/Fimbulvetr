@@ -30,6 +30,11 @@ export class FxView {
     this.add('fx_blast', at, tick, 24);
   }
 
+  /** A parry's spark, where blade met shield. */
+  spark(at: Vec, tick: number): void {
+    this.add('fx_spark', at, tick, 16);
+  }
+
   tick(t: number): void {
     for (let i = this.bursts.length - 1; i >= 0; i--) {
       const b = this.bursts[i];

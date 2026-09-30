@@ -26,6 +26,8 @@ export const FOG_RADIUS = 80;
 /** …and seven with the lantern. */
 export const LANTERN_FOG_RADIUS = 112;
 export const FIRE_RADIUS = 28;
+/** An awake warp stone's faint glow. */
+export const WARP_RADIUS = 28;
 
 export interface Place {
   readonly indoor: boolean;

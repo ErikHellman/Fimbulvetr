@@ -257,6 +257,9 @@ export class PlayScene extends Phaser.Scene {
     } else if (ev.t === 'blast') {
       const origin = this.sim.originOf(this.sim.screen.id);
       this.fx.blast({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
+    } else if (ev.t === 'parry') {
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fx.spark({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
     } else if (ev.t === 'shake') {
