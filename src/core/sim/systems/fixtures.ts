@@ -108,7 +108,9 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
           ? `fix_${thing.art}`
           : thing.k === 'crack'
             ? `fix_crack_${thing.art}`
-            : `fix_${thing.k}`;
+            : thing.k === 'lock' && thing.big === true
+              ? 'fix_biglock'
+              : `fix_${thing.k}`;
       for (let y = 0; y < thing.h; y++)
         for (let x = 0; x < thing.w; x++)
           out.push(fixture(rt.newId(), thing.k, art, { x: thing.at.x + x, y: thing.at.y + y }, index));
@@ -261,7 +263,10 @@ function fixtureAt(rt: SimRt, def: string, box: Box, pick: (e: Entity) => boolea
   );
 }
 
-/** Opens the locked door under `box` with a small key, for good. Returns whether one was opened. */
+/**
+ * Opens the locked door under `box` for good: a small key is spent, the big key only shown. Returns whether
+ * one was opened.
+ */
 export function unlockAt(rt: SimRt, box: Box): boolean {
   const doors = doorsOf(rt);
   const id = rt.db.screens[rt.screen.id].dungeon;
@@ -269,8 +274,11 @@ export function unlockAt(rt: SimRt, box: Box): boolean {
   const e = fixtureAt(rt, 'lock', box, (f) => mem(f, 'on') === 1);
   const thing = e === null ? undefined : thingOf(rt, e);
   const d = dungeonOf(rt.state, id);
-  if (thing?.k !== 'lock' || d.keys < 1) return false;
-  d.keys -= 1;
+  if (thing?.k !== 'lock') return false;
+  if (thing.big === true) {
+    if (!d.bigKey) return false;
+  } else if (d.keys < 1) return false;
+  else d.keys -= 1;
   doors.push(thing.id);
   rt.emit({ t: 'sfx', id: 'sfx_unlock' });
   refreshFixtures(rt);

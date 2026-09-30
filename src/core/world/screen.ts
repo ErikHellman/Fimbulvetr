@@ -125,8 +125,18 @@ export type Thing =
       readonly appear?: RoomSignal;
       readonly when?: Cond;
     }
-  /** A locked door: walking into it with a small key opens it for good (`id` saved in the dungeon's doors). */
-  | { readonly k: 'lock'; readonly id: string; readonly at: TilePos; readonly w: number; readonly h: number }
+  /**
+   * A locked door: walking into it with a small key opens it for good (`id` saved in the dungeon's doors).
+   * A `big` one (the boss door) takes the dungeon's big key instead, which is kept.
+   */
+  | {
+      readonly k: 'lock';
+      readonly id: string;
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly big?: true;
+    }
   /**
    * Bars that slam shut once Ask has stepped clear of them, and open when the room gives `opens`. While
    * `when` fails they stay open. With an `id` the opening is saved in the dungeon's doors, for good; one

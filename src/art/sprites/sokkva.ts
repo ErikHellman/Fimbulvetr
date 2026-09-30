@@ -182,6 +182,26 @@ function wheel(on: boolean): Raster {
   return outline(r, INK, 1);
 }
 
+const DOOR_H = 26;
+const GOLD = hex(C.shieldRim);
+
+/** The boss door: iron-bound oak with a great padlock, or its threshold once open. */
+function bigLock(open: boolean): Raster {
+  const r = createRaster(18, DOOR_H);
+  if (open) {
+    rect(r, 1, DOOR_H - 7, 16, 4, WHEEL);
+    rect(r, 1, DOOR_H - 4, 16, 1, WHEEL_SHADE);
+    return outline(r, INK, 1);
+  }
+  rect(r, 1, 3, 16, DOOR_H - 5, WHEEL_SHADE);
+  for (const x of [4, 8, 12]) rect(r, x, 3, 2, DOOR_H - 5, WHEEL);
+  for (const y of [5, 12, DOOR_H - 7]) rect(r, 1, y, 16, 2, IRON);
+  ellipse(r, 9, 9, 3, 3, IRON_SHADE);
+  rect(r, 5, 11, 8, 7, GOLD);
+  rect(r, 8, 13, 2, 3, INK);
+  return outline(r, INK, 1);
+}
+
 export function sokkvaFrames(): SpriteFrame[] {
   const prop = (name: string, raster: Raster): SpriteFrame => ({
     name,
@@ -218,6 +238,8 @@ export function sokkvaFrames(): SpriteFrame[] {
     prop('prop_bomb_blink_s_0', bomb('spark')),
     prop('prop_bomb_blink_s_1', bomb('flash')),
     prop('prop_bomb_pot_idle_s_0', bombPot()),
+    fixture('fix_biglock_closed_s_0', bigLock(false)),
+    fixture('fix_biglock_open_s_0', bigLock(true)),
     fixture('fix_wheel_on_s_0', wheel(true)),
     fixture('fix_wheel_off_s_0', wheel(false)),
     fixture('fix_crack_wall_closed_s_0', crackedWall()),
@@ -236,6 +258,7 @@ export const SOKKVA_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
   enemy_leirkrabbi: { idle: all(1, 1), walk: all(2, 8), tell: all(1, 1), pinch: all(1, 1), hurt: all(1, 1) },
   prop_bomb: { idle: one(1, 1), fuse: one(2, 6), blink: one(2, 12) },
   prop_bomb_pot: { idle: one(1, 1) },
+  fix_biglock: { closed: one(1, 1), open: one(1, 1) },
   fix_wheel: { on: one(1, 1), off: one(1, 1) },
   fix_crack_wall: { closed: one(1, 1), open: one(1, 1) },
   fix_crack_rock: { closed: one(1, 1), open: one(1, 1) },
