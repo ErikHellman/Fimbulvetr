@@ -3,7 +3,13 @@ import { DB } from '@content/index';
 import type { EnemyId } from '@content/ids';
 import type { ContentDb } from '@core/sim/db';
 import type { Thing } from '@core/world/screen';
+import { shoot } from '@core/sim/systems/projectiles';
+import type { Vec } from '@core/math/vec';
 import { Harness, frameOf } from './harness';
+
+const shootFrom = (h: Harness, pos: Vec, dir: Vec, owner: number): void => {
+  shoot(h.sim, 'axe', { x: pos.x, y: pos.y - 4 }, dir, owner);
+};
 
 /** An open test_a with `id` at (16, 10). */
 function arena(id: EnemyId): ContentDb {
@@ -83,5 +89,54 @@ describe('barrow-wight', () => {
     h.hold(['shield'], 240);
     expect(h.sim.hero.hp).toBe(hp);
     expect(h.events.some((e) => e.t === 'hit' && e.target === h.sim.hero.id && e.blocked)).toBe(true);
+  });
+});
+
+describe('draugr archer', () => {
+  it('keeps its distance, draws for 400 ms and looses an arrow the shield stops', () => {
+    const h = new Harness({ db: arena('bogdraugr'), tile: [16, 13], facing: 'n' });
+    h.idle(40);
+    const e = h.sim.enemies[0];
+    if (e === undefined) throw new Error('no archer');
+    h.until((s) => s.enemies[0]?.fsm.s === 'draw', 400, frameOf(['shield']));
+    const drawAt = h.sim.tick;
+    // It backed off out of blade's reach first.
+    expect(Math.hypot(e.pos.x - h.sim.hero.pos.x, e.pos.y - h.sim.hero.pos.y)).toBeGreaterThanOrEqual(60);
+    h.until(
+      (s) => s.actors.some((a) => a.kind === 'projectile' && a.faction === 'enemy'),
+      60,
+      frameOf(['shield']),
+    );
+    const tell = h.sim.tick - drawAt;
+    expect(tell).toBeGreaterThanOrEqual(18);
+    expect(tell).toBeLessThanOrEqual(30);
+    // Face it with the shield: the arrow clatters off.
+    const hp = h.sim.hero.hp;
+    const dx = e.pos.x - h.sim.hero.pos.x;
+    const dy = e.pos.y - h.sim.hero.pos.y;
+    h.sim.hero.facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'e' : 'w') : dy > 0 ? 's' : 'n';
+    h.until((s) => !s.actors.some((a) => a.kind === 'projectile'), 120, frameOf(['shield']));
+    expect(h.sim.hero.hp).toBe(hp);
+    h.expectAnims();
+  });
+});
+
+describe('the returning axe', () => {
+  it('flies out, turns back to its thrower and is gone', () => {
+    const h = new Harness({ db: arena('dummy'), tile: [5, 5] });
+    const thrower = h.sim.enemies[0];
+    if (thrower === undefined) throw new Error('no thrower');
+    h.sim.hero.hp = 999;
+    h.sim.hero.maxHp = 999;
+    // Loose one east from the dummy, well away from Ask.
+    shootFrom(h, thrower.pos, { x: 1, y: 0 }, thrower.id);
+    let far = 0;
+    for (let i = 0; i < 200 && h.sim.actors.some((a) => a.def === 'axe'); i++) {
+      const axe = h.sim.actors.find((a) => a.def === 'axe');
+      if (axe !== undefined) far = Math.max(far, axe.pos.x - thrower.pos.x);
+      h.idle(1);
+    }
+    expect(far).toBeGreaterThan(100);
+    expect(h.sim.actors.some((a) => a.def === 'axe')).toBe(false);
   });
 });

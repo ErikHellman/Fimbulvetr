@@ -78,8 +78,8 @@ export function stepProjectiles(rt: SimRt): void {
   for (const e of flying) {
     if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
     else if (e.def === 'eldr') stepEldr(rt, e, wind);
-    else if (e.def === 'spit') stepSpit(rt, e);
-    else if (e.def === 'arrow') stepArrow(rt, e);
+    else if (e.def === 'arrow' && e.faction === 'hero') stepArrow(rt, e);
+    else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe') stepShot(rt, e);
   }
 }
 
@@ -151,24 +151,37 @@ function stepArrow(rt: SimRt, e: Entity): void {
   gone();
 }
 
-/** A gob of spit's box around its ground point; it is drawn `SPIT_Z` px up, at head height. */
-const SPIT_BOX = { x: -4, y: -8, w: 8, h: 8 } as const;
-const SPIT_Z = 10;
-/** Spit numbers: px per tick, ticks, and quarter hearts. */
-export const SPIT = { speed: 2.5, life: 120, amount: 2, knock: 3 } as const;
+/** A shot's box around its ground point; it is drawn `z` px up. */
+const SHOT_BOX = { x: -4, y: -8, w: 8, h: 8 } as const;
 
-/** Looses an enemy's shot from `pos` along `dir`. */
-export function shoot(rt: SimRt, def: ShotId, pos: Vec, dir: Vec): void {
+/**
+ * Enemy shots, in px per tick, ticks and quarter hearts. An axe flies `out` px, then back to whoever
+ * threw it.
+ */
+export const SHOTS = {
+  spit: { art: 'fx_spit', speed: 2.5, life: 120, amount: 2, knock: 3, z: 10, out: 0 },
+  arrow: { art: 'fx_arrow', speed: 4, life: 90, amount: 2, knock: 2, z: 10, out: 0 },
+  axe: { art: 'fx_axe', speed: 3, life: 240, amount: 4, knock: 4, z: 14, out: 120 },
+} as const satisfies Record<
+  ShotId,
+  { art: string; speed: number; life: number; amount: number; knock: number; z: number; out: number }
+>;
+/** The water-worm's spit (kept for the tests that time it). */
+export const SPIT = SHOTS.spit;
+
+/** Looses an enemy's shot from `pos` along `dir`; an axe remembers its thrower (`owner`). */
+export function shoot(rt: SimRt, def: ShotId, pos: Vec, dir: Vec, owner?: number): void {
   const d = length(dir) === 0 ? { x: 0, y: 1 } : normalize(dir);
+  const s = SHOTS[def];
   const e = createEntity({
     id: rt.newId(),
     kind: 'projectile',
     def,
-    art: 'fx_spit',
+    art: s.art,
     pos: { ...pos },
     facing: dirFromVec(d, 's'),
-    body: SPIT_BOX,
-    hurt: SPIT_BOX,
+    body: SHOT_BOX,
+    hurt: SHOT_BOX,
     faction: 'enemy',
     hp: 1,
     maxHp: 1,
@@ -177,23 +190,53 @@ export function shoot(rt: SimRt, def: ShotId, pos: Vec, dir: Vec): void {
   setAnim(e, 'fly');
   e.mem['dx'] = d.x;
   e.mem['dy'] = d.y;
-  e.mem['z'] = SPIT_Z;
+  e.mem['z'] = s.z;
+  if (owner !== undefined) e.mem['owner'] = owner;
   rt.actors.push(e);
-  rt.emit({ t: 'sfx', id: 'sfx_spit' });
+  rt.emit({ t: 'sfx', id: def === 'axe' ? 'sfx_axe' : def === 'arrow' ? 'sfx_bow' : 'sfx_spit' });
 }
 
 /**
- * A gob of spit flies straight over water and low ground until it meets a wall, runs out, is struck
- * away by the sword, or hits Ask (the shield stops it from the front).
+ * An enemy shot flies straight over water and low ground until it meets a wall, runs out, is struck away
+ * by the sword, or hits Ask (the shield stops it from the front). An axe turns back after `out` px (or
+ * when struck) and flies through anything back to its thrower, and is gone when caught or when the thrower
+ * is.
  */
-function stepSpit(rt: SimRt, e: Entity): void {
+function stepShot(rt: SimRt, e: Entity): void {
+  const s = SHOTS[e.def as ShotId];
   const gone = (): void => {
     rt.actors = rt.actors.filter((a) => a !== e);
   };
-  const next = { x: e.pos.x + mem(e, 'dx') * SPIT.speed, y: e.pos.y + mem(e, 'dy') * SPIT.speed };
-  if (e.fsm.t >= SPIT.life || wallAt(rt, { x: next.x, y: next.y - 4 })) {
+  if (e.fsm.t >= s.life) {
     gone();
     return;
+  }
+  let next: Vec;
+  if (e.fsm.s === 'back') {
+    const owner = rt.actors.find((a) => a.id === mem(e, 'owner'));
+    if (owner === undefined) {
+      gone();
+      return;
+    }
+    const to = sub({ x: owner.pos.x, y: owner.pos.y - 10 }, e.pos);
+    if (length(to) <= s.speed + 2) {
+      gone();
+      return;
+    }
+    const n = normalize(to);
+    next = { x: e.pos.x + n.x * s.speed, y: e.pos.y + n.y * s.speed };
+  } else {
+    next = { x: e.pos.x + mem(e, 'dx') * s.speed, y: e.pos.y + mem(e, 'dy') * s.speed };
+    const blocked = wallAt(rt, { x: next.x, y: next.y - 4 });
+    if (s.out > 0 && (blocked || mem(e, 'flown') + s.speed > s.out)) {
+      e.fsm = { s: 'back', t: e.fsm.t };
+      return;
+    }
+    if (blocked) {
+      gone();
+      return;
+    }
+    e.mem['flown'] = mem(e, 'flown') + s.speed;
   }
   e.pos = next;
   e.fsm.t += 1;
@@ -201,11 +244,12 @@ function stepSpit(rt: SimRt, e: Entity): void {
   const sword = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (sword !== null && overlaps(sword, box)) {
     rt.emit({ t: 'sfx', id: 'sfx_block' });
-    gone();
+    if (s.out > 0) e.fsm = { s: 'back', t: e.fsm.t };
+    else gone();
     return;
   }
   if (!overlaps(box, at(rt.hero.hurt, rt.hero.pos))) return;
-  if (hurtHero(rt, e, SPIT.amount, SPIT.knock, 0)) gone();
+  if (hurtHero(rt, e, s.amount, s.knock, 0) && s.out === 0) gone();
 }
 
 /**

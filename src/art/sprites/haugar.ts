@@ -250,6 +250,84 @@ function eyeStone(open: boolean): Raster {
   return outline(r, INK, 1);
 }
 
+// ── The draugr archer (32×32, feet at 16, 30) and the barrow-warden (48×48, feet at 24, 45) ─────────────
+
+const ARCHER_LOOK: Look = {
+  skin: '#9aab9c',
+  hair: '#d9d8c8',
+  hairStyle: 'long',
+  top: '#4a4a3a',
+  legs: 'pants',
+  bottom: '#35332a',
+};
+
+type ArcherPose = 'rest' | 'draw' | 'loose' | 'hurt';
+
+function archer(side: Side, phase: number, pose: ArcherPose, sink = 0): Raster {
+  const arms = pose === 'rest' || pose === 'hurt' ? 'down' : 'forward';
+  const r = drawPerson(ARCHER_LOOK, side, phase, { eyes: WIGHT_EYES, arms, ...(sink > 0 ? { sink } : {}) });
+  if (sink > 0 || pose === 'hurt') return r;
+  const b = phase === 1 || phase === 3 ? 1 : 0;
+  const wood = hex(C.woodShade);
+  const cord = hex('#d8d0bc');
+  const pull = pose === 'draw' ? 3 : 0;
+  if (side === 'w') {
+    line(r, 7, b + 12, 5, b + 18, wood);
+    line(r, 5, b + 18, 7, b + 24, wood);
+    line(r, 7, b + 12, 9 + pull, b + 18, cord);
+    line(r, 9 + pull, b + 18, 7, b + 24, cord);
+  } else if (side === 's') {
+    line(r, 9, b + 20, 16, b + 23, wood);
+    line(r, 16, b + 23, 23, b + 20, wood);
+    line(r, 9, b + 20, 16, b + 20 - pull, cord);
+    line(r, 16, b + 20 - pull, 23, b + 20, cord);
+  } else rect(r, 21, b + 8, 1, 14, wood);
+  return r;
+}
+
+/** The Haugbúi King's spectral axe, spinning: four frames of a pale blade on a haft (18×18). */
+function axe(i: number): Raster {
+  const r = createRaster(18, 18);
+  const ghost = hex('#b8e8f0');
+  const pale = hex('#7fd8e8');
+  const haft = hex('#8a9aa0');
+  const cx = 9;
+  const cy = 9;
+  const [dx, dy] = (
+    [
+      [1, 0],
+      [0.7, 0.7],
+      [0, 1],
+      [-0.7, 0.7],
+    ] as const
+  )[i % 4] ?? [1, 0];
+  line(
+    r,
+    Math.round(cx - dx * 6),
+    Math.round(cy - dy * 6),
+    Math.round(cx + dx * 6),
+    Math.round(cy + dy * 6),
+    haft,
+  );
+  ellipse(r, cx + dx * 5, cy + dy * 5, 3, 3, pale);
+  ellipse(r, cx + dx * 5, cy + dy * 5, 1.5, 1.5, ghost);
+  return outline(r, INK, 1);
+}
+
+/** Nearest-neighbour scale by 3/2: the warden is the wight drawn half again as large. */
+function grow(src: Raster): Raster {
+  const w = Math.floor((src.w * 3) / 2);
+  const h = Math.floor((src.h * 3) / 2);
+  const r = createRaster(w, h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = (Math.floor((y * 2) / 3) * src.w + Math.floor((x * 2) / 3)) * 4;
+      const j = (y * w + x) * 4;
+      for (let k = 0; k < 4; k++) r.data[j + k] = src.data[i + k] ?? 0;
+    }
+  return r;
+}
+
 export function haugarFrames(): SpriteFrame[] {
   const fixture = (name: string, raster: Raster): SpriteFrame => ({ name, raster, ox: 9, oy: raster.h - 3 });
   const wights: SpriteFrame[] = [];
@@ -270,6 +348,48 @@ export function haugarFrames(): SpriteFrame[] {
     });
     add('sleep', 0, wight(side, 0, 'rest', 22));
   }
+  const archers: SpriteFrame[] = [];
+  const wardens: SpriteFrame[] = [];
+  for (const side of ['s', 'n', 'w'] as const) {
+    const add = (
+      list: SpriteFrame[],
+      art: string,
+      anim: string,
+      i: number,
+      raster: Raster,
+      ox: number,
+      oy: number,
+    ): void => {
+      list.push({ name: `${art}_${anim}_${side}_${String(i)}`, raster, ox, oy });
+      if (side === 'w')
+        list.push({ name: `${art}_${anim}_e_${String(i)}`, raster: flipX(raster), ox: raster.w - ox, oy });
+    };
+    const a = (anim: string, i: number, r: Raster): void => {
+      add(archers, 'enemy_bogdraugr', anim, i, r, 16, 30);
+    };
+    a('idle', 0, archer(side, 0, 'rest'));
+    for (let i = 0; i < 4; i++) a('walk', i, archer(side, i, 'rest'));
+    a('tell', 0, archer(side, 0, 'loose'));
+    a('tell', 1, archer(side, 0, 'draw'));
+    a('loose', 0, archer(side, 0, 'loose'));
+    a('hurt', 0, archer(side, 2, 'hurt'));
+    [22, 16, 10, 4].forEach((sink, i) => {
+      a('rise', i, archer(side, 0, 'rest', sink));
+    });
+    a('sleep', 0, archer(side, 0, 'rest', 22));
+    const w = (anim: string, i: number, r: Raster): void => {
+      add(wardens, 'enemy_haugvordr', anim, i, grow(r), 24, 45);
+    };
+    w('idle', 0, wight(side, 0, 'rest'));
+    for (let i = 0; i < 4; i++) w('walk', i, wight(side, i, 'rest'));
+    w('tell', 0, wight(side, 0, 'raise'));
+    w('tell', 1, wight(side, 1, 'raise'));
+    w('sweep', 0, wight(side, 0, 'cut'));
+    w('brace', 0, wight(side, 1, 'rest'));
+    w('bash', 0, wight(side, 1, 'rest'));
+    w('bash', 1, wight(side, 3, 'rest'));
+    w('dazed', 0, wight(side, 2, 'hurt'));
+  }
   const sparks = Array.from({ length: 4 }, (_, i) => ({
     name: `fx_spark_idle_s_${String(i)}`,
     raster: spark(i),
@@ -284,7 +404,16 @@ export function haugarFrames(): SpriteFrame[] {
     { name: 'fx_arrow_fly_n_0', raster: up, ox: 3, oy: 8 },
     { name: 'fx_arrow_fly_s_0', raster: flipY(up), ox: 3, oy: 8 },
   ];
+  const axes = Array.from({ length: 4 }, (_, i) => ({
+    name: `fx_axe_fly_s_${String(i)}`,
+    raster: axe(i),
+    ox: 9,
+    oy: 9,
+  }));
   return [
+    ...axes,
+    ...archers,
+    ...wardens,
     ...arrows,
     { name: 'prop_arrow_pot_idle_s_0', raster: arrowPot(), ox: 8, oy: 17 },
     { name: 'prop_grave_gold_idle_s_0', raster: graveGold(), ox: 8, oy: 13 },
@@ -307,6 +436,7 @@ const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fp
 
 export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fx_arrow: { fly: { frames: 1, fps: 1, loop: true, dirs: ALL } },
+  fx_axe: { fly: { frames: 4, fps: 16, loop: true, dirs: ['s'] } },
   prop_arrow_pot: { idle: one(1, 1) },
   prop_grave_gold: { idle: one(1, 1) },
   fix_eye: { on: one(1, 1), off: one(1, 1) },
@@ -322,5 +452,23 @@ export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
     hurt: all(1, 1),
     rise: all(4, 6, false),
     sleep: all(1, 1),
+  },
+  enemy_bogdraugr: {
+    idle: all(1, 1),
+    walk: all(4, 5),
+    tell: all(2, 5, false),
+    loose: all(1, 1),
+    hurt: all(1, 1),
+    rise: all(4, 6, false),
+    sleep: all(1, 1),
+  },
+  enemy_haugvordr: {
+    idle: all(1, 1),
+    walk: all(4, 4),
+    tell: all(2, 6),
+    sweep: all(1, 1),
+    brace: all(1, 1),
+    bash: all(2, 8),
+    dazed: all(1, 1),
   },
 };

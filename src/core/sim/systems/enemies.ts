@@ -30,8 +30,8 @@ export function actorCtx(rt: SimRt): ActorCtx {
       rt.actors.push(e);
       return e;
     },
-    shoot: (def, pos, dir) => {
-      shoot(rt, def, pos, dir);
+    shoot: (def, pos, dir, owner) => {
+      shoot(rt, def, pos, dir, owner);
     },
   };
 }

@@ -88,10 +88,13 @@ export function killEnemy(rt: SimRt, e: Entity, def: EnemyDef): void {
   if (def.boss !== undefined) {
     for (const a of [...rt.actors])
       if (a.kind === 'enemy' && mem(a, 'summoned') === 1) killEnemy(rt, a, enemyDef(rt, a));
-    const dungeon = rt.db.screens[rt.screen.id].dungeon;
-    if (dungeon !== undefined) dungeonOf(rt.state, dungeon).bossDead = true;
     rt.emit({ t: 'shake', amount: 6 });
-    rt.emit({ t: 'bossDead' });
+    // A mini-boss only guards something: the dungeon's boss still waits.
+    if (def.boss.mini !== true) {
+      const dungeon = rt.db.screens[rt.screen.id].dungeon;
+      if (dungeon !== undefined) dungeonOf(rt.state, dungeon).bossDead = true;
+      rt.emit({ t: 'bossDead' });
+    }
   }
   if (mem(e, 'summoned') === 0 && e.mem['thing'] !== undefined) {
     const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];

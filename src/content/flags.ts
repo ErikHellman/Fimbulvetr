@@ -119,6 +119,8 @@ export const FLAGS = {
   n_hildr_met: { t: 'bool' },
   n_geirmundr_met: { t: 'bool' },
   n_hallsteinn_met: { t: 'bool' },
+  /** Haugvörðr, the barrow-warden, is dead (set by its death): it never rises again. */
+  st_d3_warden: { t: 'bool' },
   /** The third runestone is lit: M4's goal. */
   st_stone3_lit: { t: 'bool' },
   /** Styrr taught the dash thrust: the sword pressed mid-roll lunges, and pierces a shield. */

@@ -539,9 +539,10 @@ function bossAlive(w: World, state: GameState, id: ScreenId): boolean {
   const def = w.db.screens[id];
   const ctx = ctxOf(w, state);
   if (def.dungeon !== undefined && dungeonOf(state, def.dungeon).bossDead) return false;
-  return def.things.some(
-    (t) => t.k === 'enemy' && w.db.enemies[t.id].boss !== undefined && evalCond(t.when, ctx),
-  );
+  return def.things.some((t) => {
+    const boss = t.k === 'enemy' ? w.db.enemies[t.id].boss : undefined;
+    return t.k === 'enemy' && boss !== undefined && boss.mini !== true && evalCond(t.when, ctx);
+  });
 }
 
 function signal(
@@ -636,7 +637,13 @@ function gather(w: World, node: Node): boolean {
         }
         case 'enemy': {
           const e = w.db.enemies[t.id];
-          if (e.boss === undefined || !evalCond(t.when, ctx) || !bossAlive(w, state, id)) return;
+          if (
+            e.boss === undefined ||
+            e.boss.mini === true ||
+            !evalCond(t.when, ctx) ||
+            !bossAlive(w, state, id)
+          )
+            return;
           if (!(e.needs ?? []).every((item) => has(state, item))) return;
           for (const eff of t.onDeath ?? []) if (eff.k === 'set') state.flags[eff.flag] = eff.value;
           if (def.dungeon !== undefined) dungeonOf(state, def.dungeon).bossDead = true;

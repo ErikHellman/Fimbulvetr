@@ -105,7 +105,8 @@ function spawnThings(rt: SimRt): Entity[] {
     switch (thing.k) {
       case 'enemy': {
         const def = rt.db.enemies[thing.id];
-        if (!evalCond(thing.when, ctx) || (def.boss !== undefined && bossDown(rt))) break;
+        if (!evalCond(thing.when, ctx) || (def.boss !== undefined && def.boss.mini !== true && bossDown(rt)))
+          break;
         const e = createEnemy(rt.newId(), def, tileFeet(thing.at));
         // The thing index is only kept for enemies that do something when they die.
         if (thing.onDeath !== undefined) e.mem['thing'] = index;

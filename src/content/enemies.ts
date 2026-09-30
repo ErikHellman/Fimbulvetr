@@ -421,4 +421,70 @@ export const ENEMY_DEFS = {
     stunnable: 90,
     drops: { heart: 2, silver: 4, none: 3 },
   },
+  /**
+   * A draugr archer of Konungshaugr: keeps its distance, draws (400 ms) and looses an arrow the shield
+   * stops. Weak to fire; leaves arrows once the bow is owned.
+   */
+  bogdraugr: {
+    id: 'bogdraugr',
+    art: 'enemy_bogdraugr',
+    hp: 4,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -7, y: -26, w: 14, h: 26 },
+    behaviour: 'bogdraugr',
+    weak: ['fire'],
+    knockResist: 0.3,
+    immortal: false,
+    solid: false,
+    stunnable: 120,
+    drops: { heart: 2, silver: 2, arrows: 4, none: 2 },
+  },
+  /**
+   * Haugvörðr, the barrow-warden, Konungshaugr's mini-boss: a giant shielded wight (see warden.ts). Its
+   * sweep (400 ms tell) and its shield bash (500 ms tell) both stagger through a raised shield; a bash into
+   * a wall leaves it dazed and open.
+   */
+  haugvordr: {
+    id: 'haugvordr',
+    art: 'enemy_haugvordr',
+    hp: 16,
+    body: { x: -10, y: -10, w: 20, h: 10 },
+    hurt: { x: -12, y: -40, w: 24, h: 40 },
+    behaviour: 'haugvordr',
+    knockResist: 0.9,
+    immortal: false,
+    solid: true,
+    shield: true,
+    weak: ['fire'],
+    boss: { name: { en: 'Haugvörðr, the barrow-warden', sv: 'Haugvörðr, högväktaren' }, mini: true },
+    attacks: {
+      sweep: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -36, w: 30, h: 36 },
+          w: { x: -30, y: -36, w: 30, h: 36 },
+          s: { x: -18, y: -14, w: 36, h: 30 },
+          n: { x: -18, y: -46, w: 36, h: 30 },
+        },
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+      bash: {
+        from: 0,
+        to: 119,
+        boxes: {
+          e: { x: 4, y: -34, w: 16, h: 34 },
+          w: { x: -20, y: -34, w: 16, h: 34 },
+          s: { x: -14, y: -8, w: 28, h: 18 },
+          n: { x: -14, y: -44, w: 28, h: 18 },
+        },
+        amount: 4,
+        knock: 8,
+        tags: HEAVY,
+      },
+    },
+    drops: { heart: 1, silver: 0, none: 0 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

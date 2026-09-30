@@ -44,8 +44,11 @@ export interface EnemyDef {
   readonly cracks?: Element;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */
   readonly stunnable?: number;
-  /** A boss: named on the health bar. */
-  readonly boss?: { readonly name: L10n };
+  /**
+   * A boss: named on the health bar. A `mini` boss (a key item's guard) shows the bar too, but its death
+   * neither ends the dungeon's boss nor counts as the boss for the solver.
+   */
+  readonly boss?: { readonly name: L10n; readonly mini?: true };
   /** Items it cannot be beaten without (the progression solver checks them). */
   readonly needs?: readonly ItemId[];
   /** Turns into this prop at sunrise (a troll caught by daylight is a stone). */
@@ -113,9 +116,9 @@ export interface ActorCtx {
   emit(event: SimEvent): void;
   /** Summons an enemy (a spike, a whelp); it acts from the next tick and never counts as a screen thing. */
   spawn(id: EnemyId, pos: Vec, facing: Dir4): Entity;
-  /** Looses a shot (a gob of spit) from `pos` along `dir`. */
-  shoot(def: ShotId, pos: Vec, dir: Vec): void;
+  /** Looses a shot (a gob of spit, an arrow, a returning axe) from `pos` along `dir`; `owner` catches an axe. */
+  shoot(def: ShotId, pos: Vec, dir: Vec, owner?: number): void;
 }
 
-/** Things enemies throw or spit. */
-export type ShotId = 'spit';
+/** Things enemies throw or spit: a water-worm's spit, a draugr's arrow, the Haugbúi King's spectral axe. */
+export type ShotId = 'spit' | 'arrow' | 'axe';
