@@ -1,4 +1,5 @@
-import type { ItemId, NpcId, ShopId } from '@content/ids';
+import type { FishId, ItemId, NpcId, ShopId } from '@content/ids';
+import { seasonAt } from '../../clock/clock';
 import { setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE } from '../../actors/hero';
@@ -8,8 +9,8 @@ import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC, dirFromVec } from '../../math/dir';
 import { length, sub, type Vec } from '../../math/vec';
 import { TILE } from '../../world/dims';
-import { tileFeet } from '../../world/screen';
-import { evalCond, type CondCtx } from '../../story/cond';
+import { tileFeet, type TilePos } from '../../world/screen';
+import { evalCond, phaseOf, type CondCtx } from '../../story/cond';
 import {
   nodeOf,
   openDialogue,
@@ -20,6 +21,15 @@ import {
   type Speaker,
 } from '../../story/dialogue';
 import { applyEffect, type Effect } from '../../story/effects';
+import {
+  FISHING,
+  newFishRun,
+  nibbling,
+  stepFishing,
+  type FishDef,
+  type FishPhase,
+  type FishResult,
+} from '../../story/fishing';
 import { buyRow, visibleStock, wareOf, type BuyResult, type Ware } from '../../story/shop';
 import {
   FADE_STEP_TICKS,
@@ -61,6 +71,27 @@ export type StoryUi =
     }
   /** The save-slot picker is up (the shell owns it and answers with `saved`). */
   | { readonly k: 'save' }
+  /** Ask is fishing: where the float lies and how the line is doing. */
+  | {
+      readonly k: 'fish';
+      readonly phase: FishPhase;
+      /** Ticks in the phase. */
+      readonly t: number;
+      /** The float's tile. */
+      readonly float: TilePos;
+      /** The float twitches (a nibble) or is pulled under (the bite). */
+      readonly nibble: boolean;
+      readonly bite: boolean;
+      /** Line tension 0…1000; it snaps at 1000. */
+      readonly tension: number;
+      readonly band: readonly [number, number];
+      /** How far out the fish is, and how far it may run before it is gone. */
+      readonly dist: number;
+      readonly maxDist: number;
+      readonly surging: boolean;
+      readonly fish: FishId | null;
+      readonly result: FishResult | null;
+    }
   | null;
 
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
@@ -184,6 +215,10 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
     case 'save':
       delete run.saved;
       return true;
+    case 'fish':
+      run.fish = newFishRun(step.float);
+      setAnim(rt.hero, 'fish');
+      return true;
     case 'say':
     case 'card':
     case 'move':
@@ -227,6 +262,8 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
       if (run.saved !== true) return true;
       delete run.saved;
       return false;
+    case 'fish':
+      return stepFish(rt, run, step, input);
     case 'do':
     case 'face':
     case 'warp':
@@ -256,6 +293,40 @@ function stepShop(rt: SimRt, run: StoryRun, id: ShopId, input: InputFrame): bool
   }
   ui.last = buyRow(rt, id, ui.cursor);
   return true;
+}
+
+/** The fish that bite here and now: the season of this region, the part of the day. */
+function bitingNow(rt: SimRt): FishDef[] {
+  const c = rt.state.clock;
+  const season = seasonAt(c, rt.db.screens[rt.screen.id].region, rt.db.clock);
+  const phase = phaseOf(c.minute);
+  return Object.values(rt.db.fish).filter(
+    (f) => f.seasons.includes(season) && (f.phases === undefined || f.phases.includes(phase)),
+  );
+}
+
+function stepFish(rt: SimRt, run: StoryRun, step: Step & { k: 'fish' }, input: InputFrame): boolean {
+  const fishing = run.fish;
+  if (fishing === undefined) return false;
+  const was = fishing.phase;
+  const going = stepFishing(fishing, input, {
+    rng: rt.state.rng,
+    biting: bitingNow(rt),
+    land: (fish) => {
+      applyAll(rt, [{ k: 'silver', n: fish.silver }, ...(fish.onLand ?? []), ...(step.each ?? [])]);
+    },
+  });
+  if (fishing.phase !== was) {
+    if (fishing.phase === 'bite') rt.emit({ t: 'sfx', id: 'sfx_bite' });
+    else if (fishing.phase === 'reel') rt.emit({ t: 'sfx', id: 'sfx_reel' });
+    else if (fishing.result === 'snapped') rt.emit({ t: 'sfx', id: 'sfx_snap' });
+    else if (fishing.result === 'landed') rt.emit({ t: 'sfx', id: 'sfx_itemget' });
+    else if (fishing.phase === 'cast' || fishing.result !== null) rt.emit({ t: 'sfx', id: 'sfx_splash' });
+  }
+  if (going) return true;
+  delete run.fish;
+  setAnim(rt.hero, 'idle');
+  return false;
 }
 
 /** Moves toward `to` at `speed` px per tick. Returns true until arrived. */
@@ -292,6 +363,24 @@ export function storyUi(rt: SimRt): StoryUi {
       shown: Math.min(1, (run.t + 1) / revealTicks(step.text, cps)),
       choices: [],
       cursor: 0,
+    };
+  }
+  if (step.k === 'fish' && run.fish !== undefined) {
+    const f = run.fish;
+    return {
+      k: 'fish',
+      phase: f.phase,
+      t: f.t,
+      float: f.float,
+      nibble: nibbling(f),
+      bite: f.phase === 'bite',
+      tension: f.tension,
+      band: FISHING.band,
+      dist: f.dist,
+      maxDist: f.maxDist,
+      surging: f.surgeLeft > 0,
+      fish: f.fish,
+      result: f.result,
     };
   }
   // Once answered, the picker is gone even before the step ends on the next tick.

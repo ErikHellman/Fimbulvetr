@@ -434,6 +434,47 @@ export const SFX_BANK = {
     volume: 0.2,
     duty: 0.2,
   },
+  /** The float pulled under: a quick, bright plip. */
+  sfx_bite: {
+    wave: 'sine',
+    freq: 1300,
+    freqEnd: 700,
+    attack: 0.003,
+    sustain: 0.03,
+    release: 0.06,
+    volume: 0.35,
+  },
+  /** The reel ratcheting as the line comes in. */
+  sfx_reel: {
+    wave: 'square',
+    freq: 520,
+    freqEnd: 480,
+    attack: 0.002,
+    sustain: 0.1,
+    release: 0.04,
+    volume: 0.12,
+    duty: 0.1,
+  },
+  /** The line parting: a thin twang. */
+  sfx_snap: {
+    wave: 'triangle',
+    freq: 1800,
+    freqEnd: 300,
+    attack: 0.002,
+    sustain: 0.04,
+    release: 0.2,
+    volume: 0.3,
+  },
+  /** Something small hitting the water. */
+  sfx_splash: {
+    wave: 'noise',
+    freq: 2200,
+    freqEnd: 600,
+    attack: 0.004,
+    sustain: 0.06,
+    release: 0.18,
+    volume: 0.25,
+  },
   /** A water-worm spitting: a wet, falling pop. */
   sfx_spit: {
     wave: 'noise',

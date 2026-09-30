@@ -187,6 +187,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       const ui = bridge().sim.storyUi();
       if (ui === null) return null;
       if (ui.k === 'save') return { k: 'save', who: null, text: '', shown: 1, choices: [], cursor: 0 };
+      if (ui.k === 'fish') return { k: 'fish', who: null, text: ui.phase, shown: 1, choices: [], cursor: 0 };
       if (ui.k === 'shop')
         return {
           k: 'shop',

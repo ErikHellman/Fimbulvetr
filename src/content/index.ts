@@ -20,6 +20,7 @@ import { WORLD_LAYOUT } from './world/layout';
 import { LEGEND } from './world/legend';
 import { SPAWN_TABLES } from './spawns';
 import { GALDR_DEFS } from './galdr';
+import { FISH_DEFS } from './fish';
 import { SCREENS } from './world/registry';
 
 export const DB: ContentDb = {
@@ -45,6 +46,7 @@ export const DB: ContentDb = {
   shops: SHOP_DEFS,
   weather: WEATHER_RULES,
   spawns: SPAWN_TABLES,
+  fish: FISH_DEFS,
   /** The raid night never dawns: the clock waits until it is over. */
   freezeClock: raidNight,
 };

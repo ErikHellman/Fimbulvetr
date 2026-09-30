@@ -535,6 +535,10 @@ export class UiScene extends Phaser.Scene {
       this.drawPicker(lang);
       return;
     }
+    if (ui.k === 'fish') {
+      this.lastShown = '';
+      return;
+    }
     const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
     const count = Math.floor(ui.shown * full.length);
     const shown = full.slice(0, count);

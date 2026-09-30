@@ -126,6 +126,10 @@ export const SFX = [
   'sfx_howl',
   'sfx_shriek',
   'sfx_spit',
+  'sfx_bite',
+  'sfx_reel',
+  'sfx_snap',
+  'sfx_splash',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -210,6 +214,10 @@ export const SCRIPTS = [
   'thing_notices',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
+
+/** Fish that bite in Mýrland's waters; each season and part of the day has its own. */
+export const FISH = ['perch', 'pike', 'bream', 'trout', 'eel', 'burbot', 'salmon', 'gamli'] as const;
+export type FishId = (typeof FISH)[number];
 
 /** Things that can be lifted, thrown, broken or split. */
 export const PROPS = [

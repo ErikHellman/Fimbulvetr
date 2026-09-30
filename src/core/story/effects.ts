@@ -37,7 +37,9 @@ export type Effect =
   | { readonly k: 'policy'; readonly policy: ClockState['policy'] }
   /** Sleep to the next day's `until` minute. */
   | { readonly k: 'sleep'; readonly until: number }
-  | { readonly k: 'sfx'; readonly id: SfxId };
+  | { readonly k: 'sfx'; readonly id: SfxId }
+  /** A piece of heart handed over (a reward), counted like one picked up; `id` is saved in `world.pieces`. */
+  | { readonly k: 'piece'; readonly id: string };
 
 export function applyEffect(e: Effect, rt: SimRt): void {
   const s = rt.state;
@@ -108,7 +110,27 @@ export function applyEffect(e: Effect, rt: SimRt): void {
     case 'sfx':
       rt.emit({ t: 'sfx', id: e.id });
       break;
+    case 'piece':
+      grantPiece(rt, e.id);
+      break;
   }
+}
+
+/** Pieces of heart that make one heart container's worth. */
+export const PIECES_PER_HEART = 4;
+
+/** Takes a piece of heart for good (once per id); every fourth adds a heart and refills health. */
+export function grantPiece(rt: SimRt, id: string): void {
+  const w = rt.state.world;
+  if (w.pieces.includes(id)) return;
+  w.pieces.push(id);
+  rt.state.inv.items.heart_piece = w.pieces.length % PIECES_PER_HEART;
+  if (w.pieces.length % PIECES_PER_HEART === 0) {
+    rt.hero.maxHp = Math.min(MAX_HP, rt.hero.maxHp + HEART);
+    rt.hero.hp = rt.hero.maxHp;
+  }
+  rt.emit({ t: 'itemGet', item: 'heart_piece' });
+  rt.emit({ t: 'sfx', id: 'sfx_itemget' });
 }
 
 /**

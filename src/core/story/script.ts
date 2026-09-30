@@ -6,6 +6,7 @@ import type { TilePos } from '../world/screen';
 import type { Cond } from './cond';
 import type { DialogueRun, Speaker } from './dialogue';
 import type { Effect } from './effects';
+import type { FishRun } from './fishing';
 import type { BuyResult } from './shop';
 
 /** An actor a script can move or turn: the hero or an NPC on the current screen. */
@@ -40,7 +41,12 @@ export type Step =
    * Offers the save slots (at mead halls and hofs): the shell shows its slot picker and answers with the
    * `saved` command, whether a slot was written or the player backed out.
    */
-  | { readonly k: 'save' };
+  | { readonly k: 'save' }
+  /**
+   * Fishing from where Ask stands, the float at `float`, until they put the rod down (cancel). `each` is
+   * applied for every fish landed (after its silver and its own `onLand`).
+   */
+  | { readonly k: 'fish'; readonly float: TilePos; readonly each?: readonly Effect[] };
 
 export interface ScriptDef {
   readonly steps: readonly Step[];
@@ -61,6 +67,8 @@ export interface StoryRun {
   shop: { cursor: number; last: BuyResult | null } | null;
   /** Set by the `saved` command while a `save` step waits; absent otherwise (so it never changes the hash). */
   saved?: true;
+  /** The fishing session, while a `fish` step runs; absent otherwise (so it never changes the hash). */
+  fish?: FishRun;
 }
 
 export const FADE_STEP_TICKS = 18;
