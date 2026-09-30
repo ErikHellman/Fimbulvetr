@@ -1,6 +1,6 @@
 import type { AttackWindow, EnemyDef } from '@core/actors/enemies/defs';
 import type { Box } from '@core/math/box';
-import { HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
+import { ARROW, HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
 import type { EnemyId } from './ids';
 
 /** The same box for every facing (a body slam). */
@@ -486,5 +486,51 @@ export const ENEMY_DEFS = {
       },
     },
     drops: { heart: 1, silver: 0, none: 0 },
+  },
+  /**
+   * The Haugbúi King, Konungshaugr's boss (see king.ts): his mail turns every blow; an arrow in his
+   * blazing crown while he lowers his head to charge (500 ms tell) fells him, open to the blade.
+   */
+  haugkonungr: {
+    id: 'haugkonungr',
+    art: 'enemy_haugkonungr',
+    hp: 24,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -44, w: 28, h: 44 },
+    behaviour: 'haugkonungr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    struckBy: ARROW,
+    needs: ['bow'],
+    boss: { name: { en: 'The Haugbúi King', sv: 'Högbokungen' } },
+    attacks: {
+      sweep: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -40, w: 32, h: 40 },
+          w: { x: -32, y: -40, w: 32, h: 40 },
+          s: { x: -20, y: -14, w: 40, h: 32 },
+          n: { x: -20, y: -50, w: 40, h: 32 },
+        },
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+      charge: {
+        from: 0,
+        to: 149,
+        boxes: {
+          e: { x: 4, y: -40, w: 18, h: 40 },
+          w: { x: -22, y: -40, w: 18, h: 40 },
+          s: { x: -14, y: -10, w: 28, h: 22 },
+          n: { x: -14, y: -52, w: 28, h: 22 },
+        },
+        amount: 4,
+        knock: 8,
+        tags: HEAVY,
+      },
+    },
   },
 } as const satisfies Record<EnemyId, EnemyDef>;

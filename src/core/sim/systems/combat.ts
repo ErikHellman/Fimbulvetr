@@ -32,6 +32,18 @@ import { applyAll } from './story';
 export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult {
   const def = target.kind === 'enemy' ? enemyDef(rt, target) : undefined;
   if (mem(target, 'asleep') === 1) return { outcome: 'ignored', dealt: 0 };
+  if (
+    def?.struckBy !== undefined &&
+    (hit.tags & def.struckBy) !== 0 &&
+    mem(target, 'exposed') === 1 &&
+    target.faction !== hit.faction
+  ) {
+    // Its weak spot, bared for a moment (a crown's gem): the behaviour takes it from here.
+    target.mem['struck'] = 1;
+    rt.emit({ t: 'hit', target: target.id, blocked: false, dealt: 0 });
+    rt.emit({ t: 'sfx', id: 'sfx_gem' });
+    return { outcome: 'damaged', dealt: 0 };
+  }
   const armoured = def?.guard === true && mem(target, 'cracked') !== 1;
   if (
     armoured &&

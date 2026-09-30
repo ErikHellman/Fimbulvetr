@@ -40,6 +40,11 @@ export interface EnemyDef {
    * blast), or land while its own guard is down (`mem.open`, set by its behaviour while it swings).
    */
   readonly shield?: boolean;
+  /**
+   * Hit tags that strike its weak spot while its behaviour has it `mem.exposed` (the King's crown, an
+   * arrow): the hit sets `mem.struck` for the behaviour instead of clinking off.
+   */
+  readonly struckBy?: number;
   /** The element that breaks its `guard` for good (a bomb's force cracks a mud-crab's shell). */
   readonly cracks?: Element;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */

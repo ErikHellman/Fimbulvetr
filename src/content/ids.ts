@@ -83,6 +83,7 @@ export const ENEMIES = [
   'haugbui',
   'bogdraugr',
   'haugvordr',
+  'haugkonungr',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 

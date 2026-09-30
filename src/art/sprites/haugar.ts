@@ -3,7 +3,7 @@ import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
 import { outline } from '../outline';
 import { C } from '../palette';
-import { createRaster, flipX, hex, type Raster } from '../raster';
+import { blit, createRaster, flipX, hex, type Raster } from '../raster';
 import { drawPerson, type Look, type Side } from './people';
 import type { SpriteFrame } from './types';
 
@@ -328,6 +328,42 @@ function grow(src: Raster): Raster {
   return r;
 }
 
+/** The Haugbúi King: the wight grown half again, in a gold crown whose three gems blaze on the charge. */
+const KING_LOOK: Look = { ...WIGHT_LOOK, top: '#5a3a5a', bottom: '#2a2a34', beard: '#d8d8c8' };
+
+function king(side: Side, phase: number, pose: WightPose, blaze: boolean, sunk = 0): Raster {
+  const arms = pose === 'raise' ? 'up' : pose === 'cut' ? 'forward' : 'down';
+  const base = drawPerson(KING_LOOK, side, phase, {
+    eyes: WIGHT_EYES,
+    arms,
+    ...(sunk > 0 ? { sink: sunk } : {}),
+  });
+  const b = (phase === 1 || phase === 3 ? 1 : 0) + sunk;
+  if (pose === 'raise') {
+    const hx = side === 'w' ? 12 : 23;
+    rect(base, hx, b + 2, 2, 12, BLADE);
+  } else if (pose === 'cut') {
+    if (side === 'w') rect(base, 3, b + 19, 9, 2, BLADE);
+    else rect(base, 22, b + 20, 2, 8, BLADE);
+  }
+  // Six rows of headroom over the grown figure for the crown.
+  const r = createRaster(48, 54);
+  blit(r, grow(base), 0, 6);
+  const gold = hex('#e8c050');
+  const shade = hex('#a8802a');
+  const top = Math.round((b + 3) * 1.5) + 4;
+  rect(r, 16, top, 16, 3, gold);
+  rect(r, 28, top, 4, 3, shade);
+  for (const x of [16, 22, 29]) rect(r, x, top - 3, 3, 3, gold);
+  const gem = blaze ? hex('#ff7040') : hex('#7a2a2a');
+  if (side !== 'n')
+    for (const x of [18, 23, 28]) {
+      rect(r, x, top, 2, 2, gem);
+      if (blaze) rect(r, x, top - 1, 2, 1, hex('#ffd0a0'));
+    }
+  return r;
+}
+
 export function haugarFrames(): SpriteFrame[] {
   const fixture = (name: string, raster: Raster): SpriteFrame => ({ name, raster, ox: 9, oy: raster.h - 3 });
   const wights: SpriteFrame[] = [];
@@ -389,6 +425,21 @@ export function haugarFrames(): SpriteFrame[] {
     w('bash', 0, wight(side, 1, 'rest'));
     w('bash', 1, wight(side, 3, 'rest'));
     w('dazed', 0, wight(side, 2, 'hurt'));
+    const k = (anim: string, i: number, r: Raster): void => {
+      add(wardens, 'enemy_haugkonungr', anim, i, r, 24, 51);
+    };
+    k('idle', 0, king(side, 0, 'rest', false));
+    for (let i = 0; i < 4; i++) k('walk', i, king(side, i, 'rest', false));
+    k('roar', 0, king(side, 0, 'raise', true));
+    k('tell', 0, king(side, 0, 'raise', false));
+    k('tell', 1, king(side, 1, 'raise', false));
+    k('sweep', 0, king(side, 0, 'cut', false));
+    k('lower', 0, king(side, 1, 'rest', true));
+    k('lower', 1, king(side, 3, 'rest', true));
+    k('charge', 0, king(side, 1, 'rest', true));
+    k('charge', 1, king(side, 3, 'rest', true));
+    k('dazed', 0, king(side, 2, 'hurt', false));
+    k('fallen', 0, king(side, 0, 'hurt', false, 12));
   }
   const sparks = Array.from({ length: 4 }, (_, i) => ({
     name: `fx_spark_idle_s_${String(i)}`,
@@ -461,6 +512,17 @@ export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
     hurt: all(1, 1),
     rise: all(4, 6, false),
     sleep: all(1, 1),
+  },
+  enemy_haugkonungr: {
+    idle: all(1, 1),
+    walk: all(4, 4),
+    roar: all(1, 1),
+    tell: all(2, 6),
+    sweep: all(1, 1),
+    lower: all(2, 10),
+    charge: all(2, 10),
+    dazed: all(1, 1),
+    fallen: all(1, 1),
   },
   enemy_haugvordr: {
     idle: all(1, 1),
