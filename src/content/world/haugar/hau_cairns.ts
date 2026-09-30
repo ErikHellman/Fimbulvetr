@@ -35,6 +35,6 @@ export const hauCairns: ScreenDef = {
     '#EEEEEEEEEEEEEEEEEEE,,,,EEEEKEEEEEEEEEE#',
     '#EEEEEiEEEEEEEEEEEEE,,,,EEEEEEEEEEEiEEE#',
     '#EEEEEEEEEEEEEEEEEEE,,,,EEEEEEEEEEEEEEE#',
-    '~###################,,,,################',
+    '####################,,,,################',
   ],
 };

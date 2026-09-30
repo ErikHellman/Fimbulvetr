@@ -21,7 +21,7 @@ export const hauBarrows: ScreenDef = {
     { x: 9, y: 19 },
   ],
   map: [
-    '~#######,,,,############################',
+    '########,,,,############################',
     '#EEEEEEE,,,,EEEEEEEEEEEEEEEEEEEEEEEEEEE#',
     '#EEEEEEE,,,,EEEEEEEEEEEEEEEEEENNNEEEEEE#',
     '#EEmEEiE,,,,EEEmEEEEEEEEEEENNNNNNNNNEEE#',
