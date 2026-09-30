@@ -7,7 +7,8 @@ const story = (page: Page) => page.evaluate(() => window.__fimbul?.story() ?? nu
 const mode = (page: Page) => page.evaluate(() => window.__fimbul?.mode());
 const flags = (page: Page) => page.evaluate(() => window.__fimbul?.flags() ?? {});
 const fish = (page: Page) => page.evaluate(() => window.__fimbul?.fish() ?? null);
-const tileY = async (page: Page): Promise<number> => Math.floor(((await hero(page))?.y ?? 0) / 16);
+/** The tile row Ask's feet stand on (as the game counts it: feet resting on a tile's top edge are above it). */
+const tileY = async (page: Page): Promise<number> => Math.floor((((await hero(page))?.y ?? 1) - 1) / 16);
 
 async function backToPlay(page: Page, key: string): Promise<void> {
   for (let i = 0; i < 40 && (await mode(page)) !== 'play'; i++) await tap(page, key);
@@ -23,9 +24,11 @@ test('the boomerang strikes the weir’s latch and the drawbridge carries Ask in
   await tap(page, 'KeyK');
   await expect.poll(async () => (await flags(page)).w_myl_bridge).toBe(true);
   // Down to the bridge head and west over the rapids until Mýrland greets Ask.
+  // Step by frames and let go on the bridge's rows (6–7): holding on past them walks off its end.
   await page.keyboard.down('KeyS');
-  await expect.poll(async () => tileY(page)).toBeGreaterThanOrEqual(7);
+  for (let i = 0; i < 400 && (await tileY(page)) < 6; i++) await frames(page);
   await page.keyboard.up('KeyS');
+  expect(await tileY(page)).toBeLessThanOrEqual(7);
   await page.keyboard.down('KeyA');
   await expect.poll(async () => mode(page), { timeout: 15_000 }).toBe('story');
   await page.keyboard.up('KeyA');
