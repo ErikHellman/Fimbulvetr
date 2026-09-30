@@ -70,29 +70,33 @@ test('fishing off Kári’s jetty: cast, strike the bite, reel within the band, 
   await boot(page, 'preset=fisher&nosave');
   await tap(page, 'KeyE');
   await expect.poll(async () => (await fish(page))?.phase).toBe('idle');
+  // One frame at a time, as a player would: cast when idle, strike the moment the float goes under (the
+  // window is a third of a second), hold the line while it is slack and let go when it strains or surges.
   let landed = false;
-  for (let tries = 0; tries < 6 && !landed; tries++) {
-    await tap(page, 'Enter');
-    await expect.poll(async () => (await fish(page))?.phase, { timeout: 15_000 }).toBe('bite');
-    await tap(page, 'Enter');
-    let holding = false;
-    for (let i = 0; i < 4000; i++) {
-      const f = await fish(page);
-      if (f === null || f.phase !== 'reel') break;
-      const want = f.tension < 650 && !f.surging;
-      if (want !== holding) {
-        if (want) await page.keyboard.down('KeyE');
-        else await page.keyboard.up('KeyE');
-        holding = want;
-      }
+  let holding = false;
+  const hold = async (want: boolean): Promise<void> => {
+    if (want === holding) return;
+    if (want) await page.keyboard.down('KeyE');
+    else await page.keyboard.up('KeyE');
+    holding = want;
+  };
+  for (let i = 0; i < 20_000 && !landed; i++) {
+    const f = await fish(page);
+    if (f === null) break;
+    if (f.phase === 'result') {
+      await hold(false);
+      landed = f.result === 'landed';
+      if (!landed) await tap(page, 'Enter');
+    } else if (f.phase === 'idle') {
+      await hold(false);
+      await tap(page, 'Enter');
+    } else if (f.phase === 'bite') await tap(page, 'Enter');
+    else {
+      if (f.phase === 'reel') await hold(f.tension < 650 && !f.surging);
       await frames(page);
     }
-    if (holding) await page.keyboard.up('KeyE');
-    const end = await fish(page);
-    landed = end?.result === 'landed';
-    // Back to the rod for another cast.
-    await expect.poll(async () => (await fish(page))?.phase, { timeout: 5_000 }).toBe('idle');
   }
+  await hold(false);
   expect(landed).toBe(true);
   expect((await flags(page)).q_fish_caught).toBeGreaterThanOrEqual(1);
   await tap(page, 'Escape');

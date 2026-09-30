@@ -19,7 +19,16 @@ function alive(h: Harness): void {
   h.expectAnims();
 }
 
+/** Drinks the red mead from the menu's action when health runs low (the walker cannot open menus). */
+function drinkIfLow(h: Harness): void {
+  if (h.sim.hero.hp <= 6 && (h.sim.state.inv.items.mead_red ?? 0) > 0) {
+    h.sim.command({ t: 'eat', item: 'mead_red' });
+    h.idle(1);
+  }
+}
+
 function leave(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
+  drinkIfLow(h);
   walkFighting(h, tx, ty);
   crossFighting(h, dir, to);
   if (h.sim.mode === 'story') finishStory(h);

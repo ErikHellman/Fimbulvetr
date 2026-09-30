@@ -6,6 +6,8 @@ const waitForMove = async (page: import('@playwright/test').Page): Promise<void>
 };
 
 test('M0 exit: move, fight, roll, shield, cross screens, tints, save and import', async ({ page }) => {
+  // Three boots, each building every frame of art: with two workers under SwiftShader this passes 30 s.
+  test.setTimeout(90_000);
   const errors = collectErrors(page);
   await boot(page, 'preset=m0&screen=test_a&at=13,11');
 
