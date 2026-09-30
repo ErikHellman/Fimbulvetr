@@ -429,6 +429,7 @@ export const DEV_PRESETS = {
     pieces: ['hp_d1_r09', 'hp_myl_peat', 'hp_hau_barrows', 'hp_hau_tarn'],
     opened: ['d1_hc', 'd2_hc', 'd2_c_bombs', 'hau_k_gully', 'hau_k_barrows'],
     dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
+    warps: ['haugar'],
   },
   /** Before the King's great door in the champions' hall, with the bow, the great key and a full quiver. */
   d3boss: {
@@ -527,6 +528,7 @@ export const DEV_PRESETS = {
     pieces: ['hp_d1_r09', 'hp_myl_peat', 'hp_hau_barrows', 'hp_hau_tarn'],
     opened: ['d1_hc', 'd2_hc', 'd3_hc', 'd2_c_bombs', 'd3_c_bow', 'hau_k_gully', 'hau_k_barrows'],
     dungeons: { d1: { bossDead: true }, d2: { bossDead: true }, d3: { bossDead: true } },
+    warps: ['haugar'],
   },
   /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
