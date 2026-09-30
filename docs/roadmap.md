@@ -78,7 +78,13 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Overworld solver proofs (and brambles barring the bypass round the pine), exit route, e2e, v1-m2c fixture, docs
     - [ ] User playtest and Swedish proofread
 - [ ] M3 Mýrland + D2 — brief: `docs/briefs/m3.md`, plan: `docs/superpowers/plans/2026-09-30-m3.md`
-  - [ ] M3a Mýrland: seasonal fords, water that never freezes, the boomerang latch, fishing, the water-worm and the bog-light, 10 screens, 5 NPCs
+  - [ ] M3a Mýrland
+    - [x] Seasonal water: rapids, warm springs, shoals that flood in spring; the solver learns seasons; every seam tested in every season
+    - [x] Latches and drawbridges; the first enemy projectile; the water-worm and the bog-light
+    - [x] Fishing (bite, then reel), the fish table, Gamli, a piece handed over
+    - [x] Content: 10 screens and 2 interiors, Kári, Bárðr, Þuríðr, Ljótr, Auðr, `q_runestone_2` to the drowned mill, `q_fisher`
+    - [x] Solver proofs in every season, route, e2e, v1-m3a fixture, docs
+    - [ ] User playtest and Swedish proofread
   - [ ] M3b Sökkva Kvern: water levels, bombs, cracks, the big lock, 16 rooms, Lindormr, Mýrland's bomb secrets
 - [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
