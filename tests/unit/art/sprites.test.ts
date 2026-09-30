@@ -188,6 +188,12 @@ describe('enemies', () => {
     );
   });
 
+  it('flashes a blast out and away in a one-shot burst', () => {
+    expect(ANIMS['fx_blast']?.['idle']).toMatchObject({ frames: 6, loop: false, dirs: ['s'] });
+    const sizes = [0, 5].map((i) => countOpaque(frame(`fx_blast_idle_s_${i}`).raster));
+    expect(sizes[1]).toBeLessThan(sizes[0] ?? 0);
+  });
+
   it('draws a crack whole and blown open', () => {
     for (const art of ['fix_crack_wall', 'fix_crack_rock'])
       expect(rastersEqual(frame(`${art}_closed_s_0`).raster, frame(`${art}_open_s_0`).raster), art).toBe(

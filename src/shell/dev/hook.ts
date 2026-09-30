@@ -1,4 +1,5 @@
 import type { UiKey } from '@content/i18n/ui';
+import { itemMax, owns } from '@core/items/defs';
 import { SCREEN_IDS, isScreenId } from '@content/world/screens';
 import { mem } from '@core/actors/entity';
 import { isSeason, type ClockState } from '@core/clock/types';
@@ -82,6 +83,10 @@ export interface FimbulHook {
     result: string | null;
     surging: boolean;
   } | null;
+  /** The water level of the screen Ask is on, or null on screens without water. */
+  water(): { level: number; flag: string } | null;
+  /** Bombs in the bag, and how many it holds. */
+  ammo(): { bombs: number; max: number; owned: boolean };
   /** The saved state of the dungeon Ask is in, or null outside dungeons. */
   dungeon(): {
     id: string;
@@ -143,6 +148,22 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     boss: () => {
       const b = bridge().sim.boss();
       return b === null ? null : { name: b.name.en, hp: b.hp, maxHp: b.maxHp, phase: b.phase };
+    },
+    water: () => {
+      const sim = bridge().sim;
+      const flag = sim.db.screens[sim.screen.id].water;
+      if (flag === undefined) return null;
+      const v = sim.state.flags[flag];
+      return { level: typeof v === 'number' ? v : 0, flag };
+    },
+    ammo: () => {
+      const sim = bridge().sim;
+      const have = sim.state.inv.items;
+      return {
+        bombs: have.bombs ?? 0,
+        max: itemMax(sim.db.items, have, 'bombs'),
+        owned: owns(have, 'bombs'),
+      };
     },
     dungeon: () => {
       const sim = bridge().sim;

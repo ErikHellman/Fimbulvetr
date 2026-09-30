@@ -59,6 +59,9 @@ export const TERRAIN_IDS = [
   'sluice_hi',
   'race',
   'race_hi',
+  'boards',
+  'mill_wall',
+  'silt',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -165,4 +168,10 @@ export const TERRAIN = {
   race: { solid: true, low: true, rise: { floats: 1 } },
   /** A deeper race whose planks float only at the top level (2). */
   race_hi: { solid: true, low: true, rise: { floats: 2 } },
+  /** The sunken mill's floor: old wet boards. */
+  boards: { solid: false },
+  /** The mill's walls: dressed stone below, timber above. */
+  mill_wall: { solid: true },
+  /** Grey silt at the bottom of the millpond, where Lindormr lies: soft and slow. */
+  silt: { solid: false, slow: 0.8 },
 } as const satisfies Record<TerrainId, TerrainDef>;

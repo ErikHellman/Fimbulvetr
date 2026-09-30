@@ -289,6 +289,39 @@ function mound(bubble: number | null): Raster {
   return outline(r, INK, 1);
 }
 
+// ── The blast: 48×48, centred 30 px down (the bomb's feet), a flash that swells and breaks into smoke ──
+
+const FIRE = hex(C.ember);
+const FIRE_LIGHT = hex(C.emberLight);
+const SMOKE = hex('#6b6560');
+const SMOKE_LIGHT = hex('#8d8782');
+
+function blastFrame(i: number): Raster {
+  const r = createRaster(48, 48);
+  const cy = 30 - i;
+  if (i < 3) {
+    const k = 8 + i * 6;
+    ellipse(r, 24, cy, k + 2, k, FIRE);
+    ellipse(r, 24, cy, k - 2, k - 3, FIRE_LIGHT);
+    ellipse(r, 24, cy, Math.max(2, k - 8), Math.max(2, k - 9), SPARK);
+    return r;
+  }
+  // Smoke clouds drifting apart and thinning.
+  const n = 6 - i;
+  for (const [dx, dy] of [
+    [-10, -4],
+    [10, -4],
+    [0, -12],
+    [-6, 6],
+    [7, 6],
+  ] as const) {
+    const spread = 1 + (i - 3) * 0.4;
+    ellipse(r, 24 + dx * spread, cy + dy * spread, n + 2, n + 1, SMOKE);
+    ellipse(r, 23 + dx * spread, cy - 1 + dy * spread, n, n - 1, SMOKE_LIGHT);
+  }
+  return r;
+}
+
 export function sokkvaFrames(): SpriteFrame[] {
   const prop = (name: string, raster: Raster): SpriteFrame => ({
     name,
@@ -342,7 +375,14 @@ export function sokkvaFrames(): SpriteFrame[] {
     worm.push({ name: `enemy_lind_mound_bubble_${dir}_0`, raster: mound(0), ox: 14, oy: 21 });
     worm.push({ name: `enemy_lind_mound_bubble_${dir}_1`, raster: mound(1), ox: 14, oy: 21 });
   }
+  const blasts = Array.from({ length: 6 }, (_, i) => ({
+    name: `fx_blast_idle_s_${String(i)}`,
+    raster: blastFrame(i),
+    ox: 24,
+    oy: 30,
+  }));
   return [
+    ...blasts,
     ...crabs,
     ...worm,
     prop('prop_bomb_idle_s_0', bomb('rest')),
@@ -368,6 +408,7 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const all = (frames: number, fps: number): AnimDef => ({ frames, fps, loop: true, dirs: ALL });
 
 export const SOKKVA_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  fx_blast: { idle: { frames: 6, fps: 15, loop: false, dirs: ['s'] } },
   enemy_lindormr: {
     idle: all(1, 1),
     hidden: all(1, 1),

@@ -3,6 +3,7 @@ import { grade } from '@art/grading';
 import { ANIMS } from '@art/sprites';
 import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
+import { waterIndices } from '@art/tiles/waterIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import type { ScreenId } from '@content/world/screens';
@@ -252,6 +253,9 @@ export class PlayScene extends Phaser.Scene {
     if (ev.t === 'killed') {
       const origin = this.sim.originOf(this.sim.screen.id);
       this.fx.poof({ x: origin.x + ev.x, y: origin.y + ev.y - 6 }, this.sim.tick);
+    } else if (ev.t === 'blast') {
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fx.blast({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
     } else if (ev.t === 'shake') {
@@ -502,8 +506,16 @@ export class PlayScene extends Phaser.Scene {
     return out;
   }
 
+  /** The cover layer: ground cover, and over it the water level on screens with water. */
   private coverTiles(id: ScreenId): number[] {
-    return coverIndices(this.sim.coverOf(id), this.services.db.coverOrder, this.services.assets.tileset);
+    const { db } = this.services;
+    const { tileset } = this.services.assets;
+    const cover = coverIndices(this.sim.coverOf(id), db.coverOrder, tileset);
+    const flag = db.screens[id].water;
+    if (flag === undefined) return cover;
+    const v = this.sim.state.flags[flag];
+    const water = waterIndices(this.sim.terrainOf(id), db.terrain, typeof v === 'number' ? v : 0, tileset);
+    return cover.map((c, i) => ((water[i] ?? -1) >= 0 ? (water[i] ?? c) : c));
   }
 
   private dropScreensExcept(id: ScreenId): void {

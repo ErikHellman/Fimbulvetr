@@ -46,7 +46,7 @@ describe('tileset', () => {
       else expect(e.count).toBeGreaterThan(0);
     }
     const total = TERRAIN_IDS.reduce((n, id) => n + ts.entries[id].count * ts.entries[id].frames, 0);
-    expect(ts.tiles).toHaveLength(total + 2 * Object.keys(ts.cover).length);
+    expect(ts.tiles).toHaveLength(total + 2 * Object.keys(ts.cover).length + 2);
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 
@@ -121,6 +121,18 @@ describe('tileset', () => {
     expect(has(first('menhir'), C.rock)).toBe(false);
     expect(has(first('bed'), C.floor)).toBe(true);
     expect(has(first('tree'), C.grass)).toBe(true);
+  });
+
+  it('overlays the water level: flooded sluices and floated planks, nothing on the dry or sunken', async () => {
+    const { waterIndices } = await import('@art/tiles/waterIndices');
+    const { DB } = await import('@content/index');
+    const cells: TerrainId[] = ['sluice', 'sluice_hi', 'race', 'race_hi', 'boards'];
+    const grid = { cols: 5, rows: 1, cells };
+    const { flooded, afloat } = ts.water;
+    expect(waterIndices(grid, DB.terrain, 0, ts)).toEqual([-1, -1, -1, -1, -1]);
+    expect(waterIndices(grid, DB.terrain, 1, ts)).toEqual([flooded, -1, afloat, -1, -1]);
+    expect(waterIndices(grid, DB.terrain, 2, ts)).toEqual([flooded, flooded, afloat, afloat, -1]);
+    expect(differingPixels(tile(ts, flooded), tile(ts, afloat))).toBeGreaterThan(20);
   });
 
   it('is deterministic', () => {

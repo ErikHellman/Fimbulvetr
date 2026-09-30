@@ -304,6 +304,35 @@ const MILL_WATERS = {
       channel(p, true);
     },
   },
+  /** Old wet boards, dark with the water that stood over them. */
+  boards: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      planks(p, C.woodShade, C.ink, v.variant === 1);
+      p.speckle(C.mudShade, 0.06);
+    },
+  },
+  /** Dressed stone below, black timber above: the mill's walls, auto-tiled like the cave's. */
+  mill_wall: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      planks(p, C.woodShade, C.ink, false);
+      region(p, v.mask, 0, C.rockShade, C.ink, C.rock, 0.12);
+    },
+  },
+  /** Grey silt: the millpond's bottom. */
+  silt: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      p.fill(C.mud);
+      p.speckle(C.mudShade, 0.2);
+      p.speckle(C.mudLight, 0.06);
+      p.rect(2 + v.variant * 4, 6 + v.variant * 3, 4, 1, C.mudShade);
+    },
+  },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
