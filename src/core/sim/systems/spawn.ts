@@ -1,3 +1,4 @@
+import type { EnemyId } from '@content/ids';
 import type { Entity } from '../../actors/entity';
 import { createEnemy } from '../../actors/enemies';
 import { createCritter } from '../../actors/critters';
@@ -42,6 +43,25 @@ export function spawnActors(rt: SimRt, heroAt: Vec = rt.hero.pos): Entity[] {
   return rt.actors;
 }
 
+/**
+ * Runestone scaling: a mortal, non-boss foe on a lowland screen outside the dungeons grows with the stones
+ * lit (`Tuning.stones`). Below the first step nothing is touched, so older states hash as before.
+ */
+export function scaleFoe(rt: SimRt, e: Entity): void {
+  const def = rt.db.enemies[e.def as EnemyId];
+  const screen = rt.db.screens[rt.screen.id];
+  if (def.boss !== undefined || def.immortal || screen.dungeon !== undefined) return;
+  if (!rt.db.lowlands.includes(screen.region)) return;
+  const s = rt.db.tuning.stones;
+  const tier = s.flags.filter((f) => rt.state.flags[f] === true).length;
+  const pct = s.hpPct[tier] ?? 100;
+  const blow = s.blow[tier] ?? 0;
+  if (pct === 100 && blow === 0) return;
+  e.maxHp = Math.ceil((def.hp * pct) / 100);
+  e.hp = e.maxHp;
+  e.mem['tier'] = tier;
+}
+
 /** Tiles of clear ground a rolled enemy keeps between itself and Ask's arrival. */
 const SPAWN_CLEARANCE = 4;
 
@@ -73,6 +93,7 @@ function spawnRolled(rt: SimRt, heroAt: Vec): void {
   for (const r of rollSpawns({ ...table, entries }, season, night, def.spawns, seed, free)) {
     const e = createEnemy(rt.newId(), rt.db.enemies[r.id], tileFeet(r.at));
     e.mem['rolled'] = 1;
+    scaleFoe(rt, e);
     rt.actors.push(e);
   }
 }
@@ -88,6 +109,7 @@ function spawnThings(rt: SimRt): Entity[] {
         const e = createEnemy(rt.newId(), def, tileFeet(thing.at));
         // The thing index is only kept for enemies that do something when they die.
         if (thing.onDeath !== undefined) e.mem['thing'] = index;
+        scaleFoe(rt, e);
         out.push(e);
         break;
       }

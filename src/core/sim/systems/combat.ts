@@ -145,7 +145,9 @@ export function resolveAttacks(rt: SimRt): void {
         : undefined;
     const touch = def.touch !== undefined && overlaps(heroBox, at(e.hurt, e.pos)) ? def.touch : undefined;
     const hit = blow ?? touch;
-    if (hit !== undefined && hurtHero(rt, e, hit.amount, hit.knock, hit.tags)) return;
+    // Runestone scaling (see spawn.ts `scaleFoe`): a harder blow once enough stones burn.
+    const extra = e.mem['tier'] === undefined ? 0 : (rt.db.tuning.stones.blow[mem(e, 'tier')] ?? 0);
+    if (hit !== undefined && hurtHero(rt, e, hit.amount + extra, hit.knock, hit.tags)) return;
   }
 }
 

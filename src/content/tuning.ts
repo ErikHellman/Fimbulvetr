@@ -57,6 +57,12 @@ export const TUNING: Tuning = {
       s: { x: -6, y: -8, w: 12, h: 28 },
     },
   },
+  /** Nothing changes before the second stone; at two, +50% health; at three, double and +1 a blow. */
+  stones: {
+    flags: ['st_stone1_lit', 'st_stone2_lit', 'st_stone3_lit'],
+    hpPct: [100, 100, 150, 200],
+    blow: [0, 0, 0, 1],
+  },
   throw: { speed: 4, flightTicks: 20 },
   push: { ticks: 16, slideTicks: 16 },
   boomerang: { speed: 3, range: 112 },

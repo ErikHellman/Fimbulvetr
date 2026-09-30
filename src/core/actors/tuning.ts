@@ -1,3 +1,4 @@
+import type { FlagId } from '@content/flags';
 import type { ArmorId, WeaponId } from '@content/ids';
 import type { Box } from '../math/box';
 import type { Dir4 } from '../math/dir';
@@ -102,6 +103,16 @@ export interface ThrustTuning {
   readonly boxes: Readonly<Record<Dir4, Box>>;
 }
 
+/**
+ * Lowland foes grow as the runestones are lit (the GDD's "difficulty scales with runestones lit"): by the
+ * number of `flags` set, their health in percent and a bonus to every blow, in quarter hearts.
+ */
+export interface StoneTuning {
+  readonly flags: readonly FlagId[];
+  readonly hpPct: readonly number[];
+  readonly blow: readonly number[];
+}
+
 export interface BoomerangTuning {
   /** px per tick, out and back. */
   readonly speed: number;
@@ -124,6 +135,7 @@ export interface Tuning {
   readonly textCps: number;
   readonly sword: SwordTuning;
   readonly thrust: ThrustTuning;
+  readonly stones: StoneTuning;
   readonly enemyIframes: number;
   readonly knockDecay: number;
 }
