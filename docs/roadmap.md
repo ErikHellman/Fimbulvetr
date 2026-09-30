@@ -101,5 +101,11 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Solver proofs in every season, route, e2e, v1-m4a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M4b Konungshaugr: bow, eye switches, ghost floors, grave-gold, the barrow-warden, the Haugbúi King, Farvegr
+    - [x] The bow and arrows, eye switches, pits and the hidden floor, sleepers and grave-gold; mini-bosses, one table of enemy shots, the draugr archer and the barrow-warden
+    - [x] The Haugbúi King; Farvegr and readying a galdr from the menu; the solver learns the bow
+    - [x] Art and shell: crypt tiles, pits and the lit hidden floor, the eye, the archer, the warden, the King and his axe, the arrow count, the Farvegr picker
+    - [x] Content: Konungshaugr's 20 rooms, `q_runestone_3` to the third stone, Haugar's bow secrets (the great cairn's quiver, the watchtower's piece), arrows for sale
+    - [x] Solver proofs, route, e2e, v1-m4b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

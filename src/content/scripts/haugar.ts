@@ -141,7 +141,7 @@ const stone3Light: ScriptDef = {
       who: null,
       text: {
         en: 'Three stones awake. In the north, a door of stone grows warm.',
-        sv: 'Tre stenar vakna. I norr blir en dörr av sten varm.',
+        sv: 'Tre stenar är vakna. I norr blir en dörr av sten varm.',
       },
     },
     { k: 'fade', out: true },

@@ -31,7 +31,7 @@ const SONGS: Partial<Record<GaldrId, Song>> = {
 };
 
 /**
- * The galdr button in play: Ask sings the first galdr known (the only one in M2), paying its seiðr; with
+ * The galdr button in play: Ask sings the readied galdr (the first in `inv.galdr`), paying its seiðr; with
  * too little seiðr the song fizzles. Only a hero standing free can sing.
  */
 export function castGaldr(rt: SimRt, input: InputFrame): void {
