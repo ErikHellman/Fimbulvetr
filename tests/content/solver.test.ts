@@ -1,14 +1,17 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DB } from '@content/index';
 import { DEV_PRESETS } from '@content/dev/presets';
 import { NEW_GAME } from '@content/start';
 import { SCREEN_IDS } from '@content/world/screens';
 import { applyPreset } from '@core/dev/query';
 import { solve } from '@core/progress/solver';
-import { SEASONS } from '@core/clock/types';
+import { SEASONS, type Season } from '@core/clock/types';
 import type { ContentDb } from '@core/sim/db';
 import { newGame, type GameState } from '@core/state/gameState';
 import { TILE } from '@core/world/dims';
+
+// Whole-world solves (every screen, one season at a time) take a few seconds each.
+vi.setConfig({ testTimeout: 60_000 });
 
 const d1Rooms = SCREEN_IDS.filter((id) => DB.screens[id].dungeon === 'd1');
 const d1Chests = d1Rooms.flatMap((id) =>
@@ -160,5 +163,61 @@ describe('the Myrkviðr and Uppvík gates in every season (winter ice, spring fl
     const blade = solve(DB, atOnundr(road), nothing, { season });
     expect(blade.pieces).toEqual(expect.arrayContaining(['hp_myr_pines', 'hp_myr_trollskog']));
     expect(blade.pieces).not.toContain('hp_myr_fen');
+  });
+});
+
+const myrland = SCREEN_IDS.filter((id) => id.startsWith('myl_'));
+
+/** Where M2 leaves Ask, at the brook's bank path down to the weir (preset `myl`). */
+function atTheBrook(boomerang = true): GameState {
+  const s = newGame(1, NEW_GAME);
+  applyPreset(s, DEV_PRESETS.myl);
+  if (!boomerang) {
+    delete s.inv.items.boomerang;
+    s.inv.slots = ['lantern', null];
+  }
+  return s;
+}
+
+/** The world with Rótarhellir's boomerang chest giving cheese instead: no boomerang to be had anywhere. */
+const NO_BOOMERANG: ContentDb = (() => {
+  const r07 = DB.screens.d1_r07;
+  const things = r07.things.map((t) =>
+    t.k === 'chest' && t.id === 'd1_c_boomerang' ? { ...t, gives: { item: 'cheese' as const } } : t,
+  );
+  return { ...DB, screens: { ...DB.screens, d1_r07: { ...r07, things } } };
+})();
+
+const withBoomerang = new Map<Season, ReturnType<typeof solve>>();
+const solveMyrland = (season: Season) => {
+  let r = withBoomerang.get(season);
+  if (r === undefined) {
+    r = solve(DB, atTheBrook(), nothing, { season });
+    withBoomerang.set(season, r);
+  }
+  return r;
+};
+
+describe('the progression solver on Mýrland, in every season', () => {
+  it.each(SEASONS)('%s: the weir holds without the boomerang', (season) => {
+    const r = solve(NO_BOOMERANG, atTheBrook(false), nothing, { season });
+    expect(r.screens).toContain('myl_weir');
+    for (const id of myrland.filter((m) => m !== 'myl_weir')) expect(r.screens, id).not.toContain(id);
+    expect(r.stranded).toEqual([]);
+  });
+
+  it.each(SEASONS)('%s: with it, all of Mýrland opens and nothing strands Ask', (season) => {
+    const r = solveMyrland(season);
+    for (const id of myrland) expect(r.screens, id).toContain(id);
+    expect(r.scripts).toEqual(expect.arrayContaining(['fish_jetty', 'widow_rest']));
+    expect(r.stranded).toEqual([]);
+    // The reed islet's piece lies beyond the boomerang's reach: only the winter ice walks out to it.
+    expect(r.pieces.includes('hp_myl_reeds')).toBe(season === 'winter');
+  });
+
+  it('floods the shoal in spring, and the old bridge still leads south', () => {
+    expect(solveMyrland('spring').screens).toEqual(
+      expect.arrayContaining(['myl_reeds', 'myl_bog', 'myl_peat']),
+    );
   });
 });
