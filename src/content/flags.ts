@@ -80,6 +80,20 @@ export const FLAGS = {
   q_vargar_done: { t: 'bool' },
   /** The weir's latch is struck: the drawbridge into Mýrland is down for good. */
   w_myl_bridge: { t: 'bool' },
+  /** Ask has crossed the weir into Mýrland. */
+  st_myrland_reached: { t: 'bool' },
+  /** Þuríðr told how the mill sank and that the second stone lies in its cellar. */
+  q_rs2_mill: { t: 'bool' },
+  /** The pass through the mountains is open (set at the end of Act I, M5): the ferry runs. */
+  st_pass_open: { t: 'bool' },
+  /** First meetings in Mýrland. */
+  n_kari_met: { t: 'bool' },
+  n_bardr_met: { t: 'bool' },
+  n_thuridr_met: { t: 'bool' },
+  n_ljotr_met: { t: 'bool' },
+  n_audr_met: { t: 'bool' },
+  /** Kári paid for Gamli with a piece of heart. */
+  q_fisher_done: { t: 'bool' },
   /** Fish Ask has landed. */
   q_fish_caught: { t: 'int', max: 99 },
   /** Ask landed Gamli, the old pike of the millpond. */

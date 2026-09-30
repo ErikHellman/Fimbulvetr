@@ -5,11 +5,18 @@ import { all, flag, not } from './util';
 export const HEIDR: DialogueDef = {
   entry: [
     { when: not(flag('n_heidr_met')), node: 'meet' },
+    { when: all(flag('st_myrland_reached'), not(flag('q_rs2_mill'))), node: 'serpent' },
     { when: flag('q_volva_done'), node: 'after' },
     { when: all(flag('q_volva_asked'), { k: 'item', id: 'fen_moss', gte: 3 }), node: 'moss' },
     { node: 'waiting' },
   ],
   nodes: {
+    serpent: {
+      text: {
+        en: 'The smoke is muddy tonight. Something long lies coiled in the mud of Mýrland, where a wheel stopped turning.',
+        sv: 'Röken är grumlig i kväll. Något långt ligger hoprullat i Mýrlands dy, där ett hjul slutade snurra.',
+      },
+    },
     meet: {
       text: {
         en: 'Come in, come in, you let the fog out. I am Heiðr. I saw you coming three nights ago, in the smoke.',

@@ -73,7 +73,7 @@ describe('screens', () => {
   });
 });
 
-const WATERSIDE = new Set(['water', 'ford', 'jetty']);
+const WATERSIDE = new Set(['water', 'ford', 'jetty', 'spring', 'rapids', 'shoal']);
 
 describe('buildings', () => {
   const cache = new Map<ScreenId, TerrainGrid>();

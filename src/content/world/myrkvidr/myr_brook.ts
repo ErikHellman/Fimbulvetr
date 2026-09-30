@@ -4,7 +4,7 @@ export const myrBrook: ScreenDef = {
   id: 'myr_brook',
   region: 'myrkvidr',
   purpose:
-    'A forest brook with a ford. It tumbles out from under the pines as rapids that never freeze. A piece of heart lies on an islet in the pool, out of reach until something can fetch it (the boomerang, M1c).',
+    'A forest brook with a ford. It tumbles out from under the pines as rapids that never freeze, and falls away south to the weir into Mýrland; a bank path follows it down. A piece of heart lies on an islet in the pool, out of reach until something can fetch it (the boomerang, M1c).',
   things: [
     { k: 'piece', id: 'hp_myr_brook', at: { x: 25, y: 16 } },
     { k: 'enemy', id: 'vargr', at: { x: 10, y: 14 } },
@@ -28,9 +28,9 @@ export const myrBrook: ScreenDef = {
     'TPP.......T%........~~~~~..~~~~~.....PPP',
     'PPP.................~~~~~..~~~~~.....PTT',
     'PTP%....%.%.T.......~~~~~~~~~~~~.....TPT',
-    'TTP.%P..P.T..P....%%~~~~~~~~~~~~.PT..PPP',
-    'PTPPPTPPTPPPPPPPPPPT~~~~~~~~~~~~PPTPPTPT',
-    'PTPPTPPTTPPPPPPTPPPPTPPP~~~~TPPPTPPPPPPP',
-    'TTPTTTPTTPPTTTPTPTPTTPTP~~~~PPPPTPPTPPPP',
+    'TTP.%P..P.T..P....%%~~~~~~~~~~~~.P...PPP',
+    'PTPPPTPPTPPPPPPPPPPT~~~~vvvv~~~~PP,,,TPT',
+    'PTPPTPPTTPPPPPPTPPPPTPPPvvvvTPPPTP,,,PPP',
+    'TTPTTTPTTPPTTTPTPTPTTPTPvvvvPPPPTP,,,PPP',
   ],
 };

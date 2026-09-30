@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DB } from '@content/index';
 import { SCREENS } from '@content/world/registry';
 import { SCREEN_IDS } from '@content/world/screens';
 
@@ -36,10 +37,23 @@ const PERSISTED = [
   'herb_fen_1',
   'herb_fen_2',
   'herb_fen_3',
+  // M3a — Mýrland (the fisher's piece is handed over by Kári, not found)
+  'hp_myl_reeds',
+  'hp_myl_fisher',
 ] as const;
+
+/** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */
+function givenPieces(root: unknown, out: Set<string>): void {
+  if (root === null || typeof root !== 'object') return;
+  const o = root as Record<string, unknown>;
+  if (o['k'] === 'piece' && typeof o['id'] === 'string' && !('at' in o)) out.add(o['id']);
+  for (const v of Object.values(o)) givenPieces(v, out);
+}
 
 function contentIds(): Set<string> {
   const out = new Set<string>();
+  givenPieces(DB.dialogue, out);
+  givenPieces(DB.scripts, out);
   for (const id of SCREEN_IDS)
     for (const t of SCREENS[id].things) {
       if (t.k === 'piece' || t.k === 'chest' || t.k === 'heart' || t.k === 'lock' || t.k === 'herb')

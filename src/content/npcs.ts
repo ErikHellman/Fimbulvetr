@@ -38,6 +38,11 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   steinn: { en: 'Steinn', sv: 'Steinn' },
   heidr: { en: 'Heiðr', sv: 'Heiðr' },
   huldra: { en: 'The huldra', sv: 'Huldran' },
+  kari: { en: 'Kári', sv: 'Kári' },
+  bardr: { en: 'Bárðr', sv: 'Bárðr' },
+  thuridr: { en: 'Þuríðr', sv: 'Þuríðr' },
+  ljotr: { en: 'Ljótr', sv: 'Ljótr' },
+  audr: { en: 'Auðr', sv: 'Auðr' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -158,4 +163,20 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   heidr: npc('heidr', [{ screen: 'myr_int_volva', at: { x: 22, y: 11 }, facing: 's' }]),
   /** Only at night, by the stone in the birch ring, her back to the path: her tail shows. */
   huldra: npc('huldra', [{ when: night, screen: 'myr_glade', at: { x: 20, y: 11 }, facing: 'n' }]),
+  /** By his jetty by day; at night in his hut, mending nets. */
+  kari: npc('kari', [
+    { when: night, screen: 'myl_int_fisher', at: { x: 21, y: 10 }, facing: 's' },
+    { screen: 'myl_fisher', at: { x: 23, y: 9 }, facing: 'w' },
+  ]),
+  /** At the foot of his landing, day and night: nobody takes his boat. */
+  bardr: npc('bardr', [{ screen: 'myl_ferry', at: { x: 22, y: 9 }, facing: 'n' }]),
+  thuridr: npc('thuridr', [{ screen: 'myl_int_widow', at: { x: 21, y: 11 }, facing: 's' }]),
+  /** Cutting peat by day. */
+  ljotr: npc('ljotr', [
+    { when: { k: 'not', c: night }, screen: 'myl_peat', at: { x: 20, y: 18 }, facing: 'n' },
+  ]),
+  /** In the reed beds by day. */
+  audr: npc('audr', [
+    { when: { k: 'not', c: night }, screen: 'myl_reeds', at: { x: 10, y: 4 }, facing: 's' },
+  ]),
 };

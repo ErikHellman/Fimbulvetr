@@ -7,9 +7,16 @@ export const RAGNA: DialogueDef = {
     { when: not(flag('n_ragna_met')), node: 'meet' },
     { when: evening, node: 'hall' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'hall' },
+    { when: flag('n_bardr_met'), node: 'ferry' },
     { node: 'day' },
   ],
   nodes: {
+    ferry: {
+      text: {
+        en: 'You met Bárðr at the lake? He would not row me north either. Nobody rows toward the mountains this year.',
+        sv: 'Har du träffat Bárðr vid sjön? Han ville inte ro mig norrut heller. Ingen ror mot bergen i år.',
+      },
+    },
     meet: {
       text: {
         en: 'Ragna, captain of the Sea-Hart. She lies out in the bay, waiting for a wind worth sailing south on.',

@@ -6,10 +6,17 @@ export const EYVINDR: DialogueDef = {
   entry: [
     { when: not(flag('n_eyvindr_met')), node: 'meet' },
     { when: evening, node: 'night' },
+    { when: flag('n_kari_met'), node: 'kari' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { node: 'day' },
   ],
   nodes: {
+    kari: {
+      text: {
+        en: 'You met old Kári down in Mýrland? He says his pike weighs as much as a calf. Liar. It weighs as much as two.',
+        sv: 'Har du träffat gamle Kári nere i Mýrland? Han säger att hans gädda väger som en kalv. Lögnare. Den väger som två.',
+      },
+    },
     meet: {
       text: {
         en: 'Quiet, you will scare the fish. Eyvindr. Not that there are fish. The bay freezes earlier every winter.',

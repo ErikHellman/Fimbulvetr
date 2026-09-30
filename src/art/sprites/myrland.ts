@@ -105,6 +105,7 @@ export function myrlandFrames(): SpriteFrame[] {
       add('enemy_vatnormr', anim, side, i, r, 16, 28);
     };
     w('under', 0, worm(side, 'under'));
+    w('idle', 0, worm(side, 'under'));
     w('tell', 0, worm(side, 'rear'));
     w('up', 0, worm(side, 'up'));
     w('sink', 0, worm(side, 'sink'));
@@ -112,6 +113,7 @@ export function myrlandFrames(): SpriteFrame[] {
     const l = (anim: string, i: number, r: Raster): void => {
       add('enemy_myrljos', anim, side, i, r, 12, 30);
     };
+    l('idle', 0, wisp('a'));
     l('fly', 0, wisp('a'));
     l('fly', 1, wisp('b'));
     l('fade', 0, wisp('faded'));
@@ -128,7 +130,7 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const a = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const MYRLAND_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
-  enemy_vatnormr: { under: a(1, 1), tell: a(1, 1), up: a(1, 1), sink: a(1, 1), hurt: a(1, 1) },
-  enemy_myrljos: { fly: a(2, 4), fade: a(1, 1), tell: a(2, 12), dart: a(1, 1), hurt: a(1, 1) },
+  enemy_vatnormr: { idle: a(1, 1), under: a(1, 1), tell: a(1, 1), up: a(1, 1), sink: a(1, 1), hurt: a(1, 1) },
+  enemy_myrljos: { idle: a(1, 1), fly: a(2, 4), fade: a(1, 1), tell: a(2, 12), dart: a(1, 1), hurt: a(1, 1) },
   fx_spit: { fly: { frames: 2, fps: 10, loop: true, dirs: ['s'] } },
 };

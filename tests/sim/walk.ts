@@ -170,7 +170,7 @@ export function interactNorth(h: Harness, tx: number, ty: number): Harness {
 }
 
 /** States in which a foe cannot be hurt (rising, buried, sinking): nothing to fight yet. */
-const UNTOUCHABLE = new Set(['rise', 'buried', 'retract', 'circle']);
+const UNTOUCHABLE = new Set(['rise', 'buried', 'retract', 'circle', 'fade']);
 
 /**
  * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls (armoured), the
@@ -181,7 +181,8 @@ function nearestFoe(sim: Sim): { e: Sim['actors'][number]; d: number } | null {
   for (const e of sim.actors) {
     if (e.kind !== 'enemy') continue;
     const def = sim.db.enemies[e.def as EnemyId];
-    if (def.guard === true || def.immortal || def.boss !== undefined) continue;
+    // Water-worms are left in their pools: the walker passes them by.
+    if (def.guard === true || def.immortal || def.boss !== undefined || def.swims === true) continue;
     if (UNTOUCHABLE.has(e.fsm.s)) continue;
     const d = Math.sqrt((e.pos.x - sim.hero.pos.x) ** 2 + (e.pos.y - sim.hero.pos.y) ** 2);
     if (best === null || d < best.d) best = { e, d };

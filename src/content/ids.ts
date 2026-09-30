@@ -169,6 +169,12 @@ export const NPCS = [
   // Myrkviðr, deep
   'heidr',
   'huldra',
+  // Mýrland
+  'kari',
+  'bardr',
+  'thuridr',
+  'ljotr',
+  'audr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -182,6 +188,8 @@ export const QUESTS = [
   'q_volva',
   'q_huldra',
   'q_vargar',
+  'q_runestone_2',
+  'q_fisher',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -212,6 +220,9 @@ export const SCRIPTS = [
   'shop_ketill',
   'shop_heidr',
   'thing_notices',
+  'myl_arrive',
+  'fish_jetty',
+  'widow_rest',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
