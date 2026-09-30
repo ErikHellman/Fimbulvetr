@@ -136,6 +136,22 @@ function light(): Raster {
   return r;
 }
 
+/** The fishing float: red over white, bobbing (`idle` 0–1), twitching (`nibble`) or pulled under (`bite`). */
+function float(sink: number): Raster {
+  const r = createRaster(8, 10);
+  const y = 1 + sink;
+  if (sink < 4) {
+    rect(r, 2, y, 4, 2, hex(C.heart));
+    rect(r, 2, y + 2, 4, 2, hex(C.wool));
+  } else {
+    // Gone under: only the rings it left.
+    rect(r, 0, 5, 8, 3, hex(C.waterLight));
+    rect(r, 2, 6, 4, 1, hex(C.water));
+  }
+  rect(r, 0, 8, 8, 1, hex(C.waterLight));
+  return r;
+}
+
 export function fxFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [];
   for (let f = 0; f < 8; f++) out.push({ name: `fx_fish_idle_s_${f}`, raster: fishJump(f), ox: 12, oy: 16 });
@@ -150,6 +166,11 @@ export function fxFrames(): SpriteFrame[] {
   out.push({ name: 'fx_snow_idle_s_0', raster: flake(false), ox: 1, oy: 1 });
   out.push({ name: 'fx_snow_idle_s_1', raster: flake(true), ox: 1, oy: 1 });
   for (let i = 0; i < 3; i++) out.push({ name: `fx_leaf_idle_s_${i}`, raster: windLeaf(i), ox: 2, oy: 1 });
+  out.push({ name: 'fx_float_idle_s_0', raster: float(0), ox: 4, oy: 8 });
+  out.push({ name: 'fx_float_idle_s_1', raster: float(1), ox: 4, oy: 8 });
+  out.push({ name: 'fx_float_nibble_s_0', raster: float(2), ox: 4, oy: 8 });
+  out.push({ name: 'fx_float_nibble_s_1', raster: float(0), ox: 4, oy: 8 });
+  out.push({ name: 'fx_float_bite_s_0', raster: float(4), ox: 4, oy: 8 });
   return out;
 }
 
@@ -162,4 +183,9 @@ export const FX_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>
   fx_eldr: { fly: { frames: 3, fps: 14, loop: true, dirs: ['s'] } },
   fx_snow: { idle: { frames: 2, fps: 1, loop: true, dirs: ['s'] } },
   fx_leaf: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
+  fx_float: {
+    idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] },
+    nibble: { frames: 2, fps: 12, loop: true, dirs: ['s'] },
+    bite: { frames: 1, fps: 1, loop: true, dirs: ['s'] },
+  },
 };

@@ -353,6 +353,46 @@ function boulder(): Raster {
   return r;
 }
 
+/**
+ * Sökkva Kvern, the drowned mill: a sagging turf roof and its gable standing out of the millpond, the
+ * great wheel half under at one end. Four tiles wide.
+ */
+function mill(): Raster {
+  const r = createRaster(64, 52);
+  // Water lapping round the foot.
+  rect(r, 1, 44, 62, 6, P.waterShade);
+  rect(r, 3, 44, 58, 1, P.waterLight);
+  // The gable end, timbers dark with wet.
+  rect(r, 10, 22, 36, 24, P.woodShade);
+  for (let x = 12; x < 46; x += 6) rect(r, x, 24, 2, 20, P.wood);
+  // The roof, turf gone to moss, sagging in the middle.
+  for (let y = 4; y < 26; y++) {
+    const inset = Math.round(Math.abs(y - 15) / 3);
+    const sag = y > 8 && y < 18 ? 1 : 0;
+    rect(r, 6 + inset, y + sag, 44 - inset * 2, 1, y < 10 ? P.turf : P.turfShade);
+  }
+  rect(r, 24, 12, 8, 6, P.ink);
+  // The wheel, black and still, its lower half under the water.
+  ellipse(r, 53, 36, 8, 8, (x, y) => ((x + y) % 5 === 0 ? P.wood : P.woodShade));
+  ellipse(r, 53, 36, 3, 3, P.ink);
+  rect(r, 43, 44, 19, 6, P.waterShade);
+  rect(r, 44, 44, 17, 1, P.waterLight);
+  return r;
+}
+
+/** Bárðr's ferry: a broad clinker-built boat, oars shipped. Three tiles long. */
+function boat(): Raster {
+  const r = createRaster(48, 20);
+  ellipse(r, 24, 12, 22, 6, (x, y) => (y > 13 ? P.woodShade : P.wood));
+  rect(r, 5, 9, 38, 1, P.woodShade);
+  rect(r, 8, 10, 32, 3, P.floorShade);
+  rect(r, 14, 10, 2, 3, P.wood);
+  rect(r, 30, 10, 2, 3, P.wood);
+  rect(r, 10, 7, 28, 1, P.trunk);
+  rect(r, 2, 16, 44, 2, P.waterLight);
+  return r;
+}
+
 export function decorFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [
     frame('decor_tree_idle_s_0', tree()),
@@ -371,6 +411,8 @@ export function decorFrames(): SpriteFrame[] {
     frame('decor_reeds_idle_s_0', reeds()),
     frame('decor_birch_idle_s_0', birch()),
     frame('decor_boulder_idle_s_0', boulder()),
+    frame('decor_mill_idle_s_0', mill()),
+    frame('decor_boat_idle_s_0', boat()),
   ];
   for (let f = 0; f < 4; f++) {
     out.push(frame(`decor_well_idle_s_${f}`, well(f)));
@@ -399,6 +441,8 @@ export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
   decor_reeds: STILL,
   decor_birch: STILL,
   decor_boulder: STILL,
+  decor_mill: STILL,
+  decor_boat: STILL,
   decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },

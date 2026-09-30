@@ -221,6 +221,36 @@ const MYRLAND_WATERS = {
       flow(p, v.mask, v.frame, 2, C.rockLight);
     },
   },
+  /** Cut peat: black-brown turves with the spade's straight cuts. */
+  peat: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      p.fill(C.mudShade);
+      p.speckle(C.mud, 0.18);
+      p.speckle('#2e231a', 0.1);
+      p.rect(0, 4 + v.variant * 3, 16, 1, '#2e231a');
+      p.rect(3 + v.variant * 4, 0, 1, 16, '#2e231a');
+    },
+  },
+  /** Still millpond water under the drowned mill (its sprite stands on top). */
+  mill: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.waterShade);
+      p.speckle(C.water, 0.2);
+    },
+  },
+  /** Water under the moored boat. */
+  boat: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.water);
+      p.speckle(C.waterShade, 0.15);
+    },
+  },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {

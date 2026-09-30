@@ -52,6 +52,9 @@ export const TERRAIN_IDS = [
   'rapids',
   'spring',
   'shoal',
+  'peat',
+  'mill',
+  'boat',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -144,4 +147,10 @@ export const TERRAIN = {
   spring: { solid: true, low: true },
   /** A gravel shoal across a river: wadeable, slow, and under the spring flood (see COVER_DEFS.flood). */
   shoal: { solid: false, slow: 0.7 },
+  /** Cut peat banks: dark, soft ground. */
+  peat: { solid: false, slow: 0.9 },
+  /** The drowned mill's roof standing out of its pond, four tiles wide and three deep. */
+  mill: { solid: true, decor: { art: ['decor_mill'], w: 4, h: 3 } },
+  /** Bárðr's ferry boat, moored at his landing, three tiles long. */
+  boat: { solid: true, decor: { art: ['decor_boat'], w: 3, h: 1 } },
 } as const satisfies Record<TerrainId, TerrainDef>;
