@@ -164,6 +164,7 @@ describe('enemies', () => {
       enemy_leirkrabbi: ['idle', 'walk', 'tell', 'pinch', 'hurt'],
       prop_bomb: ['idle', 'fuse', 'blink'],
       prop_bomb_pot: ['idle'],
+      fix_wheel: ['on', 'off'],
       fix_crack_wall: ['closed', 'open'],
       fix_crack_rock: ['closed', 'open'],
     };

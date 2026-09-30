@@ -283,6 +283,7 @@ function solidThing(
       return evalCond(t.closed, ctx);
     case 'chest':
     case 'switch':
+    case 'wheel':
     case 'brazier':
       return true;
     case 'lock':

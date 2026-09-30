@@ -253,9 +253,63 @@ const MYRLAND_WATERS = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/**
+ * Sökkva Kvern's rising water, drawn as at the lowest level: dry sluice floors of wet flagstones, and race
+ * channels with their planks lying on the bottom. The water and the floated planks are an overlay.
+ */
+function flags(p: Painter, fill: string, joint: string, variant: number): void {
+  p.fill(fill);
+  p.speckle(C.mudShade, 0.08);
+  p.rect(0, 7 + (variant % 2), 16, 1, joint);
+  p.rect(5 + variant * 3, 0, 1, 8, joint);
+  p.rect(11 - variant * 2, 8, 1, 8, joint);
+}
+
+function channel(p: Painter, deep: boolean): void {
+  p.fill(deep ? C.ink : C.caveWall);
+  p.speckle(C.mudShade, 0.2);
+  // Planks on the bottom, askew.
+  p.rect(2, 5, 12, 2, C.woodShade);
+  p.rect(3, 10, 11, 2, C.woodShade);
+  p.rect(0, 0, 16, 1, C.rockShade);
+  p.rect(0, 15, 16, 1, C.rockShade);
+}
+
+const MILL_WATERS = {
+  sluice: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, C.rockShade, C.ink, v.variant);
+    },
+  },
+  sluice_hi: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, C.rock, C.rockShade, v.variant);
+    },
+  },
+  race: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      channel(p, false);
+    },
+  },
+  race_hi: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      channel(p, true);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ...DEEP_WOOD,
   ...MYRLAND_WATERS,
+  ...MILL_WATERS,
   grass: {
     autotile: false,
     variants: 4,

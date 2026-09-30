@@ -505,4 +505,24 @@ export const SFX_BANK = {
     release: 0.08,
     volume: 0.18,
   },
+  /** A mill wheel turning: a low wooden groan. */
+  sfx_wheel: {
+    wave: 'saw',
+    freq: 90,
+    freqEnd: 70,
+    attack: 0.02,
+    sustain: 0.18,
+    release: 0.15,
+    volume: 0.25,
+  },
+  /** Water rushing through a sluice. */
+  sfx_water: {
+    wave: 'noise',
+    freq: 1400,
+    freqEnd: 500,
+    attack: 0.08,
+    sustain: 0.3,
+    release: 0.4,
+    volume: 0.22,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

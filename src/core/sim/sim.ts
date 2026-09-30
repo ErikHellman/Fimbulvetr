@@ -46,6 +46,7 @@ import { eat, equip, useItems } from './systems/items';
 import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
 import { stepBombs } from './systems/bombs';
+import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
@@ -281,6 +282,7 @@ export class Sim implements SimRt {
     if (this.mode === 'transition') stepTransition(this);
     else if (this.mode === 'story') {
       stepStory(this, input);
+      refreshWater(this);
       refreshFixtures(this);
     } else if (this.mode === 'over') stepOver(this, input);
     else this.stepPlay(input);
@@ -306,6 +308,7 @@ export class Sim implements SimRt {
       ScreenId | null
     >;
     const base = buildCollision(terrain, this.db.terrain);
+    const level = loadLevel(this, id);
     return {
       id,
       terrain,
@@ -313,6 +316,7 @@ export class Sim implements SimRt {
       collision: { ...base, flags: base.flags.slice() },
       neighbours,
       cover: coverFor(this, id),
+      ...(level === undefined ? {} : { level }),
     };
   }
 
@@ -320,6 +324,7 @@ export class Sim implements SimRt {
     tickWorldClock(this, this.ticksPerMinute);
     petrifyAtDawn(this);
     refreshCover(this);
+    refreshWater(this);
     refreshFixtures(this);
     if (checkInteract(this, input)) return;
     heroPreTick(this.hero);

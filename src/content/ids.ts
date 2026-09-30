@@ -133,6 +133,8 @@ export const SFX = [
   'sfx_splash',
   'sfx_bomb',
   'sfx_fuse',
+  'sfx_wheel',
+  'sfx_water',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

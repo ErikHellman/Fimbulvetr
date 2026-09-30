@@ -24,6 +24,8 @@ const ROCK_LIGHT = hex(C.rockLight);
 const WALL = hex(C.caveWall);
 const WALL_LIGHT = hex(C.caveWallLight);
 const DARK = hex('#161214');
+const WHEEL = hex(C.wood);
+const WHEEL_SHADE = hex(C.woodShade);
 
 // ── The bomb: 14×16, its feet at (7, 15) ─────────────────────────────────────────────────────────────
 
@@ -155,6 +157,31 @@ function crab(side: 'front' | 'back' | 'side', pose: CrabPose): Raster {
   return outline(r, INK, 1);
 }
 
+/** A mill wheel on its axle, one tile: paddles upright when turned to the water's level, askew when not. */
+function wheel(on: boolean): Raster {
+  const r = createRaster(18, 26);
+  ellipse(r, 9, 13, 7.5, 7.5, WHEEL_SHADE);
+  ellipse(r, 9, 13, 5.5, 5.5, WHEEL);
+  const spokes: readonly (readonly [number, number])[] = on
+    ? [
+        [0, -7],
+        [7, 0],
+        [0, 7],
+        [-7, 0],
+      ]
+    : [
+        [5, -5],
+        [5, 5],
+        [-5, 5],
+        [-5, -5],
+      ];
+  for (const [dx, dy] of spokes) line(r, 9, 13, 9 + dx, 13 + dy, WHEEL_SHADE);
+  ellipse(r, 9, 13, 1.5, 1.5, IRON);
+  rect(r, 7, 20, 4, 4, ROCK_SHADE);
+  if (on) rect(r, 8, 12, 2, 2, SPARK);
+  return outline(r, INK, 1);
+}
+
 export function sokkvaFrames(): SpriteFrame[] {
   const prop = (name: string, raster: Raster): SpriteFrame => ({
     name,
@@ -191,6 +218,8 @@ export function sokkvaFrames(): SpriteFrame[] {
     prop('prop_bomb_blink_s_0', bomb('spark')),
     prop('prop_bomb_blink_s_1', bomb('flash')),
     prop('prop_bomb_pot_idle_s_0', bombPot()),
+    fixture('fix_wheel_on_s_0', wheel(true)),
+    fixture('fix_wheel_off_s_0', wheel(false)),
     fixture('fix_crack_wall_closed_s_0', crackedWall()),
     fixture('fix_crack_wall_open_s_0', blownWall()),
     fixture('fix_crack_rock_closed_s_0', crackedRock()),
@@ -207,6 +236,7 @@ export const SOKKVA_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
   enemy_leirkrabbi: { idle: all(1, 1), walk: all(2, 8), tell: all(1, 1), pinch: all(1, 1), hurt: all(1, 1) },
   prop_bomb: { idle: one(1, 1), fuse: one(2, 6), blink: one(2, 12) },
   prop_bomb_pot: { idle: one(1, 1) },
+  fix_wheel: { on: one(1, 1), off: one(1, 1) },
   fix_crack_wall: { closed: one(1, 1), open: one(1, 1) },
   fix_crack_rock: { closed: one(1, 1), open: one(1, 1) },
 };

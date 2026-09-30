@@ -56,6 +56,11 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   q: 'peat',
   Z: 'mill',
   A: 'boat',
+  /** Sökkva Kvern's rising water: sluice floors that flood (1, 2) and race planks that float (3, 4). */
+  '1': 'sluice',
+  '2': 'sluice_hi',
+  '3': 'race',
+  '4': 'race_hi',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

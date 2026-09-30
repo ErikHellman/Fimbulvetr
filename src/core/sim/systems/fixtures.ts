@@ -16,6 +16,7 @@ import { revealThings, roomSignal } from './rooms';
 import { raining } from './weather';
 import { sinkTiles, walkTiles } from './cover';
 import { condCtx, probeBox } from './story';
+import { footingHolds, levelTiles, waterLevel } from './water';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
 const FIRE = { amount: 2, knock: 4 } as const;
@@ -44,6 +45,7 @@ const KINDS: Readonly<
   lock: { solid: 'on', anims: ['closed', 'open'] },
   shutter: { solid: 'on', anims: ['closed', 'open'] },
   switch: { solid: 'always', anims: ['on', 'off'] },
+  wheel: { solid: 'always', anims: ['on', 'off'] },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -86,6 +88,9 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       out.push(e);
       return;
     }
+    case 'wheel':
+      out.push(fixture(rt.newId(), 'wheel', 'fix_wheel', thing.at, index));
+      return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
       e.mem['lit'] = thing.lit === true ? 1 : 0;
@@ -142,6 +147,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return !(doorsOf(rt)?.includes(thing.id) ?? false);
     case 'crack':
       return !rt.state.world.opened.includes(thing.id);
+    case 'wheel':
+      return waterLevel(rt) === thing.level;
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -217,6 +224,11 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
 export function stampCollision(rt: SimRt): void {
   const { base, collision } = rt.screen;
   collision.flags.set(base.flags);
+  // The water level: flooded sluices and sunken planks are water; dry sluices and floated planks are not.
+  for (const [i, footing] of levelTiles(rt))
+    collision.flags[i] = footing
+      ? (collision.flags[i] ?? 0) & ~(SOLID | LOW)
+      : (collision.flags[i] ?? 0) | SOLID | LOW;
   // Ice lets Ask walk on water (and blocks nothing in flight).
   for (const i of walkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   // A spring flood over a shoal: as open water.
@@ -278,6 +290,7 @@ export function swordSwitches(rt: SimRt): void {
   const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   for (let lit = strikeSwitch(rt, box); lit; lit = strikeSwitch(rt, box));
+  strikeWheel(rt, box);
 }
 
 /** Lights the unlit switch under `box` (a sword or boomerang strike). Returns whether one was lit. */
@@ -306,6 +319,29 @@ export function openCracks(rt: SimRt, box: Box): boolean {
   if (!any) return false;
   rt.emit({ t: 'sfx', id: 'sfx_secret' });
   refreshFixtures(rt);
+  return true;
+}
+
+/**
+ * Turns the wheel under `box` that stands at another level than the water: the level follows it, unless
+ * that would change the footing under Ask (then it only clanks). Returns whether a wheel was struck.
+ */
+export function strikeWheel(rt: SimRt, box: Box): boolean {
+  const flag = rt.db.screens[rt.screen.id].water;
+  if (flag === undefined) return false;
+  const now = waterLevel(rt);
+  const e = fixtureAt(rt, 'wheel', box, (f) => {
+    const t = thingOf(rt, f);
+    return t?.k === 'wheel' && t.level !== now;
+  });
+  const thing = e === null ? undefined : thingOf(rt, e);
+  if (thing?.k !== 'wheel') return false;
+  if (!footingHolds(rt, thing.level)) {
+    rt.emit({ t: 'sfx', id: 'sfx_block' });
+    return true;
+  }
+  rt.state.flags[flag] = thing.level;
+  rt.emit({ t: 'sfx', id: 'sfx_wheel' });
   return true;
 }
 

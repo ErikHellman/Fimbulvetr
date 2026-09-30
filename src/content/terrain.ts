@@ -55,6 +55,10 @@ export const TERRAIN_IDS = [
   'peat',
   'mill',
   'boat',
+  'sluice',
+  'sluice_hi',
+  'race',
+  'race_hi',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -153,4 +157,12 @@ export const TERRAIN = {
   mill: { solid: true, decor: { art: ['decor_mill'], w: 4, h: 3 } },
   /** Bárðr's ferry boat, moored at his landing, three tiles long. */
   boat: { solid: true, decor: { art: ['decor_boat'], w: 3, h: 1 } },
+  /** A mill-race's stone floor: dry at the lowest water, flooded once the level reaches 1. */
+  sluice: { solid: false, rise: { floods: 1 } },
+  /** A higher sluice floor, flooded only at the top level (2). */
+  sluice_hi: { solid: false, rise: { floods: 2 } },
+  /** A race channel whose planks float up to the brim at level 1; below that, a drop (the boomerang crosses). */
+  race: { solid: true, low: true, rise: { floats: 1 } },
+  /** A deeper race whose planks float only at the top level (2). */
+  race_hi: { solid: true, low: true, rise: { floats: 2 } },
 } as const satisfies Record<TerrainId, TerrainDef>;

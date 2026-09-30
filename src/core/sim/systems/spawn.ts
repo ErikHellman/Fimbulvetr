@@ -125,6 +125,7 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'brazier':
       case 'bridge':
       case 'crack':
+      case 'wheel':
         spawnFixtures(rt, thing, index, out);
         break;
       case 'door':

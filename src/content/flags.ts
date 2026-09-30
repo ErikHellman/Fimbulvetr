@@ -98,6 +98,8 @@ export const FLAGS = {
   q_fish_caught: { t: 'int', max: 99 },
   /** Ask landed Gamli, the old pike of the millpond. */
   q_fish_gamli: { t: 'bool' },
+  /** Sökkva Kvern's water: 0 low (as found: the fleeing miller opened the sluices), 1 or 2. */
+  w_d2_level: { t: 'int', max: 2 },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

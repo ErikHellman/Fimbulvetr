@@ -12,7 +12,7 @@ import { gridSolidAt } from '../../world/collision';
 import type { SimRt } from '../rt';
 import { damageActor, hurtHero } from './combat';
 import { blastCover } from './cover';
-import { openCracks, strikeSwitch } from './fixtures';
+import { openCracks, strikeSwitch, strikeWheel } from './fixtures';
 import { heroCtx } from './hero';
 import { blastProp, isResting, propDef } from './props';
 
@@ -103,6 +103,7 @@ export function blast(rt: SimRt, pos: Vec): void {
   if (overlaps(box, at(rt.hero.hurt, rt.hero.pos)))
     hurtHero(rt, { pos, faction: 'env' }, BOMB.toAsk, BOMB.knock, PIERCE_SHIELD);
   for (let lit = strikeSwitch(rt, box); lit; lit = strikeSwitch(rt, box));
+  strikeWheel(rt, box);
   openCracks(rt, box);
   blastCover(rt, box);
   rt.emit({ t: 'blast', x: pos.x, y: pos.y });

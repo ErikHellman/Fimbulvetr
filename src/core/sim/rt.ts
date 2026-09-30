@@ -47,6 +47,8 @@ export interface LoadedScreen {
   readonly collision: CollisionGrid;
   readonly neighbours: Readonly<Record<Dir4, ScreenId | null>>;
   readonly cover: CoverGrid;
+  /** The water level `collision` was stamped at, on screens with `water` (see systems/water.ts). */
+  readonly level?: number;
 }
 
 /** What systems may read and change. `Sim` implements it; systems are plain functions over it. */

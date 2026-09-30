@@ -12,7 +12,7 @@ import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { damageActor, hurtHero } from './combat';
 import { blowCover } from './cover';
-import { strikeSwitch } from './fixtures';
+import { strikeSwitch, strikeWheel } from './fixtures';
 import { heroCtx } from './hero';
 import { windOf } from './weather';
 import { stepEldr } from './eldr';
@@ -188,7 +188,7 @@ function strike(rt: SimRt, e: Entity, back: boolean): void {
     rt.emit({ t: 'sfx', id: enemyDef(rt, a).stunnable === undefined ? 'sfx_block' : 'sfx_stun' });
     turn = true;
   }
-  if (strikeSwitch(rt, box)) turn = true;
+  if (strikeSwitch(rt, box) || strikeWheel(rt, box)) turn = true;
   if (mem(e, 'fetch') === 0) {
     const pickup = rt.actors.find(
       (a) => a.kind === 'pickup' && mem(a, 'hidden') !== 1 && overlaps(box, at(a.body, a.pos)),
