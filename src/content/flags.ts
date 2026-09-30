@@ -78,6 +78,8 @@ export const FLAGS = {
   q_vargar_alpha: { t: 'bool' },
   /** Bersi paid the bounty, a bigger purse. */
   q_vargar_done: { t: 'bool' },
+  /** The weir's latch is struck: the drawbridge into Mýrland is down for good. */
+  w_myl_bridge: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -223,6 +223,31 @@ function settle(w: World, state: GameState, origin: number): Node {
   throw new Error('solver: settling did not converge');
 }
 
+/** What things do to the ground in a state: tiles they block, and tiles they give footing on. */
+interface Ground {
+  /** Gates, locks, shutters, chests, switches, braziers left shut or standing. */
+  readonly blocked: ReadonlySet<number>;
+  /** Lowered drawbridges. */
+  readonly open: ReadonlySet<number>;
+}
+
+function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null): Ground {
+  return { blocked: blockedTiles(w, state, reach), open: bridgeTiles(w, state) };
+}
+
+/** Tiles of drawbridges that are down. */
+function bridgeTiles(w: World, state: GameState): Set<number> {
+  const out = new Set<number>();
+  const ctx = ctxOf(w, state);
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'bridge' || !evalCond(t.down, ctx)) continue;
+      for (let dy = 0; dy < t.h; dy++)
+        for (let dx = 0; dx < t.w; dx++) out.add(w.tile(id, t.at.x + dx, t.at.y + dy));
+    }
+  return out;
+}
+
 /** Tiles blocked by things this state leaves shut: gates, locks, shutters, chests, switches, braziers. */
 function blockedTiles(w: World, state: GameState, reach: ReadonlySet<number> | null): Set<number> {
   const out = new Set<number>();
@@ -305,12 +330,12 @@ function flood(w: World, state: GameState, origin: number): Set<number> {
   const warps = warpEdges(w, state);
   // Shutters open on signals that depend on what is reachable, so flood until the set stops growing.
   for (let i = 0; i < 20; i++) {
-    const blocked = blockedTiles(w, state, reach);
+    const ground = groundOf(w, state, reach);
     const next = new Set<number>([origin]);
     const queue = [origin];
     while (queue.length > 0) {
       const t = queue.pop() ?? origin;
-      for (const n of [...steps(w, t, blocked), ...(warps.get(t) ?? [])]) {
+      for (const n of [...steps(w, t, ground), ...(warps.get(t) ?? [])]) {
         if (next.has(n)) continue;
         next.add(n);
         queue.push(n);
@@ -322,13 +347,15 @@ function flood(w: World, state: GameState, origin: number): Set<number> {
   return reach;
 }
 
-function walkable(w: World, blocked: ReadonlySet<number>, id: ScreenId, x: number, y: number): boolean {
+function walkable(w: World, ground: Ground, id: ScreenId, x: number, y: number): boolean {
   const tr = w.terrain(id, x, y);
-  return tr !== null && !tr.solid && !blocked.has(w.tile(id, x, y));
+  if (tr === null) return false;
+  const tile = w.tile(id, x, y);
+  return (!tr.solid || ground.open.has(tile)) && !ground.blocked.has(tile);
 }
 
 /** Where one step from tile `t` can lead. */
-function steps(w: World, t: number, blocked: ReadonlySet<number>): number[] {
+function steps(w: World, t: number, ground: Ground): number[] {
   const { id, x, y } = w.where(t);
   const out: number[] = [];
   for (const dir of ['n', 's', 'e', 'w'] as const) {
@@ -340,15 +367,15 @@ function steps(w: World, t: number, blocked: ReadonlySet<number>): number[] {
       if (to === null) continue;
       const ex = (nx + SCREEN_COLS) % SCREEN_COLS;
       const ey = (ny + SCREEN_ROWS) % SCREEN_ROWS;
-      if (walkable(w, blocked, to, ex, ey)) out.push(w.tile(to, ex, ey));
+      if (walkable(w, ground, to, ex, ey)) out.push(w.tile(to, ex, ey));
       continue;
     }
-    if (walkable(w, blocked, id, nx, ny)) {
+    if (walkable(w, ground, id, nx, ny)) {
       out.push(w.tile(id, nx, ny));
       continue;
     }
     // A ledge facing this way is hopped: land on the far side.
-    if (w.terrain(id, nx, ny)?.ledge === dir && walkable(w, blocked, id, nx + d.x, ny + d.y))
+    if (w.terrain(id, nx, ny)?.ledge === dir && walkable(w, ground, id, nx + d.x, ny + d.y))
       out.push(w.tile(id, nx + d.x, ny + d.y));
   }
   for (const thing of w.db.screens[id].things)
@@ -494,6 +521,15 @@ function gather(w: World, node: Node): boolean {
           changed = true;
           return;
         }
+        case 'switch': {
+          // A latch: struck from beside it, or by the boomerang from across the water, it sets its flag.
+          if (t.set === undefined || state.flags[t.set] === true) return;
+          if (!besideReach(w, reach, id, t.at.x, t.at.y) && !throwable(w, state, reach, id, t.at.x, t.at.y))
+            return;
+          state.flags[t.set] = true;
+          changed = true;
+          return;
+        }
         case 'use': {
           if (!evalCond(t.when, ctx) || !besideReach(w, reach, id, t.at.x, t.at.y)) return;
           node.scripts.add(t.script);
@@ -552,11 +588,11 @@ function openableLocks(w: World, node: Node): { id: string; dungeon: DungeonId }
 
 /** Reachable tiles from which no path leads back to the starting tile. */
 function strandedTiles(w: World, node: Node, origin: number): number[] {
-  const blocked = blockedTiles(w, node.state, node.reach);
+  const ground = groundOf(w, node.state, node.reach);
   const warps = warpEdges(w, node.state);
   const back = new Map<number, number[]>();
   for (const t of node.reach)
-    for (const n of [...steps(w, t, blocked), ...(warps.get(t) ?? [])]) {
+    for (const n of [...steps(w, t, ground), ...(warps.get(t) ?? [])]) {
       if (!node.reach.has(n)) continue;
       const list = back.get(n);
       if (list === undefined) back.set(n, [t]);

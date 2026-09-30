@@ -141,8 +141,19 @@ export type Thing =
       readonly opens?: RoomSignal;
       readonly when?: Cond;
     }
-  /** A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. */
-  | { readonly k: 'switch'; readonly at: TilePos }
+  /**
+   * A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. With `set`,
+   * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good).
+   */
+  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId }
+  /** A drawbridge over water or a gap: its tiles are walkable while `down` holds. */
+  | {
+      readonly k: 'bridge';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly down: Cond;
+    }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */

@@ -23,12 +23,20 @@ const TILE_BOX = { x: -8, y: -14, w: 16, h: 16 } as const;
 const FLAME_BOX = { x: -6, y: -12, w: 12, h: 12 } as const;
 
 /**
- * Fixture kinds: whether they block the way (while on, or always) and their on/off animations. A chest
- * has none here; it shows open or closed.
+ * Fixture kinds: whether they block the way (while on, or always), whether they give footing over water
+ * (while on), and their on/off animations. A chest has none here; it shows open or closed.
  */
 const KINDS: Readonly<
-  Record<string, { readonly solid: 'never' | 'on' | 'always'; readonly anims?: readonly [string, string] }>
+  Record<
+    string,
+    {
+      readonly solid: 'never' | 'on' | 'always';
+      readonly walk?: 'on';
+      readonly anims?: readonly [string, string];
+    }
+  >
 > = {
+  bridge: { solid: 'never', walk: 'on', anims: ['down', 'up'] },
   gate: { solid: 'on', anims: ['closed', 'open'] },
   fire: { solid: 'never', anims: ['burn', 'out'] },
   chest: { solid: 'on' },
@@ -71,9 +79,12 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       out.push(e);
       return;
     }
-    case 'switch':
-      out.push(fixture(rt.newId(), 'switch', 'fix_switch', thing.at, index));
+    case 'switch': {
+      const e = fixture(rt.newId(), 'switch', 'fix_switch', thing.at, index);
+      if (thing.set !== undefined && rt.state.flags[thing.set] === true) e.mem['lit'] = 1;
+      out.push(e);
       return;
+    }
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
       e.mem['lit'] = thing.lit === true ? 1 : 0;
@@ -83,7 +94,8 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     case 'gate':
     case 'fire':
     case 'lock':
-    case 'shutter': {
+    case 'shutter':
+    case 'bridge': {
       const art = thing.k === 'gate' ? `fix_${thing.art}` : `fix_${thing.k}`;
       for (let y = 0; y < thing.h; y++)
         for (let x = 0; x < thing.w; x++)
@@ -113,6 +125,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
   switch (thing?.k) {
     case 'gate':
       return evalCond(thing.closed, condCtx(rt));
+    case 'bridge':
+      return evalCond(thing.down, condCtx(rt));
     case 'fire':
       return evalCond(thing.when, condCtx(rt));
     case 'chest':
@@ -181,7 +195,7 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
     if (was !== undefined && e.def === 'shutter') sounds.add('sfx_shutter');
     const kind = KINDS[e.def];
     if (kind?.anims !== undefined) setAnim(e, on === 1 ? kind.anims[0] : kind.anims[1]);
-    if (kind?.solid === 'on') changed = true;
+    if (kind?.solid === 'on' || kind?.walk === 'on') changed = true;
   }
   for (const id of sounds) rt.emit({ t: 'sfx', id });
   if (changed) stampCollision(rt);
@@ -198,6 +212,12 @@ export function stampCollision(rt: SimRt): void {
   for (const i of walkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   // A spring flood over a shoal: as open water.
   for (const i of sinkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) | SOLID | LOW;
+  // A lowered drawbridge: footing over the water.
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || KINDS[e.def]?.walk !== 'on' || mem(e, 'on') !== 1) continue;
+    const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
+    collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
+  }
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
@@ -256,6 +276,8 @@ export function strikeSwitch(rt: SimRt, box: Box): boolean {
   const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1);
   if (e === null) return false;
   e.mem['lit'] = 1;
+  const thing = thingOf(rt, e);
+  if (thing?.k === 'switch' && thing.set !== undefined) rt.state.flags[thing.set] = true;
   rt.emit({ t: 'sfx', id: 'sfx_switch' });
   return true;
 }
