@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DB } from '@content/index';
 import { SPAWN_TABLES } from '@content/spawns';
 import { NEW_GAME } from '@content/start';
 import { TERRAIN } from '@content/terrain';
@@ -6,14 +7,19 @@ import { WORLD_LAYOUT } from '@content/world/layout';
 import { LEGEND } from '@content/world/legend';
 import { SCREENS } from '@content/world/registry';
 import { SCREEN_IDS, type ScreenId } from '@content/world/screens';
+import { SEASONS, type Season } from '@core/clock/types';
+import { coverPassage } from '@core/progress/solver';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
 import { decorPlacements } from '@core/world/decor';
 import { indexLayout, neighbourOf } from '@core/world/screen';
 import { cellAt, parseTextMap, type TerrainGrid } from '@core/world/textmap';
 
-function walkable(id: ScreenId): (x: number, y: number) => boolean {
+function walkable(id: ScreenId, season?: Season): (x: number, y: number) => boolean {
   const grid = parseTextMap(SCREENS[id].map, LEGEND);
+  const cover = season === undefined ? new Map<number, boolean>() : coverPassage(DB, id, season);
   return (x, y) => {
+    const over = cover.get(y * SCREEN_COLS + x);
+    if (over !== undefined) return over;
     const t = cellAt(grid, x, y);
     return t !== undefined && !TERRAIN[t].solid;
   };
@@ -159,26 +165,30 @@ describe('world layout', () => {
     }
   });
 
-  it('has identical walkable seams between neighbouring screens', () => {
-    const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
-    for (const id of SCREEN_IDS) {
-      const here = walkable(id);
-      const east = neighbourOf(index, id, 'e');
-      if (east !== null) {
-        const there = walkable(east);
-        for (let y = 0; y < SCREEN_ROWS; y++) {
-          expect(here(SCREEN_COLS - 1, y), `${id} → ${east}, row ${y}`).toBe(there(0, y));
+  // In every season too: ice on one side of a seam and open water on the other would drop Ask in the water.
+  it.each([undefined, ...SEASONS])(
+    'has identical walkable seams between neighbours (season: %s)',
+    (season) => {
+      const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
+      for (const id of SCREEN_IDS) {
+        const here = walkable(id, season);
+        const east = neighbourOf(index, id, 'e');
+        if (east !== null) {
+          const there = walkable(east, season);
+          for (let y = 0; y < SCREEN_ROWS; y++) {
+            expect(here(SCREEN_COLS - 1, y), `${id} → ${east}, row ${y}`).toBe(there(0, y));
+          }
+        }
+        const south = neighbourOf(index, id, 's');
+        if (south !== null) {
+          const there = walkable(south, season);
+          for (let x = 0; x < SCREEN_COLS; x++) {
+            expect(here(x, SCREEN_ROWS - 1), `${id} → ${south}, col ${x}`).toBe(there(x, 0));
+          }
         }
       }
-      const south = neighbourOf(index, id, 's');
-      if (south !== null) {
-        const there = walkable(south);
-        for (let x = 0; x < SCREEN_COLS; x++) {
-          expect(here(x, SCREEN_ROWS - 1), `${id} → ${south}, col ${x}`).toBe(there(x, 0));
-        }
-      }
-    }
-  });
+    },
+  );
 });
 
 describe('doors', () => {

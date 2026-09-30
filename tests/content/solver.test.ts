@@ -5,6 +5,7 @@ import { NEW_GAME } from '@content/start';
 import { SCREEN_IDS } from '@content/world/screens';
 import { applyPreset } from '@core/dev/query';
 import { solve } from '@core/progress/solver';
+import { SEASONS } from '@core/clock/types';
 import type { ContentDb } from '@core/sim/db';
 import { newGame, type GameState } from '@core/state/gameState';
 import { TILE } from '@core/world/dims';
@@ -139,5 +140,25 @@ describe('the progression solver on Myrkviðr and Uppvík', () => {
     const outside = solve(DB, night('myr_north', [19, 10]), nothing);
     for (const id of uppvik) expect(outside.screens, id).toContain(id);
     expect(outside.stranded).toEqual([]);
+  });
+});
+
+describe('the Myrkviðr and Uppvík gates in every season (winter ice, spring floods)', () => {
+  const road = (s: GameState): void => {
+    s.flags.st_road_open = true;
+  };
+  it.each(SEASONS)('%s: Uppvík stays shut behind the pine, and nothing strands Ask', (season) => {
+    const shut = solve(DB, atOnundr(), nothing, { season });
+    for (const id of uppvik) expect(shut.screens, id).not.toContain(id);
+    expect(shut.stranded).toEqual([]);
+    const open = solve(DB, atOnundr(road), nothing, { season });
+    for (const id of uppvik) expect(open.screens, id).toContain(id);
+    expect(open.stranded).toEqual([]);
+  });
+
+  it.each(SEASONS)('%s: the fen’s piece of heart still needs Eldr', (season) => {
+    const blade = solve(DB, atOnundr(road), nothing, { season });
+    expect(blade.pieces).toEqual(expect.arrayContaining(['hp_myr_pines', 'hp_myr_trollskog']));
+    expect(blade.pieces).not.toContain('hp_myr_fen');
   });
 });

@@ -1,11 +1,13 @@
 import type { DungeonId, ItemId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
+import type { Season } from '../clock/types';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { ContentDb } from '../sim/db';
 import { dungeonOf } from '../state/dungeons';
 import type { GameState } from '../state/gameState';
 import { cloneState } from '../state/save';
 import { evalCond, type CondCtx } from '../story/cond';
+import { buildCover, coverAt } from '../world/cover';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '../world/dims';
 import { indexLayout, neighbourOf, type LayoutIndex, type RoomSignal, type Thing } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -18,7 +20,15 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * cutting are always possible), nor do props Ask can lift; brambles block until Eldr is known. A `use`
  * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask. Enemies
  * other than bosses are assumed beaten with the sword.
+ *
+ * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
+ * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored.
  */
+
+export interface SolveOptions {
+  /** Solve in this season, with the ice and floods it brings. */
+  readonly season?: Season;
+}
 
 export interface SolveResult {
   /** The goal holds in at least one line of play. */
@@ -49,17 +59,53 @@ const DIRS8: readonly (readonly [number, number])[] = [
   [-1, -1],
 ];
 
+/**
+ * The tiles of a screen whose footing the season's own cover changes: `true` where it makes them walkable
+ * (ice over water), `false` where it makes them impassable (a flood over a shoal). Uses the sim's own cover
+ * rules, so the solver and the game cannot disagree. Cuts and melted patches are not counted.
+ */
+export function coverPassage(db: ContentDb, id: ScreenId, season: Season): Map<number, boolean> {
+  const def = db.screens[id];
+  const terrain = parseTextMap(def.map, db.legend);
+  const g = buildCover(
+    def.map,
+    db.coverLegend,
+    db.coverOrder,
+    db.cover,
+    db.clock.fixedSeason[def.region] ?? season,
+    0,
+    undefined,
+    { terrain, outdoor: def.indoor !== true && def.dungeon === undefined, wet: true },
+  );
+  const out = new Map<number, boolean>();
+  for (let y = 0; y < g.rows; y++)
+    for (let x = 0; x < g.cols; x++) {
+      const kind = coverAt(g, db.coverOrder, x, y);
+      if (kind === null) continue;
+      const c = db.cover[kind];
+      if (c.walk === true) out.set(y * g.cols + x, true);
+      else if (c.sink === true) out.set(y * g.cols + x, false);
+    }
+  return out;
+}
+
 class World {
   readonly ids: readonly ScreenId[];
   readonly idx = new Map<ScreenId, number>();
   readonly grids: TerrainGrid[];
   readonly layout: LayoutIndex;
+  /** Per screen, the season's cover over the terrain (see coverPassage); empty without a season. */
+  readonly passage: ReadonlyMap<number, boolean>[];
 
-  constructor(readonly db: ContentDb) {
+  constructor(
+    readonly db: ContentDb,
+    season?: Season,
+  ) {
     this.ids = Object.keys(db.screens) as ScreenId[];
     this.ids.forEach((id, i) => this.idx.set(id, i));
     this.grids = this.ids.map((id) => parseTextMap(db.screens[id].map, db.legend));
     this.layout = indexLayout(db.layout, this.ids);
+    this.passage = this.ids.map((id) => (season === undefined ? new Map() : coverPassage(db, id, season)));
   }
 
   tile(id: ScreenId, x: number, y: number): number {
@@ -78,6 +124,8 @@ class World {
     const cell = g?.cells[y * SCREEN_COLS + x];
     if (cell === undefined) return null;
     const def = this.db.terrain[cell];
+    const cover = this.passage[this.idx.get(id) ?? 0]?.get(y * SCREEN_COLS + x);
+    if (cover !== undefined) return { solid: !cover, low: !cover };
     return {
       solid: def.solid || def.ledge !== undefined,
       low: def.low === true,
@@ -93,8 +141,13 @@ interface Node {
   scripts: Set<ScriptId>;
 }
 
-export function solve(db: ContentDb, start: GameState, goal: (s: GameState) => boolean): SolveResult {
-  const w = new World(db);
+export function solve(
+  db: ContentDb,
+  start: GameState,
+  goal: (s: GameState) => boolean,
+  opts: SolveOptions = {},
+): SolveResult {
+  const w = new World(db, opts.season);
   const origin = w.tile(
     start.hero.screen,
     Math.floor(start.hero.x / TILE),
@@ -135,7 +188,9 @@ export function solve(db: ContentDb, start: GameState, goal: (s: GameState) => b
     return ok;
   };
 
-  const finishable = explore(cloneState(start));
+  const first = cloneState(start);
+  if (opts.season !== undefined) first.clock.season = opts.season;
+  const finishable = explore(first);
   return {
     finishable,
     opened: [...opened].sort(),
