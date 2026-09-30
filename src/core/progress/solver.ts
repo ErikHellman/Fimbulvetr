@@ -60,6 +60,8 @@ export interface SolveResult {
 }
 
 const FETCH_TILES = 7;
+/** How far an arrow carries to an eye switch, in tiles (it flies 72 ticks at 5 px a tick). */
+const ARROW_TILES = 12;
 const DIRS8: readonly (readonly [number, number])[] = [
   [1, 0],
   [-1, 0],
@@ -529,6 +531,51 @@ function throwable(
   return false;
 }
 
+/**
+ * Whether an arrow can reach tile (x, y) from somewhere reachable on its screen: once the bow is owned
+ * (arrows, from pots and foes, never run out for good), along a straight four-way line over floor or low
+ * ground (water, pits).
+ */
+function shootable(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+): boolean {
+  if (!has(state, 'bow')) return false;
+  const blocked = blockedTiles(w, state, null);
+  for (const [dx, dy] of [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ] as const)
+    for (let k = 1; k <= ARROW_TILES; k++) {
+      const fx = x - dx * k;
+      const fy = y - dy * k;
+      if (reach.has(w.tile(id, fx, fy))) return true;
+      const tr = w.terrain(id, fx, fy);
+      if (tr === null || (tr.solid && !tr.low) || blocked.has(w.tile(id, fx, fy))) break;
+    }
+  return false;
+}
+
+/** Whether a switch can be struck from the reach: an eye only by an arrow, a plain one any way. */
+function strikable(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  t: Extract<Thing, { k: 'switch' }>,
+): boolean {
+  const { x, y } = t.at;
+  if (shootable(w, state, reach, id, x, y)) return true;
+  if (t.eye === true) return false;
+  return besideReach(w, reach, id, x, y) || throwable(w, state, reach, id, x, y);
+}
+
 function roomReached(w: World, reach: ReadonlySet<number>, id: ScreenId): boolean {
   const base = (w.idx.get(id) ?? 0) * 1024;
   for (let i = 0; i < SCREEN_COLS * SCREEN_ROWS; i++) if (reach.has(base + i)) return true;
@@ -571,12 +618,7 @@ function signal(
     case 'blocks':
       return true;
     case 'switches':
-      return things.every(
-        (t) =>
-          t.k !== 'switch' ||
-          besideReach(w, reach, id, t.at.x, t.at.y) ||
-          throwable(w, state, reach, id, t.at.x, t.at.y),
-      );
+      return things.every((t) => t.k !== 'switch' || strikable(w, state, reach, id, t));
     case 'braziers':
       return things.every(
         (t) =>
@@ -653,8 +695,7 @@ function gather(w: World, node: Node): boolean {
         case 'switch': {
           // A latch: struck from beside it, or by the boomerang from across the water, it sets its flag.
           if (t.set === undefined || state.flags[t.set] === true) return;
-          if (!besideReach(w, reach, id, t.at.x, t.at.y) && !throwable(w, state, reach, id, t.at.x, t.at.y))
-            return;
+          if (!strikable(w, state, reach, id, t)) return;
           state.flags[t.set] = true;
           changed = true;
           return;
