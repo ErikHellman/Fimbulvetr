@@ -54,6 +54,30 @@ describe('locked doors', () => {
   });
 });
 
+describe('the big lock', () => {
+  const BIG: Thing = { k: 'lock', id: 'd1_big_test', at: { x: 20, y: 9 }, w: 1, h: 2, big: true };
+
+  it('turns small keys away', () => {
+    const h = new Harness({ db: room([BIG]), tile: [17, 10], facing: 'e' });
+    dungeonOf(h.sim.state, 'd1').keys = 2;
+    h.hold(['right'], 60);
+    expect(dungeonOf(h.sim.state, 'd1')).toMatchObject({ keys: 2, doors: [] });
+    expect(solid(h, 20, 10)).toBe(true);
+    expect(fixtures(h, 'lock').every((f) => f.art === 'fix_biglock' && f.anim === 'closed')).toBe(true);
+    h.expectAnims();
+  });
+
+  it('opens for good with the big key, which is kept', () => {
+    const h = new Harness({ db: room([BIG]), tile: [17, 10], facing: 'e' });
+    dungeonOf(h.sim.state, 'd1').bigKey = true;
+    h.hold(['right'], 60);
+    expect(dungeonOf(h.sim.state, 'd1')).toMatchObject({ bigKey: true, keys: 0, doors: ['d1_big_test'] });
+    expect(solid(h, 20, 9) || solid(h, 20, 10)).toBe(false);
+    expect(h.events).toContainEqual({ t: 'sfx', id: 'sfx_unlock' });
+    h.expectAnims();
+  });
+});
+
 describe('shutters', () => {
   const SHUTTER: Thing = { k: 'shutter', at: { x: 20, y: 9 }, w: 1, h: 2, opens: 'clear' };
   const FOE: Thing = { k: 'enemy', id: 'vargr', at: { x: 34, y: 16 } };

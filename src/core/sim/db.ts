@@ -4,6 +4,7 @@ import type {
   CritterId,
   DialogueId,
   EnemyId,
+  FishId,
   GaldrId,
   ItemId,
   RegionId,
@@ -26,6 +27,7 @@ import type { GaldrDef, ItemDef } from '../items/defs';
 import type { FlagSpec } from '../state/flags';
 import type { Cond } from '../story/cond';
 import type { DialogueDef } from '../story/dialogue';
+import type { FishDef } from '../story/fishing';
 import type { QuestDef } from '../story/quests';
 import type { ScriptDef } from '../story/script';
 import type { ShopDef } from '../story/shop';
@@ -63,6 +65,8 @@ export interface ContentDb {
   readonly freezeClock?: Cond;
   /** Rolled enemies per region, on screens that list spawn points (only while `rolled` is on). */
   readonly spawns: Readonly<Partial<Record<RegionId, SpawnTable>>>;
+  /** What bites where Ask fishes. */
+  readonly fish: Readonly<Record<FishId, FishDef>>;
 }
 
 export interface WeatherRule {

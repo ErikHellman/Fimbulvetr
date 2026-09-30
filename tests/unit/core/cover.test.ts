@@ -11,6 +11,7 @@ const DEFS: Record<CoverId, CoverDef> = {
   drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false },
   mud: { id: 'mud', seasons: ['spring'], slow: 0.75, grows: { on: ['grass'], by: ['water'] }, wet: true },
   ice: { id: 'ice', seasons: ['winter'], slow: 1, grows: { on: ['water'] }, walk: true },
+  flood: { id: 'flood', seasons: ['spring'], slow: 1, grows: { on: ['shoal'] }, sink: true },
 };
 const LEGEND = { '"': 'tall_grass' } as const;
 const MAP = ['..""', '""..'];
@@ -96,6 +97,18 @@ describe('derived cover', () => {
       wet: false,
     });
     expect(at(dry, 2, 1)).toBeNull();
+  });
+
+  it('floods a shoal in spring only, and never freezes rapids or springs', () => {
+    const all: readonly CoverId[] = [...ALL, 'flood'];
+    // Shoal, rapids, spring, water.
+    const t = { cols: 4, rows: 1, cells: ['shoal', 'rapids', 'spring', 'water'] as TerrainId[] };
+    const build = (season: 'spring' | 'winter' | 'summer') =>
+      buildCover(['evs~'], LEG, all, DEFS, season, 0, undefined, { terrain: t, outdoor: true, wet: false });
+    const row = (g: ReturnType<typeof buildCover>) => [0, 1, 2, 3].map((x) => coverAt(g, all, x, 0));
+    expect(row(build('spring'))).toEqual(['flood', null, null, null]);
+    expect(row(build('winter'))).toEqual([null, null, null, 'ice']);
+    expect(row(build('summer'))).toEqual([null, null, null, null]);
   });
 
   it('grows nothing by itself under a roof', () => {

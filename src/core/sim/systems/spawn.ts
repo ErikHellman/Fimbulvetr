@@ -10,9 +10,11 @@ import type { Vec } from '../../math/vec';
 import { SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import { tileFeet, type TilePos } from '../../world/screen';
-import { rollSpawns } from '../../world/spawns';
+import { owns } from '../../items/defs';
+import { rollSpawns, type SpawnEntry, type SpawnTable } from '../../world/spawns';
 import type { SimRt } from '../rt';
 import { penOf } from './critters';
+import { holdFloodOff } from './cover';
 import { refreshFixtures, spawnFixtures, stampCollision } from './fixtures';
 import { createHeart, createPiece, herbGrows } from './pickups';
 import { placeNpcs } from './npcs';
@@ -34,6 +36,7 @@ export function spawnActors(rt: SimRt, heroAt: Vec = rt.hero.pos): Entity[] {
   for (const e of rt.actors) holdBack(rt, e);
   placeNpcs(rt);
   refreshFixtures(rt, false);
+  holdFloodOff(rt, rt.screen.cover, heroAt);
   stampCollision(rt);
   spawnRolled(rt, heroAt);
   return rt.actors;
@@ -61,7 +64,13 @@ function spawnRolled(rt: SimRt, heroAt: Vec): void {
     ((g.flags[p.y * g.cols + p.x] ?? SOLID) & SOLID) === 0 &&
     Math.max(Math.abs(p.x - hx), Math.abs(p.y - hy)) > SPAWN_CLEARANCE;
   const season = seasonAt(c, def.region, rt.db.clock);
-  for (const r of rollSpawns(table, season, night, def.spawns, seed, free)) {
+  // Foes Ask has no way to beat yet (a mud-crab before bombs) are left out of the draw.
+  const beatable = (e: SpawnEntry): boolean =>
+    (rt.db.enemies[e.id].needs ?? []).every((item) => owns(rt.state.inv.items, item));
+  const entries = Object.fromEntries(
+    Object.entries(table.entries).map(([s, list]) => [s, list.filter(beatable)]),
+  ) as SpawnTable['entries'];
+  for (const r of rollSpawns({ ...table, entries }, season, night, def.spawns, seed, free)) {
     const e = createEnemy(rt.newId(), rt.db.enemies[r.id], tileFeet(r.at));
     e.mem['rolled'] = 1;
     rt.actors.push(e);
@@ -121,6 +130,9 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'shutter':
       case 'switch':
       case 'brazier':
+      case 'bridge':
+      case 'crack':
+      case 'wheel':
         spawnFixtures(rt, thing, index, out);
         break;
       case 'door':

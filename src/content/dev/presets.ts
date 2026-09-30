@@ -22,6 +22,39 @@ const MYR_FLAGS = {
 } as const;
 
 /** Dev starting points for `?preset=`. Content milestones add story presets (day2, night3, …). */
+/** Everything M2 sets on the way: the road north, Uppvík, Eldr, and the vargar hunt paid. */
+const AFTER_M2 = {
+  ...MYR_FLAGS,
+  n_onundr_met: true,
+  n_dagny_met: true,
+  n_skeggi_met: true,
+  n_thordis_met: true,
+  n_hrafnkell_met: true,
+  n_solvi_met: true,
+  n_bersi_met: true,
+  st_d1_entered: true,
+  st_d1_boss_dead: true,
+  st_stone1_lit: true,
+  st_road_open: true,
+  st_uppvik_reached: true,
+  w_horn_thordis: true,
+  q_eldr_asked: true,
+  st_eldr_learned: true,
+  q_vargar_taken: true,
+  q_vargar_tracked: true,
+  q_vargar_alpha: true,
+  q_vargar_done: true,
+} as const;
+
+/** And what M3a sets: over the weir into Mýrland, and Þuríðr's tale of the drowned mill heard. */
+const MYL_FLAGS = {
+  ...AFTER_M2,
+  w_myl_bridge: true,
+  st_myrland_reached: true,
+  n_thuridr_met: true,
+  q_rs2_mill: true,
+} as const;
+
 export const DEV_PRESETS = {
   /** The M0 test kit: seax and shield in the test lands. */
   m0: { screen: 'test_a', tile: [10, 11], weapon: 'seax', shield: true },
@@ -228,6 +261,142 @@ export const DEV_PRESETS = {
     pieces: ['hp_d1_r09'],
     opened: ['d1_hc'],
     dungeons: { d1: { bossDead: true } },
+  },
+
+  /**
+   * Where M2 leaves Ask, come down the forest brook to the bank path into Mýrland: the boomerang in slot K,
+   * Eldr, the hunt paid. The weir's latch is still up.
+   */
+  myl: {
+    screen: 'myr_brook',
+    tile: [35, 17],
+    facing: 's',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1 },
+    slots: ['boomerang', 'lantern'],
+    galdr: ['eldr'],
+    flags: AFTER_M2,
+    vars: { ask_pen: 31 },
+    maxHp: 16,
+    hp: 16,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc'],
+    dungeons: { d1: { bossDead: true } },
+  },
+  /** At the end of Kári's jetty with his rod lent, on an autumn evening: Gamli may bite. */
+  fisher: {
+    screen: 'myl_fisher',
+    tile: [20, 3],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 18 * 60 + 30,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1 },
+    slots: ['boomerang', 'lantern'],
+    galdr: ['eldr'],
+    flags: { ...AFTER_M2, w_myl_bridge: true, st_myrland_reached: true, n_kari_met: true },
+    vars: { ask_pen: 31 },
+    maxHp: 16,
+    hp: 16,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc'],
+    dungeons: { d1: { bossDead: true } },
+  },
+
+  /** By the millpond after Sökkva Kvern, with bombs in slot K: for the springs' cave and the peat's crack. */
+  mylbombs: {
+    screen: 'myl_mill',
+    tile: [18, 16],
+    facing: 's',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1, bombs: 10 },
+    slots: ['bombs', 'boomerang'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true, st_d2_boss_dead: true, st_stone2_lit: true },
+    vars: { ask_pen: 31 },
+    maxHp: 20,
+    hp: 20,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc', 'd2_hc', 'd2_c_bombs'],
+    dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
+  },
+  /**
+   * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
+   * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
+   * seven pieces to be had before here).
+   */
+  d2: {
+    screen: 'd2_r01',
+    tile: [19, 18],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 2, mead_red: 2, purse: 1 },
+    slots: ['boomerang', 'lantern'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true },
+    vars: { ask_pen: 31 },
+    maxHp: 20,
+    hp: 20,
+    pieces: ['hp_d1_r09', 'hp_ask_ridge', 'hp_myr_pines', 'hp_myr_brook'],
+    opened: ['d1_hc'],
+    dungeons: { d1: { bossDead: true } },
+  },
+  /** Before Lindormr's big lock with everything D2 gives: bombs in slot K, the boomerang in L, the big key. */
+  d2boss: {
+    screen: 'd2_r11',
+    tile: [19, 3],
+    facing: 'n',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1, bombs: 10 },
+    slots: ['bombs', 'boomerang'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true, w_d2_level: 2 },
+    vars: { ask_pen: 31 },
+    maxHp: 16,
+    hp: 16,
+    pieces: ['hp_d1_r09'],
+    opened: [
+      'd1_hc',
+      'd2_c_key1',
+      'd2_c_key2',
+      'd2_c_key3',
+      'd2_c_map',
+      'd2_c_compass',
+      'd2_c_bombs',
+      'd2_c_bigkey',
+    ],
+    dungeons: {
+      d1: { bossDead: true },
+      d2: {
+        bigKey: true,
+        map: true,
+        compass: true,
+        doors: ['d2_lock_a', 'd2_lock_b', 'd2_lock_c', 'd2_sh_r07', 'd2_sh_r07w'],
+      },
+    },
   },
 
   /** At the mouth of Rótarhellir, just inside: seax, shield and the lantern. */

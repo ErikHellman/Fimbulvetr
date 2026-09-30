@@ -32,7 +32,8 @@ test('the brook runs with open water where a fish can jump', async ({ page }) =>
     window.__fimbul?.jumpFish();
   });
   await expect.poll(async () => (await view(page))?.fishAlive).toBe(1);
-  await expect.poll(async () => (await view(page))?.fishAlive, { timeout: 5_000 }).toBe(0);
+  // Its eight frames take 0.8 s of game time, and SwiftShader under a parallel run can play at a third of that.
+  await expect.poll(async () => (await view(page))?.fishAlive, { timeout: 15_000 }).toBe(0);
   expect((await view(page))?.fishJumps).toBeGreaterThan(before);
   expect(await missing(page)).toEqual([]);
   expect(errors).toEqual([]);

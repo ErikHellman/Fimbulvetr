@@ -21,4 +21,12 @@ export interface TerrainDef {
   readonly slow?: number;
   /** Solid underfoot but open above (water, sap): the boomerang flies over it. */
   readonly low?: boolean;
+  /** Its footing follows the screen's water level (see world/water.ts); the terrain itself is as at level 0. */
+  readonly rise?: TerrainRise;
+}
+
+/** How a terrain answers the water level: flooded from level `floods` up, or afloat from `floats` up. */
+export interface TerrainRise {
+  readonly floods?: 1 | 2;
+  readonly floats?: 1 | 2;
 }

@@ -1,17 +1,18 @@
 import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
-import { HERO_MACHINE } from '../../actors/hero';
+import type { ShotId } from '../../actors/enemies/defs';
+import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
 import { STUN } from '../../combat/hit';
 import { moveVector, type InputFrame } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
-import { DIR_VEC } from '../../math/dir';
+import { DIR_VEC, dirFromVec } from '../../math/dir';
 import { length, normalize, sub, type Vec } from '../../math/vec';
 import { LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
-import { damageActor } from './combat';
+import { damageActor, hurtHero } from './combat';
 import { blowCover } from './cover';
-import { strikeSwitch } from './fixtures';
+import { strikeSwitch, strikeWheel } from './fixtures';
 import { heroCtx } from './hero';
 import { windOf } from './weather';
 import { stepEldr } from './eldr';
@@ -76,7 +77,65 @@ export function stepProjectiles(rt: SimRt): void {
   for (const e of flying) {
     if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
     else if (e.def === 'eldr') stepEldr(rt, e, wind);
+    else if (e.def === 'spit') stepSpit(rt, e);
   }
+}
+
+/** A gob of spit's box around its ground point; it is drawn `SPIT_Z` px up, at head height. */
+const SPIT_BOX = { x: -4, y: -8, w: 8, h: 8 } as const;
+const SPIT_Z = 10;
+/** Spit numbers: px per tick, ticks, and quarter hearts. */
+export const SPIT = { speed: 2.5, life: 120, amount: 2, knock: 3 } as const;
+
+/** Looses an enemy's shot from `pos` along `dir`. */
+export function shoot(rt: SimRt, def: ShotId, pos: Vec, dir: Vec): void {
+  const d = length(dir) === 0 ? { x: 0, y: 1 } : normalize(dir);
+  const e = createEntity({
+    id: rt.newId(),
+    kind: 'projectile',
+    def,
+    art: 'fx_spit',
+    pos: { ...pos },
+    facing: dirFromVec(d, 's'),
+    body: SPIT_BOX,
+    hurt: SPIT_BOX,
+    faction: 'enemy',
+    hp: 1,
+    maxHp: 1,
+    state: 'fly',
+  });
+  setAnim(e, 'fly');
+  e.mem['dx'] = d.x;
+  e.mem['dy'] = d.y;
+  e.mem['z'] = SPIT_Z;
+  rt.actors.push(e);
+  rt.emit({ t: 'sfx', id: 'sfx_spit' });
+}
+
+/**
+ * A gob of spit flies straight over water and low ground until it meets a wall, runs out, is struck
+ * away by the sword, or hits Ask (the shield stops it from the front).
+ */
+function stepSpit(rt: SimRt, e: Entity): void {
+  const gone = (): void => {
+    rt.actors = rt.actors.filter((a) => a !== e);
+  };
+  const next = { x: e.pos.x + mem(e, 'dx') * SPIT.speed, y: e.pos.y + mem(e, 'dy') * SPIT.speed };
+  if (e.fsm.t >= SPIT.life || wallAt(rt, { x: next.x, y: next.y - 4 })) {
+    gone();
+    return;
+  }
+  e.pos = next;
+  e.fsm.t += 1;
+  const box = at(e.body, e.pos);
+  const sword = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
+  if (sword !== null && overlaps(sword, box)) {
+    rt.emit({ t: 'sfx', id: 'sfx_block' });
+    gone();
+    return;
+  }
+  if (!overlaps(box, at(rt.hero.hurt, rt.hero.pos))) return;
+  if (hurtHero(rt, e, SPIT.amount, SPIT.knock, 0)) gone();
 }
 
 /**
@@ -129,7 +188,7 @@ function strike(rt: SimRt, e: Entity, back: boolean): void {
     rt.emit({ t: 'sfx', id: enemyDef(rt, a).stunnable === undefined ? 'sfx_block' : 'sfx_stun' });
     turn = true;
   }
-  if (strikeSwitch(rt, box)) turn = true;
+  if (strikeSwitch(rt, box) || strikeWheel(rt, box)) turn = true;
   if (mem(e, 'fetch') === 0) {
     const pickup = rt.actors.find(
       (a) => a.kind === 'pickup' && mem(a, 'hidden') !== 1 && overlaps(box, at(a.body, a.pos)),

@@ -12,7 +12,7 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'flatbread', price: 5 },
     ],
   },
-  /** Mead, and a second horn to carry it in (Þórdís gives the first). */
+  /** Mead, a second horn to carry it in (Þórdís gives the first), and bombs once Ask carries them. */
   hrafnkell: {
     id: 'hrafnkell',
     name: { en: 'Hrafnkell’s trading house', sv: 'Hrafnkells handelshus' },
@@ -20,6 +20,7 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'mead_red', price: 20 },
       { item: 'mead_green', price: 25 },
       { item: 'horn', price: 40, when: { k: 'not', c: { k: 'item', id: 'horn', gte: 2 } } },
+      { item: 'bombs', n: 5, price: 20, when: { k: 'owns', id: 'bombs' } },
     ],
   },
   /** The völva's brews: blue mead once she has her fen-moss. */

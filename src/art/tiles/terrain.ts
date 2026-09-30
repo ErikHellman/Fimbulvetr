@@ -179,8 +179,166 @@ const DEEP_WOOD = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Mýrland's waters: white rapids, steaming warm springs, and gravel shoals across the river. */
+const MYRLAND_WATERS = {
+  rapids: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 90,
+    group: 'water',
+    paint: (p, v) => {
+      grass(p);
+      region(p, v.mask, 3, C.waterShade, C.foam, C.water, 0.2);
+      flow(p, v.mask, v.frame, 3, C.foam);
+      flow(p, v.mask, (v.frame + 2) % 4, 3, C.waterLight);
+    },
+  },
+  spring: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 240,
+    group: 'water',
+    paint: (p, v) => {
+      grass(p);
+      region(p, v.mask, 3, C.spring, C.springLight, C.springShade, 0.1);
+      // Bubbles rising: one pixel per tile that climbs a row each frame.
+      const bx = nextInt(p.rng, 5, 11);
+      const by = 12 - v.frame * 2;
+      if (insideBlob(v.mask, bx, by, 4)) p.px(bx, by, C.springLight);
+    },
+  },
+  shoal: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 150,
+    group: 'water',
+    paint: (p, v) => {
+      grass(p);
+      region(p, v.mask, 2, C.waterLight, C.water, C.rock, 0.16);
+      flow(p, v.mask, v.frame, 2, C.rockLight);
+    },
+  },
+  /** Cut peat: black-brown turves with the spade's straight cuts. */
+  peat: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      p.fill(C.mudShade);
+      p.speckle(C.mud, 0.18);
+      p.speckle('#2e231a', 0.1);
+      p.rect(0, 4 + v.variant * 3, 16, 1, '#2e231a');
+      p.rect(3 + v.variant * 4, 0, 1, 16, '#2e231a');
+    },
+  },
+  /** Still millpond water under the drowned mill (its sprite stands on top). */
+  mill: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.waterShade);
+      p.speckle(C.water, 0.2);
+    },
+  },
+  /** Water under the moored boat. */
+  boat: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.water);
+      p.speckle(C.waterShade, 0.15);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/**
+ * Sökkva Kvern's rising water, drawn as at the lowest level: dry sluice floors of wet flagstones, and race
+ * channels with their planks lying on the bottom. The water and the floated planks are an overlay.
+ */
+function flags(p: Painter, fill: string, joint: string, variant: number): void {
+  p.fill(fill);
+  p.speckle(C.mudShade, 0.08);
+  p.rect(0, 7 + (variant % 2), 16, 1, joint);
+  p.rect(5 + variant * 3, 0, 1, 8, joint);
+  p.rect(11 - variant * 2, 8, 1, 8, joint);
+}
+
+function channel(p: Painter, deep: boolean): void {
+  p.fill(deep ? C.ink : C.caveWall);
+  p.speckle(C.mudShade, 0.2);
+  // Planks on the bottom, askew.
+  p.rect(2, 5, 12, 2, C.woodShade);
+  p.rect(3, 10, 11, 2, C.woodShade);
+  p.rect(0, 0, 16, 1, C.rockShade);
+  p.rect(0, 15, 16, 1, C.rockShade);
+}
+
+const MILL_WATERS = {
+  sluice: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, C.rockShade, C.ink, v.variant);
+    },
+  },
+  sluice_hi: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, C.rock, C.rockShade, v.variant);
+    },
+  },
+  race: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      channel(p, false);
+    },
+  },
+  race_hi: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      channel(p, true);
+    },
+  },
+  /** Old wet boards, dark with the water that stood over them. */
+  boards: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      planks(p, C.woodShade, C.ink, v.variant === 1);
+      p.speckle(C.mudShade, 0.06);
+    },
+  },
+  /** Dressed stone below, black timber above: the mill's walls, auto-tiled like the cave's. */
+  mill_wall: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      planks(p, C.woodShade, C.ink, false);
+      region(p, v.mask, 0, C.rockShade, C.ink, C.rock, 0.12);
+    },
+  },
+  /** Grey silt: the millpond's bottom. */
+  silt: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      p.fill(C.mud);
+      p.speckle(C.mudShade, 0.2);
+      p.speckle(C.mudLight, 0.06);
+      p.rect(2 + v.variant * 4, 6 + v.variant * 3, 4, 1, C.mudShade);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ...DEEP_WOOD,
+  ...MYRLAND_WATERS,
+  ...MILL_WATERS,
   grass: {
     autotile: false,
     variants: 4,

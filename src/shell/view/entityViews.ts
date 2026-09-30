@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { frameFor, type AnimTable } from '@art/anims';
 import type { Entity } from '@core/actors/entity';
 import type { Vec } from '@core/math/vec';
+import { TILE } from '@core/world/dims';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import { bodyBounds, type Bounds } from './bounds';
 
@@ -36,7 +37,8 @@ export class EntityViews {
       sprite.setOrigin(ref.ox, ref.oy);
       const p = place(e);
       sprite.setPosition(Math.round(p.x), Math.round(p.y - (e.mem['z'] ?? 0)));
-      sprite.setDepth(p.y);
+      // A lowered drawbridge lies flat: anyone standing on its tile is drawn over it.
+      sprite.setDepth(e.kind === 'fixture' && e.def === 'bridge' ? p.y - TILE : p.y);
       const stun = e.mem['stun'] ?? 0;
       if (e.flash > 0 && Math.floor(e.flash / 2) % 2 === 0)
         sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);

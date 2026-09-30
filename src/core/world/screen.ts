@@ -125,8 +125,18 @@ export type Thing =
       readonly appear?: RoomSignal;
       readonly when?: Cond;
     }
-  /** A locked door: walking into it with a small key opens it for good (`id` saved in the dungeon's doors). */
-  | { readonly k: 'lock'; readonly id: string; readonly at: TilePos; readonly w: number; readonly h: number }
+  /**
+   * A locked door: walking into it with a small key opens it for good (`id` saved in the dungeon's doors).
+   * A `big` one (the boss door) takes the dungeon's big key instead, which is kept.
+   */
+  | {
+      readonly k: 'lock';
+      readonly id: string;
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly big?: true;
+    }
   /**
    * Bars that slam shut once Ask has stepped clear of them, and open when the room gives `opens`. While
    * `when` fails they stay open. With an `id` the opening is saved in the dungeon's doors, for good; one
@@ -141,8 +151,36 @@ export type Thing =
       readonly opens?: RoomSignal;
       readonly when?: Cond;
     }
-  /** A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. */
-  | { readonly k: 'switch'; readonly at: TilePos }
+  /**
+   * A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. With `set`,
+   * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good).
+   */
+  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId }
+  /** A drawbridge over water or a gap: its tiles are walkable while `down` holds. */
+  | {
+      readonly k: 'bridge';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly down: Cond;
+    }
+  /**
+   * A cracked wall or rock pile: solid until a blast opens it, for good (`id` saved in `world.opened`). A
+   * crack on a room edge is authored in both rooms under one id.
+   */
+  | {
+      readonly k: 'crack';
+      readonly id: string;
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly art: 'wall' | 'rock';
+    }
+  /**
+   * A mill wheel: struck (sword, boomerang or blast) it sets the screen's water level to `level`, unless
+   * that would change the footing under Ask. It shows turned while the water stands at its level.
+   */
+  | { readonly k: 'wheel'; readonly at: TilePos; readonly level: 0 | 1 | 2 }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
@@ -197,6 +235,8 @@ export interface ScreenDef {
   readonly dungeon?: DungeonId;
   /** Where the region's spawn table may put enemies (see ContentDb.spawns). None: nothing rolled here. */
   readonly spawns?: readonly TilePos[];
+  /** The flag holding this screen's water level, for terrains that `rise` (see world/water.ts). */
+  readonly water?: FlagId;
 }
 
 /** A grid of screens: the overworld, or one floor of a dungeon. */

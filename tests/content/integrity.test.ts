@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DB } from '@content/index';
 import { SPAWN_TABLES } from '@content/spawns';
 import { NEW_GAME } from '@content/start';
 import { TERRAIN } from '@content/terrain';
@@ -6,14 +7,19 @@ import { WORLD_LAYOUT } from '@content/world/layout';
 import { LEGEND } from '@content/world/legend';
 import { SCREENS } from '@content/world/registry';
 import { SCREEN_IDS, type ScreenId } from '@content/world/screens';
+import { SEASONS, type Season } from '@core/clock/types';
+import { coverPassage } from '@core/progress/solver';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
 import { decorPlacements } from '@core/world/decor';
 import { indexLayout, neighbourOf } from '@core/world/screen';
 import { cellAt, parseTextMap, type TerrainGrid } from '@core/world/textmap';
 
-function walkable(id: ScreenId): (x: number, y: number) => boolean {
+function walkable(id: ScreenId, season?: Season): (x: number, y: number) => boolean {
   const grid = parseTextMap(SCREENS[id].map, LEGEND);
+  const cover = season === undefined ? new Map<number, boolean>() : coverPassage(DB, id, season);
   return (x, y) => {
+    const over = cover.get(y * SCREEN_COLS + x);
+    if (over !== undefined) return over;
     const t = cellAt(grid, x, y);
     return t !== undefined && !TERRAIN[t].solid;
   };
@@ -27,12 +33,19 @@ describe('screens', () => {
     expect(() => parseTextMap(def.map, LEGEND)).not.toThrow();
   });
 
-  it.each(SCREEN_IDS)('%s places things that stand somewhere on walkable tiles', (id) => {
+  it.each(SCREEN_IDS)('%s places things that stand somewhere on walkable tiles (swimmers in water)', (id) => {
     const ok = walkable(id);
+    const grid = parseTextMap(SCREENS[id].map, LEGEND);
     const standing = new Set(['enemy', 'prop', 'critter', 'piece', 'door']);
     for (const thing of SCREENS[id].things) {
       if (!standing.has(thing.k)) continue;
-      expect(ok(thing.at.x, thing.at.y), `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`).toBe(true);
+      const where = `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`;
+      if (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) {
+        const t = cellAt(grid, thing.at.x, thing.at.y);
+        expect(t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t], where).toBe(true);
+        continue;
+      }
+      expect(ok(thing.at.x, thing.at.y), where).toBe(true);
     }
   });
 
@@ -60,7 +73,7 @@ describe('screens', () => {
   });
 });
 
-const WATERSIDE = new Set(['water', 'ford', 'jetty']);
+const WATERSIDE = new Set(['water', 'ford', 'jetty', 'spring', 'rapids', 'shoal']);
 
 describe('buildings', () => {
   const cache = new Map<ScreenId, TerrainGrid>();
@@ -159,26 +172,30 @@ describe('world layout', () => {
     }
   });
 
-  it('has identical walkable seams between neighbouring screens', () => {
-    const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
-    for (const id of SCREEN_IDS) {
-      const here = walkable(id);
-      const east = neighbourOf(index, id, 'e');
-      if (east !== null) {
-        const there = walkable(east);
-        for (let y = 0; y < SCREEN_ROWS; y++) {
-          expect(here(SCREEN_COLS - 1, y), `${id} → ${east}, row ${y}`).toBe(there(0, y));
+  // In every season too: ice on one side of a seam and open water on the other would drop Ask in the water.
+  it.each([undefined, ...SEASONS])(
+    'has identical walkable seams between neighbours (season: %s)',
+    (season) => {
+      const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
+      for (const id of SCREEN_IDS) {
+        const here = walkable(id, season);
+        const east = neighbourOf(index, id, 'e');
+        if (east !== null) {
+          const there = walkable(east, season);
+          for (let y = 0; y < SCREEN_ROWS; y++) {
+            expect(here(SCREEN_COLS - 1, y), `${id} → ${east}, row ${y}`).toBe(there(0, y));
+          }
+        }
+        const south = neighbourOf(index, id, 's');
+        if (south !== null) {
+          const there = walkable(south, season);
+          for (let x = 0; x < SCREEN_COLS; x++) {
+            expect(here(x, SCREEN_ROWS - 1), `${id} → ${south}, col ${x}`).toBe(there(x, 0));
+          }
         }
       }
-      const south = neighbourOf(index, id, 's');
-      if (south !== null) {
-        const there = walkable(south);
-        for (let x = 0; x < SCREEN_COLS; x++) {
-          expect(here(x, SCREEN_ROWS - 1), `${id} → ${south}, col ${x}`).toBe(there(x, 0));
-        }
-      }
-    }
-  });
+    },
+  );
 });
 
 describe('doors', () => {

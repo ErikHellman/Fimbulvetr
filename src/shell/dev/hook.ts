@@ -1,4 +1,5 @@
 import type { UiKey } from '@content/i18n/ui';
+import { itemMax, owns } from '@core/items/defs';
 import { SCREEN_IDS, isScreenId } from '@content/world/screens';
 import { mem } from '@core/actors/entity';
 import { isSeason, type ClockState } from '@core/clock/types';
@@ -42,6 +43,10 @@ export interface FimbulHook {
   view(): ViewStats;
   jumpFish(): void;
   tileAt(x: number, y: number): number;
+  /** The cover layer's tile at a cell of the current screen (the water overlay, snow), or -1. */
+  coverAt(x: number, y: number): number;
+  /** Chests, heart containers and cracks opened for good. */
+  opened(): string[];
   exportSaveJson(): string;
   importSaveJson(json: string): UiKey;
   flushSave(): Promise<void>;
@@ -73,6 +78,19 @@ export interface FimbulHook {
   slots(): (string | null)[];
   /** The boss bar: its name in English, health and phase; null when no boss is on screen. */
   boss(): { name: string; hp: number; maxHp: number; phase: number } | null;
+  /** While Ask fishes: the phase, the line's tension, how far out the fish is, and how it ended. */
+  fish(): {
+    phase: string;
+    tension: number;
+    dist: number;
+    fish: string | null;
+    result: string | null;
+    surging: boolean;
+  } | null;
+  /** The water level of the screen Ask is on, or null on screens without water. */
+  water(): { level: number; flag: string } | null;
+  /** Bombs in the bag, and how many it holds. */
+  ammo(): { bombs: number; max: number; owned: boolean };
   /** The saved state of the dungeon Ask is in, or null outside dungeons. */
   dungeon(): {
     id: string;
@@ -119,9 +137,37 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
     menu: () => bridge().menu(),
     picker: () => bridge().picker(),
     slots: () => [...bridge().sim.state.inv.slots],
+    fish: () => {
+      const ui = bridge().sim.storyUi();
+      if (ui?.k !== 'fish') return null;
+      return {
+        phase: ui.phase,
+        tension: ui.tension,
+        dist: ui.dist,
+        fish: ui.fish,
+        result: ui.result,
+        surging: ui.surging,
+      };
+    },
     boss: () => {
       const b = bridge().sim.boss();
       return b === null ? null : { name: b.name.en, hp: b.hp, maxHp: b.maxHp, phase: b.phase };
+    },
+    water: () => {
+      const sim = bridge().sim;
+      const flag = sim.db.screens[sim.screen.id].water;
+      if (flag === undefined) return null;
+      const v = sim.state.flags[flag];
+      return { level: typeof v === 'number' ? v : 0, flag };
+    },
+    ammo: () => {
+      const sim = bridge().sim;
+      const have = sim.state.inv.items;
+      return {
+        bombs: have.bombs ?? 0,
+        max: itemMax(sim.db.items, have, 'bombs'),
+        owned: owns(have, 'bombs'),
+      };
     },
     dungeon: () => {
       const sim = bridge().sim;
@@ -161,6 +207,8 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       bridge().jumpFish();
     },
     tileAt: (x, y) => bridge().tileAt(x, y),
+    coverAt: (x, y) => bridge().coverAt(x, y),
+    opened: () => [...bridge().sim.state.world.opened],
     exportSaveJson: () => {
       const b = bridge();
       return b.saves.exportJson(b.sim.snapshot());
@@ -187,6 +235,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       const ui = bridge().sim.storyUi();
       if (ui === null) return null;
       if (ui.k === 'save') return { k: 'save', who: null, text: '', shown: 1, choices: [], cursor: 0 };
+      if (ui.k === 'fish') return { k: 'fish', who: null, text: ui.phase, shown: 1, choices: [], cursor: 0 };
       if (ui.k === 'shop')
         return {
           k: 'shop',

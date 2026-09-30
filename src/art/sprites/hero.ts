@@ -301,6 +301,20 @@ export function heroArtFor(weapon: WeaponId): HeroArt {
   return 'hero';
 }
 
+/** Where the rod runs, from the hands out over the water, by side; the tip dips `dip` px. */
+const ROD: Readonly<Record<Side, readonly [number, number, number, number]>> = {
+  s: [20, 20, 29, 6],
+  w: [11, 17, 3, 6],
+  n: [19, 13, 25, 3],
+};
+
+function withRod(r: Raster, side: Side, dip: number): Raster {
+  const [x0, y0, x1, y1] = ROD[side];
+  line(r, x0, y0, x1, y1 + dip, hex(C.woodShade));
+  line(r, x0, y0 - 1, x1, y1 + dip - 1, hex(C.wood));
+  return r;
+}
+
 export function heroFrames(): SpriteFrame[] {
   return Object.entries(HERO_KITS).flatMap(([art, kit]) => kitFrames(art, kit));
 }
@@ -338,6 +352,14 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
     // Sending a sub-item off (the boomerang): wind up, let go.
     add('toss', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
     add('toss', side, 1, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'forward' }, SMALL));
+    // Fishing: Kári's rod held out over the water, its tip dipping on the second frame.
+    for (let i = 0; i < 2; i++)
+      add(
+        'fish',
+        side,
+        i,
+        withRod(drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL), side, i),
+      );
     // Singing a galdr: hands raised, then flung forward as the song leaves them.
     add('cast', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
     add('cast', side, 1, drawPose({ side, phase: 1, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
@@ -401,6 +423,7 @@ export const HERO_ANIMS = {
   push: { frames: 2, fps: 4, loop: true, dirs: ALL },
   toss: { frames: 2, fps: 12, loop: false, dirs: ALL },
   cast: { frames: 3, fps: 10, loop: false, dirs: ALL },
+  fish: { frames: 2, fps: 2, loop: true, dirs: ALL },
   /** Spins through the four facings and falls; held on the last frame. */
   dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },
 } satisfies Record<string, AnimDef>;

@@ -75,6 +75,11 @@ export const ENEMIES = [
   'forest_troll',
   'vargr_alpha',
   'rime_raven',
+  'vatnormr',
+  'myrljos',
+  'leirkrabbi',
+  'lindormr',
+  'lind_mound',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -123,6 +128,15 @@ export const SFX = [
   'sfx_fizzle',
   'sfx_howl',
   'sfx_shriek',
+  'sfx_spit',
+  'sfx_bite',
+  'sfx_reel',
+  'sfx_snap',
+  'sfx_splash',
+  'sfx_bomb',
+  'sfx_fuse',
+  'sfx_wheel',
+  'sfx_water',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -162,6 +176,12 @@ export const NPCS = [
   // Myrkviðr, deep
   'heidr',
   'huldra',
+  // Mýrland
+  'kari',
+  'bardr',
+  'thuridr',
+  'ljotr',
+  'audr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -175,6 +195,8 @@ export const QUESTS = [
   'q_volva',
   'q_huldra',
   'q_vargar',
+  'q_runestone_2',
+  'q_fisher',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -205,8 +227,17 @@ export const SCRIPTS = [
   'shop_ketill',
   'shop_heidr',
   'thing_notices',
+  'myl_arrive',
+  'fish_jetty',
+  'widow_rest',
+  'd2_enter',
+  'stone2_light',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
+
+/** Fish that bite in Mýrland's waters; each season and part of the day has its own. */
+export const FISH = ['perch', 'pike', 'bream', 'trout', 'eel', 'burbot', 'salmon', 'gamli'] as const;
+export type FishId = (typeof FISH)[number];
 
 /** Things that can be lifted, thrown, broken or split. */
 export const PROPS = [
@@ -220,6 +251,8 @@ export const PROPS = [
   'vines',
   'troll_stone',
   'bramble',
+  'bomb',
+  'bomb_pot',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 
@@ -231,5 +264,5 @@ export type CritterId = (typeof CRITTERS)[number];
  * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
  * grow from the terrain beneath by season (see CoverDef.grows).
  */
-export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice'] as const;
+export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood'] as const;
 export type CoverId = (typeof COVERS)[number];

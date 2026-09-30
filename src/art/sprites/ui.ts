@@ -82,7 +82,23 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'W.......',
   ],
   fen_moss: ['........', '..v..v..', '.vVvvVv.', 'vvVvvvVv', 'VvvVvVvv', '.vVvvvV.', '..VvvV..', '........'],
+  /** A round iron bomb, its fuse spitting sparks. */
+  bombs: ['.....y.y', '......Y.', '....ww..', '..iiii..', '.iliiii.', '.iiiiii.', '.iiiiiL.', '..iiLL..'],
+  /** A sack bulging with bombs. */
+  bomb_bag: ['..ss....', '.sSSs...', 'ssssss..', 'sSssSs..', 'sssiiis.', 'sSsilis.', '.sssiis.', '..ssss..'],
 };
+
+/** A bundle of bombs lying where it dropped, bobbing a pixel (`pickup_bombs`). */
+export function bombPickupFrames(): SpriteFrame[] {
+  const grid = ICONS.bombs ?? [];
+  return [0, 1].map((bob) => {
+    const g = decodeGrid(grid, ICON_PAL);
+    const r = createRaster(g.w + 2, g.h + 3);
+    blit(r, g, 1, 1 + bob);
+    const done = outline(r, hex(C.ink), 1);
+    return { name: `pickup_bombs_idle_s_${bob}`, raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
+  });
+}
 
 /** Weapons, armour and galdr for the Gear page: `gear_<id>` and `galdr_<id>`. */
 const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
@@ -220,6 +236,7 @@ export function uiFrames(): SpriteFrame[] {
   };
   for (const [item, grid] of Object.entries(ICONS)) icon(`item_${item}`, grid);
   for (const [name, grid] of Object.entries(GEAR_ICONS)) icon(name, grid);
+  out.push(...bombPickupFrames());
   return out;
 }
 
@@ -230,4 +247,5 @@ export const UI_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>
   ui_silver: { idle: ONE },
   ...Object.fromEntries(Object.keys(ICONS).map((item) => [`item_${item}`, { idle: ONE }])),
   ...Object.fromEntries(Object.keys(GEAR_ICONS).map((name) => [name, { idle: ONE }])),
+  pickup_bombs: { idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] } },
 };

@@ -2,6 +2,7 @@ import type { FlagId } from '@content/flags';
 import type { ArmorId, GaldrId, ItemId, SfxId, WeaponId } from '@content/ids';
 import { setMinute, setPolicy, setSeason, sleepUntil } from '../clock/clock';
 import type { ClockState, Season } from '../clock/types';
+import { itemMax } from '../items/defs';
 import { dungeonOf } from '../state/dungeons';
 import type { FlagValue } from '../state/flags';
 import type { SimRt } from '../sim/rt';
@@ -37,7 +38,9 @@ export type Effect =
   | { readonly k: 'policy'; readonly policy: ClockState['policy'] }
   /** Sleep to the next day's `until` minute. */
   | { readonly k: 'sleep'; readonly until: number }
-  | { readonly k: 'sfx'; readonly id: SfxId };
+  | { readonly k: 'sfx'; readonly id: SfxId }
+  /** A piece of heart handed over (a reward), counted like one picked up; `id` is saved in `world.pieces`. */
+  | { readonly k: 'piece'; readonly id: string };
 
 export function applyEffect(e: Effect, rt: SimRt): void {
   const s = rt.state;
@@ -63,6 +66,8 @@ export function applyEffect(e: Effect, rt: SimRt): void {
     case 'take': {
       const left = (s.inv.items[e.item] ?? 0) - (e.n ?? 1);
       if (left > 0) s.inv.items[e.item] = left;
+      // Ammunition stays owned at 0, in its slot, until it is refilled.
+      else if (rt.db.items[e.item].ammo !== undefined) s.inv.items[e.item] = 0;
       else {
         s.inv.items = Object.fromEntries(Object.entries(s.inv.items).filter(([id]) => id !== e.item));
         s.inv.slots = [
@@ -108,7 +113,27 @@ export function applyEffect(e: Effect, rt: SimRt): void {
     case 'sfx':
       rt.emit({ t: 'sfx', id: e.id });
       break;
+    case 'piece':
+      grantPiece(rt, e.id);
+      break;
   }
+}
+
+/** Pieces of heart that make one heart container's worth. */
+export const PIECES_PER_HEART = 4;
+
+/** Takes a piece of heart for good (once per id); every fourth adds a heart and refills health. */
+export function grantPiece(rt: SimRt, id: string): void {
+  const w = rt.state.world;
+  if (w.pieces.includes(id)) return;
+  w.pieces.push(id);
+  rt.state.inv.items.heart_piece = w.pieces.length % PIECES_PER_HEART;
+  if (w.pieces.length % PIECES_PER_HEART === 0) {
+    rt.hero.maxHp = Math.min(MAX_HP, rt.hero.maxHp + HEART);
+    rt.hero.hp = rt.hero.maxHp;
+  }
+  rt.emit({ t: 'itemGet', item: 'heart_piece' });
+  rt.emit({ t: 'sfx', id: 'sfx_itemget' });
 }
 
 /**
@@ -135,7 +160,7 @@ export function giveItem(rt: SimRt, item: ItemId, n: number): void {
   const room = def.horn === true ? hornsFree(rt) : n;
   const add = Math.min(n, room);
   if (add <= 0) return;
-  inv.items[item] = Math.min(def.max, (inv.items[item] ?? 0) + add);
+  inv.items[item] = Math.min(itemMax(rt.db.items, inv.items, item), (inv.items[item] ?? 0) + add);
   const hero = rt.state.hero;
   if (def.purse === true) hero.purse = Math.min(2, inv.items[item] ?? 0) as 0 | 1 | 2;
   if (def.maxSeidr !== undefined) {

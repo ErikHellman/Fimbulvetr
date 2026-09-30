@@ -38,16 +38,22 @@ const CONTENT = {
   screens: DB.screens,
   weather: DB.weather,
   freezeClock: DB.freezeClock,
+  fish: DB.fish,
 };
+
+/** Flags read now and set by a later milestone's content (the pass opens at the end of Act I, M5). */
+const SET_LATER = new Set(['st_pass_open']);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {
     const read = new Set<string>();
-    const set = new Set<string>(Object.keys(NEW_GAME.flags ?? {}));
+    const set = new Set<string>([...Object.keys(NEW_GAME.flags ?? {}), ...SET_LATER]);
     for (const o of walk(CONTENT)) {
       if (o['k'] === 'flag' && typeof o['id'] === 'string') read.add(o['id']);
       if ((o['k'] === 'set' || o['k'] === 'add') && typeof o['flag'] === 'string') set.add(o['flag']);
       if (o['k'] === 'pen' && typeof o['flag'] === 'string') set.add(o['flag']);
+      // A latch sets its flag when struck.
+      if (o['k'] === 'switch' && typeof o['set'] === 'string') set.add(o['set']);
     }
     const unset = [...read].filter((f) => !set.has(f));
     expect(unset).toEqual([]);

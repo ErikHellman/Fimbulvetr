@@ -28,13 +28,16 @@ export const hero = (page: Page) => page.evaluate(() => window.__fimbul?.hero())
 export const eventCount = (page: Page, key: string): Promise<number> =>
   page.evaluate((k) => window.__fimbul?.eventCounts[k] ?? 0, key);
 
-/** Holds a key until the hero has fully arrived on `screen`. */
+/**
+ * Holds a key until the hero has fully arrived on `screen`. A long walk under SwiftShader with two workers
+ * can take over 15 s, so it waits up to 30.
+ */
 export async function walkUntilScreen(page: Page, key: string, screen: string): Promise<void> {
   await page.keyboard.down(key);
   await page.waitForFunction(
     (s) => window.__fimbul?.screenId() === s && window.__fimbul.mode() === 'play',
     screen,
-    { timeout: 15_000 },
+    { timeout: 30_000 },
   );
   await page.keyboard.up(key);
 }

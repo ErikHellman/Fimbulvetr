@@ -1,3 +1,4 @@
+import { shoot } from './projectiles';
 import type { Dir4 } from '../../math/dir';
 import type { Vec } from '../../math/vec';
 import { mem } from '../../actors/entity';
@@ -28,6 +29,9 @@ export function actorCtx(rt: SimRt): ActorCtx {
       e.mem['summoned'] = 1;
       rt.actors.push(e);
       return e;
+    },
+    shoot: (def, pos, dir) => {
+      shoot(rt, def, pos, dir);
     },
   };
 }

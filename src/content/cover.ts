@@ -12,13 +12,13 @@ export const COVER_DEFS = {
   /** Winter snow over all open ground outdoors; the sword clears a path. */
   snow: { id: 'snow', seasons: ['winter'], slow: 0.7, grows: { on: GROUND }, cloak: true },
   /** Deep drifts, drawn on the map (`^`): no blade clears them; fire melts them (Eldr, M2b). */
-  drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false, cloak: true, melts: true },
+  drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false, cloak: true, melts: true, blasts: true },
   /** Spring mud along the water on wet days; it cannot be cleared, only waited out. */
   mud: {
     id: 'mud',
     seasons: ['spring'],
     slow: 0.75,
-    grows: { on: GROUND, by: ['water', 'ford'] },
+    grows: { on: GROUND, by: ['water', 'ford', 'shoal', 'rapids', 'spring'] },
     wet: true,
     cut: false,
   },
@@ -31,6 +31,15 @@ export const COVER_DEFS = {
     cut: false,
     walk: true,
     melts: true,
+  },
+  /** Spring meltwater over a shoal: the river swells and the crossing is gone until summer. */
+  flood: {
+    id: 'flood',
+    seasons: ['spring'],
+    slow: 1,
+    grows: { on: ['shoal'] },
+    cut: false,
+    sink: true,
   },
 } as const satisfies Record<CoverId, CoverDef>;
 

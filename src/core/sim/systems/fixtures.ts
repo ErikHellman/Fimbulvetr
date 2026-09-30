@@ -14,8 +14,9 @@ import { hurtHero } from './combat';
 import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
 import { raining } from './weather';
-import { walkTiles } from './cover';
+import { sinkTiles, walkTiles } from './cover';
 import { condCtx, probeBox } from './story';
+import { footingHolds, levelTiles, waterLevel } from './water';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
 const FIRE = { amount: 2, knock: 4 } as const;
@@ -23,18 +24,28 @@ const TILE_BOX = { x: -8, y: -14, w: 16, h: 16 } as const;
 const FLAME_BOX = { x: -6, y: -12, w: 12, h: 12 } as const;
 
 /**
- * Fixture kinds: whether they block the way (while on, or always) and their on/off animations. A chest
- * has none here; it shows open or closed.
+ * Fixture kinds: whether they block the way (while on, or always), whether they give footing over water
+ * (while on), and their on/off animations. A chest has none here; it shows open or closed.
  */
 const KINDS: Readonly<
-  Record<string, { readonly solid: 'never' | 'on' | 'always'; readonly anims?: readonly [string, string] }>
+  Record<
+    string,
+    {
+      readonly solid: 'never' | 'on' | 'always';
+      readonly walk?: 'on';
+      readonly anims?: readonly [string, string];
+    }
+  >
 > = {
+  bridge: { solid: 'never', walk: 'on', anims: ['down', 'up'] },
   gate: { solid: 'on', anims: ['closed', 'open'] },
   fire: { solid: 'never', anims: ['burn', 'out'] },
   chest: { solid: 'on' },
+  crack: { solid: 'on', anims: ['closed', 'open'] },
   lock: { solid: 'on', anims: ['closed', 'open'] },
   shutter: { solid: 'on', anims: ['closed', 'open'] },
   switch: { solid: 'always', anims: ['on', 'off'] },
+  wheel: { solid: 'always', anims: ['on', 'off'] },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -60,7 +71,7 @@ function fixture(id: number, def: string, art: string, tile: TilePos, index: num
 }
 
 /**
- * Spawns fixtures: one per tile of a gate, fire, lock or shutter (each tile animates on its own), one per
+ * Spawns fixtures: one per tile of a gate, fire, lock, shutter, bridge or crack (each tile animates on its own), one per
  * chest (open if it was opened before), switch and brazier.
  */
 export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entity[]): void {
@@ -71,8 +82,14 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       out.push(e);
       return;
     }
-    case 'switch':
-      out.push(fixture(rt.newId(), 'switch', 'fix_switch', thing.at, index));
+    case 'switch': {
+      const e = fixture(rt.newId(), 'switch', 'fix_switch', thing.at, index);
+      if (thing.set !== undefined && rt.state.flags[thing.set] === true) e.mem['lit'] = 1;
+      out.push(e);
+      return;
+    }
+    case 'wheel':
+      out.push(fixture(rt.newId(), 'wheel', 'fix_wheel', thing.at, index));
       return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
@@ -83,8 +100,17 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     case 'gate':
     case 'fire':
     case 'lock':
-    case 'shutter': {
-      const art = thing.k === 'gate' ? `fix_${thing.art}` : `fix_${thing.k}`;
+    case 'shutter':
+    case 'bridge':
+    case 'crack': {
+      const art =
+        thing.k === 'gate'
+          ? `fix_${thing.art}`
+          : thing.k === 'crack'
+            ? `fix_crack_${thing.art}`
+            : thing.k === 'lock' && thing.big === true
+              ? 'fix_biglock'
+              : `fix_${thing.k}`;
       for (let y = 0; y < thing.h; y++)
         for (let x = 0; x < thing.w; x++)
           out.push(fixture(rt.newId(), thing.k, art, { x: thing.at.x + x, y: thing.at.y + y }, index));
@@ -113,12 +139,18 @@ function isOn(rt: SimRt, e: Entity): boolean {
   switch (thing?.k) {
     case 'gate':
       return evalCond(thing.closed, condCtx(rt));
+    case 'bridge':
+      return evalCond(thing.down, condCtx(rt));
     case 'fire':
       return evalCond(thing.when, condCtx(rt));
     case 'chest':
       return mem(e, 'wait') !== 1;
     case 'lock':
       return !(doorsOf(rt)?.includes(thing.id) ?? false);
+    case 'crack':
+      return !rt.state.world.opened.includes(thing.id);
+    case 'wheel':
+      return waterLevel(rt) === thing.level;
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -181,7 +213,7 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
     if (was !== undefined && e.def === 'shutter') sounds.add('sfx_shutter');
     const kind = KINDS[e.def];
     if (kind?.anims !== undefined) setAnim(e, on === 1 ? kind.anims[0] : kind.anims[1]);
-    if (kind?.solid === 'on') changed = true;
+    if (kind?.solid === 'on' || kind?.walk === 'on') changed = true;
   }
   for (const id of sounds) rt.emit({ t: 'sfx', id });
   if (changed) stampCollision(rt);
@@ -194,8 +226,21 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
 export function stampCollision(rt: SimRt): void {
   const { base, collision } = rt.screen;
   collision.flags.set(base.flags);
+  // The water level: flooded sluices and sunken planks are water; dry sluices and floated planks are not.
+  for (const [i, footing] of levelTiles(rt))
+    collision.flags[i] = footing
+      ? (collision.flags[i] ?? 0) & ~(SOLID | LOW)
+      : (collision.flags[i] ?? 0) | SOLID | LOW;
   // Ice lets Ask walk on water (and blocks nothing in flight).
   for (const i of walkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
+  // A spring flood over a shoal: as open water.
+  for (const i of sinkTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) | SOLID | LOW;
+  // A lowered drawbridge: footing over the water.
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || KINDS[e.def]?.walk !== 'on' || mem(e, 'on') !== 1) continue;
+    const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
+    collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
+  }
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
@@ -218,7 +263,10 @@ function fixtureAt(rt: SimRt, def: string, box: Box, pick: (e: Entity) => boolea
   );
 }
 
-/** Opens the locked door under `box` with a small key, for good. Returns whether one was opened. */
+/**
+ * Opens the locked door under `box` for good: a small key is spent, the big key only shown. Returns whether
+ * one was opened.
+ */
 export function unlockAt(rt: SimRt, box: Box): boolean {
   const doors = doorsOf(rt);
   const id = rt.db.screens[rt.screen.id].dungeon;
@@ -226,8 +274,11 @@ export function unlockAt(rt: SimRt, box: Box): boolean {
   const e = fixtureAt(rt, 'lock', box, (f) => mem(f, 'on') === 1);
   const thing = e === null ? undefined : thingOf(rt, e);
   const d = dungeonOf(rt.state, id);
-  if (thing?.k !== 'lock' || d.keys < 1) return false;
-  d.keys -= 1;
+  if (thing?.k !== 'lock') return false;
+  if (thing.big === true) {
+    if (!d.bigKey) return false;
+  } else if (d.keys < 1) return false;
+  else d.keys -= 1;
   doors.push(thing.id);
   rt.emit({ t: 'sfx', id: 'sfx_unlock' });
   refreshFixtures(rt);
@@ -247,6 +298,7 @@ export function swordSwitches(rt: SimRt): void {
   const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   for (let lit = strikeSwitch(rt, box); lit; lit = strikeSwitch(rt, box));
+  strikeWheel(rt, box);
 }
 
 /** Lights the unlit switch under `box` (a sword or boomerang strike). Returns whether one was lit. */
@@ -254,7 +306,50 @@ export function strikeSwitch(rt: SimRt, box: Box): boolean {
   const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1);
   if (e === null) return false;
   e.mem['lit'] = 1;
+  const thing = thingOf(rt, e);
+  if (thing?.k === 'switch' && thing.set !== undefined) rt.state.flags[thing.set] = true;
   rt.emit({ t: 'sfx', id: 'sfx_switch' });
+  return true;
+}
+
+/** Opens every cracked wall or rock under `box` (a blast), for good. Returns whether one was opened. */
+export function openCracks(rt: SimRt, box: Box): boolean {
+  const opened = rt.state.world.opened;
+  let any = false;
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || e.def !== 'crack' || mem(e, 'on') !== 1) continue;
+    if (!overlaps(box, at(e.hurt, e.pos))) continue;
+    const thing = thingOf(rt, e);
+    if (thing?.k !== 'crack' || opened.includes(thing.id)) continue;
+    opened.push(thing.id);
+    any = true;
+  }
+  if (!any) return false;
+  rt.emit({ t: 'sfx', id: 'sfx_secret' });
+  refreshFixtures(rt);
+  return true;
+}
+
+/**
+ * Turns the wheel under `box` that stands at another level than the water: the level follows it, unless
+ * that would change the footing under Ask (then it only clanks). Returns whether a wheel was struck.
+ */
+export function strikeWheel(rt: SimRt, box: Box): boolean {
+  const flag = rt.db.screens[rt.screen.id].water;
+  if (flag === undefined) return false;
+  const now = waterLevel(rt);
+  const e = fixtureAt(rt, 'wheel', box, (f) => {
+    const t = thingOf(rt, f);
+    return t?.k === 'wheel' && t.level !== now;
+  });
+  const thing = e === null ? undefined : thingOf(rt, e);
+  if (thing?.k !== 'wheel') return false;
+  if (!footingHolds(rt, thing.level)) {
+    rt.emit({ t: 'sfx', id: 'sfx_block' });
+    return true;
+  }
+  rt.state.flags[flag] = thing.level;
+  rt.emit({ t: 'sfx', id: 'sfx_wheel' });
   return true;
 }
 

@@ -1,0 +1,52 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d2R14: ScreenDef = {
+  id: 'd2_r14',
+  region: 'myrland',
+  dungeon: 'd2',
+  water: 'w_d2_level',
+  purpose: "The miller's secret cache behind a cracked wall: silver, and bomb pots to refill.",
+  things: [
+    { k: 'crack', id: 'd2_k_r14', at: { x: 19, y: 21 }, w: 2, h: 1, art: 'wall' },
+    {
+      k: 'chest',
+      id: 'd2_c_cache',
+      at: { x: 20, y: 10 },
+      gives: {
+        silver: 50,
+        text: {
+          en: 'You found fifty pieces of silver: the miller’s hoard, walled up and forgotten.',
+          sv: 'Du hittade femtio silverbitar: mjölnarens gömma, inmurad och bortglömd.',
+        },
+      },
+    },
+    { k: 'prop', id: 'bomb_pot', at: { x: 12, y: 10 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 13, y: 10 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 27, y: 10 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 28, y: 10 } },
+  ],
+  map: [
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHFFFFFFFFFFFFFFFFFFFFHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+  ],
+};

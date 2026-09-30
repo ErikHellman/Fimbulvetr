@@ -3,6 +3,7 @@ import type { L10n } from '../i18n/t';
 import type { SimRt } from '../sim/rt';
 import { evalCond, type Cond, type CondCtx } from './cond';
 import { giveItem, hornsFree } from './effects';
+import { itemMax } from '../items/defs';
 
 export interface ShopDef {
   readonly id: ShopId;
@@ -66,7 +67,8 @@ function refusal(rt: SimRt, entry: StockEntry): BuyResult | null {
   }
   if ('galdr' in entry) return inv.galdr.includes(entry.galdr) ? 'owned' : null;
   const def = rt.db.items[entry.item];
-  if ((inv.items[entry.item] ?? 0) >= def.max) return def.max === 1 ? 'owned' : 'full';
+  const max = itemMax(rt.db.items, inv.items, entry.item);
+  if ((inv.items[entry.item] ?? 0) >= max) return max === 1 ? 'owned' : 'full';
   if (def.horn === true && hornsFree(rt) <= 0) return 'full';
   return null;
 }

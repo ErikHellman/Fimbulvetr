@@ -6,6 +6,7 @@ export const ONUNDR: DialogueDef = {
   entry: [
     { when: not(flag('n_onundr_met')), node: 'meet' },
     { when: all(flag('st_stone1_lit'), not(flag('st_road_open'))), node: 'road' },
+    { when: all(flag('st_road_open'), not(flag('st_myrland_reached'))), node: 'south' },
     { when: flag('st_road_open'), node: 'north' },
     { when: evening, node: 'night' },
     { node: 'day' },
@@ -51,6 +52,19 @@ export const ONUNDR: DialogueDef = {
         sv: 'Så. Genomsågad medan vi pratade, nästan. Följ vägen norrut förbi de djupa tallarna.',
       },
       do: [{ k: 'set', flag: 'st_road_open', value: true }],
+    },
+    south: {
+      text: {
+        en: 'And lad: my brook runs south to a weir, and past it lies Mýrland, all reed and slow water. The mill there drowned last spring. They say an old stone lies under it.',
+        sv: 'Och pojk: min bäck rinner söderut till en damm, och bortom den ligger Mýrland, bara vass och långsamt vatten. Kvarnen där drunknade i våras. Det sägs att en gammal sten ligger under den.',
+      },
+      next: 'south2',
+    },
+    south2: {
+      text: {
+        en: 'The weir’s drawbridge is hauled up from the far side. You would need something that flies out and comes back to strike its latch.',
+        sv: 'Dammens vindbrygga är uppdragen från andra sidan. Du skulle behöva något som flyger ut och kommer tillbaka för att slå till spärren.',
+      },
     },
     north: {
       text: {

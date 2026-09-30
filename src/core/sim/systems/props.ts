@@ -15,7 +15,7 @@ import { damageActor } from './combat';
 import { critterDef } from './critters';
 import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
-import { createDrop } from './pickups';
+import { spillDrop } from './pickups';
 import { applyAll, probeBox } from './story';
 
 export const propDef = (rt: SimRt, e: Entity): PropDef => rt.db.props[e.def as PropId];
@@ -38,6 +38,11 @@ export function burnProp(rt: SimRt, e: Entity): boolean {
   return true;
 }
 
+/** A bomb's blast takes a prop that breaks in one (pots, stones, bomb pots). */
+export function blastProp(rt: SimRt, e: Entity): void {
+  if (propDef(rt, e).blast === true) breakProp(rt, e);
+}
+
 /** Where loot lands around a broken prop, in px (up to eight pieces). */
 const LOOT_SPREAD: readonly { x: number; y: number }[] = [
   { x: -12, y: 0 },
@@ -58,7 +63,7 @@ function breakProp(rt: SimRt, e: Entity): void {
   rt.emit({ t: 'sfx', id: 'sfx_break' });
   (def.loot ?? []).forEach((kind, i) => {
     const d = LOOT_SPREAD[i % LOOT_SPREAD.length] ?? { x: 0, y: 0 };
-    rt.actors.push(createDrop(rt.newId(), kind, { x: e.pos.x + d.x, y: e.pos.y + d.y }));
+    spillDrop(rt, kind, { x: e.pos.x + d.x, y: e.pos.y + d.y });
   });
   if (thing?.k === 'prop') applyAll(rt, thing.onBreak ?? []);
 }
@@ -93,8 +98,14 @@ function carried(rt: SimRt, e: Entity, input: InputFrame): void {
   const hero = rt.hero;
   const state = hero.fsm.s;
   if (state !== 'lift' && state !== 'carry') {
-    // Dropped (hurt, or knocked out of the carry): it falls and is lost.
-    breakProp(rt, e);
+    // Dropped (hurt, or knocked out of the carry): it falls and is lost; a lit bomb falls at Ask's feet.
+    if (propDef(rt, e).fuse === undefined) breakProp(rt, e);
+    else {
+      e.mem['carried'] = 0;
+      e.mem['z'] = 0;
+      e.pos = { ...hero.pos };
+      hero.mem['carrying'] = 0;
+    }
     return;
   }
   const h = rt.db.tuning.hero;

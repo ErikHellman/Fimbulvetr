@@ -3,6 +3,7 @@ import { grade } from '@art/grading';
 import { ANIMS } from '@art/sprites';
 import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
+import { waterIndices } from '@art/tiles/waterIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import type { ScreenId } from '@content/world/screens';
@@ -39,6 +40,7 @@ import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { FireView } from '@shell/view/fireView';
+import { FishView } from '@shell/view/fishView';
 import { ScreenView } from '@shell/view/screenView';
 
 /** Interiors are lit by the hearth: a fixed warm grade whatever the hour. */
@@ -65,6 +67,7 @@ export class PlayScene extends Phaser.Scene {
   private fog!: DarknessView;
   private fx!: FxView;
   private flames!: FireView;
+  private fishing!: FishView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
   private readonly latch = new InputLatch();
@@ -127,6 +130,7 @@ export class PlayScene extends Phaser.Scene {
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
     this.flames = new FireView(this, data.assets.frames, ANIMS);
+    this.fishing = new FishView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
         this.audio.play(id);
@@ -230,6 +234,7 @@ export class PlayScene extends Phaser.Scene {
       viewStats: () => this.viewStats(),
       jumpFish: () => this.screens.get(this.sim.screen.id)?.ambient.jump(),
       tileAt: (x, y) => this.screens.get(this.sim.screen.id)?.view.displayedTile(x, y) ?? -1,
+      coverAt: (x, y) => this.screens.get(this.sim.screen.id)?.view.coverTile(x, y) ?? -1,
       restart: (state: GameState) => {
         this.scene.restart({ ...this.services, state });
       },
@@ -249,6 +254,9 @@ export class PlayScene extends Phaser.Scene {
     if (ev.t === 'killed') {
       const origin = this.sim.originOf(this.sim.screen.id);
       this.fx.poof({ x: origin.x + ev.x, y: origin.y + ev.y - 6 }, this.sim.tick);
+    } else if (ev.t === 'blast') {
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fx.blast({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
     } else if (ev.t === 'shake') {
@@ -371,6 +379,17 @@ export class PlayScene extends Phaser.Scene {
     }
     this.fx.tick(this.sim.tick);
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
+    {
+      const ui = this.sim.storyUi();
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fishing.draw(
+        ui?.k === 'fish' ? ui : null,
+        add(origin, this.sim.hero.pos),
+        this.sim.hero.facing,
+        origin,
+        this.sim.tick,
+      );
+    }
     const hero = this.views.bounds(this.sim.hero);
     for (const stage of this.screens.values()) {
       stage.view.tick(this.sim.tick);
@@ -488,8 +507,16 @@ export class PlayScene extends Phaser.Scene {
     return out;
   }
 
+  /** The cover layer: ground cover, and over it the water level on screens with water. */
   private coverTiles(id: ScreenId): number[] {
-    return coverIndices(this.sim.coverOf(id), this.services.db.coverOrder, this.services.assets.tileset);
+    const { db } = this.services;
+    const { tileset } = this.services.assets;
+    const cover = coverIndices(this.sim.coverOf(id), db.coverOrder, tileset);
+    const flag = db.screens[id].water;
+    if (flag === undefined) return cover;
+    const v = this.sim.state.flags[flag];
+    const water = waterIndices(this.sim.terrainOf(id), db.terrain, typeof v === 'number' ? v : 0, tileset);
+    return cover.map((c, i) => ((water[i] ?? -1) >= 0 ? (water[i] ?? c) : c));
   }
 
   private dropScreensExcept(id: ScreenId): void {

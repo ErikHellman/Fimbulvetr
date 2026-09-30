@@ -1,3 +1,4 @@
+import type { ItemId } from '@content/ids';
 import type { L10n } from '../i18n/t';
 
 export interface GaldrDef {
@@ -30,4 +31,23 @@ export interface ItemDef {
   readonly maxSeidr?: number;
   /** A larger purse: each one raises the silver cap a step (100 → 300 → 999). */
   readonly purse?: boolean;
+  /**
+   * Ammunition (bombs): `max` more for each `bag` carried, and it stays in the bag and its slot at 0
+   * once owned, so it can be refilled.
+   */
+  readonly ammo?: { readonly bag: ItemId; readonly step: number };
 }
+
+/** How many of `id` can be carried now: its `max`, raised by each bag of an ammunition. */
+export function itemMax(
+  defs: Readonly<Record<ItemId, ItemDef>>,
+  have: Readonly<Partial<Record<ItemId, number>>>,
+  id: ItemId,
+): number {
+  const def = defs[id];
+  return def.max + (def.ammo === undefined ? 0 : (have[def.ammo.bag] ?? 0) * def.ammo.step);
+}
+
+/** Owned at all: in the bag, even at a count of 0 (ammunition used up). */
+export const owns = (have: Readonly<Partial<Record<ItemId, number>>>, id: ItemId): boolean =>
+  Object.hasOwn(have, id);

@@ -5,6 +5,7 @@ import { BLOB_MASKS } from '@core/world/autotile';
 import { createPainter } from '../painter';
 import type { Raster } from '../raster';
 import { COVER_ART } from './cover';
+import { WATER_ART } from './water';
 import { TERRAIN_ART } from './terrain';
 
 export interface TilesetEntry {
@@ -37,6 +38,8 @@ export interface Tileset {
   readonly entries: Readonly<Record<TerrainId, TilesetEntry>>;
   /** Cover tiles are transparent overlays drawn on a layer above the ground. */
   readonly cover: Readonly<Record<CoverId, CoverEntry>>;
+  /** The water level's overlay tiles (see waterIndices): a flooded sluice, and a race's floated planks. */
+  readonly water: { readonly flooded: number; readonly afloat: number };
 }
 
 /**
@@ -78,7 +81,13 @@ export function buildTileset(): Tileset {
     cover[id] = { standing: tiles.length, cut: tiles.length + 1 };
     tiles.push(standing.r, cut.r);
   });
-  return { tiles, entries, cover };
+  const flooded = createPainter(16, 16, hashInts(0x3a7e, 1));
+  WATER_ART.flooded(flooded);
+  const afloat = createPainter(16, 16, hashInts(0x3a7e, 2));
+  WATER_ART.afloat(afloat);
+  const water = { flooded: tiles.length, afloat: tiles.length + 1 };
+  tiles.push(flooded.r, afloat.r);
+  return { tiles, entries, cover, water };
 }
 
 /** Every animated tile in the set: one entry per frame-0 tile of each multi-frame terrain. */

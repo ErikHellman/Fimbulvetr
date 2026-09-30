@@ -90,6 +90,28 @@ function threshold(): Raster {
   return outline(r, INK, 1);
 }
 
+/** A drawbridge tile let down: planks laid across the water, ends pinned with iron. */
+function bridgeDown(): Raster {
+  const r = createRaster(W, 18);
+  rect(r, 1, 1, 16, 16, WOOD);
+  for (let x = 4; x < 17; x += 4) rect(r, x, 1, 1, 16, WOOD_SHADE);
+  rect(r, 1, 1, 16, 1, INK);
+  rect(r, 1, 16, 16, 1, INK);
+  rect(r, 2, 2, 1, 1, IRON);
+  rect(r, 15, 2, 1, 1, IRON);
+  return r;
+}
+
+/** A drawbridge tile raised: only its edge shows, hauled up on its chains, and the water beneath. */
+function bridgeUp(): Raster {
+  const r = createRaster(W, 18);
+  rect(r, 1, 1, 16, 3, WOOD_SHADE);
+  rect(r, 1, 1, 16, 1, INK);
+  rect(r, 3, 4, 1, 3, IRON);
+  rect(r, 14, 4, 1, 3, IRON);
+  return r;
+}
+
 const LOG_H = 24;
 
 /** Logs piled across a path (the fallen tree's trunks, the barred cave mouth). */
@@ -241,6 +263,8 @@ export function fixtureFrames(): SpriteFrame[] {
   out.push(fixtureFrame('fix_fire_open_s_0', ashes()));
   out.push(fixtureFrame('fix_palisade_closed_s_0', palisade()));
   out.push(fixtureFrame('fix_palisade_open_s_0', threshold()));
+  out.push(fixtureFrame('fix_bridge_down_s_0', bridgeDown()));
+  out.push(fixtureFrame('fix_bridge_up_s_0', bridgeUp()));
   out.push(fixtureFrame('fix_logs_closed_s_0', logPile()));
   out.push(fixtureFrame('fix_logs_open_s_0', chips()));
   out.push(fixtureFrame('fix_chest_closed_s_0', chest(false)));
@@ -263,6 +287,7 @@ const FLICKER: AnimDef = { frames: 4, fps: 8, loop: true, dirs: ['s'] };
 export const FIXTURE_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fix_fire: { burn: FLICKER, closed: FLICKER, out: ONE, open: ONE },
   fix_palisade: { closed: ONE, open: ONE },
+  fix_bridge: { down: ONE, up: ONE },
   fix_logs: { closed: ONE, open: ONE },
   fix_chest: { closed: ONE, open: ONE },
   fix_lock: { closed: ONE, open: ONE },

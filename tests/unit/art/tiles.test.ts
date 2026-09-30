@@ -46,22 +46,25 @@ describe('tileset', () => {
       else expect(e.count).toBeGreaterThan(0);
     }
     const total = TERRAIN_IDS.reduce((n, id) => n + ts.entries[id].count * ts.entries[id].frames, 0);
-    expect(ts.tiles).toHaveLength(total + 2 * Object.keys(ts.cover).length);
+    expect(ts.tiles).toHaveLength(total + 2 * Object.keys(ts.cover).length + 2);
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 
-  it('animates water and the ford in four frames, the sap slower, everything else in one', () => {
+  it('animates the waters in four frames (rapids fast, springs and sap slower), everything else in one', () => {
     for (const id of TERRAIN_IDS) {
       const e = ts.entries[id];
-      if (id === 'water' || id === 'ford') expect(e, id).toMatchObject({ frames: 4, frameMs: 150 });
+      if (id === 'water' || id === 'ford' || id === 'shoal')
+        expect(e, id).toMatchObject({ frames: 4, frameMs: 150 });
+      else if (id === 'rapids') expect(e, id).toMatchObject({ frames: 4, frameMs: 90 });
+      else if (id === 'spring') expect(e, id).toMatchObject({ frames: 4, frameMs: 240 });
       else if (id === 'sap') expect(e, id).toMatchObject({ frames: 4, frameMs: 260 });
       else expect(e.frames, id).toBe(1);
     }
   });
 
-  it('lists one tile animation per water, ford and sap variant, frame-major', () => {
+  it('lists one tile animation per variant of each animated water and the sap, frame-major', () => {
     const anims = tileAnimations(ts);
-    expect(anims).toHaveLength(3 * 47);
+    expect(anims).toHaveLength(6 * 47);
     const s = ts.entries.water.start;
     expect(anims.find((a) => a.tile === s + 46)).toEqual({
       tile: s + 46,
@@ -118,6 +121,18 @@ describe('tileset', () => {
     expect(has(first('menhir'), C.rock)).toBe(false);
     expect(has(first('bed'), C.floor)).toBe(true);
     expect(has(first('tree'), C.grass)).toBe(true);
+  });
+
+  it('overlays the water level: flooded sluices and floated planks, nothing on the dry or sunken', async () => {
+    const { waterIndices } = await import('@art/tiles/waterIndices');
+    const { DB } = await import('@content/index');
+    const cells: TerrainId[] = ['sluice', 'sluice_hi', 'race', 'race_hi', 'boards'];
+    const grid = { cols: 5, rows: 1, cells };
+    const { flooded, afloat } = ts.water;
+    expect(waterIndices(grid, DB.terrain, 0, ts)).toEqual([-1, -1, -1, -1, -1]);
+    expect(waterIndices(grid, DB.terrain, 1, ts)).toEqual([flooded, -1, afloat, -1, -1]);
+    expect(waterIndices(grid, DB.terrain, 2, ts)).toEqual([flooded, flooded, afloat, afloat, -1]);
+    expect(differingPixels(tile(ts, flooded), tile(ts, afloat))).toBeGreaterThan(20);
   });
 
   it('is deterministic', () => {

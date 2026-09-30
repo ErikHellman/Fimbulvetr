@@ -1,11 +1,16 @@
+import type { FlagId } from '@content/flags';
 import type { DungeonId, ItemId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
+import type { Season } from '../clock/types';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { ContentDb } from '../sim/db';
+import { owns } from '../items/defs';
 import { dungeonOf } from '../state/dungeons';
 import type { GameState } from '../state/gameState';
 import { cloneState } from '../state/save';
 import { evalCond, type CondCtx } from '../story/cond';
+import { buildCover, coverAt } from '../world/cover';
+import { riseFooting } from '../world/water';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '../world/dims';
 import { indexLayout, neighbourOf, type LayoutIndex, type RoomSignal, type Thing } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
@@ -18,7 +23,24 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * cutting are always possible), nor do props Ask can lift; brambles block until Eldr is known. A `use`
  * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask. Enemies
  * other than bosses are assumed beaten with the sword.
+ *
+ * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
+ * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored.
  */
+
+export interface SolveOptions {
+  /** Solve in this season, with the ice and floods it brings. */
+  readonly season?: Season;
+  /** Only these screens (a dungeon's rooms and its door): ways out of them lead nowhere. */
+  readonly within?: readonly ScreenId[];
+  /**
+   * Search water levels too: Ask may turn any mill wheel they can strike (beside it, or by boomerang) when
+   * the footing under them stays the same, so the reach is a (tile × level) graph. Without it, screens with
+   * water are left out altogether (a dungeon of them is a dead end off the overworld), so whole-world
+   * solves cost what they did; a dungeon's own proofs pass `within` and `levels`.
+   */
+  readonly levels?: boolean;
+}
 
 export interface SolveResult {
   /** The goal holds in at least one line of play. */
@@ -49,17 +71,69 @@ const DIRS8: readonly (readonly [number, number])[] = [
   [-1, -1],
 ];
 
+/**
+ * The tiles of a screen whose footing the season's own cover changes: `true` where it makes them walkable
+ * (ice over water), `false` where it makes them impassable (a flood over a shoal). Uses the sim's own cover
+ * rules, so the solver and the game cannot disagree. Cuts and melted patches are not counted.
+ */
+export function coverPassage(db: ContentDb, id: ScreenId, season: Season): Map<number, boolean> {
+  const def = db.screens[id];
+  const terrain = parseTextMap(def.map, db.legend);
+  const g = buildCover(
+    def.map,
+    db.coverLegend,
+    db.coverOrder,
+    db.cover,
+    db.clock.fixedSeason[def.region] ?? season,
+    0,
+    undefined,
+    { terrain, outdoor: def.indoor !== true && def.dungeon === undefined, wet: true },
+  );
+  const out = new Map<number, boolean>();
+  for (let y = 0; y < g.rows; y++)
+    for (let x = 0; x < g.cols; x++) {
+      const kind = coverAt(g, db.coverOrder, x, y);
+      if (kind === null) continue;
+      const c = db.cover[kind];
+      if (c.walk === true) out.set(y * g.cols + x, true);
+      else if (c.sink === true) out.set(y * g.cols + x, false);
+    }
+  return out;
+}
+
 class World {
   readonly ids: readonly ScreenId[];
   readonly idx = new Map<ScreenId, number>();
   readonly grids: TerrainGrid[];
   readonly layout: LayoutIndex;
+  /** Per screen, the season's cover over the terrain (see coverPassage); empty without a season. */
+  readonly passage: ReadonlyMap<number, boolean>[];
 
-  constructor(readonly db: ContentDb) {
-    this.ids = Object.keys(db.screens) as ScreenId[];
+  /** Tile numbers span this many per level (every screen's 1024 cells). */
+  readonly span: number;
+  /** The water level flag the search turns wheels on, when searching levels (null otherwise). */
+  readonly water: FlagId | null;
+
+  constructor(
+    readonly db: ContentDb,
+    season?: Season,
+    within?: readonly ScreenId[],
+    levels = false,
+  ) {
+    const all = within ?? (Object.keys(db.screens) as ScreenId[]);
+    this.ids = levels ? all : all.filter((id) => db.screens[id].water === undefined);
     this.ids.forEach((id, i) => this.idx.set(id, i));
     this.grids = this.ids.map((id) => parseTextMap(db.screens[id].map, db.legend));
     this.layout = indexLayout(db.layout, this.ids);
+    this.passage = this.ids.map((id) => (season === undefined ? new Map() : coverPassage(db, id, season)));
+    this.span = this.ids.length * 1024;
+    const flags = new Set(this.ids.flatMap((id) => db.screens[id].water ?? []));
+    if (levels && flags.size > 1) throw new Error('solver: one water level flag at a time');
+    this.water = levels ? ([...flags][0] ?? null) : null;
+  }
+
+  has(id: ScreenId): boolean {
+    return this.idx.has(id);
   }
 
   tile(id: ScreenId, x: number, y: number): number {
@@ -72,12 +146,24 @@ class World {
     return { id: this.ids[i] ?? this.ids[0] ?? 'test_a', x: r % SCREEN_COLS, y: Math.floor(r / SCREEN_COLS) };
   }
 
-  terrain(id: ScreenId, x: number, y: number): { solid: boolean; low: boolean; ledge?: Dir4 } | null {
+  /** The terrain's footing at water level `level` (which only matters on screens with water). */
+  terrain(
+    id: ScreenId,
+    x: number,
+    y: number,
+    level = 0,
+  ): { solid: boolean; low: boolean; ledge?: Dir4 } | null {
     if (x < 0 || y < 0 || x >= SCREEN_COLS || y >= SCREEN_ROWS) return null;
     const g = this.grids[this.idx.get(id) ?? 0];
     const cell = g?.cells[y * SCREEN_COLS + x];
     if (cell === undefined) return null;
     const def = this.db.terrain[cell];
+    const cover = this.passage[this.idx.get(id) ?? 0]?.get(y * SCREEN_COLS + x);
+    if (cover !== undefined) return { solid: !cover, low: !cover };
+    if (def.rise !== undefined && this.db.screens[id].water !== undefined) {
+      const footing = riseFooting(def.rise, level);
+      return { solid: !footing, low: !footing };
+    }
     return {
       solid: def.solid || def.ledge !== undefined,
       low: def.low === true,
@@ -89,12 +175,21 @@ class World {
 /** One line of play: the saved state it has reached and what it could do there. */
 interface Node {
   readonly state: GameState;
+  /** Reachable tiles, whatever the water level. */
   reach: Set<number>;
+  /** Reachable (tile, level) pairs when searching levels (`tile + level × span`); else the tiles again. */
+  states: Set<number>;
   scripts: Set<ScriptId>;
 }
 
-export function solve(db: ContentDb, start: GameState, goal: (s: GameState) => boolean): SolveResult {
-  const w = new World(db);
+export function solve(
+  db: ContentDb,
+  start: GameState,
+  goal: (s: GameState) => boolean,
+  opts: SolveOptions = {},
+): SolveResult {
+  const w = new World(db, opts.season, opts.within, opts.levels);
+  if (!w.has(start.hero.screen)) throw new Error(`solver: ${start.hero.screen} is not searched (levels?)`);
   const origin = w.tile(
     start.hero.screen,
     Math.floor(start.hero.x / TILE),
@@ -135,7 +230,9 @@ export function solve(db: ContentDb, start: GameState, goal: (s: GameState) => b
     return ok;
   };
 
-  const finishable = explore(cloneState(start));
+  const first = cloneState(start);
+  if (opts.season !== undefined) first.clock.season = opts.season;
+  const finishable = explore(first);
   return {
     finishable,
     opened: [...opened].sort(),
@@ -160,12 +257,38 @@ const ctxOf = (w: World, state: GameState): CondCtx => ({ state, quests: w.db.qu
 
 /** Takes everything reachable, over and over, until nothing new comes of it. */
 function settle(w: World, state: GameState, origin: number): Node {
-  const node: Node = { state, reach: new Set(), scripts: new Set() };
+  const node: Node = { state, reach: new Set(), states: new Set(), scripts: new Set() };
   for (let guard = 0; guard < 200; guard++) {
-    node.reach = flood(w, state, origin);
+    node.states = flood(w, state, origin);
+    node.reach = w.water === null ? node.states : new Set([...node.states].map((st) => st % w.span));
     if (!gather(w, node)) return node;
   }
   throw new Error('solver: settling did not converge');
+}
+
+/** What things do to the ground in a state: tiles they block, and tiles they give footing on. */
+interface Ground {
+  /** Gates, locks, shutters, chests, switches, braziers left shut or standing. */
+  readonly blocked: ReadonlySet<number>;
+  /** Lowered drawbridges. */
+  readonly open: ReadonlySet<number>;
+}
+
+function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null): Ground {
+  return { blocked: blockedTiles(w, state, reach), open: bridgeTiles(w, state) };
+}
+
+/** Tiles of drawbridges that are down. */
+function bridgeTiles(w: World, state: GameState): Set<number> {
+  const out = new Set<number>();
+  const ctx = ctxOf(w, state);
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'bridge' || !evalCond(t.down, ctx)) continue;
+      for (let dy = 0; dy < t.h; dy++)
+        for (let dx = 0; dx < t.w; dx++) out.add(w.tile(id, t.at.x + dx, t.at.y + dy));
+    }
+  return out;
 }
 
 /** Tiles blocked by things this state leaves shut: gates, locks, shutters, chests, switches, braziers. */
@@ -202,10 +325,13 @@ function solidThing(
       return evalCond(t.closed, ctx);
     case 'chest':
     case 'switch':
+    case 'wheel':
     case 'brazier':
       return true;
     case 'lock':
       return !doors().includes(t.id);
+    case 'crack':
+      return !state.world.opened.includes(t.id);
     case 'shutter': {
       if (!evalCond(t.when, ctx)) return false;
       if (t.id !== undefined && doors().includes(t.id)) return false;
@@ -229,7 +355,7 @@ function warpEdges(w: World, state: GameState): Map<number, number[]> {
     for (const t of w.db.screens[id].things) {
       if (t.k !== 'use' || !evalCond(t.when, ctx)) continue;
       const warp = w.db.scripts[t.script]?.steps.find((step) => step.k === 'warp');
-      if (warp?.k !== 'warp') continue;
+      if (warp?.k !== 'warp' || !w.has(warp.screen)) continue;
       const to = w.tile(warp.screen, warp.at.x, warp.at.y);
       const tw = t.w ?? 1;
       const th = t.h ?? 1;
@@ -244,18 +370,81 @@ function warpEdges(w: World, state: GameState): Map<number, number[]> {
   return out;
 }
 
-/** Every tile the hero can walk to from `origin`: 4-way steps, screen edges, doors and ledge hops. */
+/** The water level a state stands at (the flag of the screens with water; 0 without). */
+function levelOf(w: World, state: GameState): number {
+  const flag = w.water ?? w.ids.map((id) => w.db.screens[id].water).find((f) => f !== undefined);
+  const v = flag === undefined ? undefined : state.flags[flag];
+  return typeof v === 'number' ? v : 0;
+}
+
+/** Where one move from state `s` can lead: steps, warps and, when searching levels, turning a wheel. */
+function moves(
+  w: World,
+  s: number,
+  ground: Ground,
+  warps: ReadonlyMap<number, number[]>,
+  spots: ReadonlyMap<number, readonly number[]>,
+  fixed: number,
+): number[] {
+  if (w.water === null) return [...steps(w, s, ground, fixed), ...(warps.get(s) ?? [])];
+  const t = s % w.span;
+  const level = Math.floor(s / w.span);
+  const out = [...steps(w, t, ground, level), ...(warps.get(t) ?? [])].map((n) => n + level * w.span);
+  for (const to of spots.get(t) ?? [])
+    if (to !== level && sameFooting(w, t, level, to)) out.push(t + to * w.span);
+  return out;
+}
+
+/** Whether the footing of tile `t` is the same at two water levels (a wheel refuses otherwise). */
+function sameFooting(w: World, t: number, a: number, b: number): boolean {
+  const { id, x, y } = w.where(t);
+  return w.terrain(id, x, y, a)?.solid === w.terrain(id, x, y, b)?.solid;
+}
+
+/** Tiles from which a mill wheel can be struck (beside it, or by boomerang), mapped to the levels they set. */
+function wheelSpots(w: World, state: GameState): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  if (w.water === null) return out;
+  const blocked = blockedTiles(w, state, null);
+  const add = (t: number, level: number): void => {
+    out.set(t, [...(out.get(t) ?? []), level]);
+  };
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'wheel') continue;
+      for (const [dx, dy] of DIRS8) {
+        const reachOf = has(state, 'boomerang') ? FETCH_TILES : dx !== 0 && dy !== 0 ? 0 : 1;
+        for (let k = 1; k <= reachOf; k++) {
+          const fx = t.at.x + dx * k;
+          const fy = t.at.y + dy * k;
+          const tr = w.terrain(id, fx, fy);
+          if (tr === null || (tr.solid && !tr.low) || blocked.has(w.tile(id, fx, fy))) break;
+          add(w.tile(id, fx, fy), t.level);
+        }
+      }
+    }
+  return out;
+}
+
+/**
+ * Every tile the hero can walk to from `origin`: 4-way steps, screen edges, doors and ledge hops; when
+ * searching levels, every (tile, level) pair, starting at the state's level.
+ */
 function flood(w: World, state: GameState, origin: number): Set<number> {
   let reach = new Set<number>();
   const warps = warpEdges(w, state);
+  const spots = wheelSpots(w, state);
+  const fixed = levelOf(w, state);
+  const start = w.water === null ? origin : origin + fixed * w.span;
   // Shutters open on signals that depend on what is reachable, so flood until the set stops growing.
   for (let i = 0; i < 20; i++) {
-    const blocked = blockedTiles(w, state, reach);
-    const next = new Set<number>([origin]);
-    const queue = [origin];
+    const tiles = w.water === null ? reach : new Set([...reach].map((s) => s % w.span));
+    const ground = groundOf(w, state, tiles);
+    const next = new Set<number>([start]);
+    const queue = [start];
     while (queue.length > 0) {
-      const t = queue.pop() ?? origin;
-      for (const n of [...steps(w, t, blocked), ...(warps.get(t) ?? [])]) {
+      const t = queue.pop() ?? start;
+      for (const n of moves(w, t, ground, warps, spots, fixed)) {
         if (next.has(n)) continue;
         next.add(n);
         queue.push(n);
@@ -267,13 +456,15 @@ function flood(w: World, state: GameState, origin: number): Set<number> {
   return reach;
 }
 
-function walkable(w: World, blocked: ReadonlySet<number>, id: ScreenId, x: number, y: number): boolean {
-  const tr = w.terrain(id, x, y);
-  return tr !== null && !tr.solid && !blocked.has(w.tile(id, x, y));
+function walkable(w: World, ground: Ground, id: ScreenId, x: number, y: number, level: number): boolean {
+  const tr = w.terrain(id, x, y, level);
+  if (tr === null) return false;
+  const tile = w.tile(id, x, y);
+  return (!tr.solid || ground.open.has(tile)) && !ground.blocked.has(tile);
 }
 
-/** Where one step from tile `t` can lead. */
-function steps(w: World, t: number, blocked: ReadonlySet<number>): number[] {
+/** Where one step from tile `t` can lead, at water level `level`. */
+function steps(w: World, t: number, ground: Ground, level: number): number[] {
   const { id, x, y } = w.where(t);
   const out: number[] = [];
   for (const dir of ['n', 's', 'e', 'w'] as const) {
@@ -282,22 +473,22 @@ function steps(w: World, t: number, blocked: ReadonlySet<number>): number[] {
     const ny = y + d.y;
     if (nx < 0 || ny < 0 || nx >= SCREEN_COLS || ny >= SCREEN_ROWS) {
       const to = neighbourOf(w.layout, id, dir);
-      if (to === null) continue;
+      if (to === null || !w.has(to)) continue;
       const ex = (nx + SCREEN_COLS) % SCREEN_COLS;
       const ey = (ny + SCREEN_ROWS) % SCREEN_ROWS;
-      if (walkable(w, blocked, to, ex, ey)) out.push(w.tile(to, ex, ey));
+      if (walkable(w, ground, to, ex, ey, level)) out.push(w.tile(to, ex, ey));
       continue;
     }
-    if (walkable(w, blocked, id, nx, ny)) {
+    if (walkable(w, ground, id, nx, ny, level)) {
       out.push(w.tile(id, nx, ny));
       continue;
     }
     // A ledge facing this way is hopped: land on the far side.
-    if (w.terrain(id, nx, ny)?.ledge === dir && walkable(w, blocked, id, nx + d.x, ny + d.y))
+    if (w.terrain(id, nx, ny)?.ledge === dir && walkable(w, ground, id, nx + d.x, ny + d.y, level))
       out.push(w.tile(id, nx + d.x, ny + d.y));
   }
   for (const thing of w.db.screens[id].things)
-    if (thing.k === 'door' && thing.at.x === x && thing.at.y === y)
+    if (thing.k === 'door' && thing.at.x === x && thing.at.y === y && w.has(thing.to))
       out.push(w.tile(thing.to, thing.arrive.x, thing.arrive.y));
   return out;
 }
@@ -361,8 +552,19 @@ function signal(
   if (!roomReached(w, reach, id)) return false;
   const things = w.db.screens[id].things;
   switch (s) {
-    case 'clear':
-      return !bossAlive(w, state, id);
+    case 'clear': {
+      // Foes are beaten with the sword, except those that need more (a mud-crab's shell needs bombs).
+      const ctx = ctxOf(w, state);
+      return (
+        !bossAlive(w, state, id) &&
+        things.every(
+          (t) =>
+            t.k !== 'enemy' ||
+            !evalCond(t.when, ctx) ||
+            (w.db.enemies[t.id].needs ?? []).every((item) => owns(state.inv.items, item)),
+        )
+      );
+    }
     case 'blocks':
       return true;
     case 'switches':
@@ -439,6 +641,41 @@ function gather(w: World, node: Node): boolean {
           changed = true;
           return;
         }
+        case 'switch': {
+          // A latch: struck from beside it, or by the boomerang from across the water, it sets its flag.
+          if (t.set === undefined || state.flags[t.set] === true) return;
+          if (!besideReach(w, reach, id, t.at.x, t.at.y) && !throwable(w, state, reach, id, t.at.x, t.at.y))
+            return;
+          state.flags[t.set] = true;
+          changed = true;
+          return;
+        }
+        case 'lock': {
+          // The big key is never spent, so a big lock is no choice: it opens as soon as Ask reaches it.
+          if (t.big !== true || def.dungeon === undefined) return;
+          const d = dungeonOf(state, def.dungeon);
+          if (!d.bigKey || d.doors.includes(t.id)) return;
+          let near = false;
+          for (let dy = 0; dy < t.h && !near; dy++)
+            for (let dx = 0; dx < t.w && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
+          d.doors.push(t.id);
+          changed = true;
+          return;
+        }
+        case 'crack': {
+          // Bombs, once owned, are never used up: every crack beside the reach can be blown open.
+          if (state.world.opened.includes(t.id) || !owns(state.inv.items, 'bombs')) return;
+          let near = false;
+          for (let dy = 0; dy < t.h && !near; dy++)
+            for (let dx = 0; dx < t.w && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
+          state.world.opened.push(t.id);
+          changed = true;
+          return;
+        }
         case 'use': {
           if (!evalCond(t.when, ctx) || !besideReach(w, reach, id, t.at.x, t.at.y)) return;
           node.scripts.add(t.script);
@@ -482,7 +719,7 @@ function openableLocks(w: World, node: Node): { id: string; dungeon: DungeonId }
     const d = dungeonOf(node.state, dungeon);
     if (d.keys < 1) continue;
     for (const t of w.db.screens[id].things) {
-      if (t.k !== 'lock' || d.doors.includes(t.id) || seen.has(t.id)) continue;
+      if (t.k !== 'lock' || t.big === true || d.doors.includes(t.id) || seen.has(t.id)) continue;
       let near = false;
       for (let dy = 0; dy < t.h && !near; dy++)
         for (let dx = 0; dx < t.w && !near; dx++)
@@ -495,27 +732,30 @@ function openableLocks(w: World, node: Node): { id: string; dungeon: DungeonId }
   return out;
 }
 
-/** Reachable tiles from which no path leads back to the starting tile. */
+/** Reachable tiles (at some water level) from which no path leads back to the starting tile. */
 function strandedTiles(w: World, node: Node, origin: number): number[] {
-  const blocked = blockedTiles(w, node.state, node.reach);
+  const ground = groundOf(w, node.state, node.reach);
   const warps = warpEdges(w, node.state);
+  const spots = wheelSpots(w, node.state);
+  const fixed = levelOf(w, node.state);
   const back = new Map<number, number[]>();
-  for (const t of node.reach)
-    for (const n of [...steps(w, t, blocked), ...(warps.get(t) ?? [])]) {
-      if (!node.reach.has(n)) continue;
+  for (const s of node.states)
+    for (const n of moves(w, s, ground, warps, spots, fixed)) {
+      if (!node.states.has(n)) continue;
       const list = back.get(n);
-      if (list === undefined) back.set(n, [t]);
-      else list.push(t);
+      if (list === undefined) back.set(n, [s]);
+      else list.push(s);
     }
-  const home = new Set<number>([origin]);
-  const queue = [origin];
+  const tileOf = (s: number): number => (w.water === null ? s : s % w.span);
+  const home = new Set<number>([...node.states].filter((s) => tileOf(s) === origin));
+  const queue = [...home];
   while (queue.length > 0) {
-    const t = queue.pop() ?? origin;
-    for (const p of back.get(t) ?? []) {
+    const s = queue.pop() ?? origin;
+    for (const p of back.get(s) ?? []) {
       if (home.has(p)) continue;
       home.add(p);
       queue.push(p);
     }
   }
-  return [...node.reach].filter((t) => !home.has(t));
+  return [...new Set([...node.states].filter((s) => !home.has(s)).map(tileOf))];
 }

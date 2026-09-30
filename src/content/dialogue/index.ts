@@ -33,6 +33,11 @@ import { THINGSTONE } from './thingstone';
 import { THORKELL } from './thorkell';
 import { TOFA } from './tofa';
 import { ULF } from './ulf';
+import { KARI } from './kari';
+import { BARDR } from './bardr';
+import { THURIDR } from './thuridr';
+import { LJOTR } from './ljotr';
+import { AUDR } from './audr';
 
 /** Dialogue graphs by id. Every NPC's graph lives in its own file next to this one. */
 export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
@@ -68,5 +73,10 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   steinn: STEINN,
   heidr: HEIDR,
   huldra: HULDRA,
+  kari: KARI,
+  bardr: BARDR,
+  thuridr: THURIDR,
+  ljotr: LJOTR,
+  audr: AUDR,
   thingstone: THINGSTONE,
 };

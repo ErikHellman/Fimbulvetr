@@ -30,6 +30,16 @@ function holes(p: Painter, n: number): void {
 }
 
 export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
+  /** Spring floodwater over the shoal: brown with silt, streaked with foam. */
+  flood: {
+    standing: (p) => {
+      p.fill(C.waterShade);
+      p.speckle(C.mud, 0.12);
+      for (let i = 0; i < 4; i++) p.rect(nextInt(p.rng, 0, 12), nextInt(p.rng, 1, 15), 4, 1, C.foam);
+      holes(p, 10);
+    },
+    cut: () => {},
+  },
   tall_grass: {
     standing: (p) => {
       for (let i = 0; i < 9; i++)

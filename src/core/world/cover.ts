@@ -28,12 +28,16 @@ export interface CoverDef {
   readonly cut?: false;
   /** Walkable: it takes the SOLID and LOW off the tile beneath while it stands (ice on water). */
   readonly walk?: boolean;
+  /** Impassable: it puts SOLID and LOW on the tile beneath while it stands (a spring flood over a shoal). */
+  readonly sink?: boolean;
   /** The winter cloak halves how much it slows Ask. */
   readonly cloak?: boolean;
   /** Catches fire (Eldr, burning neighbours): it burns down to a cleared tile. */
   readonly burns?: boolean;
   /** Fire melts it away (Eldr on drifts and ice). */
   readonly melts?: boolean;
+  /** A bomb's blast clears it though a blade cannot (drifts). */
+  readonly blasts?: boolean;
 }
 
 /** What derived cover needs to know about a screen. */

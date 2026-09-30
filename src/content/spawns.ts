@@ -36,4 +36,36 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
       ],
     },
   },
+  /**
+   * Mýrland: wolves on the banks by day, the drowned dead and bog-lights by night. Spring days are quiet
+   * (the floods keep the wolves up in the wood). Mud-crabs crawl out in summer and autumn, once Ask carries
+   * bombs (a foe that `needs` what Ask lacks is left out of the draw).
+   */
+  myrland: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'vargr', weight: 2 },
+        { id: 'leirkrabbi', weight: 1, time: 'day' },
+        { id: 'draugr', weight: 2, time: 'night' },
+        { id: 'myrljos', weight: 3, time: 'night' },
+      ],
+      autumn: [
+        { id: 'vargr', weight: 2 },
+        { id: 'leirkrabbi', weight: 1, time: 'day' },
+        { id: 'draugr', weight: 2, time: 'night' },
+        { id: 'myrljos', weight: 3, time: 'night' },
+      ],
+      winter: [
+        { id: 'vargr', weight: 3 },
+        { id: 'myrljos', weight: 1, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'rime_raven', weight: 1, time: 'night' },
+      ],
+      spring: [
+        { id: 'myrljos', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+      ],
+    },
+  },
 };

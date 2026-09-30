@@ -24,6 +24,7 @@ import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
 import { slotName, summaryLine } from '@shell/ui/slotText';
 import { wareName } from '@shell/ui/wareText';
 import { gearLines } from '@shell/ui/gearText';
+import { fishPanel, type FishUi } from '@shell/ui/fishText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -108,6 +109,8 @@ export class UiScene extends Phaser.Scene {
   private silver!: Phaser.GameObjects.BitmapText;
   private slotIcons: Phaser.GameObjects.Image[] = [];
   private slotLabels: Phaser.GameObjects.BitmapText[] = [];
+  /** How many are left of an item that is spent (bombs), in the slot's corner. */
+  private slotCounts: Phaser.GameObjects.BitmapText[] = [];
   private galdrBox!: Phaser.GameObjects.Graphics;
   private galdrIcon!: Phaser.GameObjects.Image;
   private galdrLabel!: Phaser.GameObjects.BitmapText;
@@ -145,6 +148,7 @@ export class UiScene extends Phaser.Scene {
     this.hearts = [];
     this.slotIcons = [];
     this.slotLabels = [];
+    this.slotCounts = [];
     const hud = this.add.graphics();
     const silverRef = this.frameRef('ui_silver_idle_s_0');
     this.add.image(6, 30, silverRef.key, silverRef.frame).setOrigin(0, 0);
@@ -164,6 +168,7 @@ export class UiScene extends Phaser.Scene {
       this.slotLabels.push(this.text(x + 8, 29, i === 0 ? 'K' : 'L', DIM));
       const icon = this.add.image(x + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
       this.slotIcons.push(icon);
+      this.slotCounts.push(this.text(x + 14, 20, '', PAPER).setDepth(1));
     }
     // The galdr, once one is known: its box left of the item slots, and the seiðr bar under the hearts.
     const gx = GAME_W - 82;
@@ -470,7 +475,10 @@ export class UiScene extends Phaser.Scene {
     this.slotLabels.forEach((label, i) => label.setText(this.link.keyLabel(i === 0 ? 'item1' : 'item2')));
     sim.state.inv.slots.forEach((item, i) => {
       const icon = this.slotIcons[i];
+      const count = this.slotCounts[i];
       if (icon === undefined) return;
+      const ammo = item !== null && sim.db.items[item].ammo !== undefined;
+      count?.setText(ammo ? String(sim.state.inv.items[item] ?? 0) : '');
       if (item === null) {
         icon.setVisible(false);
         return;
@@ -533,6 +541,11 @@ export class UiScene extends Phaser.Scene {
     if (ui.k === 'save') {
       this.lastShown = '';
       this.drawPicker(lang);
+      return;
+    }
+    if (ui.k === 'fish') {
+      this.lastShown = '';
+      this.drawFish(ui, lang);
       return;
     }
     const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
@@ -614,6 +627,36 @@ export class UiScene extends Phaser.Scene {
   private itemName(item: ItemId, lang: Lang): string {
     const name: L10n = ITEM_NAMES[item];
     return t(name, lang);
+  }
+
+  /** Fishing: what to do now, and while reeling the line's tension against its safe band and how far out. */
+  private drawFish(ui: FishUi, lang: Lang): void {
+    const p = fishPanel(ui, this.link.sim.db, lang);
+    this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
+    this.body.setText(p.text);
+    const x = BOX.x + 12;
+    const w = BOX.w - 24;
+    if (p.tension !== null) {
+      const y = BOX.y + 34;
+      const [a, b] = p.tension.band;
+      this.box
+        .fillStyle(INK, 1)
+        .fillRect(x, y, w, 8)
+        .fillStyle(0x4f8a3f, 1)
+        .fillRect(Math.round(x + a * w), y + 1, Math.round((b - a) * w), 6)
+        .fillStyle(p.tension.danger ? RED : GOLD, 1)
+        .fillRect(Math.round(x + p.tension.at * w) - 1, y - 2, 3, 12)
+        .lineStyle(1, DIM, 1)
+        .strokeRect(x - 0.5, y - 0.5, w + 1, 9);
+    }
+    if (p.dist !== null) {
+      const y = BOX.y + 54;
+      this.box
+        .fillStyle(INK, 1)
+        .fillRect(x, y, w, 4)
+        .fillStyle(PAPER, 1)
+        .fillRect(x, y, Math.round(p.dist * w), 4);
+    }
   }
 
   private panel(x: number, y: number, w: number, h: number): void {

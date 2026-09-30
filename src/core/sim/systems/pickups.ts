@@ -2,16 +2,16 @@ import { createEntity, mem, type Entity } from '../../actors/entity';
 import type { DropKind } from '../../combat/drops';
 import { at, overlaps } from '../../math/box';
 import type { Vec } from '../../math/vec';
-import { HEART, MAX_HP, PURSE_CAP, giveItem } from '../../story/effects';
+import { HEART, PURSE_CAP, giveItem, grantPiece } from '../../story/effects';
 import { coverAt } from '../../world/cover';
 import { TILE } from '../../world/dims';
 import { seasonAt } from '../../clock/clock';
 import type { Thing } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { startStory } from './story';
+import { itemMax, owns } from '../../items/defs';
 
-/** Pieces of heart that make one heart container's worth. */
-export const PIECES_PER_HEART = 4;
+export { PIECES_PER_HEART } from '../../story/effects';
 /** Dropped hearts and silver vanish after this many ticks (10 s); the view blinks them near the end. */
 export const DROP_TICKS = 600;
 
@@ -78,6 +78,17 @@ export function createDrop(id: number, kind: DropKind, pos: Vec): Entity {
 
 /** Seiðr in a dropped jar. */
 export const SEIDR_JAR = 2;
+/** Bombs in a dropped bundle. */
+export const BOMB_BUNDLE = 4;
+
+/**
+ * Leaves a drop at `pos`, unless it is bombs and Ask has none to refill (nothing drops then; the roll
+ * that chose it is already spent, so replays stay exact).
+ */
+export function spillDrop(rt: SimRt, kind: DropKind, pos: Vec): void {
+  if (kind === 'bombs' && !owns(rt.state.inv.items, 'bombs')) return;
+  rt.actors.push(createDrop(rt.newId(), kind, pos));
+}
 
 /**
  * Walking over a pickup collects it: a dropped heart heals a heart, silver adds one, and every fourth piece
@@ -109,6 +120,15 @@ export function collectPickups(rt: SimRt): void {
       rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;
     }
+    if (e.def === 'bombs') {
+      const inv = rt.state.inv;
+      inv.items.bombs = Math.min(
+        itemMax(rt.db.items, inv.items, 'bombs'),
+        (inv.items.bombs ?? 0) + BOMB_BUNDLE,
+      );
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
+      continue;
+    }
     if (e.def === 'seidr') {
       const hero = rt.state.hero;
       hero.seidr = Math.min(hero.maxSeidr, hero.seidr + SEIDR_JAR);
@@ -130,14 +150,6 @@ export function collectPickups(rt: SimRt): void {
       continue;
     }
     if (thing?.k !== 'piece') continue;
-    const w = rt.state.world;
-    if (!w.pieces.includes(thing.id)) w.pieces.push(thing.id);
-    rt.state.inv.items.heart_piece = w.pieces.length % PIECES_PER_HEART;
-    if (w.pieces.length % PIECES_PER_HEART === 0) {
-      rt.hero.maxHp = Math.min(MAX_HP, rt.hero.maxHp + HEART);
-      rt.hero.hp = rt.hero.maxHp;
-    }
-    rt.emit({ t: 'itemGet', item: 'heart_piece' });
-    rt.emit({ t: 'sfx', id: 'sfx_itemget' });
+    grantPiece(rt, thing.id);
   }
 }

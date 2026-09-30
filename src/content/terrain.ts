@@ -49,6 +49,19 @@ export const TERRAIN_IDS = [
   'birch',
   'moss',
   'boulder',
+  'rapids',
+  'spring',
+  'shoal',
+  'peat',
+  'mill',
+  'boat',
+  'sluice',
+  'sluice_hi',
+  'race',
+  'race_hi',
+  'boards',
+  'mill_wall',
+  'silt',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -135,4 +148,30 @@ export const TERRAIN = {
   moss: { solid: false },
   /** A mossy boulder (or a troll the sun caught long ago). */
   boulder: { solid: true, decor: { art: ['decor_boulder'], w: 1, h: 1 } },
+  /** White water over stones: too fast to wade, and it never freezes (the boomerang flies over it). */
+  rapids: { solid: true, low: true },
+  /** Warm spring water, steaming: no footing, and no winter ever freezes it. */
+  spring: { solid: true, low: true },
+  /** A gravel shoal across a river: wadeable, slow, and under the spring flood (see COVER_DEFS.flood). */
+  shoal: { solid: false, slow: 0.7 },
+  /** Cut peat banks: dark, soft ground. */
+  peat: { solid: false, slow: 0.9 },
+  /** The drowned mill's roof standing out of its pond, four tiles wide and three deep. */
+  mill: { solid: true, decor: { art: ['decor_mill'], w: 4, h: 3 } },
+  /** Bárðr's ferry boat, moored at his landing, three tiles long. */
+  boat: { solid: true, decor: { art: ['decor_boat'], w: 3, h: 1 } },
+  /** A mill-race's stone floor: dry at the lowest water, flooded once the level reaches 1. */
+  sluice: { solid: false, rise: { floods: 1 } },
+  /** A higher sluice floor, flooded only at the top level (2). */
+  sluice_hi: { solid: false, rise: { floods: 2 } },
+  /** A race channel whose planks float up to the brim at level 1; below that, a drop (the boomerang crosses). */
+  race: { solid: true, low: true, rise: { floats: 1 } },
+  /** A deeper race whose planks float only at the top level (2). */
+  race_hi: { solid: true, low: true, rise: { floats: 2 } },
+  /** The sunken mill's floor: old wet boards. */
+  boards: { solid: false },
+  /** The mill's walls: dressed stone below, timber above. */
+  mill_wall: { solid: true },
+  /** Grey silt at the bottom of the millpond, where Lindormr lies: soft and slow. */
+  silt: { solid: false, slow: 0.8 },
 } as const satisfies Record<TerrainId, TerrainDef>;

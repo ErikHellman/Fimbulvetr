@@ -8,7 +8,9 @@ import { FIXTURE_ANIMS, fixtureFrames } from './fixtures';
 import { FX_ANIMS, fxFrames } from './fx';
 import { HERO_ANIMS, heroFrames } from './hero';
 import { missingFrame } from './missing';
+import { MYRLAND_ANIMS, myrlandFrames } from './myrland';
 import { PEOPLE_ANIMS, peopleFrames } from './people';
+import { SOKKVA_ANIMS, sokkvaFrames } from './sokkva';
 import type { SpriteFrame } from './types';
 import { UI_ANIMS, uiFrames } from './ui';
 
@@ -27,6 +29,8 @@ export const ANIMS: AnimTable = {
   ...ENEMY_ANIMS,
   ...FIXTURE_ANIMS,
   ...CAVE_ANIMS,
+  ...MYRLAND_ANIMS,
+  ...SOKKVA_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -41,6 +45,8 @@ export function buildSprites(): SpriteFrame[] {
     ...enemyFrames(),
     ...fixtureFrames(),
     ...caveFrames(),
+    ...myrlandFrames(),
+    ...sokkvaFrames(),
     missingFrame(),
   ];
 }

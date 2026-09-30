@@ -1,16 +1,23 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { flag, not } from './util';
+import { all, flag, not } from './util';
 
 /** Sölvi the rune-carver, among his standing stones. He teaches Ask Eldr, for a stave from Skeggi's kiln. */
 export const SOLVI: DialogueDef = {
   entry: [
     { when: not(flag('n_solvi_met')), node: 'meet' },
+    { when: all(flag('st_eldr_learned'), not(flag('q_rs2_mill'))), node: 'stone2' },
     { when: flag('st_eldr_learned'), node: 'after' },
     { when: { k: 'item', id: 'charred_stave' }, node: 'stave' },
     { when: flag('q_eldr_asked'), node: 'waiting' },
     { node: 'ask' },
   ],
   nodes: {
+    stone2: {
+      text: {
+        en: 'The second of the three stones? The old verse says it sleeps where water turns stone. A millstone, I think. There was a mill in Mýrland that the water took.',
+        sv: 'Den andra av de tre stenarna? Den gamla versen säger att den sover där vatten vänder sten. En kvarnsten, tror jag. Det fanns en kvarn i Mýrland som vattnet tog.',
+      },
+    },
     meet: {
       text: {
         en: 'Mind the stones, the paint is still wet. Sölvi. I carve runes, and I listen to what they say back.',

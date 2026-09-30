@@ -60,11 +60,12 @@ test('settings change at once and survive a reload: colour-blind aid and a remap
 });
 
 test('praying at the hof saves to a slot that the title screen loads', async ({ page }) => {
+  // It boots twice (the save, then the title screen's load), each building every frame of art.
+  test.setTimeout(90_000);
   const errors = collectErrors(page);
   await boot(page, 'preset=day2&screen=ask_int_hof&at=20,9');
-  await page.keyboard.down('KeyW');
-  await page.waitForTimeout(100);
-  await page.keyboard.up('KeyW');
+  // Face the stone: held across rendered frames, never for a fixed time, so a slow machine sees it.
+  await tap(page, 'KeyW');
   await tap(page, 'KeyE');
   for (let i = 0; i < 40 && (await story(page)) !== 'save'; i++) await tap(page, 'Enter');
   expect(await story(page)).toBe('save');

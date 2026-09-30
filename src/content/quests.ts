@@ -175,6 +175,78 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_runestone_2: {
+    id: 'q_runestone_2',
+    name: { en: 'The second runestone', sv: 'Den andra runstenen' },
+    stages: [
+      {
+        when: flag('st_stone1_lit'),
+        text: {
+          en: 'The second stone sleeps where water turns stone. Önundr’s brook runs south past a weir to Mýrland, where a mill drowned.',
+          sv: 'Den andra stenen sover där vatten vänder sten. Önundrs bäck rinner söderut förbi en damm till Mýrland, där en kvarn drunknade.',
+        },
+      },
+      {
+        when: flag('st_myrland_reached'),
+        text: {
+          en: 'Find the drowned mill in Mýrland, and whoever knew it.',
+          sv: 'Hitta den drunknade kvarnen i Mýrland, och någon som kände till den.',
+        },
+      },
+      {
+        when: flag('q_rs2_mill'),
+        text: {
+          en: 'The stone lies in the cellar of Sökkva Kvern, the drowned mill. The plank walk on the millpond leads to its door.',
+          sv: 'Stenen ligger i källaren under Sökkva Kvern, den drunknade kvarnen. Plankgången på kvarndammen leder till dess dörr.',
+        },
+      },
+      {
+        when: flag('st_d2_entered'),
+        text: {
+          en: 'Turn the mill’s wheels to raise and lower the water, and find the way down to the stone.',
+          sv: 'Vrid kvarnens hjul för att höja och sänka vattnet, och hitta vägen ner till stenen.',
+        },
+      },
+      {
+        when: flag('st_d2_boss_dead'),
+        text: {
+          en: 'Lindormr is dead. Lay a hand on the runestone beyond its pond.',
+          sv: 'Lindormr är död. Lägg handen på runstenen bortom dess damm.',
+        },
+      },
+      {
+        when: flag('st_stone2_lit'),
+        text: {
+          en: 'The second runestone burns again. One remains dark.',
+          sv: 'Den andra runstenen brinner igen. En är fortfarande mörk.',
+        },
+      },
+    ],
+  },
+  q_fisher: {
+    id: 'q_fisher',
+    name: { en: 'Gamli', sv: 'Gamle' },
+    stages: [
+      {
+        when: flag('n_kari_met'),
+        text: {
+          en: 'Kári lent you his rod. Fish from his jetty; he buys every catch. Gamli, the old pike, bites in autumn at dawn and dusk.',
+          sv: 'Kári lånade ut sitt spö. Fiska från hans brygga; han köper allt du fångar. Gamle, den gamla gäddan, nappar om hösten i gryning och skymning.',
+        },
+      },
+      {
+        when: flag('q_fish_gamli'),
+        text: { en: 'You landed Gamli! Tell Kári.', sv: 'Du har landat Gamle! Berätta för Kári.' },
+      },
+      {
+        when: flag('q_fisher_done'),
+        text: {
+          en: 'Kári gave you a piece of heart for Gamli, and let the old pike go.',
+          sv: 'Kári gav dig en hjärtbit för Gamle, och släppte den gamla gäddan fri.',
+        },
+      },
+    ],
+  },
   q_vargar: {
     id: 'q_vargar',
     name: { en: 'The vargar hunt', sv: 'Vargjakten' },

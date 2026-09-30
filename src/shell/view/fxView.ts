@@ -10,7 +10,7 @@ interface Burst {
   readonly life: number;
 }
 
-/** One-shot effects that are not sim entities: the puff where an enemy dies. Timed by `sim.tick`. */
+/** One-shot effects that are not sim entities: the puff where an enemy dies, a blast. Timed by `sim.tick`. */
 export class FxView {
   private readonly bursts: Burst[] = [];
 
@@ -23,6 +23,11 @@ export class FxView {
   /** A puff of smoke at a world point (an enemy's feet), drawn above it. */
   poof(at: Vec, tick: number): void {
     this.add('fx_poof', at, tick, 24);
+  }
+
+  /** A bomb going off at a world point (its feet). */
+  blast(at: Vec, tick: number): void {
+    this.add('fx_blast', at, tick, 24);
   }
 
   tick(t: number): void {

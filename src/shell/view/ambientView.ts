@@ -37,7 +37,7 @@ interface Fish {
   frame: string;
 }
 
-/** A screen's ambient life: smoke from every chimney and the odd fish jumping in open water. */
+/** A screen's ambient life: smoke from every chimney, steam off warm springs, and fish jumping in open water. */
 export class AmbientView {
   private readonly emitters: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
   private readonly cells: readonly TilePos[];
@@ -148,6 +148,36 @@ export class AmbientView {
             alpha: { start: 0.7, end: 0 },
             maxAliveParticles: 8,
             advance: 2400,
+          })
+          .setDepth(SMOKE_DEPTH);
+        this.emitters.push(emitter);
+      }
+    }
+    this.addSteam(first.key, names);
+  }
+
+  /**
+   * Warm springs steam: a faint white emitter on every fourth spring tile of every third row, so a big pool
+   * stays well inside the particle budget (six puffs each at most).
+   */
+  private addSteam(key: string, names: readonly string[]): void {
+    const { o } = this;
+    for (let y = 1; y < o.grid.rows; y += 3) {
+      for (let x = 1; x < o.grid.cols; x += 4) {
+        if (o.grid.cells[y * o.grid.cols + x] !== 'spring') continue;
+        const emitter = this.scene.add
+          .particles(o.origin.x + x * TILE + TILE / 2, o.origin.y + y * TILE + TILE / 2, key, {
+            frame: [...names],
+            frequency: 700,
+            quantity: 1,
+            lifespan: 2000,
+            x: { min: -5, max: 5 },
+            speedX: { min: -2, max: 2 },
+            speedY: { min: -7, max: -3 },
+            alpha: { start: 0.45, end: 0 },
+            tint: 0xf4fbff,
+            maxAliveParticles: 6,
+            advance: 2000,
           })
           .setDepth(SMOKE_DEPTH);
         this.emitters.push(emitter);

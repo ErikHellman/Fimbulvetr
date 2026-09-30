@@ -263,4 +263,127 @@ export const ENEMY_DEFS = {
     stunnable: 120,
     drops: { heart: 1, silver: 2, seidr: 2, none: 3 },
   },
+  /**
+   * A water-worm in a pool: out of reach under the water, it rears up (400 ms), spits a gob of mud the
+   * shield stops, and stays up a while, open to a blow from the bank; the boomerang holds it up.
+   */
+  vatnormr: {
+    id: 'vatnormr',
+    art: 'enemy_vatnormr',
+    hp: 3,
+    body: { x: -6, y: -6, w: 12, h: 6 },
+    hurt: { x: -8, y: -20, w: 16, h: 20 },
+    behaviour: 'vatnormr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    swims: true,
+    stunnable: 120,
+    drops: { heart: 2, silver: 3, none: 3 },
+  },
+  /**
+   * A bog-light: a cold flame over the fen at night. It drifts, fades out of reach now and then, flares
+   * (400 ms) and darts. It lights the dark around it.
+   */
+  myrljos: {
+    id: 'myrljos',
+    art: 'enemy_myrljos',
+    hp: 2,
+    body: { x: -4, y: -4, w: 8, h: 4 },
+    hurt: { x: -7, y: -20, w: 14, h: 14 },
+    behaviour: 'myrljos',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    glow: 48,
+    attacks: {
+      dart: {
+        from: 0,
+        to: 19,
+        boxes: around({ x: -7, y: -18, w: 14, h: 14 }),
+        amount: 2,
+        knock: 3,
+        tags: 0,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 1, silver: 1, seidr: 3, none: 3 },
+  },
+  /**
+   * A mud-crab: its shell turns every blow until a bomb's blast cracks it; then the sword finishes it. It
+   * sidles in to Ask's flank and raises its claws (400 ms) before it pinches.
+   */
+  leirkrabbi: {
+    id: 'leirkrabbi',
+    art: 'enemy_leirkrabbi',
+    hp: 12,
+    body: { x: -8, y: -7, w: 16, h: 7 },
+    hurt: { x: -10, y: -16, w: 20, h: 16 },
+    behaviour: 'leirkrabbi',
+    knockResist: 0.6,
+    immortal: false,
+    solid: false,
+    guard: true,
+    cracks: 'force',
+    needs: ['bombs'],
+    attacks: {
+      pinch: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -16, w: 20, h: 16 },
+          w: { x: -20, y: -16, w: 20, h: 16 },
+          s: { x: -12, y: -8, w: 24, h: 18 },
+          n: { x: -12, y: -26, w: 24, h: 18 },
+        },
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    drops: { heart: 2, silver: 2, bombs: 4, none: 2 },
+  },
+  /**
+   * Lindormr, the serpent that sank the mill: it hides in its mud mounds, rears (400 ms) and spits. Only a
+   * bomb on the mound it hides in flushes it out, stunned and open to the blade (see lindormr.ts).
+   */
+  lindormr: {
+    id: 'lindormr',
+    art: 'enemy_lindormr',
+    hp: 24,
+    body: { x: -12, y: -8, w: 24, h: 8 },
+    hurt: { x: -14, y: -34, w: 28, h: 34 },
+    behaviour: 'lindormr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    attacks: {
+      charge: {
+        from: 0,
+        to: 149,
+        boxes: around({ x: -14, y: -26, w: 28, h: 26 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    boss: { name: { en: 'Lindormr', sv: 'Lindormr' } },
+    needs: ['bombs'],
+  },
+  /** One of Lindormr's mud mounds: the blade only sinks in; a blast blows it apart, and bombs spill out. */
+  lind_mound: {
+    id: 'lind_mound',
+    art: 'enemy_lind_mound',
+    hp: 1,
+    body: { x: -10, y: -10, w: 20, h: 10 },
+    hurt: { x: -11, y: -16, w: 22, h: 16 },
+    behaviour: 'lind_mound',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    guard: true,
+    cracks: 'force',
+    drops: { heart: 0, silver: 0, bombs: 1, none: 0 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

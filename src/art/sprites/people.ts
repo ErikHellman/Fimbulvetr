@@ -328,6 +328,57 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     bottom: '#3d6e3a',
     tail: '#c8a878',
   },
+  /** Kári the fisherman: old, white-bearded, in a salt-grey smock and a blue cap. */
+  kari: {
+    skin: '#c89a78',
+    hair: '#e4e0d6',
+    hairStyle: 'kerchief',
+    scarf: '#3a5a8a',
+    beard: '#eeeae2',
+    top: '#7a8288',
+    legs: 'pants',
+    bottom: '#4a4a48',
+  },
+  /** Bárðr the ferryman: broad, black-bearded, in oiled brown leather. */
+  bardr: {
+    skin: TAN,
+    hair: '#2a221e',
+    hairStyle: 'short',
+    beard: '#2a221e',
+    top: '#6a4a2a',
+    legs: 'pants',
+    bottom: '#3e2e20',
+  },
+  /** Þuríðr, the miller's widow: grey braid, mourning black, a floury apron she still wears. */
+  thuridr: {
+    skin: '#e0c4aa',
+    hair: '#a8a49c',
+    hairStyle: 'braid',
+    top: '#2a2630',
+    legs: 'skirt',
+    bottom: '#1f1c24',
+    apron: '#e6e0d0',
+  },
+  /** Ljótr the peat-cutter: stained brown to the elbows, a sour face. */
+  ljotr: {
+    skin: '#b88c6a',
+    hair: '#5a4630',
+    hairStyle: 'short',
+    beard: '#5a4630',
+    top: '#5a4a34',
+    legs: 'pants',
+    bottom: '#3a2e20',
+  },
+  /** Auðr, a reed-cutter's girl: a straw-fair braid and a green dress hitched up for the wet. */
+  audr: {
+    skin: SKIN,
+    hair: '#e8d08a',
+    hairStyle: 'braid',
+    top: '#5a8a4a',
+    legs: 'skirt',
+    bottom: '#4a6a3a',
+    child: true,
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

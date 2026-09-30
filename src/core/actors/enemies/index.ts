@@ -10,6 +10,10 @@ import { TROLL_MACHINE } from './troll';
 import { VARGR_MACHINE } from './vargr';
 import { ALPHA_MACHINE } from './alpha';
 import { RIME_RAVEN_MACHINE } from './raven';
+import { VATNORMR_MACHINE } from './worm';
+import { MYRLJOS_MACHINE } from './wisp';
+import { LEIRKRABBI_MACHINE } from './crab';
+import { LINDORMR_MACHINE, MOUND_MACHINE } from './lindormr';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -22,6 +26,11 @@ const MACHINES = {
   root_spike: SPIKE_MACHINE,
   vargr_alpha: ALPHA_MACHINE,
   rime_raven: RIME_RAVEN_MACHINE,
+  vatnormr: VATNORMR_MACHINE,
+  myrljos: MYRLJOS_MACHINE,
+  leirkrabbi: LEIRKRABBI_MACHINE,
+  lindormr: LINDORMR_MACHINE,
+  lind_mound: MOUND_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -41,6 +50,11 @@ const START: Readonly<Record<BehaviourId, string>> = {
   root_spike: 'tell',
   vargr_alpha: 'prowl',
   rime_raven: 'circle',
+  vatnormr: 'under',
+  myrljos: 'drift',
+  leirkrabbi: 'sidle',
+  lindormr: 'wake',
+  lind_mound: 'mound',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

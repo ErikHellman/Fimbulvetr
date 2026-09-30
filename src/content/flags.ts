@@ -78,6 +78,34 @@ export const FLAGS = {
   q_vargar_alpha: { t: 'bool' },
   /** Bersi paid the bounty, a bigger purse. */
   q_vargar_done: { t: 'bool' },
+  /** The weir's latch is struck: the drawbridge into Mýrland is down for good. */
+  w_myl_bridge: { t: 'bool' },
+  /** Ask has crossed the weir into Mýrland. */
+  st_myrland_reached: { t: 'bool' },
+  /** Þuríðr told how the mill sank and that the second stone lies in its cellar. */
+  q_rs2_mill: { t: 'bool' },
+  /** The pass through the mountains is open (set at the end of Act I, M5): the ferry runs. */
+  st_pass_open: { t: 'bool' },
+  /** First meetings in Mýrland. */
+  n_kari_met: { t: 'bool' },
+  n_bardr_met: { t: 'bool' },
+  n_thuridr_met: { t: 'bool' },
+  n_ljotr_met: { t: 'bool' },
+  n_audr_met: { t: 'bool' },
+  /** Kári paid for Gamli with a piece of heart. */
+  q_fisher_done: { t: 'bool' },
+  /** Fish Ask has landed. */
+  q_fish_caught: { t: 'int', max: 99 },
+  /** Ask landed Gamli, the old pike of the millpond. */
+  q_fish_gamli: { t: 'bool' },
+  /** Sökkva Kvern's water: 0 low (as found: the fleeing miller opened the sluices), 1 or 2. */
+  w_d2_level: { t: 'int', max: 2 },
+  /** Ask went down into Sökkva Kvern. */
+  st_d2_entered: { t: 'bool' },
+  /** Lindormr is dead (set by its death). */
+  st_d2_boss_dead: { t: 'bool' },
+  /** The second runestone is lit: M3's goal. */
+  st_stone2_lit: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d2R12: ScreenDef = {
+  id: 'd2_r12',
+  region: 'myrland',
+  dungeon: 'd2',
+  water: 'w_d2_level',
+  purpose:
+    'The tail-race: its planks float only at the top level, across to lock C. A water-worm spits from the race and a mud-crab holds the landing.',
+  things: [
+    { k: 'lock', id: 'd2_lock_c', at: { x: 0, y: 10 }, w: 1, h: 2 },
+    { k: 'enemy', id: 'vatnormr', at: { x: 8, y: 14 } },
+    { k: 'enemy', id: 'leirkrabbi', at: { x: 26, y: 15 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 35, y: 18 } },
+    { k: 'prop', id: 'bomb_pot', at: { x: 36, y: 18 } },
+  ],
+  map: [
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HH',
+    'FF444444444444FFF~~~~~~~~~~~~~~~~~~~~~HH',
+    'FF444444444444FFF~~~~~~~~~~~~~~~~~~~~~HH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HH~~~~~~~~~~~~FFFFFFFFFFFFFFFFFFFFFFFFHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+    'HHHHHHHHHHHHHHHHHHHFFHHHHHHHHHHHHHHHHHHH',
+  ],
+};

@@ -26,6 +26,10 @@ export interface PropDef {
   readonly loot?: readonly DropKind[];
   /** Fire burns it away (brambles); the sword does not. */
   readonly burns?: boolean;
+  /** A lit bomb: ticks until it goes off (see systems/bombs.ts). */
+  readonly fuse?: number;
+  /** Breaks in a bomb's blast (pots, stones, the bomb pots). */
+  readonly blast?: boolean;
 }
 
 export function createProp(id: number, def: PropDef, pos: Vec, thingIndex: number): Entity {

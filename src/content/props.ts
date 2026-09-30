@@ -17,6 +17,7 @@ export const PROP_DEFS = {
     liftable: true,
     fragile: true,
     throwDamage: 4,
+    blast: true,
   },
   stone: {
     id: 'stone',
@@ -26,6 +27,7 @@ export const PROP_DEFS = {
     liftable: true,
     fragile: true,
     throwDamage: 4,
+    blast: true,
   },
   rock: {
     id: 'rock',
@@ -35,6 +37,7 @@ export const PROP_DEFS = {
     liftable: true,
     fragile: true,
     throwDamage: 6,
+    blast: true,
   },
   pail: {
     id: 'pail',
@@ -111,5 +114,28 @@ export const PROP_DEFS = {
     throwDamage: 0,
     wall: true,
     burns: true,
+  },
+  /** A lit bomb: set down, lifted and thrown like a pail, until its fuse burns out (systems/bombs.ts). */
+  bomb: {
+    id: 'bomb',
+    art: 'prop_bomb',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: false,
+    throwDamage: 0,
+    fuse: 96,
+  },
+  /** A stoppered pot of bombs: breaks like a pot, in a blast too, and spills a bundle once bombs are owned. */
+  bomb_pot: {
+    id: 'bomb_pot',
+    art: 'prop_bomb_pot',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: true,
+    throwDamage: 4,
+    blast: true,
+    loot: ['bombs'],
   },
 } as const satisfies Record<PropId, PropDef>;
