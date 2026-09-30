@@ -215,6 +215,27 @@ function arrowPot(): Raster {
   return outline(r, INK, 1);
 }
 
+/** A heap of grave-gold: coins, a cup and a torc, glinting. */
+function graveGold(): Raster {
+  const r = createRaster(16, 14);
+  const gold = hex('#e8c050');
+  const shade = hex('#a8802a');
+  const light = hex('#fff0a0');
+  ellipse(r, 8, 10, 6.5, 3, (x) => (x > 10 ? shade : gold));
+  rect(r, 5, 4, 4, 5, gold);
+  rect(r, 7, 4, 2, 5, shade);
+  rect(r, 4, 3, 6, 1, gold);
+  ellipse(r, 12, 7, 2.5, 2, shade);
+  for (const [x, y] of [
+    [4, 9],
+    [9, 8],
+    [11, 11],
+    [6, 5],
+  ] as const)
+    rect(r, x, y, 1, 1, light);
+  return outline(r, INK, 1);
+}
+
 /** An eye carved in a stone block: shut (a closed lid) or opened by an arrow (a glowing pupil). */
 function eyeStone(open: boolean): Raster {
   const r = createRaster(18, 18);
@@ -247,6 +268,7 @@ export function haugarFrames(): SpriteFrame[] {
     [22, 16, 10, 4].forEach((sink, i) => {
       add('rise', i, wight(side, 0, 'rest', sink));
     });
+    add('sleep', 0, wight(side, 0, 'rest', 22));
   }
   const sparks = Array.from({ length: 4 }, (_, i) => ({
     name: `fx_spark_idle_s_${String(i)}`,
@@ -265,6 +287,7 @@ export function haugarFrames(): SpriteFrame[] {
   return [
     ...arrows,
     { name: 'prop_arrow_pot_idle_s_0', raster: arrowPot(), ox: 8, oy: 17 },
+    { name: 'prop_grave_gold_idle_s_0', raster: graveGold(), ox: 8, oy: 13 },
     fixture('fix_eye_on_s_0', eyeStone(true)),
     fixture('fix_eye_off_s_0', eyeStone(false)),
     ...sparks,
@@ -285,6 +308,7 @@ const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fp
 export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fx_arrow: { fly: { frames: 1, fps: 1, loop: true, dirs: ALL } },
   prop_arrow_pot: { idle: one(1, 1) },
+  prop_grave_gold: { idle: one(1, 1) },
   fix_eye: { on: one(1, 1), off: one(1, 1) },
   fx_spark: { idle: { frames: 4, fps: 16, loop: false, dirs: ['s'] } },
   fix_warp: { dormant: one(1, 1), awake: one(1, 1) },
@@ -297,5 +321,6 @@ export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
     cut: all(1, 1),
     hurt: all(1, 1),
     rise: all(4, 6, false),
+    sleep: all(1, 1),
   },
 };

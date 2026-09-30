@@ -68,6 +68,10 @@ export const TERRAIN_IDS = [
   'flagstone',
   'drystone',
   'tent',
+  'crypt_floor',
+  'crypt_wall',
+  'pit',
+  'ghost',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -192,4 +196,12 @@ export const TERRAIN = {
   drystone: { solid: true },
   /** Geirmundr's tent of patched hides, three tiles wide and two deep. */
   tent: { solid: true, decor: { art: ['decor_tent'], w: 3, h: 2 } },
+  /** Konungshaugr's floor: old flags, grave-dust in the cracks. */
+  crypt_floor: { solid: false },
+  /** The barrow's walls: dry stone and turf, old timber in the dark. */
+  crypt_wall: { solid: true },
+  /** A drop into the barrow's depths: no footing, but arrows and the boomerang fly over it. */
+  pit: { solid: true, low: true },
+  /** Hidden floor over the pits: sound underfoot, but drawn as the pit it spans; only light shows it. */
+  ghost: { solid: false },
 } as const satisfies Record<TerrainId, TerrainDef>;

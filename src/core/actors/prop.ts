@@ -30,6 +30,8 @@ export interface PropDef {
   readonly fuse?: number;
   /** Breaks in a bomb's blast (pots, stones, the bomb pots). */
   readonly blast?: boolean;
+  /** Grave-gold: lifting it wakes every sleeping dead on the screen. */
+  readonly wakes?: boolean;
 }
 
 export function createProp(id: number, def: PropDef, pos: Vec, thingIndex: number): Entity {

@@ -273,6 +273,7 @@ export const PROPS = [
   'bomb',
   'bomb_pot',
   'arrow_pot',
+  'grave_gold',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 

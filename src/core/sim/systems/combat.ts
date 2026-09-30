@@ -31,6 +31,7 @@ import { applyAll } from './story';
  */
 export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult {
   const def = target.kind === 'enemy' ? enemyDef(rt, target) : undefined;
+  if (mem(target, 'asleep') === 1) return { outcome: 'ignored', dealt: 0 };
   const armoured = def?.guard === true && mem(target, 'cracked') !== 1;
   if (
     armoured &&
@@ -133,7 +134,7 @@ export function resolveAttacks(rt: SimRt): void {
   const { hero } = rt;
   const heroBox = at(hero.hurt, hero.pos);
   for (const e of rt.actors) {
-    if (e.kind !== 'enemy' || mem(e, 'stun') > 0) continue;
+    if (e.kind !== 'enemy' || mem(e, 'stun') > 0 || mem(e, 'asleep') === 1) continue;
     const def = enemyDef(rt, e);
     const w = def.attacks?.[e.fsm.s];
     const blow =

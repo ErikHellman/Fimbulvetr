@@ -37,13 +37,18 @@ export type ChestGift =
 
 /** Things placed on a screen. The union grows with each milestone. */
 export type Thing =
-  /** An enemy, present while `when` holds (night-only draugr); `onDeath` applies when it is killed. */
+  /**
+   * An enemy, present while `when` holds (night-only draugr); `onDeath` applies when it is killed. One
+   * `asleep` lies still, harmless and untouchable until grave-gold is lifted in the room (it still counts
+   * against the room's `clear`).
+   */
   | {
       readonly k: 'enemy';
       readonly id: EnemyId;
       readonly at: TilePos;
       readonly when?: Cond;
       readonly onDeath?: readonly Effect[];
+      readonly asleep?: true;
     }
   | DoorThing
   /** Read with interact while facing its tile, or any tile of its `w`×`h` block (a 2×2 well). */

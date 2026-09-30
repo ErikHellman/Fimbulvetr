@@ -40,6 +40,12 @@ export function actorCtx(rt: SimRt): ActorCtx {
 export function runEnemies(rt: SimRt, ctx: ActorCtx): void {
   for (const e of [...rt.actors]) {
     if (e.kind !== 'enemy') continue;
+    // The sleeping dead lie still, out of reach, until grave-gold wakes them.
+    if (mem(e, 'asleep') === 1) {
+      e.iframes = Math.max(e.iframes, 2);
+      e.vel = { x: 0, y: 0 };
+      continue;
+    }
     const stun = mem(e, 'stun');
     if (stun > 0) {
       e.mem['stun'] = stun - 1;

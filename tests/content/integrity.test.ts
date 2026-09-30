@@ -198,6 +198,19 @@ describe('world layout', () => {
   );
 });
 
+describe('the sleeping dead', () => {
+  it('lie only where grave-gold can wake them', () => {
+    for (const id of SCREEN_IDS) {
+      const things = SCREENS[id].things;
+      if (!things.some((t) => t.k === 'enemy' && t.asleep === true)) continue;
+      expect(
+        things.some((t) => t.k === 'prop' && DB.props[t.id].wakes === true),
+        `${id} has sleepers but no grave-gold`,
+      ).toBe(true);
+    }
+  });
+});
+
 describe('warp stones', () => {
   const stones = SCREEN_IDS.flatMap((id) =>
     SCREENS[id].things.flatMap((t) => (t.k === 'warp' ? [{ id, t }] : [])),

@@ -27,7 +27,8 @@ import {
   type Light,
 } from '../world/light';
 import type { CoverGrid } from '../world/cover';
-import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
+import { GHOST_BRAZIER, GHOST_LANTERN, shownGhosts, type GhostLight } from '../world/ghost';
+import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex, type TilePos } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
@@ -256,6 +257,20 @@ export class Sim implements SimRt {
       if (glow !== undefined) out.push({ x: e.pos.x, y: e.pos.y - 12, r: glow });
     }
     return out;
+  }
+
+  /**
+   * The hidden-floor tiles that show now: those inside the lantern's glow round Ask (once owned) or a
+   * burning brazier's. Only the picture uses it.
+   */
+  ghosts(): TilePos[] {
+    const lights: GhostLight[] = [];
+    if ((this.state.inv.items.lantern ?? 0) > 0)
+      lights.push({ x: this.hero.pos.x, y: this.hero.pos.y - 8, r: GHOST_LANTERN });
+    for (const e of this.actors)
+      if (e.kind === 'fixture' && e.def === 'brazier' && e.mem['on'] === 1)
+        lights.push({ x: e.pos.x, y: e.pos.y - 8, r: GHOST_BRAZIER });
+    return shownGhosts(this.screen.terrain, this.db.terrain, lights);
   }
 
   snapshot(): GameState {

@@ -1,5 +1,5 @@
 import type { EnemyId } from '@content/ids';
-import type { Entity } from '../../actors/entity';
+import { setAnim, type Entity } from '../../actors/entity';
 import { createEnemy } from '../../actors/enemies';
 import { createCritter } from '../../actors/critters';
 import { createProp } from '../../actors/prop';
@@ -109,6 +109,11 @@ function spawnThings(rt: SimRt): Entity[] {
         const e = createEnemy(rt.newId(), def, tileFeet(thing.at));
         // The thing index is only kept for enemies that do something when they die.
         if (thing.onDeath !== undefined) e.mem['thing'] = index;
+        if (thing.asleep === true) {
+          e.mem['asleep'] = 1;
+          e.iframes = 2;
+          setAnim(e, 'sleep');
+        }
         scaleFoe(rt, e);
         out.push(e);
         break;
