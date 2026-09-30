@@ -141,6 +141,10 @@ export const SFX = [
   'sfx_warp',
   'sfx_thrust',
   'sfx_parry',
+  'sfx_bow',
+  'sfx_wake',
+  'sfx_gem',
+  'sfx_axe',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -268,6 +272,7 @@ export const PROPS = [
   'bramble',
   'bomb',
   'bomb_pot',
+  'arrow_pot',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 

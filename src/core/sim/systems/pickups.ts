@@ -80,6 +80,8 @@ export function createDrop(id: number, kind: DropKind, pos: Vec): Entity {
 export const SEIDR_JAR = 2;
 /** Bombs in a dropped bundle. */
 export const BOMB_BUNDLE = 4;
+/** Arrows in a dropped bundle. */
+export const ARROW_BUNDLE = 5;
 
 /**
  * Leaves a drop at `pos`, unless it is bombs and Ask has none to refill (nothing drops then; the roll
@@ -87,6 +89,7 @@ export const BOMB_BUNDLE = 4;
  */
 export function spillDrop(rt: SimRt, kind: DropKind, pos: Vec): void {
   if (kind === 'bombs' && !owns(rt.state.inv.items, 'bombs')) return;
+  if (kind === 'arrows' && !owns(rt.state.inv.items, 'bow')) return;
   rt.actors.push(createDrop(rt.newId(), kind, pos));
 }
 
@@ -125,6 +128,15 @@ export function collectPickups(rt: SimRt): void {
       inv.items.bombs = Math.min(
         itemMax(rt.db.items, inv.items, 'bombs'),
         (inv.items.bombs ?? 0) + BOMB_BUNDLE,
+      );
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
+      continue;
+    }
+    if (e.def === 'arrows') {
+      const inv = rt.state.inv;
+      inv.items.arrows = Math.min(
+        itemMax(rt.db.items, inv.items, 'arrows'),
+        (inv.items.arrows ?? 0) + ARROW_BUNDLE,
       );
       rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;

@@ -153,9 +153,10 @@ export type Thing =
     }
   /**
    * A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. With `set`,
-   * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good).
+   * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good). An
+   * `eye` (carved in stone) opens only to an arrow; anything else clinks off it.
    */
-  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId }
+  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId; readonly eye?: true }
   /** A drawbridge over water or a gap: its tiles are walkable while `down` holds. */
   | {
       readonly k: 'bridge';

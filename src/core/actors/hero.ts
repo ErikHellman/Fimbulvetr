@@ -23,6 +23,7 @@ export type HeroMode =
   | 'carry'
   | 'throw'
   | 'toss'
+  | 'shoot'
   | 'cast'
   | 'dying';
 
@@ -288,6 +289,18 @@ const toss: HeroDef = {
   },
 };
 
+/** Loosing an arrow (it flies on its own). */
+const shoot: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'bow');
+  },
+  tick(e, c) {
+    still(e);
+    return e.fsm.t >= c.tuning.hero.shootTicks - 1 ? 'move' : undefined;
+  },
+};
+
 /** Singing a galdr (the bolt flies on its own). */
 const cast: HeroDef = {
   enter(e) {
@@ -328,6 +341,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   carry,
   throw: throwing,
   toss,
+  shoot,
   cast,
   dying,
 };

@@ -477,8 +477,10 @@ export class UiScene extends Phaser.Scene {
       const icon = this.slotIcons[i];
       const count = this.slotCounts[i];
       if (icon === undefined) return;
-      const ammo = item !== null && sim.db.items[item].ammo !== undefined;
-      count?.setText(ammo ? String(sim.state.inv.items[item] ?? 0) : '');
+      // Ammunition shows its own count; the bow shows the arrows it fires.
+      const def = item === null ? null : sim.db.items[item];
+      const counted = def === null ? null : def.ammo !== undefined ? item : (def.fires ?? null);
+      count?.setText(counted === null ? '' : String(sim.state.inv.items[counted] ?? 0));
       if (item === null) {
         icon.setVisible(false);
         return;

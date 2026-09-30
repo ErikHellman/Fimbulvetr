@@ -161,6 +161,74 @@ function spark(i: number): Raster {
   return r;
 }
 
+// ── The bow's arrow in flight (by facing), the arrow pot, and the eye switch ──────────────────────────
+
+const SHAFT = hex(C.wood);
+const HEAD = hex(C.steel);
+const FLETCH = hex('#e8e0c8');
+
+/** An arrow flying east: 14×5 (flipped for west; north and south are drawn upright). */
+function arrowSide(): Raster {
+  const r = createRaster(16, 7);
+  rect(r, 2, 3, 10, 1, SHAFT);
+  rect(r, 12, 2, 2, 3, HEAD);
+  rect(r, 14, 3, 1, 1, HEAD);
+  rect(r, 1, 2, 2, 1, FLETCH);
+  rect(r, 1, 4, 2, 1, FLETCH);
+  return outline(r, INK, 1);
+}
+
+function arrowUp(): Raster {
+  const r = createRaster(7, 16);
+  rect(r, 3, 4, 1, 10, SHAFT);
+  rect(r, 2, 2, 3, 2, HEAD);
+  rect(r, 3, 1, 1, 1, HEAD);
+  rect(r, 2, 13, 1, 2, FLETCH);
+  rect(r, 4, 13, 1, 2, FLETCH);
+  return outline(r, INK, 1);
+}
+
+function flipY(src: Raster): Raster {
+  const r = createRaster(src.w, src.h);
+  for (let y = 0; y < src.h; y++)
+    for (let x = 0; x < src.w; x++) {
+      const i = (y * src.w + x) * 4;
+      const j = ((src.h - 1 - y) * src.w + x) * 4;
+      for (let k = 0; k < 4; k++) r.data[j + k] = src.data[i + k] ?? 0;
+    }
+  return r;
+}
+
+/** A clay pot bristling with old arrow shafts. */
+function arrowPot(): Raster {
+  const r = createRaster(16, 18);
+  ellipse(r, 8, 12, 6, 4.5, (x) => (x > 10 ? hex(C.clayShade) : hex(C.clay)));
+  rect(r, 5, 6, 6, 2, hex(C.clayShade));
+  for (const [x, top] of [
+    [6, 1],
+    [8, 0],
+    [10, 2],
+  ] as const) {
+    rect(r, x, top + 2, 1, 5, SHAFT);
+    rect(r, x - 1, top, 3, 2, FLETCH);
+  }
+  return outline(r, INK, 1);
+}
+
+/** An eye carved in a stone block: shut (a closed lid) or opened by an arrow (a glowing pupil). */
+function eyeStone(open: boolean): Raster {
+  const r = createRaster(18, 18);
+  rect(r, 1, 1, 16, 16, ROCK);
+  rect(r, 13, 1, 4, 16, ROCK_SHADE);
+  rect(r, 1, 1, 16, 2, ROCK_LIGHT);
+  ellipse(r, 9, 9, 6, 3.5, hex('#241c1c'));
+  if (open) {
+    ellipse(r, 9, 9, 5, 2.8, hex('#e8e0c8'));
+    ellipse(r, 9, 9, 2, 2, RUNE);
+  } else line(r, 3, 9, 15, 9, ROCK_SHADE);
+  return outline(r, INK, 1);
+}
+
 export function haugarFrames(): SpriteFrame[] {
   const fixture = (name: string, raster: Raster): SpriteFrame => ({ name, raster, ox: 9, oy: raster.h - 3 });
   const wights: SpriteFrame[] = [];
@@ -186,7 +254,19 @@ export function haugarFrames(): SpriteFrame[] {
     ox: 8,
     oy: 8,
   }));
+  const side = arrowSide();
+  const up = arrowUp();
+  const arrows: SpriteFrame[] = [
+    { name: 'fx_arrow_fly_e_0', raster: side, ox: 8, oy: 3 },
+    { name: 'fx_arrow_fly_w_0', raster: flipX(side), ox: 8, oy: 3 },
+    { name: 'fx_arrow_fly_n_0', raster: up, ox: 3, oy: 8 },
+    { name: 'fx_arrow_fly_s_0', raster: flipY(up), ox: 3, oy: 8 },
+  ];
   return [
+    ...arrows,
+    { name: 'prop_arrow_pot_idle_s_0', raster: arrowPot(), ox: 8, oy: 17 },
+    fixture('fix_eye_on_s_0', eyeStone(true)),
+    fixture('fix_eye_off_s_0', eyeStone(false)),
     ...sparks,
     ...wights,
     fixture('fix_warp_dormant_s_0', warpStone(false)),
@@ -203,6 +283,9 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  fx_arrow: { fly: { frames: 1, fps: 1, loop: true, dirs: ALL } },
+  prop_arrow_pot: { idle: one(1, 1) },
+  fix_eye: { on: one(1, 1), off: one(1, 1) },
   fx_spark: { idle: { frames: 4, fps: 16, loop: false, dirs: ['s'] } },
   fix_warp: { dormant: one(1, 1), awake: one(1, 1) },
   fix_slab: { closed: one(1, 1), open: one(1, 1) },

@@ -35,6 +35,8 @@ export interface HeroTuning {
   readonly carryHeight: number;
   /** The throwing pose of a sub-item (the boomerang). */
   readonly tossTicks: number;
+  /** Loosing an arrow: the hero stands still this long. */
+  readonly shootTicks: number;
   /** Singing a galdr: the hero stands still this long. */
   readonly castTicks: number;
   /** A blow that meets the shield within this many ticks of raising it is parried (with the lesson). */
@@ -113,6 +115,16 @@ export interface StoneTuning {
   readonly blow: readonly number[];
 }
 
+/** The bow's arrows. */
+export interface BowTuning {
+  /** px per tick. */
+  readonly speed: number;
+  /** Ticks before it drops. */
+  readonly life: number;
+  /** Quarter hearts to a foe. */
+  readonly damage: number;
+}
+
 export interface BoomerangTuning {
   /** px per tick, out and back. */
   readonly speed: number;
@@ -123,6 +135,7 @@ export interface BoomerangTuning {
 export interface Tuning {
   readonly hero: HeroTuning;
   readonly boomerang: BoomerangTuning;
+  readonly bow: BowTuning;
   readonly throw: ThrowTuning;
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */

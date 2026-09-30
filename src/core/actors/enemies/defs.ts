@@ -81,6 +81,8 @@ export interface DropTable {
   readonly seidr?: number;
   /** A few bombs (only while bombs are owned; otherwise nothing drops). */
   readonly bombs?: number;
+  /** A few arrows (only while the bow is owned; otherwise nothing drops). */
+  readonly arrows?: number;
   readonly none: number;
 }
 

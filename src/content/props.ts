@@ -138,4 +138,17 @@ export const PROP_DEFS = {
     blast: true,
     loot: ['bombs'],
   },
+  /** A pot stuffed with old arrows: breaks to a blade, and spills a bundle once the bow is owned. */
+  arrow_pot: {
+    id: 'arrow_pot',
+    art: 'prop_arrow_pot',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: true,
+    breakBy: 'sword',
+    throwDamage: 4,
+    blast: true,
+    loot: ['arrows'],
+  },
 } as const satisfies Record<PropId, PropDef>;

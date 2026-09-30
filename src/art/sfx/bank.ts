@@ -556,4 +556,45 @@ export const SFX_BANK = {
     volume: 0.3,
     duty: 0.2,
   },
+  /** A bowstring's snap and the arrow's hiss. */
+  sfx_bow: {
+    wave: 'triangle',
+    freq: 520,
+    freqEnd: 180,
+    attack: 0,
+    sustain: 0.03,
+    release: 0.12,
+    volume: 0.35,
+  },
+  /** The dead waking: a low, rising moan. */
+  sfx_wake: {
+    wave: 'saw',
+    freq: 70,
+    freqEnd: 140,
+    attack: 0.1,
+    sustain: 0.3,
+    release: 0.4,
+    volume: 0.28,
+  },
+  /** A crown's gem shattering: a bright, falling chime. */
+  sfx_gem: {
+    wave: 'square',
+    freq: 2400,
+    freqEnd: 900,
+    attack: 0,
+    sustain: 0.05,
+    release: 0.3,
+    volume: 0.3,
+    duty: 0.25,
+  },
+  /** A spectral axe whirling through the air. */
+  sfx_axe: {
+    wave: 'noise',
+    freq: 1800,
+    freqEnd: 2600,
+    attack: 0.02,
+    sustain: 0.15,
+    release: 0.1,
+    volume: 0.25,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

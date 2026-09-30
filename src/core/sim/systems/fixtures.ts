@@ -85,7 +85,7 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       return;
     }
     case 'switch': {
-      const e = fixture(rt.newId(), 'switch', 'fix_switch', thing.at, index);
+      const e = fixture(rt.newId(), 'switch', thing.eye === true ? 'fix_eye' : 'fix_switch', thing.at, index);
       if (thing.set !== undefined && rt.state.flags[thing.set] === true) e.mem['lit'] = 1;
       out.push(e);
       return;
@@ -305,17 +305,42 @@ export function bumpLocks(rt: SimRt, input: InputFrame): void {
   unlockAt(rt, probeBox(rt));
 }
 
-/** The sword lights the switches it strikes (a spin can light several). */
+/** The sword lights the switches it strikes (a spin can light several); an eye only clinks. */
 export function swordSwitches(rt: SimRt): void {
   const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   for (let lit = strikeSwitch(rt, box); lit; lit = strikeSwitch(rt, box));
   strikeWheel(rt, box);
+  const swing = mem(rt.hero, 'swing');
+  const eye = fixtureAt(
+    rt,
+    'switch',
+    box,
+    (f) => isEye(rt, f) && mem(f, 'lit') !== 1 && mem(f, 'hitSwing') !== swing,
+  );
+  if (eye !== null) {
+    eye.mem['hitSwing'] = swing;
+    rt.emit({ t: 'sfx', id: 'sfx_block' });
+  }
 }
 
-/** Lights the unlit switch under `box` (a sword or boomerang strike). Returns whether one was lit. */
-export function strikeSwitch(rt: SimRt, box: Box): boolean {
-  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1);
+/** Whether a switch fixture is an eye carved in stone (only an arrow opens it). */
+const isEye = (rt: SimRt, f: Entity): boolean => {
+  const t = thingOf(rt, f);
+  return t?.k === 'switch' && t.eye === true;
+};
+
+/** An unlit eye under `box` (what a boomerang clinks off). */
+export function eyeAt(rt: SimRt, box: Box): boolean {
+  return fixtureAt(rt, 'switch', box, (f) => isEye(rt, f) && mem(f, 'lit') !== 1) !== null;
+}
+
+/**
+ * Lights the unlit switch under `box`: a sword, boomerang or blast strike lights plain ones, and only an
+ * arrow lights an eye. Returns whether one was lit.
+ */
+export function strikeSwitch(rt: SimRt, box: Box, arrow = false): boolean {
+  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1 && (arrow || !isEye(rt, f)));
   if (e === null) return false;
   e.mem['lit'] = 1;
   const thing = thingOf(rt, e);

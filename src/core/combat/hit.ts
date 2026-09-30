@@ -13,6 +13,8 @@ export const THROWN = 4;
 export const STUN = 8;
 /** Pierces a foe's shield (the dash thrust). */
 export const PIERCE = 16;
+/** An arrow (a crown's gem is only broken by one). */
+export const ARROW = 32;
 
 /** One damage path for swords, arrows, galdr, fire spread and traps. */
 export interface HitData {

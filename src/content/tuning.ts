@@ -27,6 +27,7 @@ export const TUNING: Tuning = {
     throwTicks: 10,
     tossTicks: 10,
     castTicks: 14,
+    shootTicks: 14,
     parryTicks: 10,
     parryStun: 60,
     carryHeight: 18,
@@ -66,6 +67,7 @@ export const TUNING: Tuning = {
   throw: { speed: 4, flightTicks: 20 },
   push: { ticks: 16, slideTicks: 16 },
   boomerang: { speed: 3, range: 112 },
+  bow: { speed: 5, life: 72, damage: 4 },
   weapons: {
     /** The pitchfork of the raid night: long reach, light blows. */
     pitchfork: {

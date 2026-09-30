@@ -2,7 +2,8 @@ import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import type { ShotId } from '../../actors/enemies/defs';
 import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
-import { STUN } from '../../combat/hit';
+import { ARROW, STUN } from '../../combat/hit';
+import { applyEffect } from '../../story/effects';
 import { moveVector, type InputFrame } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC, dirFromVec } from '../../math/dir';
@@ -12,7 +13,7 @@ import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { damageActor, hurtHero } from './combat';
 import { blowCover } from './cover';
-import { strikeSwitch, strikeWheel } from './fixtures';
+import { eyeAt, strikeSwitch, strikeWheel } from './fixtures';
 import { heroCtx } from './hero';
 import { windOf } from './weather';
 import { stepEldr } from './eldr';
@@ -78,7 +79,76 @@ export function stepProjectiles(rt: SimRt): void {
     if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
     else if (e.def === 'eldr') stepEldr(rt, e, wind);
     else if (e.def === 'spit') stepSpit(rt, e);
+    else if (e.def === 'arrow') stepArrow(rt, e);
   }
+}
+
+/** An arrow's box around its ground point; it is drawn `ARROW_Z` px up, at bow height. */
+const ARROW_BOX = { x: -3, y: -6, w: 6, h: 6 } as const;
+const ARROW_Z = 10;
+
+/**
+ * The bow's item key: looses an arrow the way Ask faces (four ways), one from the quiver; with none it
+ * clicks empty. Returns whether one flew.
+ */
+export function shootArrow(rt: SimRt, input: InputFrame): boolean {
+  if ((rt.state.inv.items.arrows ?? 0) < 1) {
+    rt.emit({ t: 'sfx', id: 'sfx_fizzle' });
+    return false;
+  }
+  const d = DIR_VEC[rt.hero.facing];
+  const e = createEntity({
+    id: rt.newId(),
+    kind: 'projectile',
+    def: 'arrow',
+    art: 'fx_arrow',
+    pos: { x: rt.hero.pos.x + d.x * 10, y: rt.hero.pos.y + d.y * 10 },
+    facing: rt.hero.facing,
+    body: ARROW_BOX,
+    hurt: ARROW_BOX,
+    faction: 'hero',
+    hp: 1,
+    maxHp: 1,
+    state: 'fly',
+  });
+  setAnim(e, 'fly');
+  e.mem['z'] = ARROW_Z;
+  rt.actors.push(e);
+  applyEffect({ k: 'take', item: 'arrows' }, rt);
+  changeState(HERO_MACHINE, rt.hero, 'shoot', heroCtx(rt, input));
+  rt.emit({ t: 'sfx', id: 'sfx_bow' });
+  return true;
+}
+
+/**
+ * An arrow flies straight over water, pits and low ground until it meets a wall or runs out, strikes the
+ * first foe it touches (the `ARROW` tag: a crown's gem knows it), or lights a switch (eyes too).
+ */
+function stepArrow(rt: SimRt, e: Entity): void {
+  const a = rt.db.tuning.bow;
+  const gone = (): void => {
+    rt.actors = rt.actors.filter((x) => x !== e);
+  };
+  const d = DIR_VEC[e.facing];
+  const next = { x: e.pos.x + d.x * a.speed, y: e.pos.y + d.y * a.speed };
+  // A switch stands solid on its tile: the arrow strikes it before the wall check would stop it.
+  if (strikeSwitch(rt, at(e.body, next), true)) {
+    gone();
+    return;
+  }
+  if (e.fsm.t >= a.life || wallAt(rt, { x: next.x, y: next.y - 3 })) {
+    gone();
+    return;
+  }
+  e.pos = next;
+  e.fsm.t += 1;
+  const box = at(e.body, e.pos);
+  const foe = rt.actors.find(
+    (x) => x.kind === 'enemy' && overlaps(box, at(x.hurt, x.pos)) && x.iframes === 0,
+  );
+  if (foe === undefined) return;
+  damageActor(rt, foe, { amount: a.damage, element: 'none', knock: 2, dir: d, faction: 'hero', tags: ARROW });
+  gone();
 }
 
 /** A gob of spit's box around its ground point; it is drawn `SPIT_Z` px up, at head height. */
@@ -189,6 +259,10 @@ function strike(rt: SimRt, e: Entity, back: boolean): void {
     turn = true;
   }
   if (strikeSwitch(rt, box) || strikeWheel(rt, box)) turn = true;
+  else if (!back && eyeAt(rt, box)) {
+    rt.emit({ t: 'sfx', id: 'sfx_block' });
+    turn = true;
+  }
   if (mem(e, 'fetch') === 0) {
     const pickup = rt.actors.find(
       (a) => a.kind === 'pickup' && mem(a, 'hidden') !== 1 && overlaps(box, at(a.body, a.pos)),
