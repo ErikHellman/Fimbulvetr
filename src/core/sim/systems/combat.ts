@@ -5,11 +5,11 @@ import { changeState } from '../../actors/fsm';
 import { swordOf } from '../../actors/tuning';
 import { HERO_MACHINE, heroSwordBox, heroSwordDamage } from '../../actors/hero';
 import { rollDrop } from '../../combat/drops';
-import { STUN, resolveHit, type HitData, type HitResult } from '../../combat/hit';
+import { PIERCE, PIERCE_SHIELD, STUN, resolveHit, type HitData, type HitResult } from '../../combat/hit';
 import { EMPTY_FRAME } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
-import { normalize, scale, sub, type Vec } from '../../math/vec';
+import { dot, normalize, scale, sub, type Vec } from '../../math/vec';
 import { dungeonOf } from '../../state/dungeons';
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
@@ -107,7 +107,7 @@ export function resolveSword(rt: SimRt): void {
       knock: swordOf(db.tuning, rt.state.inv.weapon).knock,
       dir,
       faction: 'hero',
-      tags: 0,
+      tags: mem(hero, 'thrustOn') === 1 ? PIERCE : 0,
     });
     if (result.outcome === 'ignored') continue;
     const boss = enemyDef(rt, e).boss !== undefined;
@@ -136,18 +136,37 @@ export function resolveAttacks(rt: SimRt): void {
   }
 }
 
+/**
+ * Styrr's parry: a foe's own blow (not a shot, not fire) that meets a shield raised within the last
+ * `parryTicks` is turned, heavy or not. The foe stands stunned and the rest of its swing is spent.
+ */
+function parried(rt: SimRt, source: HitSource, dir: Vec, tags: number): boolean {
+  const { hero, db } = rt;
+  if (rt.state.flags.t_parry !== true || !('kind' in source) || source.kind !== 'enemy') return false;
+  if (hero.fsm.s !== 'shield' || hero.fsm.t >= db.tuning.hero.parryTicks || hero.iframes > 0) return false;
+  if ((tags & PIERCE_SHIELD) !== 0 || dot(dir, DIR_VEC[hero.facing]) >= 0) return false;
+  const def = enemyDef(rt, source);
+  const stun = def.boss !== undefined ? db.tuning.hero.parryStun / 2 : db.tuning.hero.parryStun;
+  source.mem['stun'] = Math.max(mem(source, 'stun'), stun);
+  source.vel = { x: 0, y: 0 };
+  const w = def.attacks?.[source.fsm.s];
+  if (w !== undefined) source.fsm.t = Math.max(source.fsm.t, w.to + 1);
+  rt.emit({ t: 'hit', target: hero.id, blocked: true, dealt: 0 });
+  rt.emit({ t: 'sfx', id: 'sfx_parry' });
+  rt.emit({ t: 'parry', x: hero.pos.x + DIR_VEC[hero.facing].x * 10, y: hero.pos.y - 14 });
+  return true;
+}
+
+/** Whatever deals a hit: an enemy, a shot, a fixture. */
+type HitSource = { readonly pos: Vec; readonly faction: Faction } | Entity;
+
 /** One hit on the hero from `source`; returns whether it landed or was blocked (not ignored). */
-export function hurtHero(
-  rt: SimRt,
-  source: { readonly pos: Vec; readonly faction: Faction },
-  amount: number,
-  knock: number,
-  tags: number,
-): boolean {
+export function hurtHero(rt: SimRt, source: HitSource, amount: number, knock: number, tags: number): boolean {
   const { hero, db } = rt;
   if (rt.god === true) return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
+  if (parried(rt, source, dir, tags)) return true;
   // Armour takes its share off every blow, but a blow always lands at least a quarter heart.
   const reduce = db.tuning.armor[rt.state.inv.armor].reduce;
   const dealt = amount <= 0 ? amount : Math.max(1, amount - Math.round(amount * reduce));

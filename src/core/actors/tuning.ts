@@ -36,6 +36,10 @@ export interface HeroTuning {
   readonly tossTicks: number;
   /** Singing a galdr: the hero stands still this long. */
   readonly castTicks: number;
+  /** A blow that meets the shield within this many ticks of raising it is parried (with the lesson). */
+  readonly parryTicks: number;
+  /** Ticks a parried foe stands stunned (a boss half as long). */
+  readonly parryStun: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -85,6 +89,19 @@ export interface FireTuning {
   readonly scorch: number;
 }
 
+/** The dash thrust: a roll turned into a lunge (Styrr's lesson). */
+export interface ThrustTuning {
+  /** Roll ticks before the sword may turn it into a thrust. */
+  readonly from: number;
+  readonly ticks: number;
+  /** px per tick. */
+  readonly speed: number;
+  /** Its blow is this many times the first swing's. */
+  readonly damageMul: number;
+  /** Hit boxes relative to the feet, by facing: longer and narrower than a swing. */
+  readonly boxes: Readonly<Record<Dir4, Box>>;
+}
+
 export interface BoomerangTuning {
   /** px per tick, out and back. */
   readonly speed: number;
@@ -106,6 +123,7 @@ export interface Tuning {
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;
+  readonly thrust: ThrustTuning;
   readonly enemyIframes: number;
   readonly knockDecay: number;
 }

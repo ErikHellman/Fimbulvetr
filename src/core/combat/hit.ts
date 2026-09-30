@@ -11,6 +11,8 @@ export const PIERCE_SHIELD = 2;
 export const THROWN = 4;
 /** Stuns an enemy that can be stunned (the boomerang). */
 export const STUN = 8;
+/** Pierces a foe's shield (the dash thrust). */
+export const PIERCE = 16;
 
 /** One damage path for swords, arrows, galdr, fire spread and traps. */
 export interface HitData {

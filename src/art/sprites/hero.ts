@@ -370,6 +370,17 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
       0,
       drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: FORWARD[side], blade }, LARGE),
     );
+    // The dash thrust: blade held straight out, legs in a long stride.
+    for (let i = 0; i < 2; i++)
+      add(
+        'thrust',
+        side,
+        i,
+        drawPose(
+          { side, phase: i === 0 ? 1 : 3, shield: RESTING_KIT[side], sword: FORWARD[side], blade },
+          LARGE,
+        ),
+      );
     for (const anim of ['attack1', 'attack2', 'attack3'] as const) {
       ATTACK_ARCS[side][anim].forEach((dir, i) => {
         add(anim, side, i, drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: dir, blade }, LARGE));
@@ -416,6 +427,7 @@ export const HERO_ANIMS = {
   attack3: { frames: 3, fps: 10, loop: false, dirs: ALL },
   spin: { frames: 4, fps: 10, loop: false, dirs: ['s'] },
   roll: { frames: 4, fps: 13, loop: false, dirs: ['s'] },
+  thrust: { frames: 2, fps: 10, loop: false, dirs: ALL },
   lift: { frames: 2, fps: 10, loop: false, dirs: ALL },
   carry: { frames: 1, fps: 1, loop: true, dirs: ALL },
   carrywalk: { frames: 4, fps: 7, loop: true, dirs: ALL },

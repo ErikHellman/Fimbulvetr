@@ -106,6 +106,10 @@ export const FLAGS = {
   st_d2_boss_dead: { t: 'bool' },
   /** The second runestone is lit: M3's goal. */
   st_stone2_lit: { t: 'bool' },
+  /** Styrr taught the dash thrust: the sword pressed mid-roll lunges, and pierces a shield. */
+  t_dash: { t: 'bool' },
+  /** Styrr taught the parry: a blow met by a freshly raised shield is turned, and its dealer stunned. */
+  t_parry: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

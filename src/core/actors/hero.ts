@@ -15,6 +15,7 @@ export type HeroMode =
   | 'charge'
   | 'spin'
   | 'roll'
+  | 'thrust'
   | 'shield'
   | 'hurt'
   | 'hop'
@@ -31,6 +32,8 @@ export interface HeroCtx {
   readonly hasShield: boolean;
   /** Holding a weapon (not bare hands): the sword button swings. */
   readonly armed: boolean;
+  /** Styrr's dash thrust is learned: the sword pressed mid-roll lunges. */
+  readonly dash: boolean;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -180,10 +183,33 @@ const roll: HeroDef = {
   },
   tick(e, c) {
     const h = c.tuning.hero;
+    if (c.dash && c.armed && e.fsm.t >= c.tuning.thrust.from && wasPressed(c.input, 'sword')) return 'thrust';
     e.vel = scale({ x: mem(e, 'rollDx'), y: mem(e, 'rollDy') }, h.rollSpeed);
     return e.fsm.t >= h.rollTicks - 1 ? 'move' : undefined;
   },
   exit(e, c) {
+    e.mem['rollCd'] = c.tuning.hero.rollCooldown;
+    still(e);
+  },
+};
+
+/** The dash thrust: the roll becomes a lunge along Ask's facing, the blade held out in front. */
+const thrust: HeroDef = {
+  enter(e, c) {
+    e.mem['swing'] = mem(e, 'swing') + 1;
+    e.mem['thrustOn'] = 1;
+    setAnim(e, 'thrust');
+    c.emit({ t: 'sfx', id: 'sfx_thrust' });
+  },
+  tick(e, c) {
+    const t = c.tuning.thrust;
+    // Full speed, easing off over the last four ticks.
+    const ease = Math.min(1, (t.ticks - e.fsm.t) / 4);
+    e.vel = scale(DIR_VEC[e.facing], t.speed * ease);
+    return e.fsm.t >= t.ticks - 1 ? 'move' : undefined;
+  },
+  exit(e, c) {
+    e.mem['thrustOn'] = 0;
     e.mem['rollCd'] = c.tuning.hero.rollCooldown;
     still(e);
   },
@@ -294,6 +320,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   charge,
   spin,
   roll,
+  thrust,
   shield,
   hurt,
   hop,
@@ -335,6 +362,7 @@ export function createHero(
 /** The hero's live weapon hitbox in screen pixels, or null when it cannot hit. */
 export function heroSwordBox(e: Entity, t: Tuning, weapon?: WeaponId): Box | null {
   const sw = swordOf(t, weapon);
+  if (mem(e, 'thrustOn') === 1) return at(t.thrust.boxes[e.facing], e.pos);
   if (mem(e, 'spinOn') === 1) return at(sw.spinBox, e.pos);
   if (mem(e, 'swordOn') === 1) return at(sw.boxes[e.facing], e.pos);
   return null;
@@ -342,6 +370,7 @@ export function heroSwordBox(e: Entity, t: Tuning, weapon?: WeaponId): Box | nul
 
 export function heroSwordDamage(e: Entity, t: Tuning, weapon?: WeaponId): number {
   const sw = swordOf(t, weapon);
+  if (mem(e, 'thrustOn') === 1) return sw.comboDamage[0] * t.thrust.damageMul;
   if (mem(e, 'spinOn') === 1) return sw.spinDamage;
   const combo = Math.min(3, Math.max(1, mem(e, 'combo')));
   return sw.comboDamage[combo - 1] ?? sw.comboDamage[0];
