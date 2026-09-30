@@ -51,6 +51,7 @@ export const SCREEN_IDS = [
   'myl_reeds',
   'myl_int_fisher',
   'myl_int_widow',
+  'myl_int_cave',
   'd1_r01',
   'd1_r02',
   'd1_r03',

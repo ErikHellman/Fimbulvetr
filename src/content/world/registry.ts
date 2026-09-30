@@ -45,6 +45,7 @@ import { mylBog } from './myrland/myl_bog';
 import { mylReeds } from './myrland/myl_reeds';
 import { mylIntFisher } from './myrland/myl_int_fisher';
 import { mylIntWidow } from './myrland/myl_int_widow';
+import { mylIntCave } from './myrland/myl_int_cave';
 import { d1R01 } from './rotarhellir/d1_r01';
 import { d1R02 } from './rotarhellir/d1_r02';
 import { d1R03 } from './rotarhellir/d1_r03';
@@ -132,6 +133,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   myl_reeds: mylReeds,
   myl_int_fisher: mylIntFisher,
   myl_int_widow: mylIntWidow,
+  myl_int_cave: mylIntCave,
   d1_r01: d1R01,
   d1_r02: d1R02,
   d1_r03: d1R03,

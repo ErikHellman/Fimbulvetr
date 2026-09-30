@@ -311,6 +311,28 @@ export const DEV_PRESETS = {
     dungeons: { d1: { bossDead: true } },
   },
 
+  /** By the millpond after Sökkva Kvern, with bombs in slot K: for the springs' cave and the peat's crack. */
+  mylbombs: {
+    screen: 'myl_mill',
+    tile: [18, 16],
+    facing: 's',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 70,
+    items: { lantern: 1, boomerang: 1, horn: 1, mead_red: 1, purse: 1, bombs: 10 },
+    slots: ['bombs', 'boomerang'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true, st_d2_boss_dead: true, st_stone2_lit: true },
+    vars: { ask_pen: 31 },
+    maxHp: 20,
+    hp: 20,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc', 'd2_hc', 'd2_c_bombs'],
+    dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
+  },
   /** Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low. */
   d2: {
     screen: 'd2_r01',

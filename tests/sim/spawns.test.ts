@@ -92,6 +92,20 @@ describe('rolled spawns on a screen', () => {
     expect(tiles(h)).toEqual(['vargr@5,5']);
   });
 
+  it('leave out foes Ask has no way to beat yet (mud-crabs before bombs)', () => {
+    const crabs: SpawnTable = {
+      count: { summer: 2 },
+      entries: { summer: [{ id: 'leirkrabbi', weight: 1 }] },
+    };
+    const db = (): ContentDb => ({ ...spawnDb(), spawns: { askdalr: crabs } });
+    const before = new Harness({ db: db(), rolled: true, tile: [20, 20], minute: 12 * 60 });
+    expect(rolled(before)).toEqual([]);
+    const after = new Harness({ db: db(), rolled: true, tile: [20, 20], minute: 12 * 60 });
+    after.sim.state.inv.items.bombs = 0;
+    spawnActors(after.sim);
+    expect(rolled(after).map((e) => e.def)).toEqual(['leirkrabbi', 'leirkrabbi']);
+  });
+
   it('never happen underground', () => {
     const h = new Harness({ db: spawnDb({ dungeon: true }), rolled: true, tile: [20, 20], minute: 12 * 60 });
     expect(rolled(h)).toEqual([]);

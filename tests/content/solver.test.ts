@@ -166,7 +166,8 @@ describe('the Myrkviðr and Uppvík gates in every season (winter ice, spring fl
   });
 });
 
-const myrland = SCREEN_IDS.filter((id) => id.startsWith('myl_'));
+/** Mýrland's screens, but for the cave behind the springs' cracked rock (bombs open it, M3b). */
+const myrland = SCREEN_IDS.filter((id) => id.startsWith('myl_') && id !== 'myl_int_cave');
 
 /** Where M2 leaves Ask, at the brook's bank path down to the weir (preset `myl`). */
 function atTheBrook(boomerang = true): GameState {
@@ -213,6 +214,21 @@ describe('the progression solver on Mýrland, in every season', () => {
     expect(r.stranded).toEqual([]);
     // The reed islet's piece lies beyond the boomerang's reach: only the winter ice walks out to it.
     expect(r.pieces.includes('hp_myl_reeds')).toBe(season === 'winter');
+  });
+
+  it.each(SEASONS)('%s: the springs’ cave and the peat’s piece stay shut without bombs', (season) => {
+    const r = solveMyrland(season);
+    expect(r.screens).not.toContain('myl_int_cave');
+    expect(r.pieces).not.toContain('hp_myl_peat');
+  });
+
+  it('opens both with bombs, and nothing strands Ask', () => {
+    const bombs = atTheBrook();
+    bombs.inv.items.bombs = 10;
+    const r = solve(DB, bombs, nothing, { season: 'autumn' });
+    expect(r.opened).toEqual(expect.arrayContaining(['myl_k_springs', 'myl_k_peat', 'myl_c_bombbag']));
+    expect(r.pieces).toContain('hp_myl_peat');
+    expect(r.stranded).toEqual([]);
   });
 
   it('floods the shoal in spring, and the old bridge still leads south', () => {
