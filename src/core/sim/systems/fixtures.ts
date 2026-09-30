@@ -47,6 +47,7 @@ const KINDS: Readonly<
   switch: { solid: 'always', anims: ['on', 'off'] },
   wheel: { solid: 'always', anims: ['on', 'off'] },
   warp: { solid: 'always', anims: ['awake', 'dormant'] },
+  seal: { solid: 'always', anims: ['lit', 'dark'] },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -94,6 +95,9 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       return;
     case 'warp':
       out.push(fixture(rt.newId(), 'warp', 'fix_warp', thing.at, index));
+      return;
+    case 'seal':
+      out.push(fixture(rt.newId(), 'seal', 'fix_seal', thing.at, index));
       return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
@@ -157,6 +161,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return waterLevel(rt) === thing.level;
     case 'warp':
       return rt.state.world.warps.includes(thing.region);
+    case 'seal':
+      return evalCond(thing.lit, condCtx(rt));
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':

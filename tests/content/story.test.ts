@@ -42,7 +42,8 @@ const CONTENT = {
 };
 
 /** Flags read now and set by a later milestone's content (the pass opens at the end of Act I, M5). */
-const SET_LATER = new Set(['st_pass_open']);
+/** Declared ahead of the milestone that sets them: the pass (M5) and the third stone (M4b). */
+const SET_LATER = new Set(['st_pass_open', 'st_stone3_lit']);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {

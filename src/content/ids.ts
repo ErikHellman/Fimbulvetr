@@ -186,6 +186,11 @@ export const NPCS = [
   'thuridr',
   'ljotr',
   'audr',
+  // Haugar
+  'styrr',
+  'hildr',
+  'geirmundr',
+  'hallsteinn',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -201,6 +206,8 @@ export const QUESTS = [
   'q_vargar',
   'q_runestone_2',
   'q_fisher',
+  'q_runestone_3',
+  'q_huscarl',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -237,6 +244,9 @@ export const SCRIPTS = [
   'd2_enter',
   'stone2_light',
   'warp_stone',
+  'hau_arrive',
+  'barrow_open',
+  'styrr_rest',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

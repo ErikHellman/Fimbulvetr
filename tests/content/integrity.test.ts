@@ -198,6 +198,25 @@ describe('world layout', () => {
   );
 });
 
+describe('warp stones', () => {
+  const stones = SCREEN_IDS.flatMap((id) =>
+    SCREENS[id].things.flatMap((t) => (t.k === 'warp' ? [{ id, t }] : [])),
+  );
+
+  it('stand one to a region, on the overworld of their own region, with walkable arrivals', () => {
+    const seen = new Set<string>();
+    for (const { id, t } of stones) {
+      expect(seen.has(t.region), `${t.region} has two warp stones`).toBe(false);
+      seen.add(t.region);
+      expect(SCREENS[id].region, id).toBe(t.region);
+      expect(WORLD_LAYOUT.at[id], `${id} is not on the overworld`).toBeDefined();
+      expect(walkable(id)(t.arrive.x, t.arrive.y), `${id} arrival`).toBe(true);
+      expect(walkable(id)(t.at.x, t.at.y), `${id} stone on walkable ground`).toBe(true);
+    }
+    expect([...seen].sort()).toEqual(['askdalr', 'haugar', 'myrkvidr', 'myrland']);
+  });
+});
+
 describe('doors', () => {
   const doors = SCREEN_IDS.flatMap((id) =>
     SCREENS[id].things.flatMap((t) => (t.k === 'door' ? [{ from: id, door: t }] : [])),

@@ -334,6 +334,31 @@ export const DEV_PRESETS = {
     dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
   },
   /**
+   * Where M3 leaves Ask: the second stone lit, in the birch glade by the path east to Haugar's rockfall,
+   * with bombs, the boomerang, two horns of red mead, five hearts and silver enough for Styrr's lessons.
+   */
+  hau: {
+    screen: 'myr_glade',
+    tile: [34, 17],
+    facing: 'e',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'autumn',
+    policy: 'cycling',
+    silver: 150,
+    items: { lantern: 1, boomerang: 1, horn: 2, mead_red: 2, purse: 1, bombs: 10 },
+    slots: ['bombs', 'boomerang'],
+    galdr: ['eldr'],
+    flags: { ...MYL_FLAGS, st_d2_entered: true, st_d2_boss_dead: true, st_stone2_lit: true },
+    vars: { ask_pen: 31 },
+    maxHp: 20,
+    hp: 20,
+    pieces: ['hp_d1_r09'],
+    opened: ['d1_hc', 'd2_hc', 'd2_c_bombs'],
+    dungeons: { d1: { bossDead: true }, d2: { bossDead: true } },
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

@@ -106,6 +106,19 @@ export const FLAGS = {
   st_d2_boss_dead: { t: 'bool' },
   /** The second runestone is lit: M3's goal. */
   st_stone2_lit: { t: 'bool' },
+  /** Ask has come past the rockfall into Haugar. */
+  st_haugar_reached: { t: 'bool' },
+  /** Styrr told Ask of the barrow-watch: the King's Barrow opens to one who keeps it at night. */
+  q_rs3_watch: { t: 'bool' },
+  /** Barrow-wights beaten at the King's Barrow on the watch. */
+  q_watch_kills: { t: 'int', max: 3 },
+  /** The watch is kept: Konungshaugr's door stands open. M4a's goal. */
+  st_barrow_open: { t: 'bool' },
+  /** First meetings in Haugar. */
+  n_styrr_met: { t: 'bool' },
+  n_hildr_met: { t: 'bool' },
+  n_geirmundr_met: { t: 'bool' },
+  n_hallsteinn_met: { t: 'bool' },
   /** The third runestone is lit: M4's goal. */
   st_stone3_lit: { t: 'bool' },
   /** Styrr taught the dash thrust: the sword pressed mid-roll lunges, and pierces a shield. */

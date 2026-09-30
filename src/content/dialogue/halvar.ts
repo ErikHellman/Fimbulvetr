@@ -9,6 +9,7 @@ export const HALVAR: DialogueDef = {
     { when: raidNight, node: 'raid' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
+    { when: all(afterRaid, flag('n_styrr_met'), not(flag('st_stone3_lit'))), node: 'styrr' },
     { when: afterRaid, node: 'after' },
     { when: all(day(1), not(flag('st_intro_seen'))), node: 'intro' },
     { when: all(day(1), choresDone(1), not(flag(paid(1)))), node: 'pay1' },
@@ -177,6 +178,12 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'Go to the hof. Gyða knows the old stories. I only lived one of them.',
         sv: 'Gå till hovet. Gyða kan de gamla berättelserna. Jag levde bara en av dem.',
+      },
+    },
+    styrr: {
+      text: {
+        en: 'Styrr? Old Styrr still breathes? … That is a name from another life, Ask. Leave it there. Bring them home.',
+        sv: 'Styrr? Gamle Styrr andas fortfarande? … Det är ett namn från ett annat liv, Ask. Låt det vara där. För hem dem.',
       },
     },
     after: {

@@ -30,6 +30,64 @@ const warpStone: ScriptDef = {
   ],
 };
 
-export const HAUGAR_SCRIPTS: Readonly<Record<'warp_stone', ScriptDef>> = {
+/** Past the rockfall: Ask has come into Haugar. */
+const hauArrive: ScriptDef = {
+  steps: [
+    { k: 'do', effects: [{ k: 'set', flag: 'st_haugar_reached', value: true }] },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'The trees fall away behind. Heather, grave-hills and standing stones under a wide grey sky. Haugar, where the old dead sleep.',
+        sv: 'Träden faller undan bakom. Ljung, gravkullar och resta stenar under en vid grå himmel. Haugar, där de gamla döda sover.',
+      },
+    },
+  ],
+};
+
+/** The barrow-watch is kept: the King's Barrow opens. */
+const barrowOpen: ScriptDef = {
+  steps: [
+    {
+      k: 'do',
+      effects: [
+        { k: 'set', flag: 'st_barrow_open', value: true },
+        { k: 'sfx', id: 'sfx_gate' },
+      ],
+    },
+    { k: 'wait', ticks: 30 },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'The last wight crumbles into the mound it came from. Deep in the hill, stone grinds on stone: the barrow’s door stands open.',
+        sv: 'Den sista gravvätten smulas sönder i högen den kom ur. Djupt i kullen skaver sten mot sten: gravhögens dörr står öppen.',
+      },
+    },
+  ],
+};
+
+/** Styrr's spare bed: rest and the save slots. */
+const styrrRest: ScriptDef = {
+  steps: [
+    {
+      k: 'say',
+      who: 'styrr',
+      text: {
+        en: 'Sleep, then. I will keep the door. Old habit.',
+        sv: 'Sov, då. Jag håller dörren. Gammal vana.',
+      },
+    },
+    { k: 'do', effects: [{ k: 'heal', n: 0 }] },
+    { k: 'save' },
+  ],
+};
+
+export const HAUGAR_SCRIPTS: Readonly<
+  Record<'warp_stone' | 'hau_arrive' | 'barrow_open' | 'styrr_rest', ScriptDef>
+> = {
   warp_stone: warpStone,
+  hau_arrive: hauArrive,
+  barrow_open: barrowOpen,
+  styrr_rest: styrrRest,
 };

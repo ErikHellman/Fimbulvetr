@@ -186,6 +186,8 @@ export type Thing =
    * Ask back to `arrive`. Always solid.
    */
   | { readonly k: 'warp'; readonly region: RegionId; readonly at: TilePos; readonly arrive: TilePos }
+  /** A rune seal (the pass's three): a solid pillar whose rune burns while `lit` holds. */
+  | { readonly k: 'seal'; readonly at: TilePos; readonly lit: Cond }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
@@ -222,8 +224,8 @@ export type Thing =
       readonly do: readonly Effect[];
     };
 
-/** A gate's look: `slab` is a barrow's stone door, `seal` one of the pass's three rune seals (lit = open). */
-export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'seal';
+/** A gate's look: `slab` is a barrow's stone door. */
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab';
 
 export interface ScreenDef {
   readonly id: ScreenId;

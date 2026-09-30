@@ -6,6 +6,8 @@ export const askVillage: ScreenDef = {
   purpose:
     "Askdalr village: the square, Sigrún's trading house (door) and the neighbours' houses. Most people are here by day.",
   things: [
+    /** The region's warp stone (Farvegr). */
+    { k: 'warp', region: 'askdalr', at: { x: 24, y: 14 }, arrive: { x: 24, y: 15 } },
     { k: 'door', at: { x: 8, y: 5 }, dir: 'n', to: 'ask_int_trader', arrive: { x: 19, y: 17 }, facing: 'n' },
     {
       k: 'sign',

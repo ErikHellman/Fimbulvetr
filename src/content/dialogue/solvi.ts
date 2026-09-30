@@ -6,12 +6,19 @@ export const SOLVI: DialogueDef = {
   entry: [
     { when: not(flag('n_solvi_met')), node: 'meet' },
     { when: all(flag('st_eldr_learned'), not(flag('q_rs2_mill'))), node: 'stone2' },
+    { when: all(flag('st_stone2_lit'), not(flag('st_barrow_open'))), node: 'stone3' },
     { when: flag('st_eldr_learned'), node: 'after' },
     { when: { k: 'item', id: 'charred_stave' }, node: 'stave' },
     { when: flag('q_eldr_asked'), node: 'waiting' },
     { node: 'ask' },
   ],
   nodes: {
+    stone3: {
+      text: {
+        en: 'The third stone? The verse says: under the king who would not lie down. That is Konungshaugr in Haugar. Its door opens for a watcher, not a thief.',
+        sv: 'Den tredje stenen? Versen säger: under kungen som inte ville lägga sig. Det är Konungshaugr i Haugar. Dess dörr öppnas för en väktare, inte för en tjuv.',
+      },
+    },
     stone2: {
       text: {
         en: 'The second of the three stones? The old verse says it sleeps where water turns stone. A millstone, I think. There was a mill in Mýrland that the water took.',

@@ -66,6 +66,10 @@ const PERSISTED = [
   'myl_k_peat',
   'myl_c_bombbag',
   'hp_myl_peat',
+  'hau_k_gully',
+  'hau_k_barrows',
+  'hp_hau_barrows',
+  'hp_hau_tarn',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

@@ -327,6 +327,7 @@ function solidThing(
     case 'switch':
     case 'wheel':
     case 'warp':
+    case 'seal':
     case 'brazier':
       return true;
     case 'lock':

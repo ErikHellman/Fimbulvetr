@@ -38,6 +38,10 @@ import { BARDR } from './bardr';
 import { THURIDR } from './thuridr';
 import { LJOTR } from './ljotr';
 import { AUDR } from './audr';
+import { STYRR } from './styrr';
+import { HILDR } from './hildr';
+import { GEIRMUNDR } from './geirmundr';
+import { HALLSTEINN } from './hallsteinn';
 
 /** Dialogue graphs by id. Every NPC's graph lives in its own file next to this one. */
 export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
@@ -78,5 +82,9 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   thuridr: THURIDR,
   ljotr: LJOTR,
   audr: AUDR,
+  styrr: STYRR,
+  hildr: HILDR,
+  geirmundr: GEIRMUNDR,
+  hallsteinn: HALLSTEINN,
   thingstone: THINGSTONE,
 };

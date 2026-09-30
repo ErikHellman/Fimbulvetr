@@ -193,8 +193,8 @@ export function haugarFrames(): SpriteFrame[] {
     fixture('fix_warp_awake_s_0', warpStone(true)),
     fixture('fix_slab_closed_s_0', slab(false)),
     fixture('fix_slab_open_s_0', slab(true)),
-    fixture('fix_seal_closed_s_0', seal(false)),
-    fixture('fix_seal_open_s_0', seal(true)),
+    fixture('fix_seal_dark_s_0', seal(false)),
+    fixture('fix_seal_lit_s_0', seal(true)),
   ];
 }
 
@@ -206,7 +206,7 @@ export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
   fx_spark: { idle: { frames: 4, fps: 16, loop: false, dirs: ['s'] } },
   fix_warp: { dormant: one(1, 1), awake: one(1, 1) },
   fix_slab: { closed: one(1, 1), open: one(1, 1) },
-  fix_seal: { closed: one(1, 1), open: one(1, 1) },
+  fix_seal: { dark: one(1, 1), lit: one(1, 1) },
   enemy_haugbui: {
     idle: all(1, 1),
     walk: all(4, 5),

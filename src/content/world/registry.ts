@@ -46,6 +46,17 @@ import { mylReeds } from './myrland/myl_reeds';
 import { mylIntFisher } from './myrland/myl_int_fisher';
 import { mylIntWidow } from './myrland/myl_int_widow';
 import { mylIntCave } from './myrland/myl_int_cave';
+import { hauGully } from './haugar/hau_gully';
+import { hauBarrows } from './haugar/hau_barrows';
+import { hauHeath } from './haugar/hau_heath';
+import { hauCairns } from './haugar/hau_cairns';
+import { hauPass } from './haugar/hau_pass';
+import { hauCircle } from './haugar/hau_circle';
+import { hauHuscarl } from './haugar/hau_huscarl';
+import { hauKing } from './haugar/hau_king';
+import { hauTarn } from './haugar/hau_tarn';
+import { hauWatch } from './haugar/hau_watch';
+import { hauIntStyrr } from './haugar/hau_int_styrr';
 import { d1R01 } from './rotarhellir/d1_r01';
 import { d1R02 } from './rotarhellir/d1_r02';
 import { d1R03 } from './rotarhellir/d1_r03';
@@ -134,6 +145,17 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   myl_int_fisher: mylIntFisher,
   myl_int_widow: mylIntWidow,
   myl_int_cave: mylIntCave,
+  hau_gully: hauGully,
+  hau_barrows: hauBarrows,
+  hau_heath: hauHeath,
+  hau_cairns: hauCairns,
+  hau_pass: hauPass,
+  hau_circle: hauCircle,
+  hau_huscarl: hauHuscarl,
+  hau_king: hauKing,
+  hau_tarn: hauTarn,
+  hau_watch: hauWatch,
+  hau_int_styrr: hauIntStyrr,
   d1_r01: d1R01,
   d1_r02: d1R02,
   d1_r03: d1R03,
