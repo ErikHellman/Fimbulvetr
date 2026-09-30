@@ -28,6 +28,8 @@ export interface ViewStats {
   readonly fog: number;
   /** Burning cover tiles drawn. */
   readonly flames: number;
+  /** Hidden-floor tiles the light shows. */
+  readonly ghosts: number;
   readonly lights: number;
 }
 

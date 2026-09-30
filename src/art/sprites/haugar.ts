@@ -3,7 +3,7 @@ import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
 import { outline } from '../outline';
 import { C } from '../palette';
-import { blit, createRaster, flipX, hex, type Raster } from '../raster';
+import { blit, createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { drawPerson, type Look, type Side } from './people';
 import type { SpriteFrame } from './types';
 
@@ -461,7 +461,17 @@ export function haugarFrames(): SpriteFrame[] {
     ox: 9,
     oy: 9,
   }));
+  // A hidden floor tile as the light shows it: pale flags over the dark, their edges glimmering.
+  const ghost = createRaster(16, 16);
+  const flag: Rgba = [138, 138, 154, 204];
+  const seam: Rgba = [90, 90, 106, 204];
+  rect(ghost, 0, 0, 16, 16, flag);
+  rect(ghost, 0, 7, 16, 1, seam);
+  rect(ghost, 5, 0, 1, 7, seam);
+  rect(ghost, 11, 8, 1, 8, seam);
+  rect(ghost, 0, 0, 16, 1, [200, 232, 240, 204]);
   return [
+    { name: 'fx_ghost_idle_s_0', raster: ghost, ox: 0, oy: 0 },
     ...axes,
     ...archers,
     ...wardens,
@@ -487,6 +497,7 @@ const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fp
 
 export const HAUGAR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fx_arrow: { fly: { frames: 1, fps: 1, loop: true, dirs: ALL } },
+  fx_ghost: { idle: one(1, 1) },
   fx_axe: { fly: { frames: 4, fps: 16, loop: true, dirs: ['s'] } },
   prop_arrow_pot: { idle: one(1, 1) },
   prop_grave_gold: { idle: one(1, 1) },
