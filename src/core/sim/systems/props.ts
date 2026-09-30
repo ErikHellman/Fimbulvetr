@@ -38,6 +38,11 @@ export function burnProp(rt: SimRt, e: Entity): boolean {
   return true;
 }
 
+/** A bomb's blast takes a prop that breaks in one (pots, stones, bomb pots). */
+export function blastProp(rt: SimRt, e: Entity): void {
+  if (propDef(rt, e).blast === true) breakProp(rt, e);
+}
+
 /** Where loot lands around a broken prop, in px (up to eight pieces). */
 const LOOT_SPREAD: readonly { x: number; y: number }[] = [
   { x: -12, y: 0 },
@@ -93,8 +98,14 @@ function carried(rt: SimRt, e: Entity, input: InputFrame): void {
   const hero = rt.hero;
   const state = hero.fsm.s;
   if (state !== 'lift' && state !== 'carry') {
-    // Dropped (hurt, or knocked out of the carry): it falls and is lost.
-    breakProp(rt, e);
+    // Dropped (hurt, or knocked out of the carry): it falls and is lost; a lit bomb falls at Ask's feet.
+    if (propDef(rt, e).fuse === undefined) breakProp(rt, e);
+    else {
+      e.mem['carried'] = 0;
+      e.mem['z'] = 0;
+      e.pos = { ...hero.pos };
+      hero.mem['carrying'] = 0;
+    }
     return;
   }
   const h = rt.db.tuning.hero;

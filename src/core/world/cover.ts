@@ -36,6 +36,8 @@ export interface CoverDef {
   readonly burns?: boolean;
   /** Fire melts it away (Eldr on drifts and ice). */
   readonly melts?: boolean;
+  /** A bomb's blast clears it though a blade cannot (drifts). */
+  readonly blasts?: boolean;
 }
 
 /** What derived cover needs to know about a screen. */

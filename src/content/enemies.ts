@@ -310,4 +310,39 @@ export const ENEMY_DEFS = {
     stunnable: 90,
     drops: { heart: 1, silver: 1, seidr: 3, none: 3 },
   },
+  /**
+   * A mud-crab: its shell turns every blow until a bomb's blast cracks it; then the sword finishes it. It
+   * sidles in to Ask's flank and raises its claws (400 ms) before it pinches.
+   */
+  leirkrabbi: {
+    id: 'leirkrabbi',
+    art: 'enemy_leirkrabbi',
+    hp: 12,
+    body: { x: -8, y: -7, w: 16, h: 7 },
+    hurt: { x: -10, y: -16, w: 20, h: 16 },
+    behaviour: 'leirkrabbi',
+    knockResist: 0.6,
+    immortal: false,
+    solid: false,
+    guard: true,
+    cracks: 'force',
+    needs: ['bombs'],
+    touch: { amount: 1, knock: 2, tags: 0 },
+    attacks: {
+      pinch: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -16, w: 20, h: 16 },
+          w: { x: -20, y: -16, w: 20, h: 16 },
+          s: { x: -12, y: -8, w: 24, h: 18 },
+          n: { x: -12, y: -26, w: 24, h: 18 },
+        },
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    drops: { heart: 2, silver: 2, bombs: 4, none: 2 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

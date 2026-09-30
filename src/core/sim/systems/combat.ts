@@ -23,7 +23,19 @@ import { applyAll } from './story';
  */
 export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult {
   const def = target.kind === 'enemy' ? enemyDef(rt, target) : undefined;
-  const guarded = def?.guard === true || mem(target, 'guard') === 1;
+  const armoured = def?.guard === true && mem(target, 'cracked') !== 1;
+  if (
+    armoured &&
+    def.cracks === hit.element &&
+    target.faction !== hit.faction &&
+    target.iframes === 0 &&
+    mem(target, 'guard') !== 1
+  ) {
+    // The one element that breaks this armour (a bomb on a mud-crab's shell): it is open from now on.
+    target.mem['cracked'] = 1;
+    rt.emit({ t: 'sfx', id: 'sfx_break' });
+  }
+  const guarded = (armoured && mem(target, 'cracked') !== 1) || mem(target, 'guard') === 1;
   if (guarded && target.faction !== hit.faction && target.iframes === 0) {
     // A guarded weak point (a closed core): the blow clinks off.
     target.knock = scale(hit.dir, (hit.knock / 2) * (1 - (def?.knockResist ?? 0)));

@@ -45,6 +45,7 @@ import { bumpLocks, fixtureHazards, refreshFixtures, swordSwitches } from './sys
 import { eat, equip, useItems } from './systems/items';
 import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
+import { stepBombs } from './systems/bombs';
 import { stepProjectiles } from './systems/projectiles';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
@@ -337,6 +338,7 @@ export class Sim implements SimRt {
     collectPickups(this);
     settleCritters(this);
     stepProps(this, input);
+    stepBombs(this);
     resolveSword(this);
     swordProps(this);
     swordSwitches(this);

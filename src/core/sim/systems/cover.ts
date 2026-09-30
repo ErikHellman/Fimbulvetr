@@ -118,6 +118,16 @@ export function blowCover(rt: SimRt, box: Box): void {
   );
 }
 
+/** A blast tears up the cover it reaches: whatever a blade cuts, and drifts (`CoverDef.blasts`). */
+export function blastCover(rt: SimRt, box: Box): void {
+  saveCut(
+    rt,
+    cutBox(rt.screen.cover, box, (k) =>
+      kindIs(rt, k, (id) => rt.db.cover[id].cut !== false || rt.db.cover[id].blasts === true),
+    ),
+  );
+}
+
 function saveCut(rt: SimRt, cut: readonly number[]): void {
   if (cut.length === 0) return;
   rt.state.world.cover[rt.screen.id] = {

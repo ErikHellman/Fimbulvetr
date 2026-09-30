@@ -12,6 +12,7 @@ import { ALPHA_MACHINE } from './alpha';
 import { RIME_RAVEN_MACHINE } from './raven';
 import { VATNORMR_MACHINE } from './worm';
 import { MYRLJOS_MACHINE } from './wisp';
+import { LEIRKRABBI_MACHINE } from './crab';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -26,6 +27,7 @@ const MACHINES = {
   rime_raven: RIME_RAVEN_MACHINE,
   vatnormr: VATNORMR_MACHINE,
   myrljos: MYRLJOS_MACHINE,
+  leirkrabbi: LEIRKRABBI_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -47,6 +49,7 @@ const START: Readonly<Record<BehaviourId, string>> = {
   rime_raven: 'circle',
   vatnormr: 'under',
   myrljos: 'drift',
+  leirkrabbi: 'sidle',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

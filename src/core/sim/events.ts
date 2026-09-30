@@ -28,4 +28,6 @@ export type SimEvent =
   /** The screen should shake (a boss stamping or falling); the shell honours the shake setting. */
   | { readonly t: 'shake'; readonly amount: number }
   /** The boss of the room has fallen (its summons went with it). */
-  | { readonly t: 'bossDead' };
+  | { readonly t: 'bossDead' }
+  /** A bomb went off at (x, y) on the current screen. */
+  | { readonly t: 'blast'; readonly x: number; readonly y: number };

@@ -12,7 +12,7 @@ export const COVER_DEFS = {
   /** Winter snow over all open ground outdoors; the sword clears a path. */
   snow: { id: 'snow', seasons: ['winter'], slow: 0.7, grows: { on: GROUND }, cloak: true },
   /** Deep drifts, drawn on the map (`^`): no blade clears them; fire melts them (Eldr, M2b). */
-  drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false, cloak: true, melts: true },
+  drift: { id: 'drift', seasons: ['winter'], slow: 0.5, cut: false, cloak: true, melts: true, blasts: true },
   /** Spring mud along the water on wet days; it cannot be cleared, only waited out. */
   mud: {
     id: 'mud',

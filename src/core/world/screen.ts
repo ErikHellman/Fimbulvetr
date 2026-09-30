@@ -154,6 +154,18 @@ export type Thing =
       readonly h: number;
       readonly down: Cond;
     }
+  /**
+   * A cracked wall or rock pile: solid until a blast opens it, for good (`id` saved in `world.opened`). A
+   * crack on a room edge is authored in both rooms under one id.
+   */
+  | {
+      readonly k: 'crack';
+      readonly id: string;
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly art: 'wall' | 'rock';
+    }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */

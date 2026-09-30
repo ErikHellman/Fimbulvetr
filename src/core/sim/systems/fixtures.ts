@@ -40,6 +40,7 @@ const KINDS: Readonly<
   gate: { solid: 'on', anims: ['closed', 'open'] },
   fire: { solid: 'never', anims: ['burn', 'out'] },
   chest: { solid: 'on' },
+  crack: { solid: 'on', anims: ['closed', 'open'] },
   lock: { solid: 'on', anims: ['closed', 'open'] },
   shutter: { solid: 'on', anims: ['closed', 'open'] },
   switch: { solid: 'always', anims: ['on', 'off'] },
@@ -68,7 +69,7 @@ function fixture(id: number, def: string, art: string, tile: TilePos, index: num
 }
 
 /**
- * Spawns fixtures: one per tile of a gate, fire, lock or shutter (each tile animates on its own), one per
+ * Spawns fixtures: one per tile of a gate, fire, lock, shutter, bridge or crack (each tile animates on its own), one per
  * chest (open if it was opened before), switch and brazier.
  */
 export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entity[]): void {
@@ -95,8 +96,14 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     case 'fire':
     case 'lock':
     case 'shutter':
-    case 'bridge': {
-      const art = thing.k === 'gate' ? `fix_${thing.art}` : `fix_${thing.k}`;
+    case 'bridge':
+    case 'crack': {
+      const art =
+        thing.k === 'gate'
+          ? `fix_${thing.art}`
+          : thing.k === 'crack'
+            ? `fix_crack_${thing.art}`
+            : `fix_${thing.k}`;
       for (let y = 0; y < thing.h; y++)
         for (let x = 0; x < thing.w; x++)
           out.push(fixture(rt.newId(), thing.k, art, { x: thing.at.x + x, y: thing.at.y + y }, index));
@@ -133,6 +140,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return mem(e, 'wait') !== 1;
     case 'lock':
       return !(doorsOf(rt)?.includes(thing.id) ?? false);
+    case 'crack':
+      return !rt.state.world.opened.includes(thing.id);
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -279,6 +288,24 @@ export function strikeSwitch(rt: SimRt, box: Box): boolean {
   const thing = thingOf(rt, e);
   if (thing?.k === 'switch' && thing.set !== undefined) rt.state.flags[thing.set] = true;
   rt.emit({ t: 'sfx', id: 'sfx_switch' });
+  return true;
+}
+
+/** Opens every cracked wall or rock under `box` (a blast), for good. Returns whether one was opened. */
+export function openCracks(rt: SimRt, box: Box): boolean {
+  const opened = rt.state.world.opened;
+  let any = false;
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || e.def !== 'crack' || mem(e, 'on') !== 1) continue;
+    if (!overlaps(box, at(e.hurt, e.pos))) continue;
+    const thing = thingOf(rt, e);
+    if (thing?.k !== 'crack' || opened.includes(thing.id)) continue;
+    opened.push(thing.id);
+    any = true;
+  }
+  if (!any) return false;
+  rt.emit({ t: 'sfx', id: 'sfx_secret' });
+  refreshFixtures(rt);
   return true;
 }
 

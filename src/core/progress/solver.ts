@@ -3,6 +3,7 @@ import type { ScreenId } from '@content/world/screens';
 import type { Season } from '../clock/types';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { ContentDb } from '../sim/db';
+import { owns } from '../items/defs';
 import { dungeonOf } from '../state/dungeons';
 import type { GameState } from '../state/gameState';
 import { cloneState } from '../state/save';
@@ -286,6 +287,8 @@ function solidThing(
       return true;
     case 'lock':
       return !doors().includes(t.id);
+    case 'crack':
+      return !state.world.opened.includes(t.id);
     case 'shutter': {
       if (!evalCond(t.when, ctx)) return false;
       if (t.id !== undefined && doors().includes(t.id)) return false;
@@ -527,6 +530,18 @@ function gather(w: World, node: Node): boolean {
           if (!besideReach(w, reach, id, t.at.x, t.at.y) && !throwable(w, state, reach, id, t.at.x, t.at.y))
             return;
           state.flags[t.set] = true;
+          changed = true;
+          return;
+        }
+        case 'crack': {
+          // Bombs, once owned, are never used up: every crack beside the reach can be blown open.
+          if (state.world.opened.includes(t.id) || !owns(state.inv.items, 'bombs')) return;
+          let near = false;
+          for (let dy = 0; dy < t.h && !near; dy++)
+            for (let dx = 0; dx < t.w && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
+          state.world.opened.push(t.id);
           changed = true;
           return;
         }

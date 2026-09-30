@@ -161,6 +161,11 @@ describe('enemies', () => {
       item_big_key: ['idle'],
       item_dungeon_map: ['idle'],
       item_compass: ['idle'],
+      enemy_leirkrabbi: ['idle', 'walk', 'tell', 'pinch', 'hurt'],
+      prop_bomb: ['idle', 'fuse', 'blink'],
+      prop_bomb_pot: ['idle'],
+      fix_crack_wall: ['closed', 'open'],
+      fix_crack_rock: ['closed', 'open'],
     };
     for (const [art, anims] of Object.entries(used))
       for (const anim of anims) expect(ANIMS[art]?.[anim], `${art} ${anim}`).toBeDefined();
@@ -169,6 +174,21 @@ describe('enemies', () => {
   it('has art for every enemy the content names', async () => {
     const { ENEMY_DEFS } = await import('@content/enemies');
     for (const d of Object.values(ENEMY_DEFS)) expect(ANIMS[d.art], d.art).toBeDefined();
+  });
+
+  it('sparks a lit fuse and flashes a bomb about to go off', () => {
+    expect(ANIMS['prop_bomb']?.['fuse']?.frames).toBe(2);
+    expect(rastersEqual(frame('prop_bomb_fuse_s_0').raster, frame('prop_bomb_fuse_s_1').raster)).toBe(false);
+    expect(rastersEqual(frame('prop_bomb_blink_s_0').raster, frame('prop_bomb_blink_s_1').raster)).toBe(
+      false,
+    );
+  });
+
+  it('draws a crack whole and blown open', () => {
+    for (const art of ['fix_crack_wall', 'fix_crack_rock'])
+      expect(rastersEqual(frame(`${art}_closed_s_0`).raster, frame(`${art}_open_s_0`).raster), art).toBe(
+        false,
+      );
   });
 
   it('shows the draugr rising out of the ground', () => {

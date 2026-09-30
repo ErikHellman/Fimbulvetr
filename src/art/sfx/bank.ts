@@ -485,4 +485,24 @@ export const SFX_BANK = {
     release: 0.1,
     volume: 0.3,
   },
+  /** A bomb going off: a deep, falling roar of noise. */
+  sfx_bomb: {
+    wave: 'noise',
+    freq: 700,
+    freqEnd: 60,
+    attack: 0.003,
+    sustain: 0.12,
+    release: 0.45,
+    volume: 0.5,
+  },
+  /** A fuse lit: a short hiss. */
+  sfx_fuse: {
+    wave: 'noise',
+    freq: 5200,
+    freqEnd: 3800,
+    attack: 0.01,
+    sustain: 0.08,
+    release: 0.08,
+    volume: 0.18,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

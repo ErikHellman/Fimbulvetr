@@ -77,6 +77,7 @@ export const ENEMIES = [
   'rime_raven',
   'vatnormr',
   'myrljos',
+  'leirkrabbi',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -130,6 +131,8 @@ export const SFX = [
   'sfx_reel',
   'sfx_snap',
   'sfx_splash',
+  'sfx_bomb',
+  'sfx_fuse',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -242,6 +245,8 @@ export const PROPS = [
   'vines',
   'troll_stone',
   'bramble',
+  'bomb',
+  'bomb_pot',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 
