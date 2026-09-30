@@ -119,6 +119,9 @@ export const FLAGS = {
   n_hildr_met: { t: 'bool' },
   n_geirmundr_met: { t: 'bool' },
   n_hallsteinn_met: { t: 'bool' },
+  /** Haugar's eyes, opened by arrows: the great cairn's door and the watchtower's bridge. */
+  w_hau_cairn: { t: 'bool' },
+  w_hau_watch: { t: 'bool' },
   /** Konungshaugr's latches, struck by arrows: the bridges over the pits are down for good. */
   w_d3_r05: { t: 'bool' },
   w_d3_r10: { t: 'bool' },

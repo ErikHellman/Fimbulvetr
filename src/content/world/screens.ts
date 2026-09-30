@@ -63,6 +63,7 @@ export const SCREEN_IDS = [
   'hau_tarn',
   'hau_watch',
   'hau_int_styrr',
+  'hau_int_cairn',
   'd1_r01',
   'd1_r02',
   'd1_r03',

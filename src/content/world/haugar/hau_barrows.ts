@@ -6,6 +6,15 @@ export const hauBarrows: ScreenDef = {
   purpose:
     "The barrow field: grave mounds where the dead climb out at night, a great grave-hill whose cracked flank hides a piece of heart, and Geirmundr's tent by the road.",
   things: [
+    /** Geirmundr's tent: his wares by day. */
+    {
+      k: 'use',
+      at: { x: 11, y: 16 },
+      w: 3,
+      h: 2,
+      script: 'shop_geirmundr',
+      when: { k: 'not', c: { k: 'phase', is: 'night' } },
+    },
     /** The cracked flank of the eastern grave-hill: a bomb opens the hollow and its piece of heart. */
     { k: 'crack', id: 'hau_k_barrows', at: { x: 31, y: 8 }, w: 1, h: 1, art: 'rock' },
     { k: 'piece', id: 'hp_hau_barrows', at: { x: 31, y: 4 } },

@@ -79,11 +79,13 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
         { id: 'vargr', weight: 2, time: 'day' },
         { id: 'haugbui', weight: 3, time: 'night' },
         { id: 'draugr', weight: 2, time: 'night' },
+        { id: 'bogdraugr', weight: 1, time: 'night' },
       ],
       autumn: [
         { id: 'vargr', weight: 2, time: 'day' },
         { id: 'haugbui', weight: 3, time: 'night' },
         { id: 'draugr', weight: 2, time: 'night' },
+        { id: 'bogdraugr', weight: 1, time: 'night' },
       ],
       winter: [
         { id: 'vargr', weight: 3, time: 'day' },

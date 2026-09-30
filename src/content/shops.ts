@@ -21,6 +21,7 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'mead_green', price: 25 },
       { item: 'horn', price: 40, when: { k: 'not', c: { k: 'item', id: 'horn', gte: 2 } } },
       { item: 'bombs', n: 5, price: 20, when: { k: 'owns', id: 'bombs' } },
+      { item: 'arrows', n: 10, price: 15, when: { k: 'owns', id: 'bow' } },
     ],
   },
   /** The völva's brews: blue mead once she has her fen-moss. */
@@ -31,6 +32,15 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'mead_red', price: 20 },
       { item: 'mead_green', price: 25 },
       { item: 'mead_blue', price: 40, when: { k: 'flag', id: 'q_volva_done' } },
+    ],
+  },
+  /** Geirmundr's honest pots, and arrows once Ask carries a bow. */
+  geirmundr: {
+    id: 'geirmundr',
+    name: { en: 'Geirmundr’s camp', sv: 'Geirmundrs läger' },
+    stock: [
+      { item: 'mead_red', price: 25 },
+      { item: 'arrows', n: 10, price: 15, when: { k: 'owns', id: 'bow' } },
     ],
   },
   ketill: {

@@ -83,6 +83,14 @@ const styrrRest: ScriptDef = {
   ],
 };
 
+/** Geirmundr's wares, from the mouth of his tent. */
+const shopGeirmundr: ScriptDef = {
+  steps: [
+    { k: 'talk', dialogue: 'geirmundr', with: 'geirmundr' },
+    { k: 'shop', id: 'geirmundr' },
+  ],
+};
+
 /** The first steps into Konungshaugr. */
 const d3Enter: ScriptDef = {
   steps: [
@@ -159,9 +167,19 @@ const stone3Light: ScriptDef = {
 };
 
 export const HAUGAR_SCRIPTS: Readonly<
-  Record<'warp_stone' | 'hau_arrive' | 'barrow_open' | 'styrr_rest' | 'd3_enter' | 'stone3_light', ScriptDef>
+  Record<
+    | 'warp_stone'
+    | 'hau_arrive'
+    | 'barrow_open'
+    | 'styrr_rest'
+    | 'd3_enter'
+    | 'stone3_light'
+    | 'shop_geirmundr',
+    ScriptDef
+  >
 > = {
   d3_enter: d3Enter,
+  shop_geirmundr: shopGeirmundr,
   stone3_light: stone3Light,
   warp_stone: warpStone,
   hau_arrive: hauArrive,

@@ -4,8 +4,13 @@ export const hauWatch: ScreenDef = {
   id: 'hau_watch',
   region: 'haugar',
   purpose:
-    'A ruined watchtower on the far side of a mountain stream in its gorge. From the near bank Ask can only look (the way over comes with the bow, in M4b).',
-  things: [],
+    'A ruined watchtower on the far side of a mountain stream in its gorge. An eye carved on the far bank lowers the old bridge when an arrow opens it; a piece of heart lies in the tower.',
+  things: [
+    /** An eye on the far bank lowers the old bridge across the gorge. */
+    { k: 'switch', at: { x: 25, y: 8 }, set: 'w_hau_watch', eye: true },
+    { k: 'bridge', at: { x: 21, y: 14 }, w: 4, h: 2, down: { k: 'flag', id: 'w_hau_watch', eq: true } },
+    { k: 'piece', id: 'hp_hau_watch', at: { x: 31, y: 6 } },
+  ],
   /** Where Haugar's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 6, y: 7 },

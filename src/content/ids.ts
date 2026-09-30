@@ -218,7 +218,7 @@ export const QUESTS = [
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr'] as const;
+export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'geirmundr'] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
@@ -256,6 +256,7 @@ export const SCRIPTS = [
   'styrr_rest',
   'd3_enter',
   'stone3_light',
+  'shop_geirmundr',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

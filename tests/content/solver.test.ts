@@ -238,8 +238,8 @@ describe('the progression solver on Mýrland, in every season', () => {
   });
 });
 
-/** Haugar's overworld and Styrr's cottage. */
-const haugar = SCREEN_IDS.filter((id) => id.startsWith('hau_'));
+/** Haugar's overworld and Styrr's cottage, but for the great cairn (an eye opens it to the bow, M4b). */
+const haugar = SCREEN_IDS.filter((id) => id.startsWith('hau_') && id !== 'hau_int_cairn');
 
 /** Where M3 leaves Ask, in the birch glade by the path east (preset `hau`); `bombs` false takes them. */
 function inTheGlade(bombs = true): GameState {
@@ -278,6 +278,19 @@ describe('the progression solver on Haugar, in every season', () => {
     expect(r.pieces).toEqual(expect.arrayContaining(['hp_hau_barrows', 'hp_hau_tarn']));
     expect(r.scripts).toContain('styrr_rest');
     expect(r.stranded).toEqual([]);
+  });
+
+  it.each(SEASONS)('%s: the cairn’s quiver and the watchtower’s piece wait for the bow', (season) => {
+    const r = solveHaugar(season);
+    expect(r.screens).not.toContain('hau_int_cairn');
+    expect(r.pieces).not.toContain('hp_hau_watch');
+    const bow = inTheGlade();
+    bow.inv.items.bow = 1;
+    const b = solve(DB, bow, nothing, { season });
+    expect(b.screens).toContain('hau_int_cairn');
+    expect(b.opened).toContain('hau_c_quiver');
+    expect(b.pieces).toContain('hp_hau_watch');
+    expect(b.stranded).toEqual([]);
   });
 
   it('fetches the tarn’s piece with the boomerang, or over winter ice', () => {

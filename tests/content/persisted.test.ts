@@ -90,6 +90,8 @@ const PERSISTED = [
   'd3_sh_r09e',
   'd3_sh_r20',
   'd3_k_r18',
+  'hau_c_quiver',
+  'hp_hau_watch',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

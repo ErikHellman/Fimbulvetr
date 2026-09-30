@@ -57,6 +57,7 @@ import { hauKing } from './haugar/hau_king';
 import { hauTarn } from './haugar/hau_tarn';
 import { hauWatch } from './haugar/hau_watch';
 import { hauIntStyrr } from './haugar/hau_int_styrr';
+import { hauIntCairn } from './haugar/hau_int_cairn';
 import { d1R01 } from './rotarhellir/d1_r01';
 import { d1R02 } from './rotarhellir/d1_r02';
 import { d1R03 } from './rotarhellir/d1_r03';
@@ -176,6 +177,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   hau_tarn: hauTarn,
   hau_watch: hauWatch,
   hau_int_styrr: hauIntStyrr,
+  hau_int_cairn: hauIntCairn,
   d1_r01: d1R01,
   d1_r02: d1R02,
   d1_r03: d1R03,
