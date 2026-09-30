@@ -86,5 +86,12 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Solver proofs in every season, route, e2e, v1-m3a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M3b Sökkva Kvern: water levels, bombs, cracks, the big lock, 16 rooms, Lindormr, Mýrland's bomb secrets
+    - [x] Bombs as ammunition, the blast, cracks, the mud-crab
+    - [x] Water levels (sluices, race planks, mill wheels), the big lock, the solver over water levels
+    - [x] Lindormr and its mud mounds
+    - [x] Art and shell: mill terrains, the water overlay, bombs, cracks, wheels, the blast, the bomb count
+    - [x] Content: 16 rooms, the mill door, `q_runestone_2` to the second stone, the springs' cave and bomb bag, the peat's piece, bombs for sale
+    - [x] Solver proofs over every water level, route, e2e, v1-m3b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
