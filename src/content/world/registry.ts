@@ -85,6 +85,26 @@ import { d2R13 } from './sokkva/d2_r13';
 import { d2R14 } from './sokkva/d2_r14';
 import { d2R15 } from './sokkva/d2_r15';
 import { d2R16 } from './sokkva/d2_r16';
+import { d3R01 } from './konungshaugr/d3_r01';
+import { d3R02 } from './konungshaugr/d3_r02';
+import { d3R03 } from './konungshaugr/d3_r03';
+import { d3R04 } from './konungshaugr/d3_r04';
+import { d3R05 } from './konungshaugr/d3_r05';
+import { d3R06 } from './konungshaugr/d3_r06';
+import { d3R07 } from './konungshaugr/d3_r07';
+import { d3R08 } from './konungshaugr/d3_r08';
+import { d3R09 } from './konungshaugr/d3_r09';
+import { d3R10 } from './konungshaugr/d3_r10';
+import { d3R11 } from './konungshaugr/d3_r11';
+import { d3R12 } from './konungshaugr/d3_r12';
+import { d3R13 } from './konungshaugr/d3_r13';
+import { d3R14 } from './konungshaugr/d3_r14';
+import { d3R15 } from './konungshaugr/d3_r15';
+import { d3R16 } from './konungshaugr/d3_r16';
+import { d3R17 } from './konungshaugr/d3_r17';
+import { d3R18 } from './konungshaugr/d3_r18';
+import { d3R19 } from './konungshaugr/d3_r19';
+import { d3R20 } from './konungshaugr/d3_r20';
 import type { ScreenDef } from '@core/world/screen';
 import type { ScreenId } from './screens';
 import { testA } from './testlands/test_a';
@@ -184,4 +204,24 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d2_r14: d2R14,
   d2_r15: d2R15,
   d2_r16: d2R16,
+  d3_r01: d3R01,
+  d3_r02: d3R02,
+  d3_r03: d3R03,
+  d3_r04: d3R04,
+  d3_r05: d3R05,
+  d3_r06: d3R06,
+  d3_r07: d3R07,
+  d3_r08: d3R08,
+  d3_r09: d3R09,
+  d3_r10: d3R10,
+  d3_r11: d3R11,
+  d3_r12: d3R12,
+  d3_r13: d3R13,
+  d3_r14: d3R14,
+  d3_r15: d3R15,
+  d3_r16: d3R16,
+  d3_r17: d3R17,
+  d3_r18: d3R18,
+  d3_r19: d3R19,
+  d3_r20: d3R20,
 };

@@ -256,6 +256,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         },
       },
       {
+        when: flag('st_d3_entered'),
+        text: {
+          en: 'Konungshaugr: find the way down to the King under the hill. Take nothing that wakes the dead, unless you mean to.',
+          sv: 'Konungshaugr: hitta vägen ner till kungen under kullen. Ta inget som väcker de döda, om du inte menar det.',
+        },
+      },
+      {
+        when: flag('st_d3_boss_dead'),
+        text: {
+          en: 'The Haugbúi King is dust. Lay a hand on the runestone beyond his hall.',
+          sv: 'Högbokungen är stoft. Lägg handen på runstenen bortom hans sal.',
+        },
+      },
+      {
         when: flag('st_stone3_lit'),
         text: {
           en: 'The third runestone burns again. The pass knows it.',

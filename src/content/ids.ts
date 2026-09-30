@@ -254,6 +254,8 @@ export const SCRIPTS = [
   'hau_arrive',
   'barrow_open',
   'styrr_rest',
+  'd3_enter',
+  'stone3_light',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

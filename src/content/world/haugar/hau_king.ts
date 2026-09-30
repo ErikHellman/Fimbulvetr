@@ -6,6 +6,9 @@ export const hauKing: ScreenDef = {
   purpose:
     "Konungshaugr, the King's Barrow: a great grave-hill with a stone door on its south face, shut until the barrow-watch is kept. At night, with Styrr's word, the dead come out of their mounds to guard it.",
   things: [
+    /** Through the open door, down into Konungshaugr. */
+    { k: 'door', at: { x: 19, y: 10 }, dir: 'n', to: 'd3_r01', arrive: { x: 19, y: 18 }, facing: 'n' },
+    { k: 'door', at: { x: 20, y: 10 }, dir: 'n', to: 'd3_r01', arrive: { x: 20, y: 18 }, facing: 'n' },
     /** The barrow's door: shut until the watch is kept. */
     {
       k: 'gate',

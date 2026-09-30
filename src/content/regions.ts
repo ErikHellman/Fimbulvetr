@@ -17,7 +17,7 @@ export const REGION_NAMES = {
 export const DUNGEON_NAMES = {
   d1: { en: 'Rótarhellir', sv: 'Rótarhellir' },
   d2: { en: 'Sökkva Kvern', sv: 'Sökkva Kvern' },
-  d3: { en: 'The third hall', sv: 'Den tredje salen' },
+  d3: { en: 'Konungshaugr', sv: 'Konungshaugr' },
   d4: { en: 'The fourth hall', sv: 'Den fjärde salen' },
   d5: { en: 'The fifth hall', sv: 'Den femte salen' },
   d6: { en: 'The sixth hall', sv: 'Den sjätte salen' },

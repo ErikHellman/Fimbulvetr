@@ -119,6 +119,16 @@ export const FLAGS = {
   n_hildr_met: { t: 'bool' },
   n_geirmundr_met: { t: 'bool' },
   n_hallsteinn_met: { t: 'bool' },
+  /** Konungshaugr's latches, struck by arrows: the bridges over the pits are down for good. */
+  w_d3_r05: { t: 'bool' },
+  w_d3_r10: { t: 'bool' },
+  w_d3_r12: { t: 'bool' },
+  w_d3_r14: { t: 'bool' },
+  w_d3_r15: { t: 'bool' },
+  /** Ask went down into Konungshaugr. */
+  st_d3_entered: { t: 'bool' },
+  /** The Haugbúi King is dead (set by his death). */
+  st_d3_boss_dead: { t: 'bool' },
   /** Haugvörðr, the barrow-warden, is dead (set by its death): it never rises again. */
   st_d3_warden: { t: 'bool' },
   /** The third runestone is lit: M4's goal. */

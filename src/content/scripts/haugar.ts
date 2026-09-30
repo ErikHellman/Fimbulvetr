@@ -83,9 +83,86 @@ const styrrRest: ScriptDef = {
   ],
 };
 
+/** The first steps into Konungshaugr. */
+const d3Enter: ScriptDef = {
+  steps: [
+    { k: 'do', effects: [{ k: 'set', flag: 'st_d3_entered', value: true }] },
+    {
+      k: 'say',
+      who: 'ask',
+      text: {
+        en: 'Cold air, old smoke, and gold gleaming in the dark. Nothing down here is asleep for good.',
+        sv: 'Kall luft, gammal rök och guld som glimmar i mörkret. Inget här nere sover för gott.',
+      },
+    },
+  ],
+};
+
+/**
+ * The Haugbúi King is dust: Ask lights the third runestone and learns Farvegr from it. Kolbeinn's king
+ * stirs; Ask comes out by the barrow's door, and M4 ends.
+ */
+const stone3Light: ScriptDef = {
+  steps: [
+    {
+      k: 'do',
+      effects: [
+        { k: 'set', flag: 'st_stone3_lit', value: true },
+        { k: 'learn', galdr: 'farvegr' },
+        { k: 'sfx', id: 'sfx_warp' },
+      ],
+    },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Ask lays a hand on the stone. The runes wake one by one, and each is a road: a song of every place a warp stone stands.',
+        sv: 'Ask lägger handen på stenen. Runorna vaknar en efter en, och var och en är en väg: en sång om varje plats där en färdsten står.',
+      },
+    },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'You learned Farvegr, the way-song! Ready it in the menu, and sing it under the open sky to walk to any warp stone you have woken.',
+        sv: 'Du lärde dig Farvegr, vägsången! Gör den redo i menyn och sjung den under bar himmel för att gå till vilken färdsten du än har väckt.',
+      },
+    },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Three stones awake. In the north, a door of stone grows warm.',
+        sv: 'Tre stenar vakna. I norr blir en dörr av sten varm.',
+      },
+    },
+    { k: 'fade', out: true },
+    {
+      k: 'card',
+      text: {
+        en: 'In the hall of ice, the empty throne is empty no longer.',
+        sv: 'I isens sal är den tomma tronen inte längre tom.',
+      },
+    },
+    {
+      k: 'say',
+      who: 'kolbeinn',
+      text: {
+        en: 'All three, my king. Let the boy open the pass for us. We will be waiting on the other side.',
+        sv: 'Alla tre, min konung. Låt pojken öppna passet åt oss. Vi väntar på andra sidan.',
+      },
+    },
+    { k: 'warp', screen: 'hau_king', at: { x: 20, y: 12 }, facing: 's' },
+    { k: 'fade', out: false },
+    { k: 'card', text: { en: 'To be continued.', sv: 'Fortsättning följer.' } },
+  ],
+};
+
 export const HAUGAR_SCRIPTS: Readonly<
-  Record<'warp_stone' | 'hau_arrive' | 'barrow_open' | 'styrr_rest', ScriptDef>
+  Record<'warp_stone' | 'hau_arrive' | 'barrow_open' | 'styrr_rest' | 'd3_enter' | 'stone3_light', ScriptDef>
 > = {
+  d3_enter: d3Enter,
+  stone3_light: stone3Light,
   warp_stone: warpStone,
   hau_arrive: hauArrive,
   barrow_open: barrowOpen,

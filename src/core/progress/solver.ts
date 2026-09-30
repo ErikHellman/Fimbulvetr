@@ -499,14 +499,21 @@ function steps(w: World, t: number, ground: Ground, level: number): number[] {
 
 const has = (state: GameState, item: ItemId): boolean => (state.inv.items[item] ?? 0) > 0;
 
-/** A reachable tile orthogonally next to (x, y): close enough to open, strike or light it. */
+/**
+ * A reachable tile orthogonally next to (x, y) on the same screen: close enough to open, strike or light
+ * it. Off-screen neighbours never count (a tile number off the left edge would wrap to the row above).
+ */
 function besideReach(w: World, reach: ReadonlySet<number>, id: ScreenId, x: number, y: number): boolean {
   return [
     [1, 0],
     [-1, 0],
     [0, 1],
     [0, -1],
-  ].some(([dx = 0, dy = 0]) => reach.has(w.tile(id, x + dx, y + dy)));
+  ].some(([dx = 0, dy = 0]) => {
+    const nx = x + dx;
+    const ny = y + dy;
+    return nx >= 0 && ny >= 0 && nx < SCREEN_COLS && ny < SCREEN_ROWS && reach.has(w.tile(id, nx, ny));
+  });
 }
 
 /** Whether the boomerang can reach tile (x, y) from somewhere reachable on its screen: over floor or low. */
@@ -524,8 +531,8 @@ function throwable(
     for (let k = 1; k <= FETCH_TILES; k++) {
       const fx = x - dx * k;
       const fy = y - dy * k;
-      if (reach.has(w.tile(id, fx, fy))) return true;
       const tr = w.terrain(id, fx, fy);
+      if (tr !== null && reach.has(w.tile(id, fx, fy))) return true;
       if (tr === null || (tr.solid && !tr.low) || blocked.has(w.tile(id, fx, fy))) break;
     }
   return false;
@@ -555,8 +562,8 @@ function shootable(
     for (let k = 1; k <= ARROW_TILES; k++) {
       const fx = x - dx * k;
       const fy = y - dy * k;
-      if (reach.has(w.tile(id, fx, fy))) return true;
       const tr = w.terrain(id, fx, fy);
+      if (tr !== null && reach.has(w.tile(id, fx, fy))) return true;
       if (tr === null || (tr.solid && !tr.low) || blocked.has(w.tile(id, fx, fy))) break;
     }
   return false;
