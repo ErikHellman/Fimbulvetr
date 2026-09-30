@@ -162,6 +162,8 @@ describe('enemies', () => {
       item_dungeon_map: ['idle'],
       item_compass: ['idle'],
       enemy_leirkrabbi: ['idle', 'walk', 'tell', 'pinch', 'hurt'],
+      enemy_lindormr: ['hidden', 'tell', 'rear', 'roar', 'ripple', 'dazed', 'coil', 'charge', 'burrow'],
+      enemy_lind_mound: ['idle', 'bubble'],
       prop_bomb: ['idle', 'fuse', 'blink'],
       prop_bomb_pot: ['idle'],
       fix_wheel: ['on', 'off'],

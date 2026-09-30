@@ -202,6 +202,93 @@ function bigLock(open: boolean): Raster {
   return outline(r, INK, 1);
 }
 
+// ── Lindormr: 48×48, its feet at (24, 44); and its mud mounds, 28×24, feet at (14, 21) ──────────────
+
+const SCALE = hex('#3f5a44');
+const SCALE_SHADE = hex('#2a3d2e');
+const SCALE_LIGHT = hex('#6f8f5a');
+const BELLY = hex('#c9b98a');
+const FANG = hex('#f0ead0');
+const MUD = hex(C.mud);
+const MUD_SHADE = hex(C.mudShade);
+const MUD_LIGHT = hex(C.mudLight);
+
+type WormPose = 'hidden' | 'tell' | 'rear' | 'roar' | 'ripple' | 'dazed' | 'coil' | 'charge' | 'burrow';
+
+/** Mud rings round where it breaks the surface. */
+function mudRing(r: Raster, wide: number): void {
+  ellipse(r, 24, 42, wide, 3, MUD_SHADE);
+  ellipse(r, 24, 42, wide - 3, 2, MUD);
+}
+
+function serpent(side: 'front' | 'back' | 'side', pose: WormPose): Raster {
+  const r = createRaster(48, 48);
+  if (pose === 'hidden') {
+    ellipse(r, 20, 40, 1.5, 1.5, MUD_LIGHT);
+    ellipse(r, 27, 42, 1, 1, MUD_LIGHT);
+    return outline(r, INK, 1);
+  }
+  if (pose === 'ripple') {
+    mudRing(r, 14);
+    ellipse(r, 24, 42, 7, 1.5, MUD_LIGHT);
+    return outline(r, INK, 1);
+  }
+  const lying = pose === 'dazed' || pose === 'charge';
+  if (pose === 'coil') {
+    mudRing(r, 16);
+    ellipse(r, 24, 36, 14, 7, SCALE_SHADE);
+    ellipse(r, 24, 34, 11, 5, SCALE);
+    ellipse(r, 24, 30, 7, 4, SCALE_LIGHT);
+  } else if (lying) {
+    // Stretched along the ground, the head forward.
+    ellipse(r, 22, 39, 18, 4, SCALE_SHADE);
+    ellipse(r, 22, 37, 16, 3, SCALE);
+  } else {
+    mudRing(r, pose === 'burrow' ? 16 : 13);
+    const top = pose === 'tell' ? 20 : pose === 'burrow' ? 30 : 10;
+    for (let y = top + 8; y < 42; y++) {
+      const sway = Math.round(Math.sin((y - top) / 5) * 2);
+      rect(r, 19 + sway, y, 10, 1, SCALE);
+      rect(r, 26 + sway, y, 3, 1, SCALE_SHADE);
+      if (side === 'front') rect(r, 22 + sway, y, 4, 1, BELLY);
+    }
+  }
+  // The head.
+  const hx = lying ? 38 : 24;
+  const hy = lying ? 35 : pose === 'coil' ? 24 : pose === 'tell' ? 20 : pose === 'burrow' ? 30 : 10;
+  ellipse(r, hx, hy + 3, 7, 5, (_x, y) => (y > hy + 5 ? SCALE_SHADE : SCALE));
+  if (side !== 'back') {
+    const eye = pose === 'dazed' ? SCALE_SHADE : hex('#e8d24a');
+    rect(r, hx - 4, hy + 1, 2, 2, eye);
+    rect(r, hx + 2, hy + 1, 2, 2, eye);
+    if (pose === 'rear' || pose === 'roar' || pose === 'charge') {
+      const gape = pose === 'roar' ? 4 : 2;
+      rect(r, hx - 3, hy + 5, 6, gape, hex('#5a1f1f'));
+      rect(r, hx - 3, hy + 5, 1, 2, FANG);
+      rect(r, hx + 2, hy + 5, 1, 2, FANG);
+    }
+  }
+  if (pose === 'dazed')
+    for (const [x, y] of [
+      [hx - 6, hy - 4],
+      [hx + 5, hy - 5],
+    ] as const)
+      rect(r, x, y, 2, 2, SPARK);
+  return outline(r, INK, 1);
+}
+
+/** A mound of grey mud; bubbling while the serpent hides in it. */
+function mound(bubble: number | null): Raster {
+  const r = createRaster(28, 24);
+  ellipse(r, 14, 15, 11, 6.5, (_x, y) => (y > 16 ? MUD_SHADE : MUD));
+  ellipse(r, 11, 12, 4, 2, MUD_LIGHT);
+  if (bubble !== null) {
+    ellipse(r, 10 + bubble * 5, 9 - bubble, 2, 2, MUD_LIGHT);
+    rect(r, 16 - bubble * 3, 8 + bubble, 2, 2, MUD_LIGHT);
+  }
+  return outline(r, INK, 1);
+}
+
 export function sokkvaFrames(): SpriteFrame[] {
   const prop = (name: string, raster: Raster): SpriteFrame => ({
     name,
@@ -230,8 +317,34 @@ export function sokkvaFrames(): SpriteFrame[] {
     add('pinch', 0, 'snap');
     add('hurt', 0, 'hurt');
   }
+  const worm: SpriteFrame[] = [];
+  const wormPoses: readonly (readonly [string, WormPose])[] = [
+    ['idle', 'rear'],
+    ['hidden', 'hidden'],
+    ['tell', 'tell'],
+    ['rear', 'rear'],
+    ['roar', 'roar'],
+    ['ripple', 'ripple'],
+    ['dazed', 'dazed'],
+    ['coil', 'coil'],
+    ['charge', 'charge'],
+    ['burrow', 'burrow'],
+  ];
+  for (const [dir, side] of views)
+    for (const [anim, pose] of wormPoses) {
+      const raster = serpent(side, pose);
+      worm.push({ name: `enemy_lindormr_${anim}_${dir}_0`, raster, ox: 24, oy: 44 });
+      if (dir === 'w')
+        worm.push({ name: `enemy_lindormr_${anim}_e_0`, raster: flipX(raster), ox: 24, oy: 44 });
+    }
+  for (const dir of ALL) {
+    worm.push({ name: `enemy_lind_mound_idle_${dir}_0`, raster: mound(null), ox: 14, oy: 21 });
+    worm.push({ name: `enemy_lind_mound_bubble_${dir}_0`, raster: mound(0), ox: 14, oy: 21 });
+    worm.push({ name: `enemy_lind_mound_bubble_${dir}_1`, raster: mound(1), ox: 14, oy: 21 });
+  }
   return [
     ...crabs,
+    ...worm,
     prop('prop_bomb_idle_s_0', bomb('rest')),
     prop('prop_bomb_fuse_s_0', bomb('rest')),
     prop('prop_bomb_fuse_s_1', bomb('spark')),
@@ -255,6 +368,19 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const all = (frames: number, fps: number): AnimDef => ({ frames, fps, loop: true, dirs: ALL });
 
 export const SOKKVA_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  enemy_lindormr: {
+    idle: all(1, 1),
+    hidden: all(1, 1),
+    tell: all(1, 1),
+    rear: all(1, 1),
+    roar: all(1, 1),
+    ripple: all(1, 1),
+    dazed: all(1, 1),
+    coil: all(1, 1),
+    charge: all(1, 1),
+    burrow: all(1, 1),
+  },
+  enemy_lind_mound: { idle: all(1, 1), bubble: all(2, 6) },
   enemy_leirkrabbi: { idle: all(1, 1), walk: all(2, 8), tell: all(1, 1), pinch: all(1, 1), hurt: all(1, 1) },
   prop_bomb: { idle: one(1, 1), fuse: one(2, 6), blink: one(2, 12) },
   prop_bomb_pot: { idle: one(1, 1) },

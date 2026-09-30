@@ -345,4 +345,46 @@ export const ENEMY_DEFS = {
     },
     drops: { heart: 2, silver: 2, bombs: 4, none: 2 },
   },
+  /**
+   * Lindormr, the serpent that sank the mill: it hides in its mud mounds, rears (400 ms) and spits. Only a
+   * bomb on the mound it hides in flushes it out, stunned and open to the blade (see lindormr.ts).
+   */
+  lindormr: {
+    id: 'lindormr',
+    art: 'enemy_lindormr',
+    hp: 24,
+    body: { x: -12, y: -8, w: 24, h: 8 },
+    hurt: { x: -14, y: -34, w: 28, h: 34 },
+    behaviour: 'lindormr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    attacks: {
+      charge: {
+        from: 0,
+        to: 149,
+        boxes: around({ x: -14, y: -26, w: 28, h: 26 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    boss: { name: { en: 'Lindormr', sv: 'Lindormr' } },
+    needs: ['bombs'],
+  },
+  /** One of Lindormr's mud mounds: the blade only sinks in; a blast blows it apart, and bombs spill out. */
+  lind_mound: {
+    id: 'lind_mound',
+    art: 'enemy_lind_mound',
+    hp: 1,
+    body: { x: -10, y: -10, w: 20, h: 10 },
+    hurt: { x: -11, y: -16, w: 22, h: 16 },
+    behaviour: 'lind_mound',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    guard: true,
+    cracks: 'force',
+    drops: { heart: 0, silver: 0, bombs: 1, none: 0 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;
