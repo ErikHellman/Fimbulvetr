@@ -5,6 +5,7 @@ import type { SimRt } from '../rt';
 import { lightBrazier } from './fixtures';
 import { throwBoomerang } from './projectiles';
 import { probeBox } from './story';
+import { owns } from '../../items/defs';
 
 /** What an item does when its slot button is pressed in play; returns whether it was used. */
 export type ItemUse = (rt: SimRt, input: InputFrame) => boolean;
@@ -28,7 +29,11 @@ export function useItems(rt: SimRt, input: InputFrame): void {
 /** Owned sub-items only; an item already in the other slot swaps places. */
 export function equip(rt: SimRt, slot: 0 | 1, item: ItemId | null): boolean {
   const inv = rt.state.inv;
-  if (item !== null && (!rt.db.items[item].slot || (inv.items[item] ?? 0) < 1)) return false;
+  // Ammunition can sit in a slot at 0; anything else must be in hand.
+  const def = item === null ? null : rt.db.items[item];
+  const held =
+    item === null ? false : def?.ammo !== undefined ? owns(inv.items, item) : (inv.items[item] ?? 0) >= 1;
+  if (item !== null && (def?.slot !== true || !held)) return false;
   const other = slot === 0 ? 1 : 0;
   const next: [ItemId | null, ItemId | null] = [inv.slots[0], inv.slots[1]];
   if (item !== null && next[other] === item) next[other] = next[slot];

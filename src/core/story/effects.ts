@@ -2,6 +2,7 @@ import type { FlagId } from '@content/flags';
 import type { ArmorId, GaldrId, ItemId, SfxId, WeaponId } from '@content/ids';
 import { setMinute, setPolicy, setSeason, sleepUntil } from '../clock/clock';
 import type { ClockState, Season } from '../clock/types';
+import { itemMax } from '../items/defs';
 import { dungeonOf } from '../state/dungeons';
 import type { FlagValue } from '../state/flags';
 import type { SimRt } from '../sim/rt';
@@ -65,6 +66,8 @@ export function applyEffect(e: Effect, rt: SimRt): void {
     case 'take': {
       const left = (s.inv.items[e.item] ?? 0) - (e.n ?? 1);
       if (left > 0) s.inv.items[e.item] = left;
+      // Ammunition stays owned at 0, in its slot, until it is refilled.
+      else if (rt.db.items[e.item].ammo !== undefined) s.inv.items[e.item] = 0;
       else {
         s.inv.items = Object.fromEntries(Object.entries(s.inv.items).filter(([id]) => id !== e.item));
         s.inv.slots = [
@@ -157,7 +160,7 @@ export function giveItem(rt: SimRt, item: ItemId, n: number): void {
   const room = def.horn === true ? hornsFree(rt) : n;
   const add = Math.min(n, room);
   if (add <= 0) return;
-  inv.items[item] = Math.min(def.max, (inv.items[item] ?? 0) + add);
+  inv.items[item] = Math.min(itemMax(rt.db.items, inv.items, item), (inv.items[item] ?? 0) + add);
   const hero = rt.state.hero;
   if (def.purse === true) hero.purse = Math.min(2, inv.items[item] ?? 0) as 0 | 1 | 2;
   if (def.maxSeidr !== undefined) {

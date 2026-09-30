@@ -72,6 +72,8 @@ export interface DropTable {
   readonly silver: number;
   /** A seiðr jar (two points of seiðr). */
   readonly seidr?: number;
+  /** A few bombs (only while bombs are owned; otherwise nothing drops). */
+  readonly bombs?: number;
   readonly none: number;
 }
 

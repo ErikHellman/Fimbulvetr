@@ -9,6 +9,7 @@ import { seasonAt } from '../../clock/clock';
 import type { Thing } from '../../world/screen';
 import type { SimRt } from '../rt';
 import { startStory } from './story';
+import { itemMax, owns } from '../../items/defs';
 
 export { PIECES_PER_HEART } from '../../story/effects';
 /** Dropped hearts and silver vanish after this many ticks (10 s); the view blinks them near the end. */
@@ -77,6 +78,17 @@ export function createDrop(id: number, kind: DropKind, pos: Vec): Entity {
 
 /** Seiðr in a dropped jar. */
 export const SEIDR_JAR = 2;
+/** Bombs in a dropped bundle. */
+export const BOMB_BUNDLE = 4;
+
+/**
+ * Leaves a drop at `pos`, unless it is bombs and Ask has none to refill (nothing drops then; the roll
+ * that chose it is already spent, so replays stay exact).
+ */
+export function spillDrop(rt: SimRt, kind: DropKind, pos: Vec): void {
+  if (kind === 'bombs' && !owns(rt.state.inv.items, 'bombs')) return;
+  rt.actors.push(createDrop(rt.newId(), kind, pos));
+}
 
 /**
  * Walking over a pickup collects it: a dropped heart heals a heart, silver adds one, and every fourth piece
@@ -105,6 +117,15 @@ export function collectPickups(rt: SimRt): void {
     if (e.def === 'silver') {
       const hero = rt.state.hero;
       hero.silver = Math.min(PURSE_CAP[hero.purse], hero.silver + 1);
+      rt.emit({ t: 'sfx', id: 'sfx_pickup' });
+      continue;
+    }
+    if (e.def === 'bombs') {
+      const inv = rt.state.inv;
+      inv.items.bombs = Math.min(
+        itemMax(rt.db.items, inv.items, 'bombs'),
+        (inv.items.bombs ?? 0) + BOMB_BUNDLE,
+      );
       rt.emit({ t: 'sfx', id: 'sfx_pickup' });
       continue;
     }

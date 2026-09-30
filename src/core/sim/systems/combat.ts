@@ -14,7 +14,7 @@ import { dungeonOf } from '../../state/dungeons';
 import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
 import { enemyDef } from './movement';
-import { createDrop } from './pickups';
+import { spillDrop } from './pickups';
 import { applyAll } from './story';
 
 /**
@@ -73,7 +73,7 @@ export function killEnemy(rt: SimRt, e: Entity, def: EnemyDef): void {
   }
   if (def.drops === undefined) return;
   const drop = rollDrop(rt.state.rng, def.drops);
-  if (drop !== null) rt.actors.push(createDrop(rt.newId(), drop, e.pos));
+  if (drop !== null) spillDrop(rt, drop, e.pos);
 }
 
 /** Applies the hero's live sword box to every actor it touches, once per swing. */

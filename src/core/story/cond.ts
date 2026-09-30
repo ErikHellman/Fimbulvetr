@@ -18,6 +18,8 @@ export type Cond =
       readonly lt?: number;
     }
   | { readonly k: 'item'; readonly id: ItemId; readonly gte?: number }
+  /** Owned at all, even at 0 (ammunition used up). */
+  | { readonly k: 'owns'; readonly id: ItemId }
   | { readonly k: 'silver'; readonly gte: number }
   | { readonly k: 'quest'; readonly id: QuestId; readonly gte: number }
   | { readonly k: 'season'; readonly is: Season }
@@ -59,6 +61,8 @@ export function evalCond(c: Cond | undefined, ctx: CondCtx): boolean {
     }
     case 'item':
       return (s.inv.items[c.id] ?? 0) >= (c.gte ?? 1);
+    case 'owns':
+      return Object.hasOwn(s.inv.items, c.id);
     case 'silver':
       return s.hero.silver >= c.gte;
     case 'quest': {

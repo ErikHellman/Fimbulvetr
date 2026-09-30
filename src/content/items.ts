@@ -45,6 +45,7 @@ const MAX: Partial<Record<ItemId, number>> = {
   seidr_upgrade: 4,
   quiver: 2,
   bomb_bag: 2,
+  bombs: 10,
   purse: 2,
   small_key: 9,
   horn: 4,
@@ -53,6 +54,14 @@ const MAX: Partial<Record<ItemId, number>> = {
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
 const FOUND: Partial<Record<ItemId, L10n>> = {
+  bombs: {
+    en: 'You found bombs! Set one down with its item key, then stand clear. They blast cracked walls and rock, and anything near.',
+    sv: 'Du hittade bomber! Lägg ner en med dess föremålsknapp och gå undan. De spränger spruckna väggar och klippor, och allt i närheten.',
+  },
+  bomb_bag: {
+    en: 'You found a larger bomb bag! It holds ten more bombs.',
+    sv: 'Du hittade en större bombpåse! Den rymmer tio bomber till.',
+  },
   boomerang: {
     en: 'You found the boomerang! Throw it with its item key. It stuns, strikes far switches and fetches what lies out of reach.',
     sv: 'Du hittade bumerangen! Kasta den med dess föremålsknapp. Den bedövar, träffar avlägsna brytare och hämtar det som ligger utom räckhåll.',
@@ -110,6 +119,7 @@ export const ITEM_DEFS = Object.fromEntries(
       ...(IN_HORN.has(id) ? { horn: true } : {}),
       ...(id === 'seidr_upgrade' ? { maxSeidr: 5 } : {}),
       ...(id === 'purse' ? { purse: true } : {}),
+      ...(id === 'bombs' ? { ammo: { bag: 'bomb_bag' as const, step: 10 } } : {}),
     };
     return [id, def];
   }),

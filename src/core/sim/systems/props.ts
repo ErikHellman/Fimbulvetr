@@ -15,7 +15,7 @@ import { damageActor } from './combat';
 import { critterDef } from './critters';
 import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
-import { createDrop } from './pickups';
+import { spillDrop } from './pickups';
 import { applyAll, probeBox } from './story';
 
 export const propDef = (rt: SimRt, e: Entity): PropDef => rt.db.props[e.def as PropId];
@@ -58,7 +58,7 @@ function breakProp(rt: SimRt, e: Entity): void {
   rt.emit({ t: 'sfx', id: 'sfx_break' });
   (def.loot ?? []).forEach((kind, i) => {
     const d = LOOT_SPREAD[i % LOOT_SPREAD.length] ?? { x: 0, y: 0 };
-    rt.actors.push(createDrop(rt.newId(), kind, { x: e.pos.x + d.x, y: e.pos.y + d.y }));
+    spillDrop(rt, kind, { x: e.pos.x + d.x, y: e.pos.y + d.y });
   });
   if (thing?.k === 'prop') applyAll(rt, thing.onBreak ?? []);
 }
