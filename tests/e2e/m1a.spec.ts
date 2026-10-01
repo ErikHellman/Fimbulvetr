@@ -85,6 +85,8 @@ test('sleeping on the third night starts the raid', async ({ page }) => {
 });
 
 test('every screen draws without errors or missing art', async ({ page }) => {
+  // One warp per screen, and there are more than a hundred: a slow browser needs longer than the default.
+  test.setTimeout(120_000);
   const errors = collectErrors(page);
   await boot(page, 'nosave&preset=m0');
   const ids = await page.evaluate(() => window.__fimbul?.screens() ?? []);

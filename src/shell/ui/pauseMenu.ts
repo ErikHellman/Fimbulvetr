@@ -1,4 +1,4 @@
-import { ITEMS, type ItemId } from '@content/ids';
+import { ITEMS, type GaldrId, type ItemId } from '@content/ids';
 import { wasPressed, type Action, type InputFrame } from '@core/input/actions';
 import type { ItemDef } from '@core/items/defs';
 import type { InventoryState } from '@core/state/gameState';
@@ -18,19 +18,31 @@ export interface MenuState {
   readonly confirm: boolean;
 }
 
-/** One line of the items tab: an owned sub-item (for the K/L slots) or food (to eat). */
-export interface MenuItem {
-  readonly id: ItemId;
-  readonly count: number;
-  readonly kind: 'sub' | 'food';
-  /** The slot it sits in, if any. */
-  readonly slot: 0 | 1 | null;
-}
+/**
+ * One line of the items tab: an owned sub-item (for the K/L slots), food (to eat), or a galdr known (to
+ * ready for the galdr button; `ready` is the one it sings now).
+ */
+export type MenuItem =
+  | {
+      readonly id: ItemId;
+      readonly count: number;
+      readonly kind: 'sub' | 'food';
+      /** The slot it sits in, if any. */
+      readonly slot: 0 | 1 | null;
+    }
+  | {
+      readonly id: GaldrId;
+      readonly count: 0;
+      readonly kind: 'galdr';
+      readonly slot: null;
+      readonly ready: boolean;
+    };
 
 export type MenuAction =
   | { readonly k: 'close' }
   | { readonly k: 'equip'; readonly slot: 0 | 1; readonly item: ItemId }
   | { readonly k: 'eat'; readonly item: ItemId }
+  | { readonly k: 'ready'; readonly galdr: GaldrId }
   /** Open the settings menu (the scene runs it over the system tab). */
   | { readonly k: 'settings' }
   | { readonly k: 'startOver' };
@@ -39,7 +51,7 @@ export function openMenu(tab: MenuTab = 'items'): MenuState {
   return { tab, cursor: 0, confirm: false };
 }
 
-/** What the items tab lists: owned sub-items, then food and mead, both in registry order. */
+/** What the items tab lists: owned sub-items, then food and mead, both in registry order, then the galdr known. */
 export function menuItems(inv: InventoryState, defs: Readonly<Record<ItemId, ItemDef>>): MenuItem[] {
   const owned = ITEMS.filter((id) => (inv.items[id] ?? 0) > 0);
   const slotOf = (id: ItemId): 0 | 1 | null => (inv.slots[0] === id ? 0 : inv.slots[1] === id ? 1 : null);
@@ -48,6 +60,13 @@ export function menuItems(inv: InventoryState, defs: Readonly<Record<ItemId, Ite
   return [
     ...subs.map((id) => ({ id, count: inv.items[id] ?? 0, kind: 'sub' as const, slot: slotOf(id) })),
     ...food.map((id) => ({ id, count: inv.items[id] ?? 0, kind: 'food' as const, slot: null })),
+    ...inv.galdr.map((id, i) => ({
+      id,
+      count: 0 as const,
+      kind: 'galdr' as const,
+      slot: null,
+      ready: i === 0,
+    })),
   ];
 }
 
@@ -88,7 +107,10 @@ export function stepMenu(
   if (state.tab === 'items') {
     const item = items[Math.min(state.cursor, items.length - 1)];
     if (item === undefined) return { state, actions: [] };
-    if (item.kind === 'sub') {
+    if (item.kind === 'galdr') {
+      if (any(frame, ['confirm', 'interact', 'galdr']))
+        return { state, actions: [{ k: 'ready', galdr: item.id }] };
+    } else if (item.kind === 'sub') {
       if (wasPressed(frame, 'item2')) return { state, actions: [{ k: 'equip', slot: 1, item: item.id }] };
       if (any(frame, ['item1', 'confirm', 'interact']))
         return { state, actions: [{ k: 'equip', slot: 0, item: item.id }] };

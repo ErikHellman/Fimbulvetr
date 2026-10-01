@@ -106,6 +106,40 @@ export const FLAGS = {
   st_d2_boss_dead: { t: 'bool' },
   /** The second runestone is lit: M3's goal. */
   st_stone2_lit: { t: 'bool' },
+  /** Ask has come past the rockfall into Haugar. */
+  st_haugar_reached: { t: 'bool' },
+  /** Styrr told Ask of the barrow-watch: the King's Barrow opens to one who keeps it at night. */
+  q_rs3_watch: { t: 'bool' },
+  /** Barrow-wights beaten at the King's Barrow on the watch. */
+  q_watch_kills: { t: 'int', max: 3 },
+  /** The watch is kept: Konungshaugr's door stands open. M4a's goal. */
+  st_barrow_open: { t: 'bool' },
+  /** First meetings in Haugar. */
+  n_styrr_met: { t: 'bool' },
+  n_hildr_met: { t: 'bool' },
+  n_geirmundr_met: { t: 'bool' },
+  n_hallsteinn_met: { t: 'bool' },
+  /** Haugar's eyes, opened by arrows: the great cairn's door and the watchtower's bridge. */
+  w_hau_cairn: { t: 'bool' },
+  w_hau_watch: { t: 'bool' },
+  /** Konungshaugr's latches, struck by arrows: the bridges over the pits are down for good. */
+  w_d3_r05: { t: 'bool' },
+  w_d3_r10: { t: 'bool' },
+  w_d3_r12: { t: 'bool' },
+  w_d3_r14: { t: 'bool' },
+  w_d3_r15: { t: 'bool' },
+  /** Ask went down into Konungshaugr. */
+  st_d3_entered: { t: 'bool' },
+  /** The Haugbúi King is dead (set by his death). */
+  st_d3_boss_dead: { t: 'bool' },
+  /** Haugvörðr, the barrow-warden, is dead (set by its death): it never rises again. */
+  st_d3_warden: { t: 'bool' },
+  /** The third runestone is lit: M4's goal. */
+  st_stone3_lit: { t: 'bool' },
+  /** Styrr taught the dash thrust: the sword pressed mid-roll lunges, and pierces a shield. */
+  t_dash: { t: 'bool' },
+  /** Styrr taught the parry: a blow met by a freshly raised shield is turned, and its dealer stunned. */
+  t_parry: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

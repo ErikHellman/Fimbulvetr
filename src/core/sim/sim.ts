@@ -21,12 +21,14 @@ import {
   FOG_RADIUS,
   LANTERN_FOG_RADIUS,
   LANTERN_RADIUS,
+  WARP_RADIUS,
   darknessOf,
   fogOf,
   type Light,
 } from '../world/light';
 import type { CoverGrid } from '../world/cover';
-import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex } from '../world/screen';
+import { GHOST_BRAZIER, GHOST_LANTERN, shownGhosts, type GhostLight } from '../world/ghost';
+import { indexLayout, neighbourOf, screenOrigin, type LayoutIndex, type TilePos } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
@@ -245,12 +247,30 @@ export class Sim implements SimRt {
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 6, r: FIRE_RADIUS });
     out.push(...fireLights(this, FIRE_RADIUS));
+    // Awake warp stones glow faintly.
+    for (const e of this.actors)
+      if (e.kind === 'fixture' && e.def === 'warp' && e.mem['on'] === 1)
+        out.push({ x: e.pos.x, y: e.pos.y - 16, r: WARP_RADIUS });
     // Bog-lights shine.
     for (const e of this.actors) {
       const glow = e.kind === 'enemy' ? this.db.enemies[e.def as EnemyId].glow : undefined;
       if (glow !== undefined) out.push({ x: e.pos.x, y: e.pos.y - 12, r: glow });
     }
     return out;
+  }
+
+  /**
+   * The hidden-floor tiles that show now: those inside the lantern's glow round Ask (once owned) or a
+   * burning brazier's. Only the picture uses it.
+   */
+  ghosts(): TilePos[] {
+    const lights: GhostLight[] = [];
+    if ((this.state.inv.items.lantern ?? 0) > 0)
+      lights.push({ x: this.hero.pos.x, y: this.hero.pos.y - 8, r: GHOST_LANTERN });
+    for (const e of this.actors)
+      if (e.kind === 'fixture' && e.def === 'brazier' && e.mem['on'] === 1)
+        lights.push({ x: e.pos.x, y: e.pos.y - 8, r: GHOST_BRAZIER });
+    return shownGhosts(this.screen.terrain, this.db.terrain, lights);
   }
 
   snapshot(): GameState {
@@ -390,6 +410,11 @@ export class Sim implements SimRt {
       case 'eat':
         eat(this, c.item);
         break;
+      case 'ready': {
+        const known = this.state.inv.galdr;
+        if (known.includes(c.galdr)) this.state.inv.galdr = [c.galdr, ...known.filter((g) => g !== c.galdr)];
+        break;
+      }
       case 'setHp':
         this.hero.hp = Math.max(0, Math.min(this.hero.maxHp, Math.floor(c.hp)));
         break;

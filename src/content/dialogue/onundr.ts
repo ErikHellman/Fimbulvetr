@@ -7,6 +7,7 @@ export const ONUNDR: DialogueDef = {
     { when: not(flag('n_onundr_met')), node: 'meet' },
     { when: all(flag('st_stone1_lit'), not(flag('st_road_open'))), node: 'road' },
     { when: all(flag('st_road_open'), not(flag('st_myrland_reached'))), node: 'south' },
+    { when: all(flag('st_stone2_lit'), not(flag('st_haugar_reached'))), node: 'east' },
     { when: flag('st_road_open'), node: 'north' },
     { when: evening, node: 'night' },
     { node: 'day' },
@@ -64,6 +65,19 @@ export const ONUNDR: DialogueDef = {
       text: {
         en: 'The weir’s drawbridge is hauled up from the far side. You would need something that flies out and comes back to strike its latch.',
         sv: 'Dammens vindbrygga är uppdragen från andra sidan. Du skulle behöva något som flyger ut och kommer tillbaka för att slå till spärren.',
+      },
+    },
+    east: {
+      text: {
+        en: 'Two stones lit, they say in Uppvík. The third lies east, in Haugar, where the barrows are. The storm brought the rocks down across the old path out of the birch glade.',
+        sv: 'Två stenar tända, säger de i Uppvík. Den tredje ligger österut, i Haugar, där gravhögarna är. Stormen rasade ner stenar över den gamla stigen ut ur björkgläntan.',
+      },
+      next: 'east2',
+    },
+    east2: {
+      text: {
+        en: 'You carry bombs now, I hear. Well. A rockfall does not argue with a bomb.',
+        sv: 'Du bär bomber nu, hör jag. Nåja. Ett stenras säger inte emot en bomb.',
       },
     },
     north: {

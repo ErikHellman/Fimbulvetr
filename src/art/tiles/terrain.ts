@@ -335,8 +335,123 @@ const MILL_WATERS = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Heather: grass gone purple-brown, with sprigs of bloom. */
+function heath(p: Painter): void {
+  p.fill('#6f6a44');
+  p.speckle('#57533a', 0.2);
+  p.speckle('#8a5a7a', 0.1);
+  p.speckle('#b07aa0', 0.03);
+}
+
+/** Terrain added for Haugar (M4a): heather, grave-hills, cairns, paving and dry-stone walls. */
+const HAUGAR = {
+  heath: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      heath(p);
+    },
+  },
+  /** A grave-hill's flank: turf over the mound, a pale rim where it meets the ground. */
+  barrow: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      heath(p);
+      region(p, v.mask, 1, C.turf, C.turfShade, C.turfLight, 0.14);
+    },
+  },
+  cairn: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      heath(p);
+    },
+  },
+  flagstone: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      p.fill(C.rock);
+      p.speckle(C.rockLight, 0.06);
+      p.rect(0, 7 + (v.variant % 2), 16, 1, C.rockShade);
+      p.rect(5 + v.variant * 3, 0, 1, 8, C.rockShade);
+      p.rect((10 + v.variant * 4) % 16, 8, 1, 8, C.rockShade);
+      p.speckle('#8a9a5a', 0.03);
+    },
+  },
+  drystone: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      heath(p);
+      region(p, v.mask, 1, C.rockShade, C.ink, C.rock, 0.3);
+    },
+  },
+  tent: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      heath(p);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/** Konungshaugr's floor: grey flags with dark seams and grave-dust. */
+function cryptFloor(p: Painter, variant: number): void {
+  p.fill('#5a5550');
+  p.speckle('#4a4540', 0.16);
+  p.speckle('#6e6860', 0.06);
+  p.rect(0, 7 + (variant % 2), 16, 1, '#3a3632');
+  p.rect(4 + variant * 4, 0, 1, 8, '#3a3632');
+  p.rect((9 + variant * 5) % 16, 8, 1, 8, '#3a3632');
+}
+
+/** A pit: black depths inside a crumbling rim of floor. Ghost floor is drawn the same, joined to it. */
+function pit(p: Painter, mask: number): void {
+  cryptFloor(p, 0);
+  region(p, mask, 2, '#0c0a0c', '#2a2522', '#141014', 0.2);
+}
+
+/** Terrain added for Konungshaugr (M4b). */
+const KONUNGSHAUGR = {
+  crypt_floor: {
+    autotile: false,
+    variants: 3,
+    paint: (p, v) => {
+      cryptFloor(p, v.variant);
+    },
+  },
+  crypt_wall: {
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      cryptFloor(p, 1);
+      region(p, v.mask, 0, '#3a3230', C.ink, '#4e4440', 0.2);
+    },
+  },
+  pit: {
+    autotile: true,
+    variants: 0,
+    group: 'pit',
+    paint: (p, v) => {
+      pit(p, v.mask);
+    },
+  },
+  ghost: {
+    autotile: true,
+    variants: 0,
+    group: 'pit',
+    paint: (p, v) => {
+      pit(p, v.mask);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
   ...DEEP_WOOD,
+  ...KONUNGSHAUGR,
+  ...HAUGAR,
   ...MYRLAND_WATERS,
   ...MILL_WATERS,
   grass: {

@@ -1,0 +1,223 @@
+{
+  "format": "fimbulvetr",
+  "v": 1,
+  "build": "fixture",
+  "savedAt": "2026-09-30T12:00:00.000Z",
+  "state": {
+    "seed": 5,
+    "rng": {
+      "s": 3839802622
+    },
+    "flags": {
+      "st_farm_day": 3,
+      "st_intro_seen": true,
+      "q_sheep_d1": true,
+      "q_water_d1": true,
+      "q_paid_d1": true,
+      "ev_embla_d1": true,
+      "q_logs": 5,
+      "q_paid_d2": true,
+      "ev_embla_d2": true,
+      "q_ravens": 5,
+      "q_paid_d3": true,
+      "ev_embla_d3": true,
+      "st_raid_begun": true,
+      "st_raid_done": true,
+      "st_seax_given": true,
+      "st_legend_told": true,
+      "n_onundr_met": true,
+      "n_dagny_met": true,
+      "n_skeggi_met": true,
+      "n_thordis_met": true,
+      "n_hrafnkell_met": true,
+      "n_solvi_met": true,
+      "n_bersi_met": true,
+      "st_d1_entered": true,
+      "st_d1_boss_dead": true,
+      "st_stone1_lit": true,
+      "st_road_open": true,
+      "st_uppvik_reached": true,
+      "w_horn_thordis": true,
+      "q_eldr_asked": true,
+      "st_eldr_learned": true,
+      "q_vargar_taken": true,
+      "q_vargar_tracked": true,
+      "q_vargar_alpha": true,
+      "q_vargar_done": true,
+      "w_myl_bridge": true,
+      "st_myrland_reached": true,
+      "n_thuridr_met": true,
+      "q_rs2_mill": true,
+      "st_d2_entered": true,
+      "st_d2_boss_dead": true,
+      "st_stone2_lit": true,
+      "st_haugar_reached": true,
+      "n_styrr_met": true,
+      "q_rs3_watch": true,
+      "q_watch_kills": 3,
+      "st_barrow_open": true,
+      "t_dash": true,
+      "t_parry": true,
+      "st_d3_entered": true,
+      "st_d3_warden": true,
+      "w_d3_r10": true,
+      "w_d3_r12": true,
+      "st_d3_boss_dead": true,
+      "st_stone3_lit": true
+    },
+    "hero": {
+      "screen": "hau_circle",
+      "x": 328,
+      "y": 158,
+      "facing": "s",
+      "hp": 28,
+      "maxHp": 28,
+      "seidr": 6,
+      "maxSeidr": 10,
+      "silver": 40,
+      "purse": 0
+    },
+    "inv": {
+      "items": {
+        "lantern": 1,
+        "boomerang": 1,
+        "horn": 2,
+        "mead_red": 1,
+        "purse": 1,
+        "bombs": 10,
+        "bow": 1,
+        "arrows": 30,
+        "heart_container": 1
+      },
+      "slots": ["bow", "bombs"],
+      "galdr": ["farvegr", "eldr"],
+      "weapon": "seax",
+      "armor": "wool_tunic",
+      "ring": null,
+      "shield": true
+    },
+    "clock": {
+      "minute": 1380,
+      "sub": 5,
+      "day": 1,
+      "season": "autumn",
+      "seasonDay": 0,
+      "epoch": 1,
+      "policy": "cycling"
+    },
+    "world": {
+      "opened": [
+        "d1_hc",
+        "d2_hc",
+        "d2_c_bombs",
+        "hau_k_gully",
+        "hau_k_barrows",
+        "d3_c_key1",
+        "d3_c_key2",
+        "d3_c_bow",
+        "d3_c_key3",
+        "d3_c_bigkey",
+        "d3_hc"
+      ],
+      "pieces": ["hp_d1_r09", "hp_myl_peat", "hp_hau_barrows", "hp_hau_tarn"],
+      "warps": ["haugar"],
+      "visited": [
+        "ask_int_longhouse",
+        "d3_r01",
+        "d3_r04",
+        "d3_r08",
+        "d3_r07",
+        "d3_r06",
+        "d3_r09",
+        "d3_r10",
+        "d3_r13",
+        "d3_r12",
+        "d3_r11",
+        "d3_r19",
+        "d3_r20",
+        "hau_king",
+        "hau_circle"
+      ],
+      "cover": {},
+      "vars": {
+        "ask_pen": 31
+      }
+    },
+    "dungeons": {
+      "d1": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": true,
+        "doors": []
+      },
+      "d2": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": true,
+        "doors": []
+      },
+      "d3": {
+        "keys": 0,
+        "bigKey": true,
+        "map": false,
+        "compass": false,
+        "bossDead": true,
+        "doors": [
+          "d3_lock_a",
+          "d3_sh_r09w",
+          "d3_sh_r09e",
+          "d3_lock_b",
+          "d3_lock_c",
+          "d3_lock_big",
+          "d3_sh_r20"
+        ]
+      },
+      "d4": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d5": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d6": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d7": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      },
+      "d8": {
+        "keys": 0,
+        "bigKey": false,
+        "map": false,
+        "compass": false,
+        "bossDead": false,
+        "doors": []
+      }
+    },
+    "playTicks": 15419
+  },
+  "sum": "351f0cde"
+}

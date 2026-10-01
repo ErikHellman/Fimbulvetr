@@ -48,8 +48,8 @@ export const THURIDR: DialogueDef = {
     },
     lit: {
       text: {
-        en: 'The pond went still last night, and the mud is quiet. Whatever you did down there, I slept.',
-        sv: 'Dammen blev stilla i natt, och dyn är tyst. Vad du än gjorde där nere, så sov jag.',
+        en: 'The pond went still last night, and the mud is quiet. Whatever you did down there, I slept. The peat-cutters say the next stone is east, among the barrows. Go carefully.',
+        sv: 'Dammen blev stilla i natt, och dyn är tyst. Vad du än gjorde där nere, så sov jag. Torvskärarna säger att nästa sten ligger österut, bland gravhögarna. Gå försiktigt.',
       },
     },
     night: {

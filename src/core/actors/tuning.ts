@@ -1,3 +1,4 @@
+import type { FlagId } from '@content/flags';
 import type { ArmorId, WeaponId } from '@content/ids';
 import type { Box } from '../math/box';
 import type { Dir4 } from '../math/dir';
@@ -34,8 +35,14 @@ export interface HeroTuning {
   readonly carryHeight: number;
   /** The throwing pose of a sub-item (the boomerang). */
   readonly tossTicks: number;
+  /** Loosing an arrow: the hero stands still this long. */
+  readonly shootTicks: number;
   /** Singing a galdr: the hero stands still this long. */
   readonly castTicks: number;
+  /** A blow that meets the shield within this many ticks of raising it is parried (with the lesson). */
+  readonly parryTicks: number;
+  /** Ticks a parried foe stands stunned (a boss half as long). */
+  readonly parryStun: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -85,6 +92,39 @@ export interface FireTuning {
   readonly scorch: number;
 }
 
+/** The dash thrust: a roll turned into a lunge (Styrr's lesson). */
+export interface ThrustTuning {
+  /** Roll ticks before the sword may turn it into a thrust. */
+  readonly from: number;
+  readonly ticks: number;
+  /** px per tick. */
+  readonly speed: number;
+  /** Its blow is this many times the first swing's. */
+  readonly damageMul: number;
+  /** Hit boxes relative to the feet, by facing: longer and narrower than a swing. */
+  readonly boxes: Readonly<Record<Dir4, Box>>;
+}
+
+/**
+ * Lowland foes grow as the runestones are lit (the GDD's "difficulty scales with runestones lit"): by the
+ * number of `flags` set, their health in percent and a bonus to every blow, in quarter hearts.
+ */
+export interface StoneTuning {
+  readonly flags: readonly FlagId[];
+  readonly hpPct: readonly number[];
+  readonly blow: readonly number[];
+}
+
+/** The bow's arrows. */
+export interface BowTuning {
+  /** px per tick. */
+  readonly speed: number;
+  /** Ticks before it drops. */
+  readonly life: number;
+  /** Quarter hearts to a foe. */
+  readonly damage: number;
+}
+
 export interface BoomerangTuning {
   /** px per tick, out and back. */
   readonly speed: number;
@@ -95,6 +135,7 @@ export interface BoomerangTuning {
 export interface Tuning {
   readonly hero: HeroTuning;
   readonly boomerang: BoomerangTuning;
+  readonly bow: BowTuning;
   readonly throw: ThrowTuning;
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */
@@ -106,6 +147,8 @@ export interface Tuning {
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;
+  readonly thrust: ThrustTuning;
+  readonly stones: StoneTuning;
   readonly enemyIframes: number;
   readonly knockDecay: number;
 }

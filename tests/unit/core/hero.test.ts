@@ -35,6 +35,7 @@ function setup(hasShield = true): {
         tuning: TUNING,
         hasShield,
         armed: true,
+        dash: false,
         ledgeHop: () => null,
         emit: (ev) => events.push(ev),
       });

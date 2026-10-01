@@ -14,6 +14,10 @@ import { VATNORMR_MACHINE } from './worm';
 import { MYRLJOS_MACHINE } from './wisp';
 import { LEIRKRABBI_MACHINE } from './crab';
 import { LINDORMR_MACHINE, MOUND_MACHINE } from './lindormr';
+import { HAUGBUI_MACHINE } from './haugbui';
+import { BOGDRAUGR_MACHINE } from './archer';
+import { HAUGVORDR_MACHINE } from './warden';
+import { KING_MACHINE } from './king';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -31,6 +35,10 @@ const MACHINES = {
   leirkrabbi: LEIRKRABBI_MACHINE,
   lindormr: LINDORMR_MACHINE,
   lind_mound: MOUND_MACHINE,
+  haugbui: HAUGBUI_MACHINE,
+  bogdraugr: BOGDRAUGR_MACHINE,
+  haugvordr: HAUGVORDR_MACHINE,
+  haugkonungr: KING_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -55,6 +63,10 @@ const START: Readonly<Record<BehaviourId, string>> = {
   leirkrabbi: 'sidle',
   lindormr: 'wake',
   lind_mound: 'mound',
+  haugbui: 'rise',
+  bogdraugr: 'rise',
+  haugvordr: 'stand',
+  haugkonungr: 'throne',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

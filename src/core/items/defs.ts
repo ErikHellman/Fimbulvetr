@@ -36,6 +36,10 @@ export interface ItemDef {
    * once owned, so it can be refilled.
    */
   readonly ammo?: { readonly bag: ItemId; readonly step: number };
+  /** A sub-item that spends another item as ammunition (the bow fires arrows); the HUD shows that count. */
+  readonly fires?: ItemId;
+  /** Given with it the first time (the bow comes with a full quiver). */
+  readonly comes?: { readonly item: ItemId; readonly n: number };
 }
 
 /** How many of `id` can be carried now: its `max`, raised by each bag of an ammunition. */

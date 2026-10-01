@@ -39,7 +39,7 @@ const MAX: Partial<Record<ItemId, number>> = {
   mead_red: 4,
   mead_green: 4,
   mead_blue: 4,
-  arrows: 70,
+  arrows: 30,
   heart_piece: 36,
   heart_container: 8,
   seidr_upgrade: 4,
@@ -54,6 +54,14 @@ const MAX: Partial<Record<ItemId, number>> = {
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
 const FOUND: Partial<Record<ItemId, L10n>> = {
+  bow: {
+    en: 'You found the bow, and a quiver of thirty arrows! Shoot with its item key, the way you face. Arrows strike from afar, and open the eyes carved in stone.',
+    sv: 'Du hittade pilbågen, och ett koger med trettio pilar! Skjut med dess föremålsknapp, åt det håll du vänder dig. Pilar träffar på avstånd och öppnar ögonen som är huggna i sten.',
+  },
+  quiver: {
+    en: 'You found a larger quiver! It holds twenty more arrows.',
+    sv: 'Du hittade ett större koger! Det rymmer tjugo pilar till.',
+  },
   bombs: {
     en: 'You found bombs! Set one down with its item key, then stand clear. They blast cracked walls and rock, and anything near.',
     sv: 'Du hittade bomber! Lägg ner en med dess föremålsknapp och gå undan. De spränger spruckna väggar och klippor, och allt i närheten.',
@@ -120,6 +128,8 @@ export const ITEM_DEFS = Object.fromEntries(
       ...(id === 'seidr_upgrade' ? { maxSeidr: 5 } : {}),
       ...(id === 'purse' ? { purse: true } : {}),
       ...(id === 'bombs' ? { ammo: { bag: 'bomb_bag' as const, step: 10 } } : {}),
+      ...(id === 'arrows' ? { ammo: { bag: 'quiver' as const, step: 20 } } : {}),
+      ...(id === 'bow' ? { fires: 'arrows' as const, comes: { item: 'arrows' as const, n: 30 } } : {}),
     };
     return [id, def];
   }),

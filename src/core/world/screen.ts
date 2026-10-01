@@ -37,13 +37,18 @@ export type ChestGift =
 
 /** Things placed on a screen. The union grows with each milestone. */
 export type Thing =
-  /** An enemy, present while `when` holds (night-only draugr); `onDeath` applies when it is killed. */
+  /**
+   * An enemy, present while `when` holds (night-only draugr); `onDeath` applies when it is killed. One
+   * `asleep` lies still, harmless and untouchable until grave-gold is lifted in the room (it still counts
+   * against the room's `clear`).
+   */
   | {
       readonly k: 'enemy';
       readonly id: EnemyId;
       readonly at: TilePos;
       readonly when?: Cond;
       readonly onDeath?: readonly Effect[];
+      readonly asleep?: true;
     }
   | DoorThing
   /** Read with interact while facing its tile, or any tile of its `w`×`h` block (a 2×2 well). */
@@ -153,9 +158,10 @@ export type Thing =
     }
   /**
    * A switch stone: a sword or boomerang strike lights it for as long as Ask stays in the room. With `set`,
-   * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good).
+   * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good). An
+   * `eye` (carved in stone) opens only to an arrow; anything else clinks off it.
    */
-  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId }
+  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId; readonly eye?: true }
   /** A drawbridge over water or a gap: its tiles are walkable while `down` holds. */
   | {
       readonly k: 'bridge';
@@ -181,6 +187,13 @@ export type Thing =
    * that would change the footing under Ask. It shows turned while the water stands at its level.
    */
   | { readonly k: 'wheel'; readonly at: TilePos; readonly level: 0 | 1 | 2 }
+  /**
+   * A warp stone: interact wakes it for good (its region goes into `world.warps`); Farvegr's song brings
+   * Ask back to `arrive`. Always solid.
+   */
+  | { readonly k: 'warp'; readonly region: RegionId; readonly at: TilePos; readonly arrive: TilePos }
+  /** A rune seal (the pass's three): a solid pillar whose rune burns while `lit` holds. */
+  | { readonly k: 'seal'; readonly at: TilePos; readonly lit: Cond }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
@@ -217,7 +230,8 @@ export type Thing =
       readonly do: readonly Effect[];
     };
 
-export type GateArt = 'palisade' | 'fire' | 'logs';
+/** A gate's look: `slab` is a barrow's stone door. */
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab';
 
 export interface ScreenDef {
   readonly id: ScreenId;

@@ -416,6 +416,8 @@ export function enemyFrames(): SpriteFrame[] {
     [22, 16, 10, 4].forEach((sink, i) => {
       d('rise', i, risen(side, sink));
     });
+    // Asleep in its grave until grave-gold wakes it: only the head and raised hands show.
+    d('sleep', 0, risen(side, 22));
     d('tell', 0, drawPerson(DRAUGR_LOOK, side, 0, { eyes: DEAD_EYES, arms: 'up' }));
     d('tell', 1, drawPerson(DRAUGR_LOOK, side, 1, { eyes: DEAD_EYES, arms: 'up' }));
     d('swing', 0, drawPerson(DRAUGR_LOOK, side, 0, { eyes: DEAD_EYES, arms: 'forward' }));
@@ -466,6 +468,7 @@ export const ENEMY_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
     hurt: a(1, 1),
     walk: a(4, 4),
     rise: a(4, 6, false),
+    sleep: a(1, 1),
     tell: a(2, 6),
     swing: a(2, 12, false),
   },

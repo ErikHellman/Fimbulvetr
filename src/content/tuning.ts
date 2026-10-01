@@ -27,6 +27,9 @@ export const TUNING: Tuning = {
     throwTicks: 10,
     tossTicks: 10,
     castTicks: 14,
+    shootTicks: 14,
+    parryTicks: 10,
+    parryStun: 60,
     carryHeight: 18,
     body: { x: -6, y: -8, w: 12, h: 8 },
     hurt: { x: -7, y: -26, w: 14, h: 26 },
@@ -43,9 +46,28 @@ export const TUNING: Tuning = {
     },
     spinBox: { x: -26, y: -36, w: 52, h: 44 },
   },
+  thrust: {
+    from: 4,
+    ticks: 14,
+    speed: 2.4,
+    damageMul: 2,
+    boxes: {
+      e: { x: 2, y: -20, w: 28, h: 12 },
+      w: { x: -30, y: -20, w: 28, h: 12 },
+      n: { x: -6, y: -46, w: 12, h: 30 },
+      s: { x: -6, y: -8, w: 12, h: 28 },
+    },
+  },
+  /** Nothing changes before the second stone; at two, +50% health; at three, double and +1 a blow. */
+  stones: {
+    flags: ['st_stone1_lit', 'st_stone2_lit', 'st_stone3_lit'],
+    hpPct: [100, 100, 150, 200],
+    blow: [0, 0, 0, 1],
+  },
   throw: { speed: 4, flightTicks: 20 },
   push: { ticks: 16, slideTicks: 16 },
   boomerang: { speed: 3, range: 112 },
+  bow: { speed: 5, life: 72, damage: 4 },
   weapons: {
     /** The pitchfork of the raid night: long reach, light blows. */
     pitchfork: {

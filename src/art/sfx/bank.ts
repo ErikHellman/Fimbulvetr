@@ -525,4 +525,76 @@ export const SFX_BANK = {
     release: 0.4,
     volume: 0.22,
   },
+  /** A warp stone waking: a rising, ringing hum. */
+  sfx_warp: {
+    wave: 'sine',
+    freq: 220,
+    freqEnd: 660,
+    attack: 0.05,
+    sustain: 0.25,
+    release: 0.5,
+    volume: 0.3,
+  },
+  /** The dash thrust: a sharp, rushing hiss. */
+  sfx_thrust: {
+    wave: 'noise',
+    freq: 6000,
+    freqEnd: 1800,
+    attack: 0.002,
+    sustain: 0.06,
+    release: 0.1,
+    volume: 0.35,
+  },
+  /** A parry: a bright ring of steel on steel. */
+  sfx_parry: {
+    wave: 'square',
+    freq: 1760,
+    freqEnd: 1320,
+    attack: 0,
+    sustain: 0.04,
+    release: 0.25,
+    volume: 0.3,
+    duty: 0.2,
+  },
+  /** A bowstring's snap and the arrow's hiss. */
+  sfx_bow: {
+    wave: 'triangle',
+    freq: 520,
+    freqEnd: 180,
+    attack: 0,
+    sustain: 0.03,
+    release: 0.12,
+    volume: 0.35,
+  },
+  /** The dead waking: a low, rising moan. */
+  sfx_wake: {
+    wave: 'saw',
+    freq: 70,
+    freqEnd: 140,
+    attack: 0.1,
+    sustain: 0.3,
+    release: 0.4,
+    volume: 0.28,
+  },
+  /** A crown's gem shattering: a bright, falling chime. */
+  sfx_gem: {
+    wave: 'square',
+    freq: 2400,
+    freqEnd: 900,
+    attack: 0,
+    sustain: 0.05,
+    release: 0.3,
+    volume: 0.3,
+    duty: 0.25,
+  },
+  /** A spectral axe whirling through the air. */
+  sfx_axe: {
+    wave: 'noise',
+    freq: 1800,
+    freqEnd: 2600,
+    attack: 0.02,
+    sustain: 0.15,
+    release: 0.1,
+    volume: 0.25,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

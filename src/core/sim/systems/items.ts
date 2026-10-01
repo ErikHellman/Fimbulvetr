@@ -3,7 +3,7 @@ import { wasPressed, type InputFrame } from '../../input/actions';
 import { applyEffect } from '../../story/effects';
 import type { SimRt } from '../rt';
 import { lightBrazier } from './fixtures';
-import { throwBoomerang } from './projectiles';
+import { shootArrow, throwBoomerang } from './projectiles';
 import { placeBomb } from './bombs';
 import { probeBox } from './story';
 import { owns } from '../../items/defs';
@@ -16,6 +16,7 @@ const USES: Partial<Record<ItemId, ItemUse>> = {
   lantern: (rt) => lightBrazier(rt, probeBox(rt)),
   boomerang: throwBoomerang,
   bombs: (rt) => placeBomb(rt),
+  bow: (rt, input) => shootArrow(rt, input),
 };
 
 /** Item slot buttons in play: K uses slot 0, L slot 1. Only a hero standing free can use an item. */

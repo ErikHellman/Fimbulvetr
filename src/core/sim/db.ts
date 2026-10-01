@@ -65,6 +65,8 @@ export interface ContentDb {
   readonly freezeClock?: Cond;
   /** Rolled enemies per region, on screens that list spawn points (only while `rolled` is on). */
   readonly spawns: Readonly<Partial<Record<RegionId, SpawnTable>>>;
+  /** The lowland regions, where foes grow with the runestones lit (see `Tuning.stones`). */
+  readonly lowlands: readonly RegionId[];
   /** What bites where Ask fishes. */
   readonly fish: Readonly<Record<FishId, FishDef>>;
 }

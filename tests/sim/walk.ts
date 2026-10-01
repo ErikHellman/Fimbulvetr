@@ -260,3 +260,51 @@ export function crossFighting(h: Harness, dir: Dir4, screen: ScreenId): Harness 
   fightNear(h);
   return crossTo(h, dir, screen);
 }
+
+/**
+ * Duels a shielded foe (a barrow-wight) as Styrr teaches: close in and wait for its tell, raise the
+ * shield just as the blade comes (a parry, with the lesson; a plain block without), then strike while it
+ * stands open (stunned, or its blade still out). Returns once it is dead, or after `budget` ticks.
+ */
+export function duel(h: Harness, foe: Sim['actors'][number], budget = 2400): Harness {
+  for (let spent = 0; spent < budget; spent++) {
+    if (!h.sim.actors.includes(foe) || h.sim.mode !== 'play') return h;
+    const dx = foe.pos.x - h.sim.hero.pos.x;
+    const dy = foe.pos.y - h.sim.hero.pos.y;
+    const horizontal = Math.abs(dx) > Math.abs(dy);
+    const toward: Action = horizontal ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+    const side: Action = horizontal ? (dy > 0 ? 'down' : 'up') : dx > 0 ? 'right' : 'left';
+    const along = Math.max(Math.abs(dx), Math.abs(dy));
+    const across = Math.min(Math.abs(dx), Math.abs(dy));
+    const s = h.sim.hero.fsm.s;
+    const open = (foe.mem['stun'] ?? 0) > 0 || foe.mem['open'] === 1;
+    if (foe.fsm.s === 'tell' && foe.fsm.t >= 20) {
+      // The blade is about to fall: shield up facing it, held through the cut.
+      if (s === 'move') h.step(frameOf([toward], [toward]));
+      for (let i = 0; i < 14 && h.sim.actors.includes(foe); i++) h.step(frameOf(['shield']));
+      h.step(frameOf([], [], ['shield']));
+      continue;
+    }
+    if (s !== 'move') {
+      h.step(frameOf([]));
+      continue;
+    }
+    if (open && along <= 22 && across <= 10) {
+      h.step(frameOf([toward], [toward]));
+      h.step(frameOf([], ['sword']));
+      continue;
+    }
+    if (along > (open ? 20 : 24) || across > 8) {
+      const held: Action[] = [];
+      if (along > (open ? 20 : 24)) held.push(toward);
+      if (across > 8) held.push(side);
+      h.step(frameOf(held));
+      continue;
+    }
+    // Close and square on: face it and wait for its move.
+    if (h.sim.hero.facing !== ({ right: 'e', left: 'w', down: 's', up: 'n' } as const)[toward])
+      h.step(frameOf([toward], [toward]));
+    else h.step(frameOf([]));
+  }
+  return h;
+}

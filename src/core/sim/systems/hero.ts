@@ -13,6 +13,7 @@ export function heroCtx(rt: SimRt, input: InputFrame): HeroCtx {
     tuning: rt.db.tuning,
     hasShield: rt.state.inv.shield,
     armed: rt.state.inv.weapon !== 'none',
+    dash: rt.state.flags.t_dash === true,
     ledgeHop: (dir) => ledgeHop(rt.screen.collision, at(rt.hero.body, rt.hero.pos), dir, heroSolidAt(rt)),
     emit: (ev) => {
       rt.emit(ev);

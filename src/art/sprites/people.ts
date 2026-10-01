@@ -379,6 +379,47 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     bottom: '#4a6a3a',
     child: true,
   },
+  /** Styrr, the old huscarl: grey braid-less hair, a grey beard to his belt, an old red tunic. */
+  styrr: {
+    skin: TAN,
+    hair: '#b8b8b0',
+    hairStyle: 'long',
+    beard: '#c8c8c0',
+    top: '#8a3a32',
+    legs: 'pants',
+    bottom: '#4a4038',
+  },
+  /** Hildr the shepherd: a brown hood against the wind, a sheepskin over a blue dress. */
+  hildr: {
+    skin: SKIN,
+    hair: '#7a5a3a',
+    hairStyle: 'kerchief',
+    scarf: '#6b4a2f',
+    top: '#d8d0bc',
+    legs: 'skirt',
+    bottom: '#4a5a8a',
+  },
+  /** Geirmundr the grave-robber: black-haired, sly, in a dirty green cloak with earth on his knees. */
+  geirmundr: {
+    skin: '#d8b090',
+    hair: '#2a2420',
+    hairStyle: 'short',
+    beard: '#2a2420',
+    top: '#4a5a34',
+    legs: 'pants',
+    bottom: '#5a4630',
+  },
+  /** Hallsteinn, warden of the pass: a big man in grey wool, a wolfskin over his shoulders. */
+  hallsteinn: {
+    skin: TAN,
+    hair: '#8a7a5a',
+    hairStyle: 'short',
+    beard: '#8a7a5a',
+    top: '#6a6a6a',
+    legs: 'pants',
+    bottom: '#3a3a3a',
+    apron: '#8a8070',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

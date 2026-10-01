@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { ItemId, ShopId } from '@content/ids';
+import type { GaldrId, ItemId, ShopId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
@@ -13,6 +13,8 @@ export type Command =
   | { readonly t: 'buy'; readonly shop: ShopId; readonly item: ItemId }
   /** Puts an owned sub-item in item slot 0 (K) or 1 (L), or empties the slot; swaps if it was in the other. */
   | { readonly t: 'equip'; readonly slot: 0 | 1; readonly item: ItemId | null }
+  /** Readies a known galdr for the galdr button (it moves to the front of those known). */
+  | { readonly t: 'ready'; readonly galdr: GaldrId }
   /** Eats food (or drinks mead) from the pack. */
   | { readonly t: 'eat'; readonly item: ItemId }
   /** Dev: give items. */

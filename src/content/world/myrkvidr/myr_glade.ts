@@ -4,7 +4,7 @@ export const myrGlade: ScreenDef = {
   id: 'myr_glade',
   region: 'myrkvidr',
   purpose:
-    'A glade east of the north road: a ring of white birches round an old standing stone. By night the huldra waits there.',
+    'A glade east of the north road: a ring of white birches round an old standing stone. By night the huldra waits there. A path runs east out of it to the rockfall into Haugar.',
   things: [],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
   spawns: [
@@ -30,9 +30,9 @@ export const myrGlade: ScreenDef = {
     'TTPP..P.....,..B.........B...."....P.PPT',
     'PPT...."....,..B.........B..........PPPP',
     'PPPP...."...,...B.......B......B...."TPP',
-    'PPPP........,....BB.,.BB....%........PPP',
-    'PTT..."..B..,......,,,...............PPP',
-    'PTPPP.....PP,,,,,,,,,,,,,,,,,,,,,,..PPPP',
+    'PPPP........,....BB.,.BB....%...........',
+    'PTT..."..B..,......,,,..................',
+    'PTPPP.....PP,,,,,,,,,,,,,,,,,,,,,,,,,,,,',
     'PTPTPPPPPTPPPPPPPTPPPTTTTPPPTTPP.,.PPPPT',
     'PPPTPPPTTPTPPPPTPPPPPTPPTTPPTTPP.,.PTPTP',
     'PPPPPPPTPPTPPPPPPTPPPTPPTPPPPPTT.,.PPPPP',

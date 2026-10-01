@@ -1,4 +1,4 @@
-import type { ArmorId, DungeonId, GaldrId, ItemId, WeaponId } from '@content/ids';
+import type { ArmorId, DungeonId, GaldrId, ItemId, WeaponId, RegionId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { setMinute, setPolicy, setSeason } from '../clock/clock';
 import { WEATHER_KINDS, isSeason, type ClockState, type Season, type WeatherKind } from '../clock/types';
@@ -196,6 +196,8 @@ export interface DevPreset {
   /** Seiðr now (the bar's size stays 10 unless `maxSeidr` says otherwise). */
   readonly seidr?: number;
   readonly maxSeidr?: number;
+  /** Warp stones already woken, by region. */
+  readonly warps?: readonly RegionId[];
 }
 
 /** Applies a preset to a fresh state. A dev query's own screen/at/season/time still win afterwards. */
@@ -231,4 +233,5 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   if (p.galdr !== undefined) state.inv.galdr = [...p.galdr];
   if (p.maxSeidr !== undefined) state.hero.maxSeidr = p.maxSeidr;
   if (p.seidr !== undefined) state.hero.seidr = Math.min(p.seidr, state.hero.maxSeidr);
+  for (const r of p.warps ?? []) if (!state.world.warps.includes(r)) state.world.warps.push(r);
 }

@@ -393,6 +393,43 @@ function boat(): Raster {
   return r;
 }
 
+/** A cairn: grey stones piled in a cone, lichen on the old ones. */
+function cairn(): Raster {
+  const r = createRaster(18, 20);
+  const stones: ReadonlyArray<readonly [number, number, number, number]> = [
+    [5, 16, 4, 2.5],
+    [12, 16, 4, 2.5],
+    [8.5, 12, 4.5, 2.5],
+    [6, 8.5, 3, 2],
+    [11, 8.5, 3, 2],
+    [9, 5, 3, 2],
+  ];
+  for (const [x, y, rx, ry] of stones) {
+    ellipse(r, x, y, rx, ry, (px, py) => (px - x + (py - y) > 1 ? P.rockShade : P.rock));
+    rect(r, Math.round(x - 1), Math.round(y - ry + 1), 2, 1, P.rockLight);
+  }
+  rect(r, 4, 15, 2, 1, hex('#8a9a5a'));
+  rect(r, 11, 12, 2, 1, hex('#8a9a5a'));
+  return r;
+}
+
+/** Geirmundr's tent: patched hides over a ridge pole, the flap tied back on a dark inside. */
+function tent(): Raster {
+  const r = createRaster(48, 34);
+  const hide = hex('#9c8663');
+  const hideShade = hex('#6f5a3c');
+  for (let y = 4; y < 32; y++) {
+    const half = 3 + ((y - 4) * 20) / 28;
+    rect(r, Math.round(24 - half), y, Math.round(half), 1, hide);
+    rect(r, 24, y, Math.round(half), 1, hideShade);
+  }
+  rect(r, 22, 2, 4, 3, P.wood);
+  rect(r, 20, 20, 8, 12, hex('#2a2018'));
+  rect(r, 14, 12, 5, 4, hex('#b9a47c'));
+  rect(r, 30, 22, 6, 3, hex('#b9a47c'));
+  return r;
+}
+
 export function decorFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [
     frame('decor_tree_idle_s_0', tree()),
@@ -413,6 +450,8 @@ export function decorFrames(): SpriteFrame[] {
     frame('decor_boulder_idle_s_0', boulder()),
     frame('decor_mill_idle_s_0', mill()),
     frame('decor_boat_idle_s_0', boat()),
+    frame('decor_cairn_idle_s_0', cairn()),
+    frame('decor_tent_idle_s_0', tent()),
   ];
   for (let f = 0; f < 4; f++) {
     out.push(frame(`decor_well_idle_s_${f}`, well(f)));
@@ -443,6 +482,8 @@ export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
   decor_boulder: STILL,
   decor_mill: STILL,
   decor_boat: STILL,
+  decor_cairn: STILL,
+  decor_tent: STILL,
   decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },

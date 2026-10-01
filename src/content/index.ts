@@ -47,6 +47,7 @@ export const DB: ContentDb = {
   weather: WEATHER_RULES,
   spawns: SPAWN_TABLES,
   fish: FISH_DEFS,
+  lowlands: ['askdalr', 'myrkvidr', 'myrland', 'haugar'],
   /** The raid night never dawns: the clock waits until it is over. */
   freezeClock: raidNight,
 };

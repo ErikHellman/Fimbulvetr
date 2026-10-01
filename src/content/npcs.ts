@@ -43,6 +43,10 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   thuridr: { en: 'Þuríðr', sv: 'Þuríðr' },
   ljotr: { en: 'Ljótr', sv: 'Ljótr' },
   audr: { en: 'Auðr', sv: 'Auðr' },
+  styrr: { en: 'Styrr', sv: 'Styrr' },
+  hildr: { en: 'Hildr', sv: 'Hildr' },
+  geirmundr: { en: 'Geirmundr', sv: 'Geirmundr' },
+  hallsteinn: { en: 'Hallsteinn', sv: 'Hallsteinn' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -179,4 +183,16 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   audr: npc('audr', [
     { when: { k: 'not', c: night }, screen: 'myl_reeds', at: { x: 10, y: 4 }, facing: 's' },
   ]),
+  /** Styrr keeps to his cottage: by the hearth by day, by the door at night. */
+  styrr: npc('styrr', [{ screen: 'hau_int_styrr', at: { x: 22, y: 11 }, facing: 's' }]),
+  /** With her sheep on the heath by day; home before dark. */
+  hildr: npc('hildr', [
+    { when: { k: 'not', c: night }, screen: 'hau_heath', at: { x: 17, y: 5 }, facing: 's' },
+  ]),
+  /** By his tent at the barrow field by day; at night he hides inside it. */
+  geirmundr: npc('geirmundr', [
+    { when: { k: 'not', c: night }, screen: 'hau_barrows', at: { x: 14, y: 18 }, facing: 's' },
+  ]),
+  /** At the pass door, day and night. */
+  hallsteinn: npc('hallsteinn', [{ screen: 'hau_pass', at: { x: 22, y: 6 }, facing: 's' }]),
 };

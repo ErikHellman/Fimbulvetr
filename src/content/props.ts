@@ -138,4 +138,29 @@ export const PROP_DEFS = {
     blast: true,
     loot: ['bombs'],
   },
+  /** Grave-gold heaped by the dead: lifting it wakes them; it breaks into silver. */
+  grave_gold: {
+    id: 'grave_gold',
+    art: 'prop_grave_gold',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: true,
+    throwDamage: 4,
+    wakes: true,
+    loot: ['silver', 'silver', 'silver'],
+  },
+  /** A pot stuffed with old arrows: breaks to a blade, and spills a bundle once the bow is owned. */
+  arrow_pot: {
+    id: 'arrow_pot',
+    art: 'prop_arrow_pot',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: true,
+    breakBy: 'sword',
+    throwDamage: 4,
+    blast: true,
+    loot: ['arrows'],
+  },
 } as const satisfies Record<PropId, PropDef>;

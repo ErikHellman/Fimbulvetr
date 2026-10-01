@@ -30,4 +30,6 @@ export type SimEvent =
   /** The boss of the room has fallen (its summons went with it). */
   | { readonly t: 'bossDead' }
   /** A bomb went off at (x, y) on the current screen. */
-  | { readonly t: 'blast'; readonly x: number; readonly y: number };
+  | { readonly t: 'blast'; readonly x: number; readonly y: number }
+  /** Ask parried a blow at (x, y) on the current screen: a spark. */
+  | { readonly t: 'parry'; readonly x: number; readonly y: number };

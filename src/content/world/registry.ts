@@ -46,6 +46,18 @@ import { mylReeds } from './myrland/myl_reeds';
 import { mylIntFisher } from './myrland/myl_int_fisher';
 import { mylIntWidow } from './myrland/myl_int_widow';
 import { mylIntCave } from './myrland/myl_int_cave';
+import { hauGully } from './haugar/hau_gully';
+import { hauBarrows } from './haugar/hau_barrows';
+import { hauHeath } from './haugar/hau_heath';
+import { hauCairns } from './haugar/hau_cairns';
+import { hauPass } from './haugar/hau_pass';
+import { hauCircle } from './haugar/hau_circle';
+import { hauHuscarl } from './haugar/hau_huscarl';
+import { hauKing } from './haugar/hau_king';
+import { hauTarn } from './haugar/hau_tarn';
+import { hauWatch } from './haugar/hau_watch';
+import { hauIntStyrr } from './haugar/hau_int_styrr';
+import { hauIntCairn } from './haugar/hau_int_cairn';
 import { d1R01 } from './rotarhellir/d1_r01';
 import { d1R02 } from './rotarhellir/d1_r02';
 import { d1R03 } from './rotarhellir/d1_r03';
@@ -74,6 +86,26 @@ import { d2R13 } from './sokkva/d2_r13';
 import { d2R14 } from './sokkva/d2_r14';
 import { d2R15 } from './sokkva/d2_r15';
 import { d2R16 } from './sokkva/d2_r16';
+import { d3R01 } from './konungshaugr/d3_r01';
+import { d3R02 } from './konungshaugr/d3_r02';
+import { d3R03 } from './konungshaugr/d3_r03';
+import { d3R04 } from './konungshaugr/d3_r04';
+import { d3R05 } from './konungshaugr/d3_r05';
+import { d3R06 } from './konungshaugr/d3_r06';
+import { d3R07 } from './konungshaugr/d3_r07';
+import { d3R08 } from './konungshaugr/d3_r08';
+import { d3R09 } from './konungshaugr/d3_r09';
+import { d3R10 } from './konungshaugr/d3_r10';
+import { d3R11 } from './konungshaugr/d3_r11';
+import { d3R12 } from './konungshaugr/d3_r12';
+import { d3R13 } from './konungshaugr/d3_r13';
+import { d3R14 } from './konungshaugr/d3_r14';
+import { d3R15 } from './konungshaugr/d3_r15';
+import { d3R16 } from './konungshaugr/d3_r16';
+import { d3R17 } from './konungshaugr/d3_r17';
+import { d3R18 } from './konungshaugr/d3_r18';
+import { d3R19 } from './konungshaugr/d3_r19';
+import { d3R20 } from './konungshaugr/d3_r20';
 import type { ScreenDef } from '@core/world/screen';
 import type { ScreenId } from './screens';
 import { testA } from './testlands/test_a';
@@ -134,6 +166,18 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   myl_int_fisher: mylIntFisher,
   myl_int_widow: mylIntWidow,
   myl_int_cave: mylIntCave,
+  hau_gully: hauGully,
+  hau_barrows: hauBarrows,
+  hau_heath: hauHeath,
+  hau_cairns: hauCairns,
+  hau_pass: hauPass,
+  hau_circle: hauCircle,
+  hau_huscarl: hauHuscarl,
+  hau_king: hauKing,
+  hau_tarn: hauTarn,
+  hau_watch: hauWatch,
+  hau_int_styrr: hauIntStyrr,
+  hau_int_cairn: hauIntCairn,
   d1_r01: d1R01,
   d1_r02: d1R02,
   d1_r03: d1R03,
@@ -162,4 +206,24 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d2_r14: d2R14,
   d2_r15: d2R15,
   d2_r16: d2R16,
+  d3_r01: d3R01,
+  d3_r02: d3R02,
+  d3_r03: d3R03,
+  d3_r04: d3R04,
+  d3_r05: d3R05,
+  d3_r06: d3R06,
+  d3_r07: d3R07,
+  d3_r08: d3R08,
+  d3_r09: d3R09,
+  d3_r10: d3R10,
+  d3_r11: d3R11,
+  d3_r12: d3R12,
+  d3_r13: d3R13,
+  d3_r14: d3R14,
+  d3_r15: d3R15,
+  d3_r16: d3R16,
+  d3_r17: d3R17,
+  d3_r18: d3R18,
+  d3_r19: d3R19,
+  d3_r20: d3R20,
 };

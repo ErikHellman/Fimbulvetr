@@ -25,6 +25,7 @@ const NO_VIEW = {
   leaves: 0,
   fog: 0,
   flames: 0,
+  ghosts: 0,
   bolts: 0,
   dark: 0,
   lights: 0,

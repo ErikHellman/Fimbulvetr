@@ -40,6 +40,7 @@ import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { FireView } from '@shell/view/fireView';
+import { GhostView } from '@shell/view/ghostView';
 import { FishView } from '@shell/view/fishView';
 import { ScreenView } from '@shell/view/screenView';
 
@@ -67,6 +68,7 @@ export class PlayScene extends Phaser.Scene {
   private fog!: DarknessView;
   private fx!: FxView;
   private flames!: FireView;
+  private ghostFloor!: GhostView;
   private fishing!: FishView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
@@ -130,6 +132,7 @@ export class PlayScene extends Phaser.Scene {
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
     this.flames = new FireView(this, data.assets.frames, ANIMS);
+    this.ghostFloor = new GhostView(this, data.assets.frames);
     this.fishing = new FishView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
@@ -257,6 +260,9 @@ export class PlayScene extends Phaser.Scene {
     } else if (ev.t === 'blast') {
       const origin = this.sim.originOf(this.sim.screen.id);
       this.fx.blast({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
+    } else if (ev.t === 'parry') {
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fx.spark({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
     } else if (ev.t === 'shake') {
@@ -294,6 +300,7 @@ export class PlayScene extends Phaser.Scene {
         this.audio.play('sfx_menu_ok');
       } else if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
       else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
+      else if (a.k === 'ready') this.sim.command({ t: 'ready', galdr: a.galdr });
       else if (a.k === 'startOver') {
         const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
         this.services.saves.autosaver.request(state);
@@ -379,6 +386,7 @@ export class PlayScene extends Phaser.Scene {
     }
     this.fx.tick(this.sim.tick);
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
+    this.ghostFloor.draw(this.sim.ghosts(), this.sim.originOf(this.sim.screen.id));
     {
       const ui = this.sim.storyUi();
       const origin = this.sim.originOf(this.sim.screen.id);
@@ -490,6 +498,7 @@ export class PlayScene extends Phaser.Scene {
       dark: this.darkness.shown.dark,
       fog: this.fog.shown.dark,
       flames: this.flames.shown,
+      ghosts: this.ghostFloor.shown,
       lights: this.darkness.shown.lights,
     };
     const out = { ...sum };

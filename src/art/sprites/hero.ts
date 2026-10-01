@@ -315,6 +315,31 @@ function withRod(r: Raster, side: Side, dip: number): Raster {
   return r;
 }
 
+/** A drawn bow held out in front, by side: its grip (x, y); the stave bends away from Ask. */
+const BOW: Readonly<Record<Side, readonly [number, number]>> = { s: [16, 24], w: [7, 18], n: [16, 11] };
+
+function withBow(r: Raster, side: Side, drawn: boolean): Raster {
+  const [x, y] = BOW[side];
+  const wood = hex(C.wood);
+  const shade = hex(C.woodShade);
+  const pull = drawn ? 2 : 0;
+  if (side === 'w') {
+    line(r, x + 1, y - 7, x - 1, y - 3, wood);
+    line(r, x - 1, y - 3, x - 1, y + 3, wood);
+    line(r, x - 1, y + 3, x + 1, y + 7, wood);
+    line(r, x + 1, y - 7, x + 2 + pull, y, shade);
+    line(r, x + 2 + pull, y, x + 1, y + 7, shade);
+  } else {
+    const dy = side === 's' ? 1 : -1;
+    line(r, x - 7, y - dy, x - 3, y + dy, wood);
+    line(r, x - 3, y + dy, x + 3, y + dy, wood);
+    line(r, x + 3, y + dy, x + 7, y - dy, wood);
+    line(r, x - 7, y - dy, x, y - dy * (2 + pull), shade);
+    line(r, x, y - dy * (2 + pull), x + 7, y - dy, shade);
+  }
+  return r;
+}
+
 export function heroFrames(): SpriteFrame[] {
   return Object.entries(HERO_KITS).flatMap(([art, kit]) => kitFrames(art, kit));
 }
@@ -360,6 +385,14 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
         i,
         withRod(drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL), side, i),
       );
+    // Loosing an arrow: the bow held out, drawn, then let go.
+    for (let i = 0; i < 2; i++)
+      add(
+        'bow',
+        side,
+        i,
+        withBow(drawPose({ side, phase: 0, shield: 'none', arms: 'forward' }, SMALL), side, i === 0),
+      );
     // Singing a galdr: hands raised, then flung forward as the song leaves them.
     add('cast', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
     add('cast', side, 1, drawPose({ side, phase: 1, shield: RESTING_KIT[side], arms: 'up' }, SMALL));
@@ -370,6 +403,17 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
       0,
       drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: FORWARD[side], blade }, LARGE),
     );
+    // The dash thrust: blade held straight out, legs in a long stride.
+    for (let i = 0; i < 2; i++)
+      add(
+        'thrust',
+        side,
+        i,
+        drawPose(
+          { side, phase: i === 0 ? 1 : 3, shield: RESTING_KIT[side], sword: FORWARD[side], blade },
+          LARGE,
+        ),
+      );
     for (const anim of ['attack1', 'attack2', 'attack3'] as const) {
       ATTACK_ARCS[side][anim].forEach((dir, i) => {
         add(anim, side, i, drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: dir, blade }, LARGE));
@@ -416,6 +460,7 @@ export const HERO_ANIMS = {
   attack3: { frames: 3, fps: 10, loop: false, dirs: ALL },
   spin: { frames: 4, fps: 10, loop: false, dirs: ['s'] },
   roll: { frames: 4, fps: 13, loop: false, dirs: ['s'] },
+  thrust: { frames: 2, fps: 10, loop: false, dirs: ALL },
   lift: { frames: 2, fps: 10, loop: false, dirs: ALL },
   carry: { frames: 1, fps: 1, loop: true, dirs: ALL },
   carrywalk: { frames: 4, fps: 7, loop: true, dirs: ALL },
@@ -423,6 +468,7 @@ export const HERO_ANIMS = {
   push: { frames: 2, fps: 4, loop: true, dirs: ALL },
   toss: { frames: 2, fps: 12, loop: false, dirs: ALL },
   cast: { frames: 3, fps: 10, loop: false, dirs: ALL },
+  bow: { frames: 2, fps: 8, loop: false, dirs: ALL },
   fish: { frames: 2, fps: 2, loop: true, dirs: ALL },
   /** Spins through the four facings and falls; held on the last frame. */
   dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },

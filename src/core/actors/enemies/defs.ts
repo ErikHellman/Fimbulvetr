@@ -35,12 +35,25 @@ export interface EnemyDef {
   readonly attacks?: Readonly<Partial<Record<string, AttackWindow>>>;
   /** Armoured: every blow clinks off (a raid troll). Behaviours can also guard for a while (`mem.guard`). */
   readonly guard?: boolean;
+  /**
+   * Carries a shield: blows from the front clink off, unless they pierce (the dash thrust), are heavy (a
+   * blast), or land while its own guard is down (`mem.open`, set by its behaviour while it swings).
+   */
+  readonly shield?: boolean;
+  /**
+   * Hit tags that strike its weak spot while its behaviour has it `mem.exposed` (the King's crown, an
+   * arrow): the hit sets `mem.struck` for the behaviour instead of clinking off.
+   */
+  readonly struckBy?: number;
   /** The element that breaks its `guard` for good (a bomb's force cracks a mud-crab's shell). */
   readonly cracks?: Element;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */
   readonly stunnable?: number;
-  /** A boss: named on the health bar. */
-  readonly boss?: { readonly name: L10n };
+  /**
+   * A boss: named on the health bar. A `mini` boss (a key item's guard) shows the bar too, but its death
+   * neither ends the dungeon's boss nor counts as the boss for the solver.
+   */
+  readonly boss?: { readonly name: L10n; readonly mini?: true };
   /** Items it cannot be beaten without (the progression solver checks them). */
   readonly needs?: readonly ItemId[];
   /** Turns into this prop at sunrise (a troll caught by daylight is a stone). */
@@ -76,6 +89,8 @@ export interface DropTable {
   readonly seidr?: number;
   /** A few bombs (only while bombs are owned; otherwise nothing drops). */
   readonly bombs?: number;
+  /** A few arrows (only while the bow is owned; otherwise nothing drops). */
+  readonly arrows?: number;
   readonly none: number;
 }
 
@@ -106,9 +121,9 @@ export interface ActorCtx {
   emit(event: SimEvent): void;
   /** Summons an enemy (a spike, a whelp); it acts from the next tick and never counts as a screen thing. */
   spawn(id: EnemyId, pos: Vec, facing: Dir4): Entity;
-  /** Looses a shot (a gob of spit) from `pos` along `dir`. */
-  shoot(def: ShotId, pos: Vec, dir: Vec): void;
+  /** Looses a shot (a gob of spit, an arrow, a returning axe) from `pos` along `dir`; `owner` catches an axe. */
+  shoot(def: ShotId, pos: Vec, dir: Vec, owner?: number): void;
 }
 
-/** Things enemies throw or spit. */
-export type ShotId = 'spit';
+/** Things enemies throw or spit: a water-worm's spit, a draugr's arrow, the Haugbúi King's spectral axe. */
+export type ShotId = 'spit' | 'arrow' | 'axe';

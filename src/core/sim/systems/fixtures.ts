@@ -15,7 +15,7 @@ import { wallTiles } from './props';
 import { revealThings, roomSignal } from './rooms';
 import { raining } from './weather';
 import { sinkTiles, walkTiles } from './cover';
-import { condCtx, probeBox } from './story';
+import { condCtx, probeBox, startScript } from './story';
 import { footingHolds, levelTiles, waterLevel } from './water';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
@@ -46,6 +46,8 @@ const KINDS: Readonly<
   shutter: { solid: 'on', anims: ['closed', 'open'] },
   switch: { solid: 'always', anims: ['on', 'off'] },
   wheel: { solid: 'always', anims: ['on', 'off'] },
+  warp: { solid: 'always', anims: ['awake', 'dormant'] },
+  seal: { solid: 'always', anims: ['lit', 'dark'] },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -83,13 +85,19 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       return;
     }
     case 'switch': {
-      const e = fixture(rt.newId(), 'switch', 'fix_switch', thing.at, index);
+      const e = fixture(rt.newId(), 'switch', thing.eye === true ? 'fix_eye' : 'fix_switch', thing.at, index);
       if (thing.set !== undefined && rt.state.flags[thing.set] === true) e.mem['lit'] = 1;
       out.push(e);
       return;
     }
     case 'wheel':
       out.push(fixture(rt.newId(), 'wheel', 'fix_wheel', thing.at, index));
+      return;
+    case 'warp':
+      out.push(fixture(rt.newId(), 'warp', 'fix_warp', thing.at, index));
+      return;
+    case 'seal':
+      out.push(fixture(rt.newId(), 'seal', 'fix_seal', thing.at, index));
       return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
@@ -151,6 +159,10 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return !rt.state.world.opened.includes(thing.id);
     case 'wheel':
       return waterLevel(rt) === thing.level;
+    case 'warp':
+      return rt.state.world.warps.includes(thing.region);
+    case 'seal':
+      return evalCond(thing.lit, condCtx(rt));
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -293,17 +305,42 @@ export function bumpLocks(rt: SimRt, input: InputFrame): void {
   unlockAt(rt, probeBox(rt));
 }
 
-/** The sword lights the switches it strikes (a spin can light several). */
+/** The sword lights the switches it strikes (a spin can light several); an eye only clinks. */
 export function swordSwitches(rt: SimRt): void {
   const box = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (box === null) return;
   for (let lit = strikeSwitch(rt, box); lit; lit = strikeSwitch(rt, box));
   strikeWheel(rt, box);
+  const swing = mem(rt.hero, 'swing');
+  const eye = fixtureAt(
+    rt,
+    'switch',
+    box,
+    (f) => isEye(rt, f) && mem(f, 'lit') !== 1 && mem(f, 'hitSwing') !== swing,
+  );
+  if (eye !== null) {
+    eye.mem['hitSwing'] = swing;
+    rt.emit({ t: 'sfx', id: 'sfx_block' });
+  }
 }
 
-/** Lights the unlit switch under `box` (a sword or boomerang strike). Returns whether one was lit. */
-export function strikeSwitch(rt: SimRt, box: Box): boolean {
-  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1);
+/** Whether a switch fixture is an eye carved in stone (only an arrow opens it). */
+const isEye = (rt: SimRt, f: Entity): boolean => {
+  const t = thingOf(rt, f);
+  return t?.k === 'switch' && t.eye === true;
+};
+
+/** An unlit eye under `box` (what a boomerang clinks off). */
+export function eyeAt(rt: SimRt, box: Box): boolean {
+  return fixtureAt(rt, 'switch', box, (f) => isEye(rt, f) && mem(f, 'lit') !== 1) !== null;
+}
+
+/**
+ * Lights the unlit switch under `box`: a sword, boomerang or blast strike lights plain ones, and only an
+ * arrow lights an eye. Returns whether one was lit.
+ */
+export function strikeSwitch(rt: SimRt, box: Box, arrow = false): boolean {
+  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1 && (arrow || !isEye(rt, f)));
   if (e === null) return false;
   e.mem['lit'] = 1;
   const thing = thingOf(rt, e);
@@ -350,6 +387,26 @@ export function strikeWheel(rt: SimRt, box: Box): boolean {
   }
   rt.state.flags[flag] = thing.level;
   rt.emit({ t: 'sfx', id: 'sfx_wheel' });
+  return true;
+}
+
+/** The script a warp stone runs when touched (its line about Farvegr). */
+const WARP_SCRIPT = 'warp_stone' as const;
+
+/**
+ * Wakes the warp stone under `probe` (interact): its region is woken for good, once. Either way the stone
+ * speaks. Returns whether there was a stone.
+ */
+export function touchWarp(rt: SimRt, probe: Box): boolean {
+  const e = fixtureAt(rt, 'warp', probe, () => true);
+  const thing = e === null ? undefined : thingOf(rt, e);
+  if (thing?.k !== 'warp') return false;
+  if (!rt.state.world.warps.includes(thing.region)) {
+    rt.state.world.warps.push(thing.region);
+    rt.emit({ t: 'sfx', id: 'sfx_warp' });
+    refreshFixtures(rt);
+  }
+  startScript(rt, WARP_SCRIPT);
   return true;
 }
 

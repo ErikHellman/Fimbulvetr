@@ -90,7 +90,9 @@ export interface FimbulHook {
   /** The water level of the screen Ask is on, or null on screens without water. */
   water(): { level: number; flag: string } | null;
   /** Bombs in the bag, and how many it holds. */
-  ammo(): { bombs: number; max: number; owned: boolean };
+  ammo(): { bombs: number; max: number; owned: boolean; arrows: number; arrowMax: number; bow: boolean };
+  /** The regions whose warp stones are awake, in the order they were woken. */
+  warps(): string[];
   /** The saved state of the dungeon Ask is in, or null outside dungeons. */
   dungeon(): {
     id: string;
@@ -167,8 +169,12 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
         bombs: have.bombs ?? 0,
         max: itemMax(sim.db.items, have, 'bombs'),
         owned: owns(have, 'bombs'),
+        arrows: have.arrows ?? 0,
+        arrowMax: itemMax(sim.db.items, have, 'arrows'),
+        bow: (have.bow ?? 0) > 0,
       };
     },
+    warps: () => [...bridge().sim.state.world.warps],
     dungeon: () => {
       const sim = bridge().sim;
       const id = sim.db.screens[sim.screen.id].dungeon;
@@ -236,6 +242,8 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       if (ui === null) return null;
       if (ui.k === 'save') return { k: 'save', who: null, text: '', shown: 1, choices: [], cursor: 0 };
       if (ui.k === 'fish') return { k: 'fish', who: null, text: ui.phase, shown: 1, choices: [], cursor: 0 };
+      if (ui.k === 'warps')
+        return { k: 'warps', who: null, text: '', shown: 1, choices: [...ui.rows], cursor: ui.cursor };
       if (ui.k === 'shop')
         return {
           k: 'shop',

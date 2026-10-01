@@ -5,7 +5,11 @@ export const mylRiver: ScreenDef = {
   region: 'myrland',
   purpose:
     'The wide slow river of Mýrland and the old plank bridge over it, the crossing in every season. The paths meet here: north to the ferry, south to the bog, west to the mill.',
-  things: [{ k: 'enemy', id: 'vatnormr', at: { x: 30, y: 13 } }],
+  things: [
+    /** The region's warp stone (Farvegr). */
+    { k: 'warp', region: 'myrland', at: { x: 10, y: 3 }, arrive: { x: 10, y: 4 } },
+    { k: 'enemy', id: 'vatnormr', at: { x: 30, y: 13 } },
+  ],
   /** Where Mýrland's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 5, y: 4 },

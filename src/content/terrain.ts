@@ -62,6 +62,16 @@ export const TERRAIN_IDS = [
   'boards',
   'mill_wall',
   'silt',
+  'heath',
+  'barrow',
+  'cairn',
+  'flagstone',
+  'drystone',
+  'tent',
+  'crypt_floor',
+  'crypt_wall',
+  'pit',
+  'ghost',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -174,4 +184,24 @@ export const TERRAIN = {
   mill_wall: { solid: true },
   /** Grey silt at the bottom of the millpond, where Lindormr lies: soft and slow. */
   silt: { solid: false, slow: 0.8 },
+  /** Haugar's heather moor: purple-brown and springy underfoot. */
+  heath: { solid: false },
+  /** The flank of a great grave-hill: steep turf, not to be climbed. */
+  barrow: { solid: true },
+  /** A cairn of piled stones over the old dead. */
+  cairn: { solid: true, decor: { art: ['decor_cairn'], w: 1, h: 1 } },
+  /** Old paving: the stone circle's floor, the watchtower's yard. */
+  flagstone: { solid: false },
+  /** A dry-stone wall, shoulder high. */
+  drystone: { solid: true },
+  /** Geirmundr's tent of patched hides, three tiles wide and two deep. */
+  tent: { solid: true, decor: { art: ['decor_tent'], w: 3, h: 2 } },
+  /** Konungshaugr's floor: old flags, grave-dust in the cracks. */
+  crypt_floor: { solid: false },
+  /** The barrow's walls: dry stone and turf, old timber in the dark. */
+  crypt_wall: { solid: true },
+  /** A drop into the barrow's depths: no footing, but arrows and the boomerang fly over it. */
+  pit: { solid: true, low: true },
+  /** Hidden floor over the pits: sound underfoot, but drawn as the pit it spans; only light shows it. */
+  ghost: { solid: false },
 } as const satisfies Record<TerrainId, TerrainDef>;

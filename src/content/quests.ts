@@ -223,6 +223,88 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_runestone_3: {
+    id: 'q_runestone_3',
+    name: { en: 'The third runestone', sv: 'Den tredje runstenen' },
+    stages: [
+      {
+        when: flag('st_stone2_lit'),
+        text: {
+          en: 'The last stone lies east, in Haugar, the barrow hills. A rockfall blocks the path out of the birch glade; a bomb would clear it.',
+          sv: 'Den sista stenen ligger österut, i Haugar, gravkullarna. Ett stenras spärrar stigen ut ur björkgläntan; en bomb skulle rensa den.',
+        },
+      },
+      {
+        when: flag('st_haugar_reached'),
+        text: {
+          en: 'Haugar: heather and grave-hills. Somebody here must know where the third stone lies.',
+          sv: 'Haugar: ljung och gravkullar. Någon här måste veta var den tredje stenen ligger.',
+        },
+      },
+      {
+        when: flag('q_rs3_watch'),
+        text: {
+          en: 'The stone lies in Konungshaugr, the King’s Barrow. Keep the barrow-watch: stand by its door at night and put the three risen dead back in the ground.',
+          sv: 'Stenen ligger i Konungshaugr, Kungens hög. Håll gravvakt: stå vid dess dörr om natten och lägg de tre uppståndna döda tillbaka i jorden.',
+        },
+      },
+      {
+        when: flag('st_barrow_open'),
+        text: {
+          en: 'The watch is kept, and the King’s Barrow stands open.',
+          sv: 'Vakten är hållen, och Kungens hög står öppen.',
+        },
+      },
+      {
+        when: flag('st_d3_entered'),
+        text: {
+          en: 'Konungshaugr: find the way down to the King under the hill. Take nothing that wakes the dead, unless you mean to.',
+          sv: 'Konungshaugr: hitta vägen ner till kungen under kullen. Ta inget som väcker de döda, om du inte menar det.',
+        },
+      },
+      {
+        when: flag('st_d3_boss_dead'),
+        text: {
+          en: 'The Haugbúi King is dust. Lay a hand on the runestone beyond his hall.',
+          sv: 'Högbokungen är stoft. Lägg handen på runstenen bortom hans sal.',
+        },
+      },
+      {
+        when: flag('st_stone3_lit'),
+        text: {
+          en: 'The third runestone burns again. The pass knows it.',
+          sv: 'Den tredje runstenen brinner igen. Passet vet om det.',
+        },
+      },
+    ],
+  },
+  q_huscarl: {
+    id: 'q_huscarl',
+    name: { en: 'The old huscarl', sv: 'Den gamle huskarlen' },
+    stages: [
+      {
+        when: flag('n_styrr_met'),
+        text: {
+          en: 'Styrr, who carried a shield for the old jarl, teaches sword-craft for silver: first the dash thrust, then the parry.',
+          sv: 'Styrr, som bar sköld åt den gamle jarlen, lär ut svärdskonst mot silver: först utfallsstöten, sedan pareringen.',
+        },
+      },
+      {
+        when: flag('t_dash'),
+        text: {
+          en: 'You know the dash thrust: strike in the middle of a roll, and it pierces a shield. Styrr will teach the parry next.',
+          sv: 'Du kan utfallsstöten: hugg mitt i en rullning, så går den genom en sköld. Styrr lär ut pareringen härnäst.',
+        },
+      },
+      {
+        when: flag('t_parry'),
+        text: {
+          en: 'You know the parry: raise the shield just as a blow lands, and its dealer stands open. Styrr has more to teach, one day.',
+          sv: 'Du kan pareringen: lyft skölden precis när ett hugg träffar, så står den som högg öppen. Styrr har mer att lära ut, en dag.',
+        },
+      },
+    ],
+  },
   q_fisher: {
     id: 'q_fisher',
     name: { en: 'Gamli', sv: 'Gamle' },

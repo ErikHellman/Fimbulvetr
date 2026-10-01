@@ -94,5 +94,19 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: 16 rooms, the mill door, `q_runestone_2` to the second stone, the springs' cave and bomb bag, the peat's piece, bombs for sale
     - [x] Solver proofs over every water level, route, e2e, v1-m3b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M4 Haugar + D3 · [ ] M5 Act I finale (demo)
+- [ ] M4 Haugar + D3 — brief: `docs/briefs/m4.md`, plan: `docs/superpowers/plans/2026-09-30-m4.md`
+  - [ ] M4a Haugar
+    - [x] Warp stones in every lowland region; the dash thrust and the parry; shielded foes and the barrow-wight; runestone scaling
+    - [x] Art and shell: heather, grave-hills, cairns, the slab door and the seals, the wight, the thrust, the parry spark
+    - [x] Content: 10 screens and Styrr's cottage, Styrr, Hildr, Geirmundr, Hallsteinn, `q_runestone_3` to the open barrow, `q_huscarl`, the barrow-watch, the `haugar` spawn table
+    - [x] Solver proofs in every season, route, e2e, v1-m4a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M4b Konungshaugr: bow, eye switches, ghost floors, grave-gold, the barrow-warden, the Haugbúi King, Farvegr
+    - [x] The bow and arrows, eye switches, pits and the hidden floor, sleepers and grave-gold; mini-bosses, one table of enemy shots, the draugr archer and the barrow-warden
+    - [x] The Haugbúi King; Farvegr and readying a galdr from the menu; the solver learns the bow
+    - [x] Art and shell: crypt tiles, pits and the lit hidden floor, the eye, the archer, the warden, the King and his axe, the arrow count, the Farvegr picker
+    - [x] Content: Konungshaugr's 20 rooms, `q_runestone_3` to the third stone, Haugar's bow secrets (the great cairn's quiver, the watchtower's piece), arrows for sale
+    - [x] Solver proofs, route, e2e, v1-m4b fixture, docs
+    - [ ] User playtest and Swedish proofread
+- [ ] M5 Act I finale (demo)
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

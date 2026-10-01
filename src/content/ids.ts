@@ -80,6 +80,10 @@ export const ENEMIES = [
   'leirkrabbi',
   'lindormr',
   'lind_mound',
+  'haugbui',
+  'bogdraugr',
+  'haugvordr',
+  'haugkonungr',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -137,6 +141,13 @@ export const SFX = [
   'sfx_fuse',
   'sfx_wheel',
   'sfx_water',
+  'sfx_warp',
+  'sfx_thrust',
+  'sfx_parry',
+  'sfx_bow',
+  'sfx_wake',
+  'sfx_gem',
+  'sfx_axe',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -182,6 +193,11 @@ export const NPCS = [
   'thuridr',
   'ljotr',
   'audr',
+  // Haugar
+  'styrr',
+  'hildr',
+  'geirmundr',
+  'hallsteinn',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -197,10 +213,12 @@ export const QUESTS = [
   'q_vargar',
   'q_runestone_2',
   'q_fisher',
+  'q_runestone_3',
+  'q_huscarl',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr'] as const;
+export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'geirmundr'] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
@@ -232,6 +250,13 @@ export const SCRIPTS = [
   'widow_rest',
   'd2_enter',
   'stone2_light',
+  'warp_stone',
+  'hau_arrive',
+  'barrow_open',
+  'styrr_rest',
+  'd3_enter',
+  'stone3_light',
+  'shop_geirmundr',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
@@ -253,6 +278,8 @@ export const PROPS = [
   'bramble',
   'bomb',
   'bomb_pot',
+  'arrow_pot',
+  'grave_gold',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 

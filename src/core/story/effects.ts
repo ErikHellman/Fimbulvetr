@@ -167,6 +167,11 @@ export function giveItem(rt: SimRt, item: ItemId, n: number): void {
     hero.maxSeidr = Math.min(MAX_SEIDR, hero.maxSeidr + def.maxSeidr * add);
     hero.seidr = hero.maxSeidr;
   }
+  // The bow comes with its arrows.
+  if (def.comes !== undefined) {
+    const c = def.comes;
+    inv.items[c.item] = Math.min(itemMax(rt.db.items, inv.items, c.item), (inv.items[c.item] ?? 0) + c.n);
+  }
   if (def.slot && !inv.slots.includes(item)) {
     if (inv.slots[0] === null) inv.slots = [item, inv.slots[1]];
     else if (inv.slots[1] === null) inv.slots = [inv.slots[0], item];
