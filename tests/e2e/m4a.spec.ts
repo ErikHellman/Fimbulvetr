@@ -64,13 +64,20 @@ test('Styrr teaches the dash thrust for silver, and it lunges out of a roll', as
   expect(f.t_dash).toBe(true);
   expect(f.q_rs3_watch).toBe(true);
   expect(await page.evaluate(() => window.__fimbul?.silver())).toBe(100);
-  // Roll south, and strike in the middle of it.
-  await page.keyboard.down('KeyS');
-  await tap(page, 'Space');
-  await frames(page);
-  await tap(page, 'KeyJ');
-  await page.keyboard.up('KeyS');
-  expect(await page.evaluate(() => window.__fimbul?.eventCounts['sfx_thrust'] ?? 0)).toBeGreaterThan(0);
+  // Roll south, and strike in the middle of it. The blade must fall after the roll's first few ticks, and
+  // a slow browser may run several ticks a frame: so strike again and again while the roll lasts, and roll
+  // again if a whole roll slipped by between two strikes.
+  const thrusts = () => page.evaluate(() => window.__fimbul?.eventCounts['sfx_thrust'] ?? 0);
+  for (let i = 0; i < 4 && (await thrusts()) === 0; i++) {
+    await expect.poll(async () => (await hero(page))?.fsm).toBe('move');
+    await page.keyboard.down('KeyS');
+    await page.keyboard.down('Space');
+    await frames(page);
+    await page.keyboard.up('Space');
+    while ((await hero(page))?.fsm === 'roll') await tap(page, 'KeyJ');
+    await page.keyboard.up('KeyS');
+  }
+  expect(await thrusts()).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
 
