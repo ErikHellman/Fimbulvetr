@@ -84,6 +84,17 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
   fen_moss: ['........', '..v..v..', '.vVvvVv.', 'vvVvvvVv', 'VvvVvVvv', '.vVvvvV.', '..VvvV..', '........'],
   /** A torn leaf of parchment, a rune scratched on it. */
   rune_leaf: ['.sssss..', '.sSssss.', 'ssuSsss.', 'ssuussSs', 'sSsusss.', '.ssuSss.', '.sssss..', '..s.s...'],
+  /** An old clasp of ring-mail, its rings dark with age. */
+  mail_clasp: [
+    '..llll..',
+    '.lLllLl.',
+    'lLgggLLl',
+    'lLgGgLLl',
+    'lLgggLLl',
+    '.lLllLl.',
+    '..llll..',
+    '........',
+  ],
   /** A bronze sheep's bell on its leather strap. */
   trade_bell: [
     '.wwwww..',

@@ -12,6 +12,7 @@ export const HALVAR: DialogueDef = {
     { when: raidNight, node: 'raid' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
+    { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
     { when: atLeast('q_farm', 2), node: 'farm_done' },
     { when: atLeast('q_farm', 1), node: 'fold' },
     { when: flag('st_farm_asked'), node: 'roof' },
@@ -292,6 +293,21 @@ export const HALVAR: DialogueDef = {
         en: 'Timber costs silver, even now. Come back with a fuller purse. I am not going anywhere.',
         sv: 'Timmer kostar silver, även nu. Kom tillbaka med en fullare pung. Jag ska ingenstans.',
       },
+    },
+    clasp: {
+      text: {
+        en: 'Where did you get that? … Steinn. The old dog is still alive, then.',
+        sv: 'Var fick du tag i det där? … Steinn. Den gamle hunden lever alltså.',
+      },
+      do: [{ k: 'take', item: 'mail_clasp' }],
+      next: 'clasp2',
+    },
+    clasp2: {
+      text: {
+        en: 'Do I remember what we swore? Tell him: every word, and I wish I did not. Tell him only that, Ask. Nothing more.',
+        sv: 'Om jag minns vad vi svor? Säg till honom: varje ord, och jag önskar att jag inte gjorde det. Säg bara det, Ask. Inget mer.',
+      },
+      do: [{ k: 'set', flag: 'q_steinn_answer', value: true }],
     },
     farm_done: {
       text: {

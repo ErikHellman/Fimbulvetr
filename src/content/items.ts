@@ -36,6 +36,7 @@ export const ITEM_NAMES = {
   trade_yarn: { en: 'Spun yarn', sv: 'Spunnet garn' },
   trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
   rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
+  mail_clasp: { en: 'Ring-mail clasp', sv: 'Brynjespänne' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {

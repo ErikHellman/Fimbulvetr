@@ -574,4 +574,31 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_steinn: {
+    id: 'q_steinn',
+    name: { en: 'An old clasp', sv: 'Ett gammalt spänne' },
+    stages: [
+      {
+        when: flag('q_steinn_asked'),
+        text: {
+          en: 'Steinn gave Ask a clasp from his old ring-mail, for Halvar. He wants to know if Halvar remembers what they swore.',
+          sv: 'Steinn gav Ask ett spänne från sin gamla brynja, till Halvar. Han vill veta om Halvar minns vad de svor.',
+        },
+      },
+      {
+        when: flag('q_steinn_answer'),
+        text: {
+          en: 'Halvar’s answer: “Every word, and I wish I did not.” Bring it to Steinn in Uppvík’s mead hall.',
+          sv: 'Halvars svar: ”Varje ord, och jag önskar att jag inte gjorde det.” Ta det till Steinn i Uppvíks mjödhall.',
+        },
+      },
+      {
+        when: flag('q_steinn_done'),
+        text: {
+          en: 'Steinn heard Halvar’s answer and paid Ask 150 silver. What they swore stays between them and the mountain.',
+          sv: 'Steinn hörde Halvars svar och betalade Ask 150 silver. Det de svor stannar mellan dem och berget.',
+        },
+      },
+    ],
+  },
 };

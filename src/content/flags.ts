@@ -179,6 +179,10 @@ export const FLAGS = {
   q_trolls_asked: { t: 'bool' },
   q_trolls_stoned: { t: 'int', max: 5 },
   q_trolls_done: { t: 'bool' },
+  /** Steinn's clasp (`q_steinn`): carried to Halvar, his answer, and Steinn paid for the errand. */
+  q_steinn_asked: { t: 'bool' },
+  q_steinn_answer: { t: 'bool' },
+  q_steinn_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;
