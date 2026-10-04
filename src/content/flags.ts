@@ -150,6 +150,8 @@ export const FLAGS = {
   st_bragd_learned: { t: 'bool' },
   /** The rime across the gorge beyond the pass has melted (M6 opens the road north). */
   st_rime_open: { t: 'bool' },
+  /** Sölvi taught Hlíf, the ward-song, once the pass was open. */
+  st_hlif_learned: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

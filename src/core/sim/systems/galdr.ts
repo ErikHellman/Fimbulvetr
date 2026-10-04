@@ -23,7 +23,16 @@ function farvegr(rt: SimRt): 'later' | 'fizzle' {
   return 'later';
 }
 
+/** Hlíf's ward: the hits it absorbs, and how long it holds (20 s). */
+export const HLIF = { hits: 3, ticks: 1200 } as const;
+
 const SONGS: Partial<Record<GaldrId, Song>> = {
+  hlif: (rt) => {
+    rt.hero.mem['ward'] = HLIF.hits;
+    rt.hero.mem['wardT'] = HLIF.ticks;
+    rt.emit({ t: 'sfx', id: 'sfx_ward' });
+    return 'pay';
+  },
   eldr: (rt, input) => {
     castEldr(rt, input);
     return 'pay';

@@ -350,6 +350,12 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
 export function heroPreTick(e: Entity): void {
   const cd = mem(e, 'rollCd');
   if (cd > 0) e.mem['rollCd'] = cd - 1;
+  // Hlíf's ward fades when its time runs out, whatever is left of it.
+  const ward = mem(e, 'wardT');
+  if (ward > 0) {
+    e.mem['wardT'] = ward - 1;
+    if (ward === 1) e.mem['ward'] = 0;
+  }
 }
 
 export function createHero(

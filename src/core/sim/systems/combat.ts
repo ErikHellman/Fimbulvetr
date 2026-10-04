@@ -197,6 +197,21 @@ function parried(rt: SimRt, source: HitSource, dir: Vec, tags: number): boolean 
   return true;
 }
 
+/**
+ * Hlíf's ward takes the blow, whatever it is (heavy ones too), and is one hit thinner. Ask gets the hurt
+ * i-frames, so one swing spends one rune.
+ */
+function warded(rt: SimRt, amount: number): boolean {
+  const { hero } = rt;
+  if (mem(hero, 'ward') <= 0 || amount <= 0 || hero.iframes > 0) return false;
+  hero.mem['ward'] = mem(hero, 'ward') - 1;
+  if (mem(hero, 'ward') === 0) hero.mem['wardT'] = 0;
+  hero.iframes = rt.db.tuning.hero.hurtIframes;
+  rt.emit({ t: 'hit', target: hero.id, blocked: true, dealt: 0 });
+  rt.emit({ t: 'sfx', id: 'sfx_ward' });
+  return true;
+}
+
 /** Whatever deals a hit: an enemy, a shot, a fixture. */
 type HitSource = { readonly pos: Vec; readonly faction: Faction } | Entity;
 
@@ -206,6 +221,7 @@ export function hurtHero(rt: SimRt, source: HitSource, amount: number, knock: nu
   if (rt.god === true) return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
+  if (warded(rt, amount)) return true;
   if (parried(rt, source, dir, tags)) return true;
   // Armour takes its share off every blow, but a blow always lands at least a quarter heart.
   const reduce = db.tuning.armor[rt.state.inv.armor].reduce;

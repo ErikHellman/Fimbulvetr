@@ -223,6 +223,11 @@ export class Sim implements SimRt {
   }
 
   /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
+  /** Hlíf's ward on Ask: the hits it still holds and the ticks it has left (both 0 when there is none). */
+  ward(): { readonly hits: number; readonly ticks: number } {
+    return { hits: mem(this.hero, 'ward'), ticks: mem(this.hero, 'wardT') };
+  }
+
   boss(): BossView | null {
     for (const e of this.actors) {
       if (e.kind !== 'enemy') continue;
