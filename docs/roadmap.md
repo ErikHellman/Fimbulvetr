@@ -108,5 +108,5 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: Konungshaugr's 20 rooms, `q_runestone_3` to the third stone, Haugar's bow secrets (the great cairn's quiver, the watchtower's piece), arrows for sale
     - [x] Solver proofs, route, e2e, v1-m4b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M5 Act I finale (demo) — brief: `docs/briefs/m5.md` (draft, awaiting approval)
+- [ ] M5 Act I finale (demo) — brief: `docs/briefs/m5.md`
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
