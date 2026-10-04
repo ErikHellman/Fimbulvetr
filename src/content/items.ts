@@ -35,6 +35,7 @@ export const ITEM_NAMES = {
   trade_fleece: { en: 'Raw fleece', sv: 'Råull' },
   trade_yarn: { en: 'Spun yarn', sv: 'Spunnet garn' },
   trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
+  trade_comb: { en: 'Walrus-ivory comb', sv: 'Kam av valrossben' },
   rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
   mail_clasp: { en: 'Ring-mail clasp', sv: 'Brynjespänne' },
   grave_ring: { en: 'Grave-ring', sv: 'Gravring' },

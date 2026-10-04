@@ -44,6 +44,7 @@ import { GEIRMUNDR } from './geirmundr';
 import { HALLSTEINN } from './hallsteinn';
 import { THRALL } from './thrall';
 import { BRAGI } from './bragi';
+import { HRAFN } from './hrafn';
 
 /** Dialogue graphs by id. Every NPC's graph lives in its own file next to this one. */
 export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
@@ -90,5 +91,6 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   hallsteinn: HALLSTEINN,
   thrall: THRALL,
   bragi: BRAGI,
+  hrafn: HRAFN,
   thingstone: THINGSTONE,
 };

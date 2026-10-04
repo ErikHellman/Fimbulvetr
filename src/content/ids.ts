@@ -42,7 +42,7 @@ export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
 /** Things carried for someone: a quest's token or a brew's ingredients. */
 export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
 /** The trading chain's goods (`q_trade`): each is traded on for the next. */
-export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_hook'] as const;
+export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_hook', 'trade_comb'] as const;
 /** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
 export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
 /** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
@@ -218,6 +218,7 @@ export const NPCS = [
   // Niflmýrr
   'thrall',
   'bragi',
+  'hrafn',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 

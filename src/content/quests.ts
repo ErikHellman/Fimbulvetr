@@ -498,6 +498,13 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         },
       },
       {
+        when: atLeast('q_trade', 4),
+        text: {
+          en: 'Hrafn the seal-hunter gave a walrus-ivory comb for the hook, for someone who still combs her hair for a reason.',
+          sv: 'Sälfångaren Hrafn gav en kam av valrossben för kroken, åt någon som fortfarande kammar sitt hår av en anledning.',
+        },
+      },
+      {
         when: atLeast('q_trade', 7),
         text: { en: 'Every trade is made.', sv: 'Alla byten är gjorda.' },
       },

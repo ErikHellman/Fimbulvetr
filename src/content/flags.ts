@@ -223,6 +223,8 @@ export const FLAGS = {
   st_twist_heard: { t: 'bool' },
   /** Bragi the skald, met by his fire at the drained camp (M6a). */
   n_bragi_met: { t: 'bool' },
+  /** Hrafn the seal-hunter, met in his hut on Niflmýrr's shore (M6a). */
+  n_hrafn_met: { t: 'bool' },
   /** The skald's verses bought: each marks a secret on the map (see content/verses.ts). */
   w_verse_deadwood: { t: 'bool' },
   w_verse_cairns: { t: 'bool' },

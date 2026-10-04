@@ -57,6 +57,24 @@ describe('the trading chain, steps 1–3', () => {
     expect(trade(h)?.text.en).toContain('seal-hunter');
   });
 
+  it('step 4: Hrafn the seal-hunter gives a walrus-ivory comb for Gamli’s bone hook', () => {
+    const h = new Harness({ preset: DEV_PRESETS.fimbul, screen: 'nif_int_hut', tile: [19, 13] });
+    Object.assign(h.sim.state.flags, { st_rime_open: true, st_niflmyrr_reached: true, q_trade: 3 });
+    h.sim.state.inv.items = { ...h.sim.state.inv.items, trade_hook: 1 };
+    const items = () => h.sim.state.inv.items;
+    talkTo(h, 'hrafn');
+    expect(h.sim.state.flags.n_hrafn_met).toBe(true);
+    expect(h.sim.state.flags.q_trade).toBe(3);
+    talkTo(h, 'hrafn');
+    expect([items().trade_hook ?? 0, items().trade_comb]).toEqual([0, 1]);
+    expect(h.sim.state.flags.q_trade).toBe(4);
+    expect(trade(h)?.done).toBe(false);
+    expect(trade(h)?.text.en).toContain('combs her hair');
+    // Traded once.
+    talkTo(h, 'hrafn');
+    expect(items().trade_comb).toBe(1);
+  });
+
   it('has nothing in the ashes before the raid', () => {
     const h = new Harness({ preset: DEV_PRESETS.day2 });
     warp(h, 'ask_pasture', 6, 14);

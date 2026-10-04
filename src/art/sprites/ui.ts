@@ -154,6 +154,17 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     '..sss...',
     '........',
   ],
+  /** A comb of walrus ivory, its back carved. */
+  trade_comb: [
+    '........',
+    '.ssssss.',
+    'sSssSssS',
+    'ssssssss',
+    's.s.s.s.',
+    's.s.s.s.',
+    's.s.s.s.',
+    '........',
+  ],
   /** A round iron bomb, its fuse spitting sparks. */
   bombs: ['.....y.y', '......Y.', '....ww..', '..iiii..', '.iliiii.', '.iiiiii.', '.iiiiiL.', '..iiLL..'],
   /** A short hunting bow, strung. */

@@ -441,6 +441,16 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     bottom: '#4a3a2a',
     apron: '#6a4a2a',
   },
+  /** Hrafn the seal-hunter: wind-burnt, black-haired, in sealskin and oiled leather. */
+  hrafn: {
+    skin: TAN,
+    hair: '#1f1c1a',
+    hairStyle: 'short',
+    beard: '#1f1c1a',
+    top: '#5a5048',
+    legs: 'pants',
+    bottom: '#3a332c',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

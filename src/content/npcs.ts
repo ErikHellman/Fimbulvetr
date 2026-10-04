@@ -61,6 +61,7 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   hallsteinn: { en: 'Hallsteinn', sv: 'Hallsteinn' },
   thrall: { en: 'A bled thrall', sv: 'En tappad träl' },
   bragi: { en: 'Bragi', sv: 'Bragi' },
+  hrafn: { en: 'Hrafn', sv: 'Hrafn' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -230,6 +231,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   thrall: npc('thrall', [
     { when: not(flag('st_twist_heard')), screen: 'nif_camp', at: { x: 16, y: 9 }, facing: 's' },
   ]),
+  /** The seal-hunter, at home in his hut on the shore. */
+  hrafn: npc('hrafn', [{ screen: 'nif_int_hut', at: { x: 17, y: 11 }, facing: 's' }]),
   /** The wandering skald: by his fire in the drained camp from evening to dawn. */
   bragi: npc('bragi', [{ when: evening, screen: 'nif_camp', at: { x: 35, y: 12 }, facing: 's' }]),
 };
