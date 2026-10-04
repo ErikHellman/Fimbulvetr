@@ -49,6 +49,7 @@ const KINDS: Readonly<
   wheel: { solid: 'always', anims: ['on', 'off'] },
   warp: { solid: 'always', anims: ['awake', 'dormant'] },
   seal: { solid: 'always', anims: ['lit', 'dark'] },
+  post: { solid: 'always' },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -100,6 +101,12 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     case 'seal':
       out.push(fixture(rt.newId(), 'seal', 'fix_seal', thing.at, index));
       return;
+    case 'post': {
+      const e = fixture(rt.newId(), 'post', 'fix_post', thing.at, index);
+      setAnim(e, 'idle');
+      out.push(e);
+      return;
+    }
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
       e.mem['lit'] = thing.lit === true ? 1 : 0;
@@ -248,6 +255,19 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
   if (changed) stampCollision(rt);
 }
 
+/** The tiles of the resting rafts: footing over the water (see `stampCollision`). */
+export function raftTiles(rt: SimRt): number[] {
+  const out: number[] = [];
+  const cols = rt.screen.collision.cols;
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || e.def !== 'raft' || mem(e, 'moving') === 1) continue;
+    const x = mem(e, 'tx');
+    const y = mem(e, 'ty');
+    out.push(y * cols + x, y * cols + x + 1, (y + 1) * cols + x, (y + 1) * cols + x + 1);
+  }
+  return out;
+}
+
 /**
  * collision = base terrain + the tiles of solid fixtures (closed gates, locks and shutters, chests in
  * sight, switches, braziers) + wall props (root blocks, vines).
@@ -270,6 +290,8 @@ export function stampCollision(rt: SimRt): void {
     const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
     collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   }
+  // A raft resting at its stop: footing over the water.
+  for (const i of raftTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
     collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;

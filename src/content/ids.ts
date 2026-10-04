@@ -170,6 +170,7 @@ export const SFX = [
   'sfx_melt',
   'sfx_is',
   'sfx_ljos',
+  'sfx_chain',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

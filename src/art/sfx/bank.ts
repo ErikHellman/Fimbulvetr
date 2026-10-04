@@ -668,4 +668,14 @@ export const SFX_BANK = {
     release: 0.6,
     volume: 0.28,
   },
+  /** The grapple chain paying out: a dry iron rattle that rises. */
+  sfx_chain: {
+    wave: 'square',
+    freq: 180,
+    freqEnd: 420,
+    attack: 0.01,
+    sustain: 0.12,
+    release: 0.08,
+    volume: 0.22,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

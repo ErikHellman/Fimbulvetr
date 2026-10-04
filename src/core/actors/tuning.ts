@@ -141,6 +141,16 @@ export interface BoomerangTuning {
   readonly range: number;
 }
 
+/** The grapple chain's head. */
+export interface GrappleTuning {
+  /** px per tick, out and back. */
+  readonly speed: number;
+  /** px flown before it turns back (six tiles). */
+  readonly range: number;
+  /** px per tick Ask is pulled along it to a post. */
+  readonly pull: number;
+}
+
 /** What the arm-rings do while worn. */
 export interface RingTuning {
   /** The arm-ring of stamina scales the wait between rolls by this. */
@@ -154,6 +164,7 @@ export interface Tuning {
   readonly rings: RingTuning;
   readonly boomerang: BoomerangTuning;
   readonly bow: BowTuning;
+  readonly grapple: GrappleTuning;
   readonly throw: ThrowTuning;
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */

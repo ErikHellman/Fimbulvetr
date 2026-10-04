@@ -27,6 +27,8 @@ export const FOG_THICK = 0.8;
 export const FOG_RADIUS = 80;
 /** …and seven with the lantern. */
 export const LANTERN_FOG_RADIUS = 112;
+/** In a fog room (Helgrind) only a small circle round Ask is clear, or the lantern's own light. */
+export const FOG_ROOM_RADIUS = 32;
 export const FIRE_RADIUS = 28;
 /** An awake warp stone's faint glow. */
 export const WARP_RADIUS = 28;
@@ -39,6 +41,8 @@ export interface Place {
   readonly weather: WeatherKind;
   /** A region where the fog never lifts (Niflmýrr), whatever the sky. */
   readonly misty?: boolean;
+  /** A room filled with fog (Helgrind's fog rooms, Náströnd's last stand), indoors or not. */
+  readonly fogRoom?: boolean;
 }
 
 /** 0 = nothing is hidden … 1 = pitch black, from daylight (0 night … 1 day) and where the hero is. */
@@ -51,8 +55,9 @@ export function darknessOf(daylight: number, place: Place): number {
   return Math.min(1, night + extra);
 }
 
-/** How thick the fog is where the hero stands: outdoors in fog, or anywhere outdoors in a misty region. */
+/** How thick the fog is where the hero stands: outdoors in fog, outdoors in a misty region, or in a fog room. */
 export function fogOf(place: Place): number {
+  if (place.fogRoom === true) return FOG_THICK;
   if (place.indoor || place.dark) return 0;
   return place.weather === 'fog' || place.misty === true ? FOG_THICK : 0;
 }

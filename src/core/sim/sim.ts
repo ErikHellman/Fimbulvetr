@@ -19,6 +19,7 @@ import { buildCollision } from '../world/collision';
 import {
   FIRE_RADIUS,
   FOG_RADIUS,
+  FOG_ROOM_RADIUS,
   LANTERN_FOG_RADIUS,
   LANTERN_RADIUS,
   WARP_RADIUS,
@@ -53,6 +54,8 @@ import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
 import { stepRiders } from './systems/mara';
 import { LJOS, ljosBurns, stepLjos } from './systems/ljos';
+import { grappleLine } from './systems/grapple';
+import { stepRafts } from './systems/raft';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
@@ -94,6 +97,9 @@ export interface SimOptions {
 }
 
 /** The whole game rules engine. Deterministic: same state + same inputs ⇒ same result. */
+/** A foe that fills its room with fog while it lives (Náströnd's last phase sets `mem.fog`). */
+const fogRaised = (rt: SimRt): boolean => rt.actors.some((e) => e.kind === 'enemy' && mem(e, 'fog') === 1);
+
 export class Sim implements SimRt {
   readonly state: GameState;
   mode: Mode = 'play';
@@ -224,15 +230,24 @@ export class Sim implements SimRt {
    */
   fog(): { readonly amount: number; readonly r: number } {
     const def = this.db.screens[this.screen.id];
+    const fogRoom = def.fog === true || fogRaised(this);
     const amount = fogOf({
       indoor: !outdoors(this),
       dark: def.dark === true,
       weather: this.weather(),
       misty: misty(this),
+      fogRoom,
     });
     // Ljós burns the fog away while it lasts.
     if (amount === 0 || ljosBurns(this)) return { amount: 0, r: 0 };
-    return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
+    const lantern = (this.state.inv.items.lantern ?? 0) > 0;
+    if (fogRoom) return { amount, r: lantern ? LANTERN_RADIUS : FOG_ROOM_RADIUS };
+    return { amount, r: lantern ? LANTERN_FOG_RADIUS : FOG_RADIUS };
+  }
+
+  /** The grapple chain while it is out: from Ask's hand to its head, in screen pixels; else null. */
+  grapple(): { readonly hand: Vec; readonly head: Vec } | null {
+    return grappleLine(this);
   }
 
   /** Hlíf's ward on Ask: the hits it still holds and the ticks it has left (both 0 when there is none). */
@@ -382,6 +397,7 @@ export class Sim implements SimRt {
     useItems(this, input);
     castGaldr(this, input);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
+    stepRafts(this);
     const ctx = actorCtx(this);
     stepLjos(this);
     runEnemies(this, ctx);

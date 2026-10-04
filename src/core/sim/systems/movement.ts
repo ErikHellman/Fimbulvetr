@@ -23,7 +23,8 @@ export function blocksHero(rt: SimRt, e: Entity): boolean {
 
 export function moveAll(rt: SimRt): void {
   const obstacles = rt.actors.filter((e) => blocksHero(rt, e)).map((e) => at(e.body, e.pos));
-  moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles);
+  // Aboard a moving raft, Ask goes where the raft goes (see `stepRafts`).
+  if (mem(rt.hero, 'raft') !== 1) moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles);
   const walls = gridSolidAt(rt.screen.collision, () => true);
   const { cols, rows } = rt.screen.collision;
   const sky: SolidAt = (tx, ty) => tx < 0 || ty < 0 || tx >= cols || ty >= rows;

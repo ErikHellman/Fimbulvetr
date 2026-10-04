@@ -6,6 +6,12 @@ import { TILE } from '@core/world/dims';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import { bodyBounds, type Bounds } from './bounds';
 
+/**
+ * Fixtures that lie flat (a lowered drawbridge, a raft), by how far (px) they sink in the draw order:
+ * anyone standing on them is drawn over them.
+ */
+const FLAT: Readonly<Record<string, number>> = { bridge: TILE, raft: 2 * TILE };
+
 /** Mirrors sim entities as sprites. Safe to call every frame: views are derived from state only. */
 export class EntityViews {
   private readonly sprites = new Map<number, Phaser.GameObjects.Sprite>();
@@ -37,8 +43,7 @@ export class EntityViews {
       sprite.setOrigin(ref.ox, ref.oy);
       const p = place(e);
       sprite.setPosition(Math.round(p.x), Math.round(p.y - (e.mem['z'] ?? 0)));
-      // A lowered drawbridge lies flat: anyone standing on its tile is drawn over it.
-      sprite.setDepth(e.kind === 'fixture' && e.def === 'bridge' ? p.y - TILE : p.y);
+      sprite.setDepth(p.y - (e.kind === 'fixture' ? (FLAT[e.def] ?? 0) : 0));
       const stun = e.mem['stun'] ?? 0;
       const frozen = e.mem['frozen'] ?? 0;
       if (e.flash > 0 && Math.floor(e.flash / 2) % 2 === 0)

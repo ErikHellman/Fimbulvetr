@@ -94,6 +94,10 @@ const FOUND: Partial<Record<ItemId, L10n>> = {
     en: 'You found a larger bomb bag! It holds ten more bombs.',
     sv: 'Du hittade en större bombpåse! Den rymmer tio bomber till.',
   },
+  grapple: {
+    en: 'You found the grapple chain! Fire it with its item key, the way you face. It hooks iron posts and pulls you across pits and water, drags light foes and far things to you, and catches on shields.',
+    sv: 'Du hittade änterkedjan! Skjut ut den med dess föremålsknapp, åt det håll du vänder dig. Den hakar fast i järnstolpar och drar dig över gropar och vatten, drar lätta fiender och avlägsna saker till dig och fastnar i sköldar.',
+  },
   boomerang: {
     en: 'You found the boomerang! Throw it with its item key. It stuns, strikes far switches and fetches what lies out of reach.',
     sv: 'Du hittade bumerangen! Kasta den med dess föremålsknapp. Den bedövar, träffar avlägsna brytare och hämtar det som ligger utom räckhåll.',

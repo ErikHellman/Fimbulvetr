@@ -21,6 +21,7 @@ import { createHeart, createPiece, herbGrows } from './pickups';
 import { placeNpcs } from './npcs';
 import { holdBack } from './rooms';
 import { condCtx } from './story';
+import { createRaft } from './raft';
 
 /** Whether the current room's dungeon has lost its boss (who then never comes back). */
 function bossDown(rt: SimRt): boolean {
@@ -163,8 +164,12 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'wheel':
       case 'warp':
       case 'seal':
+      case 'post':
       case 'scenery':
         spawnFixtures(rt, thing, index, out);
+        break;
+      case 'raft':
+        out.push(createRaft(rt, thing, index));
         break;
       case 'door':
       case 'sign':

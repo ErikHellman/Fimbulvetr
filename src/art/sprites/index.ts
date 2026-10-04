@@ -16,6 +16,7 @@ import { UI_ANIMS, uiFrames } from './ui';
 import { HAUGAR_ANIMS, haugarFrames } from './haugar';
 import { PASS_ANIMS, passFrames } from './pass';
 import { NIFLMYRR_ANIMS, niflmyrrFrames } from './niflmyrr';
+import { HELGRIND_ANIMS, helgrindFrames } from './helgrind';
 
 export type { SpriteFrame } from './types';
 
@@ -37,6 +38,7 @@ export const ANIMS: AnimTable = {
   ...HAUGAR_ANIMS,
   ...PASS_ANIMS,
   ...NIFLMYRR_ANIMS,
+  ...HELGRIND_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -56,6 +58,7 @@ export function buildSprites(): SpriteFrame[] {
     ...haugarFrames(),
     ...passFrames(),
     ...niflmyrrFrames(),
+    ...helgrindFrames(),
     missingFrame(),
   ];
 }

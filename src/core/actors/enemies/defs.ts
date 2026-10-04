@@ -48,6 +48,8 @@ export interface EnemyDef {
   readonly struckBy?: number;
   /** The element that breaks its `guard` for good (a bomb's force cracks a mud-crab's shell). */
   readonly cracks?: Element;
+  /** Light enough for the grapple chain to drag it to Ask (who then finds it stunned). */
+  readonly light?: true;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */
   readonly stunnable?: number;
   /**

@@ -25,6 +25,7 @@ export type HeroMode =
   | 'toss'
   | 'shoot'
   | 'cast'
+  | 'chain'
   | 'dying';
 
 export interface HeroCtx {
@@ -315,6 +316,21 @@ const cast: HeroDef = {
   },
 };
 
+/**
+ * The grapple chain is out (or pulling Ask along it): Ask stands still with the arm out. The chain's own
+ * step ends it, back to `move`, when the head is caught or Ask lands.
+ */
+const chain: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'toss');
+  },
+  tick(e) {
+    still(e);
+    return undefined;
+  },
+};
+
 /** Fallen at 0 hp. The sim is in `over` mode, which advances the clock of this state by hand. */
 const dying: HeroDef = {
   enter(e) {
@@ -345,6 +361,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   toss,
   shoot,
   cast,
+  chain,
   dying,
 };
 

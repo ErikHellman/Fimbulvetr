@@ -196,6 +196,13 @@ export type Thing =
   | { readonly k: 'warp'; readonly region: RegionId; readonly at: TilePos; readonly arrive: TilePos }
   /** A rune seal (the pass's three): a solid pillar whose rune burns while `lit` holds. */
   | { readonly k: 'seal'; readonly at: TilePos; readonly lit: Cond }
+  /** A grapple post: a solid iron-bound pillar the grapple chain hooks, pulling Ask to the tile before it. */
+  | { readonly k: 'post'; readonly at: TilePos }
+  /**
+   * A raft, 2×2 tiles, resting at `at` (its top-left tile) and plying a straight line through each stop of
+   * `path` and back again. Resting, it is footing; Ask aboard as it sets off rides along. Never saved.
+   */
+  | { readonly k: 'raft'; readonly at: TilePos; readonly path: readonly TilePos[] }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
@@ -271,6 +278,8 @@ export interface ScreenDef {
   readonly indoor?: boolean;
   /** No light of its own (a cave): only the lantern and fires show anything. */
   readonly dark?: boolean;
+  /** Filled with fog (a Helgrind room): only a small circle round Ask shows, or the lantern's light. */
+  readonly fog?: boolean;
   /** A dungeon room: its grid in `layout.dungeons`; the clock stops and there is no weather. */
   readonly dungeon?: DungeonId;
   /** Where the region's spawn table may put enemies (see ContentDb.spawns). None: nothing rolled here. */

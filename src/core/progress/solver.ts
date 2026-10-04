@@ -27,7 +27,8 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
  * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored. Once Ís can be
  * sung (the galdr or a stave), still water is walkable in any season. Hidden floor (the ghost floor, the
- * drowned path) is floor, as it is to the sim: light only shows it.
+ * drowned path) is floor, as it is to the sim: light only shows it. Once the grapple chain is held, a post
+ * in a straight line from a reached tile pulls Ask to the tile before it.
  */
 
 export interface SolveOptions {
@@ -62,6 +63,8 @@ export interface SolveResult {
 }
 
 const FETCH_TILES = 7;
+/** How far the grapple chain reaches a post, in tiles (it flies 96 px). */
+const GRAPPLE_TILES = 6;
 /** How far an arrow carries to an eye switch, in tiles (it flies 72 ticks at 5 px a tick). */
 const ARROW_TILES = 12;
 const DIRS8: readonly (readonly [number, number])[] = [
@@ -274,7 +277,7 @@ function settle(w: World, state: GameState, origin: number): Node {
 interface Ground {
   /** Gates, locks, shutters, chests, switches, braziers left shut or standing. */
   readonly blocked: ReadonlySet<number>;
-  /** Lowered drawbridges, and still water once Ís can floor it. */
+  /** Lowered drawbridges, rafts' decks at their stops, and still water once Ís can floor it. */
   readonly open: ReadonlySet<number>;
 }
 
@@ -299,6 +302,8 @@ function bridgeTiles(w: World, state: GameState): Set<number> {
   const ctx = ctxOf(w, state);
   for (const id of w.ids)
     for (const t of w.db.screens[id].things) {
+      if (t.k === 'raft')
+        for (const stop of [t.at, ...t.path]) for (const i of deckOf(w, id, stop)) out.add(i);
       if (t.k !== 'bridge' || !evalCond(t.down, ctx)) continue;
       for (let dy = 0; dy < t.h; dy++)
         for (let dx = 0; dx < t.w; dx++) out.add(w.tile(id, t.at.x + dx, t.at.y + dy));
@@ -343,6 +348,7 @@ function solidThing(
     case 'wheel':
     case 'warp':
     case 'seal':
+    case 'post':
     case 'brazier':
       return true;
     case 'lock':
@@ -384,6 +390,78 @@ function warpEdges(w: World, state: GameState): Map<number, number[]> {
           out.set(from, [...(out.get(from) ?? []), to]);
         }
     }
+  return out;
+}
+
+/**
+ * Once the grapple is held: from each tile in a straight four-way line of up to `GRAPPLE_TILES` from a post,
+ * over floor or anything low (water, pits) and nothing left shut, to the tile before the post, when Ask can
+ * stand there. One way only: the chain pulls, it never carries Ask back.
+ */
+function grappleEdges(w: World, state: GameState): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  if (!has(state, 'grapple')) return out;
+  const blocked = blockedTiles(w, state, null);
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'post') continue;
+      for (const dir of ['n', 's', 'e', 'w'] as const) {
+        const d = DIR_VEC[dir];
+        const lx = t.at.x - d.x;
+        const ly = t.at.y - d.y;
+        const land = w.terrain(id, lx, ly);
+        const to = w.tile(id, lx, ly);
+        if (land === null || land.solid || blocked.has(to)) continue;
+        for (let k = 2; k <= GRAPPLE_TILES; k++) {
+          const fx = t.at.x - d.x * k;
+          const fy = t.at.y - d.y * k;
+          const between = w.terrain(id, fx + d.x, fy + d.y);
+          if (between === null || (between.solid && !between.low)) break;
+          if (k > 2 && blocked.has(w.tile(id, fx + d.x, fy + d.y))) break;
+          const from = w.terrain(id, fx, fy);
+          if (from === null) break;
+          const f = w.tile(id, fx, fy);
+          out.set(f, [...(out.get(f) ?? []), to]);
+        }
+      }
+    }
+  return out;
+}
+
+/** The four tiles of a raft's deck resting with its top-left tile at `at`. */
+const deckOf = (w: World, id: ScreenId, at: { x: number; y: number }): number[] => [
+  w.tile(id, at.x, at.y),
+  w.tile(id, at.x + 1, at.y),
+  w.tile(id, at.x, at.y + 1),
+  w.tile(id, at.x + 1, at.y + 1),
+];
+
+/** A raft carries Ask from each stop's deck to the next stop's and back (its decks are footing). */
+function raftEdges(w: World): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'raft') continue;
+      const stops = [t.at, ...t.path];
+      for (let i = 1; i < stops.length; i++) {
+        const a = stops[i - 1];
+        const b = stops[i];
+        if (a === undefined || b === undefined) continue;
+        const [ta] = deckOf(w, id, a);
+        const [tb] = deckOf(w, id, b);
+        if (ta === undefined || tb === undefined) continue;
+        for (const f of deckOf(w, id, a)) out.set(f, [...(out.get(f) ?? []), tb]);
+        for (const f of deckOf(w, id, b)) out.set(f, [...(out.get(f) ?? []), ta]);
+      }
+    }
+  return out;
+}
+
+/** Every move that is not a step: warps from a `use`, pulls along the grapple chain, and raft rides. */
+function jumpEdges(w: World, state: GameState): Map<number, number[]> {
+  const out = warpEdges(w, state);
+  for (const more of [grappleEdges(w, state), raftEdges(w)])
+    for (const [from, to] of more) out.set(from, [...(out.get(from) ?? []), ...to]);
   return out;
 }
 
@@ -449,7 +527,7 @@ function wheelSpots(w: World, state: GameState): Map<number, number[]> {
  */
 function flood(w: World, state: GameState, origin: number): Set<number> {
   let reach = new Set<number>();
-  const warps = warpEdges(w, state);
+  const warps = jumpEdges(w, state);
   const spots = wheelSpots(w, state);
   const fixed = levelOf(w, state);
   const start = w.water === null ? origin : origin + fixed * w.span;
@@ -818,7 +896,7 @@ function openableLocks(w: World, node: Node): { id: string; dungeon: DungeonId }
 /** Reachable tiles (at some water level) from which no path leads back to the starting tile. */
 function strandedTiles(w: World, node: Node, origin: number): number[] {
   const ground = groundOf(w, node.state, node.reach);
-  const warps = warpEdges(w, node.state);
+  const warps = jumpEdges(w, node.state);
   const spots = wheelSpots(w, node.state);
   const fixed = levelOf(w, node.state);
   const back = new Map<number, number[]>();

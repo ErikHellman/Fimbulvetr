@@ -30,6 +30,8 @@ export interface ViewStats {
   readonly flames: number;
   /** Hidden-floor tiles the light shows. */
   readonly ghosts: number;
+  /** Links of the grapple chain drawn. */
+  readonly chain: number;
   /** Hlíf's runes drawn round Ask. */
   readonly ward: number;
   readonly lights: number;

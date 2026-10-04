@@ -19,6 +19,7 @@ import { heroCtx } from './hero';
 import { windOf } from './weather';
 import { stepEldr } from './eldr';
 import { stepIs } from './is';
+import { stepGrapple } from './grapple';
 import { enemyDef } from './movement';
 
 /** The boomerang's box around its ground point; it is drawn `FLY_Z` px up, at hand height. */
@@ -81,6 +82,7 @@ export function stepProjectiles(rt: SimRt): void {
     if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
     else if (e.def === 'eldr') stepEldr(rt, e, wind);
     else if (e.def === 'is') stepIs(rt, e);
+    else if (e.def === 'grapple') stepGrapple(rt, e);
     else if (e.def === 'bragd') stepBragd(rt, e);
     else if (e.def === 'arrow' && e.faction === 'hero') stepArrow(rt, e);
     else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe') stepShot(rt, e);

@@ -68,6 +68,7 @@ export const TUNING: Tuning = {
   push: { ticks: 16, slideTicks: 16 },
   boomerang: { speed: 3, range: 112 },
   bow: { speed: 5, life: 72, damage: 4 },
+  grapple: { speed: 6, range: 96, pull: 4 },
   weapons: {
     /** The pitchfork of the raid night: long reach, light blows. */
     pitchfork: {

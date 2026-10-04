@@ -175,6 +175,8 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
   arrows: ['.....l.l', '......l.', '.....w.w', '....w.w.', '...w.w..', '..w.w...', '.ss.s...', 'ss......'],
   /** A leather quiver full of arrows. */
   quiver: ['..s.s.s.', '..w.w.w.', '.WWWWWW.', '.WwwwwW.', '.WwwwwW.', '.WwwwwW.', '.WwwwwW.', '..WWWW..'],
+  /** A coil of iron chain with its hook. */
+  grapple: ['.....l.l', '......Ll', '.....lL.', '.LlLl...', 'L....L..', 'l....l..', 'L....L..', '.lLlL...'],
   /** A sack bulging with bombs. */
   bomb_bag: ['..ss....', '.sSSs...', 'ssssss..', 'sSssSs..', 'sssiiis.', 'sSsilis.', '.sssiis.', '..ssss..'],
 };
