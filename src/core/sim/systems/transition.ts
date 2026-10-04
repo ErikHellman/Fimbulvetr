@@ -6,6 +6,7 @@ import type { Vec } from '../../math/vec';
 import { SCREEN_H, SCREEN_W, TILE } from '../../world/dims';
 import { tileFeet, type DoorThing } from '../../world/screen';
 import type { SimRt, Transition } from '../rt';
+import { forfeitDuels } from './combat';
 import { placeHero } from './hero';
 import { spawnActors } from './spawn';
 
@@ -40,6 +41,7 @@ export function markVisited(rt: SimRt, id: ScreenId): void {
 
 /** Makes `id` the live screen with fresh actors and the hero at `heroAt`, and records it as the entry. */
 export function enterScreen(rt: SimRt, id: ScreenId, heroAt: Vec, facing: Dir4 = rt.hero.facing): void {
+  forfeitDuels(rt);
   rt.screen = rt.load(id);
   rt.actors = spawnActors(rt, heroAt);
   placeHero(rt, heroAt);

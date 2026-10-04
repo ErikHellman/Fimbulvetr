@@ -84,6 +84,7 @@ export const ENEMIES = [
   'bogdraugr',
   'haugvordr',
   'haugkonungr',
+  'styrr_duel',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -257,6 +258,8 @@ export const SCRIPTS = [
   'd3_enter',
   'stone3_light',
   'shop_geirmundr',
+  'duel_lost',
+  'duel_won',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

@@ -1,4 +1,5 @@
-import type { EnemyId, ItemId, PropId } from '@content/ids';
+import type { FlagId } from '@content/flags';
+import type { EnemyId, ItemId, PropId, ScriptId } from '@content/ids';
 import type { L10n } from '../../i18n/t';
 import type { Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
@@ -66,6 +67,14 @@ export interface EnemyDef {
   readonly swims?: boolean;
   /** Gives off light in the dark, this many px around it (a bog-light). */
   readonly glow?: number;
+  /**
+   * A duel nobody dies in (Styrr's last lesson). Its death is a yield (its thing's `onDeath` runs, with
+   * no drop); a blow that leaves Ask at one heart ends the duel instead: the foe leaves, Ask's hearts
+   * refill, `flag` is cleared and `lost` runs. Leaving the screen clears `flag` too.
+   */
+  readonly duel?: { readonly flag: FlagId; readonly lost: ScriptId };
+  /** Ticks a parry stuns it, overriding the default (a boss otherwise stands half as long). */
+  readonly parryStun?: number;
 }
 
 export interface AttackWindow {

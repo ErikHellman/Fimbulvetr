@@ -533,4 +533,52 @@ export const ENEMY_DEFS = {
       },
     },
   },
+  /**
+   * Styrr in his last duel (see huscarl.ts): shield up and a cut, then, worn down, a heavy overhead
+   * that staggers through the shield, his own guard down while it falls. Nobody dies: he yields at 0,
+   * and Ask's fall to one heart ends the duel instead (`duel`).
+   */
+  styrr_duel: {
+    id: 'styrr_duel',
+    art: 'enemy_styrr',
+    hp: 12,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -8, y: -28, w: 16, h: 28 },
+    behaviour: 'huscarl',
+    knockResist: 0.6,
+    immortal: false,
+    solid: true,
+    shield: true,
+    boss: { name: { en: 'Styrr', sv: 'Styrr' }, mini: true },
+    duel: { flag: 'ev_duel_on', lost: 'duel_lost' },
+    parryStun: 60,
+    attacks: {
+      cut: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -26, w: 22, h: 24 },
+          w: { x: -22, y: -26, w: 22, h: 24 },
+          s: { x: -12, y: -12, w: 24, h: 22 },
+          n: { x: -12, y: -36, w: 24, h: 24 },
+        },
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+      heavy: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -28, w: 24, h: 28 },
+          w: { x: -24, y: -28, w: 24, h: 28 },
+          s: { x: -12, y: -12, w: 24, h: 24 },
+          n: { x: -12, y: -38, w: 24, h: 26 },
+        },
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

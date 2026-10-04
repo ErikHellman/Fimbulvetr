@@ -1,0 +1,80 @@
+import type { Dir4 } from '@core/math/dir';
+import type { AnimDef } from '../anims';
+import { rect } from '../draw';
+import { C } from '../palette';
+import { flipX, hex, type Raster } from '../raster';
+import { roundShield } from './haugar';
+import { LOOKS, drawPerson, type Side } from './people';
+import type { SpriteFrame } from './types';
+
+/** The Act I finale: Styrr in his last duel, Bragð's beam, Hlíf's ward and the rime across the pass. */
+
+const BLADE = hex(C.steel);
+const BLADE_SHADE = hex(C.steelShade);
+
+type DuelPose = 'rest' | 'raise' | 'cut' | 'wind' | 'heavy' | 'hurt';
+
+/** Styrr with his round shield and sword (32×32, feet at 16, 30). */
+function styrr(side: Side, phase: number, pose: DuelPose): Raster {
+  const arms =
+    pose === 'raise' || pose === 'wind' ? 'up' : pose === 'cut' || pose === 'heavy' ? 'forward' : 'down';
+  const r = drawPerson(LOOKS.styrr, side, phase, { arms });
+  const b = phase === 1 || phase === 3 ? 1 : 0;
+  const hx = side === 'w' ? 12 : 23;
+  if (pose === 'raise') {
+    rect(r, hx, b + 2, 2, 12, BLADE);
+    rect(r, hx + 1, b + 2, 1, 12, BLADE_SHADE);
+  } else if (pose === 'wind') {
+    // Both hands high, the blade laid back over the head: the heavy blow is coming.
+    rect(r, 10, b + 2, 13, 2, BLADE);
+    rect(r, 10, b + 3, 13, 1, BLADE_SHADE);
+  } else if (pose === 'cut' || pose === 'heavy') {
+    const w = pose === 'heavy' ? 3 : 2;
+    if (side === 'w') rect(r, 2, b + 19, 10, w, BLADE);
+    else if (side === 's') rect(r, 22, b + 20, w, 10 - b, BLADE);
+    else rect(r, 22, b + 3, w, 11, BLADE);
+  } else if (side !== 'n') rect(r, hx, b + 21, 2, 7, BLADE_SHADE);
+  // The shield stays up, but not while both hands swing the heavy blow (nor when he reels).
+  if (pose !== 'hurt' && pose !== 'wind' && pose !== 'heavy') {
+    if (side === 's') roundShield(r, 11, b + 20, true);
+    else if (side === 'w') roundShield(r, 9, b + 19, true);
+    else roundShield(r, 16, b + 19, false);
+  }
+  return r;
+}
+
+export function passFrames(): SpriteFrame[] {
+  const frames: SpriteFrame[] = [];
+  for (const side of ['s', 'n', 'w'] as const) {
+    const add = (anim: string, i: number, raster: Raster): void => {
+      frames.push({ name: `enemy_styrr_${anim}_${side}_${String(i)}`, raster, ox: 16, oy: 30 });
+      if (side === 'w')
+        frames.push({ name: `enemy_styrr_${anim}_e_${String(i)}`, raster: flipX(raster), ox: 16, oy: 30 });
+    };
+    add('idle', 0, styrr(side, 0, 'rest'));
+    for (let i = 0; i < 4; i++) add('walk', i, styrr(side, i, 'rest'));
+    add('tell', 0, styrr(side, 0, 'raise'));
+    add('tell', 1, styrr(side, 1, 'raise'));
+    add('cut', 0, styrr(side, 0, 'cut'));
+    add('wind', 0, styrr(side, 0, 'wind'));
+    add('wind', 1, styrr(side, 1, 'wind'));
+    add('heavy', 0, styrr(side, 0, 'heavy'));
+    add('hurt', 0, styrr(side, 2, 'hurt'));
+  }
+  return frames;
+}
+
+const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
+const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
+
+export const PASS_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  enemy_styrr: {
+    idle: all(1, 1),
+    walk: all(4, 5),
+    tell: all(2, 6),
+    cut: all(1, 1),
+    wind: all(2, 4),
+    heavy: all(1, 1),
+    hurt: all(1, 1),
+  },
+};

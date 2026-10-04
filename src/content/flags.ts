@@ -140,6 +140,14 @@ export const FLAGS = {
   t_dash: { t: 'bool' },
   /** Styrr taught the parry: a blow met by a freshly raised shield is turned, and its dealer stunned. */
   t_parry: { t: 'bool' },
+  /** Styrr has challenged Ask to the last duel (once both techniques are known). */
+  q_duel_asked: { t: 'bool' },
+  /** The duel is on: Styrr waits in his yard. Cleared by a win, a loss or leaving the yard. */
+  ev_duel_on: { t: 'bool' },
+  /** Ask won Styrr's last duel. */
+  q_duel_won: { t: 'bool' },
+  /** Styrr's last lesson: Bragð, the sword beam. */
+  st_bragd_learned: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -23,7 +23,7 @@ import type { SimRt } from '../rt';
 import { heroCtx } from './hero';
 import { enemyDef } from './movement';
 import { spillDrop } from './pickups';
-import { applyAll } from './story';
+import { applyAll, startScript } from './story';
 
 /**
  * Applies a hero-side hit to an actor: the one damage path for the sword, thrown props and projectiles.
@@ -95,6 +95,14 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
  */
 export function killEnemy(rt: SimRt, e: Entity, def: EnemyDef): void {
   rt.actors = rt.actors.filter((a) => a !== e);
+  if (def.duel !== undefined) {
+    // A duellist yields: no puff of smoke, nothing dropped; the duel's win is its thing's `onDeath`.
+    rt.emit({ t: 'shake', amount: 3 });
+    const thing = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
+    if (e.mem['thing'] !== undefined && thing?.k === 'enemy' && thing.onDeath !== undefined)
+      applyAll(rt, thing.onDeath);
+    return;
+  }
   rt.emit({ t: 'killed', id: e.id, def: e.def as EnemyId, x: e.pos.x, y: e.pos.y });
   rt.emit({ t: 'sfx', id: 'sfx_poof' });
   if (def.boss !== undefined) {
@@ -177,7 +185,8 @@ function parried(rt: SimRt, source: HitSource, dir: Vec, tags: number): boolean 
   if (hero.fsm.s !== 'shield' || hero.fsm.t >= db.tuning.hero.parryTicks || hero.iframes > 0) return false;
   if ((tags & PIERCE_SHIELD) !== 0 || dot(dir, DIR_VEC[hero.facing]) >= 0) return false;
   const def = enemyDef(rt, source);
-  const stun = def.boss !== undefined ? db.tuning.hero.parryStun / 2 : db.tuning.hero.parryStun;
+  const stun =
+    def.parryStun ?? (def.boss !== undefined ? db.tuning.hero.parryStun / 2 : db.tuning.hero.parryStun);
   source.mem['stun'] = Math.max(mem(source, 'stun'), stun);
   source.vel = { x: 0, y: 0 };
   const w = def.attacks?.[source.fsm.s];
@@ -209,7 +218,36 @@ export function hurtHero(rt: SimRt, source: HitSource, amount: number, knock: nu
   if (result.outcome === 'ignored') return false;
   rt.emit({ t: 'hit', target: hero.id, blocked: result.outcome === 'blocked', dealt: result.dealt });
   rt.emit({ t: 'sfx', id: result.outcome === 'blocked' ? 'sfx_block' : 'sfx_hurt' });
+  if (result.outcome !== 'blocked' && loseDuel(rt)) return true;
   if (result.outcome !== 'blocked' && hero.hp > 0)
     changeState(HERO_MACHINE, hero, 'hurt', heroCtx(rt, EMPTY_FRAME));
   return true;
+}
+
+/** Ask's hearts at which a duel is lost: one heart. */
+export const DUEL_FLOOR = 4;
+
+/**
+ * A duel ends before anyone falls: at one heart or less, the duellist steps back, Ask's hearts refill,
+ * the duel's flag is cleared and its `lost` script runs. Returns whether a duel was lost.
+ */
+function loseDuel(rt: SimRt): boolean {
+  if (rt.hero.hp > DUEL_FLOOR) return false;
+  const foe = rt.actors.find((a) => a.kind === 'enemy' && enemyDef(rt, a).duel !== undefined);
+  const duel = foe === undefined ? undefined : enemyDef(rt, foe).duel;
+  if (foe === undefined || duel === undefined) return false;
+  rt.actors = rt.actors.filter((a) => a !== foe && mem(a, 'summoned') !== 1);
+  rt.hero.hp = rt.hero.maxHp;
+  rt.hero.iframes = rt.db.tuning.hero.hurtIframes;
+  rt.state.flags[duel.flag] = false;
+  startScript(rt, duel.lost);
+  return true;
+}
+
+/** Leaving a duel forfeits it: the duel's flag is cleared, so the foe is not there on coming back. */
+export function forfeitDuels(rt: SimRt): void {
+  for (const a of rt.actors) {
+    const duel = a.kind === 'enemy' ? enemyDef(rt, a).duel : undefined;
+    if (duel !== undefined) rt.state.flags[duel.flag] = false;
+  }
 }

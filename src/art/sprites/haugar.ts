@@ -66,7 +66,7 @@ const BLADE_SHADE = hex(C.steelShade);
 type WightPose = 'rest' | 'raise' | 'cut' | 'hurt';
 
 /** A round shield of boards with an iron boss, centred at (cx, cy). */
-function roundShield(r: Raster, cx: number, cy: number, face: boolean): void {
+export function roundShield(r: Raster, cx: number, cy: number, face: boolean): void {
   ellipse(r, cx, cy, 5.5, 5.5, INK);
   ellipse(r, cx, cy, 4.5, 4.5, (x) => (x > cx ? BOARD_SHADE : BOARD));
   if (face) {
