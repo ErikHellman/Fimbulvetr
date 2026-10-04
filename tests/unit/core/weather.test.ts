@@ -25,6 +25,18 @@ describe('weather', () => {
     expect(counts.rain / days).toBeCloseTo(0.25, 1);
     expect(counts.wind / days).toBeCloseTo(0.15, 1);
   });
+
+  it('follows a region’s own table where it has one: no rain in Niflmýrr, snow in its winter', () => {
+    const kinds = new Set<string>();
+    for (const season of ['summer', 'autumn', 'winter', 'spring'] as const)
+      for (let day = 1; day <= 500; day++) {
+        const k = weatherAt(1, day, 900, 'niflmyrr', season, CLOCK_RULES);
+        kinds.add(k);
+        expect(k).not.toBe('rain');
+        if (season !== 'winter') expect(k).not.toBe('snow');
+      }
+    expect(kinds).toContain('snow');
+  });
 });
 
 describe('wind', () => {

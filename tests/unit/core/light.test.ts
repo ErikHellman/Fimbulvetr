@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { DARK_ROOM, FOG_THICK, NIGHT_DARK, STORM_DARK, darknessOf, fogOf } from '@core/world/light';
+import {
+  DARK_ROOM,
+  FOG_THICK,
+  MIST_DARK,
+  NIGHT_DARK,
+  STORM_DARK,
+  darknessOf,
+  fogOf,
+} from '@core/world/light';
 
 const out = { indoor: false, dark: false, weather: 'clear' } as const;
 
@@ -33,5 +41,18 @@ describe('fog', () => {
 
   it('does not darken the day by itself', () => {
     expect(darknessOf(1, { ...out, weather: 'fog' })).toBe(0);
+  });
+
+  it('always hangs outdoors in a misty region, whatever the sky', () => {
+    expect(fogOf({ ...out, misty: true })).toBe(FOG_THICK);
+    expect(fogOf({ ...out, misty: true, weather: 'snow' })).toBe(FOG_THICK);
+    expect(fogOf({ ...out, misty: true, indoor: true })).toBe(0);
+    expect(fogOf({ ...out, misty: true, dark: true })).toBe(0);
+  });
+
+  it('makes a misty region’s night the darkest outdoors', () => {
+    expect(darknessOf(1, { ...out, misty: true })).toBe(0);
+    expect(darknessOf(0, { ...out, misty: true })).toBeCloseTo(NIGHT_DARK + MIST_DARK);
+    expect(MIST_DARK).toBeGreaterThan(STORM_DARK);
   });
 });

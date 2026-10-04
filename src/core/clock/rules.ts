@@ -16,4 +16,10 @@ export interface ClockRules {
   readonly weather: Readonly<Record<Season, Readonly<Partial<Record<WeatherKind, number>>>>>;
   /** Regions whose season never follows the calendar. */
   readonly fixedSeason: Readonly<Partial<Record<RegionId, Season>>>;
+  /** Regions with weather tables of their own, per season (otherwise `weather`). */
+  readonly regionWeather?: Readonly<
+    Partial<Record<RegionId, Readonly<Record<Season, Readonly<Partial<Record<WeatherKind, number>>>>>>>
+  >;
+  /** Regions where the fog never lifts outdoors, whatever the sky (Niflmýrr). */
+  readonly misty?: readonly RegionId[];
 }

@@ -13,4 +13,14 @@ export const CLOCK_RULES: ClockRules = {
     spring: { clear: 40, rain: 40, wind: 15, fog: 5 },
   },
   fixedSeason: { hrimfjoll: 'winter' },
+  /** Niflmýrr's fog is its own (see `misty`): its sky never rains, and in winter it snows through the fog. */
+  regionWeather: {
+    niflmyrr: {
+      summer: { clear: 70, wind: 30 },
+      autumn: { clear: 60, wind: 40 },
+      winter: { clear: 40, wind: 10, snow: 50 },
+      spring: { clear: 70, wind: 30 },
+    },
+  },
+  misty: ['niflmyrr'],
 };

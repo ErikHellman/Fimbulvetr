@@ -58,7 +58,7 @@ import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
-import { outdoors, skyOf, windOf } from './systems/weather';
+import { misty, outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
   checkEdges,
@@ -204,13 +204,14 @@ export class Sim implements SimRt {
     return windOf(this);
   }
 
-  /** How much of the picture the dark hides (0 … 1): night outdoors, storms, dark rooms. */
+  /** How much of the picture the dark hides (0 … 1): night outdoors, storms, misty regions, dark rooms. */
   darkness(): number {
     const def = this.db.screens[this.screen.id];
     return darknessOf(daylight(this.state.clock, this.db.clock), {
       indoor: def.indoor === true || def.dungeon !== undefined,
       dark: def.dark === true,
       weather: this.weather(),
+      misty: misty(this),
     });
   }
 
@@ -220,7 +221,12 @@ export class Sim implements SimRt {
    */
   fog(): { readonly amount: number; readonly r: number } {
     const def = this.db.screens[this.screen.id];
-    const amount = fogOf({ indoor: !outdoors(this), dark: def.dark === true, weather: this.weather() });
+    const amount = fogOf({
+      indoor: !outdoors(this),
+      dark: def.dark === true,
+      weather: this.weather(),
+      misty: misty(this),
+    });
     if (amount === 0) return { amount: 0, r: 0 };
     return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
   }

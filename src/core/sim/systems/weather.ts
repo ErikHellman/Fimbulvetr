@@ -51,3 +51,8 @@ export function raining(rt: SimRt): boolean {
   const sky = skyOf(rt);
   return sky === 'rain' || sky === 'storm';
 }
+
+/** Whether the current screen lies in a region whose fog never lifts (Niflmýrr). */
+export function misty(rt: SimRt): boolean {
+  return rt.db.clock.misty?.includes(rt.db.screens[rt.screen.id].region) === true;
+}
