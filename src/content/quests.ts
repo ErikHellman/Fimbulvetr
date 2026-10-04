@@ -743,6 +743,33 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_ljos: {
+    id: 'q_ljos',
+    name: { en: 'Lights in the marsh', sv: 'Ljus i kärret' },
+    stages: [
+      {
+        when: flag('q_ljos_asked'),
+        text: {
+          en: 'Heiðr wants three wisp embers from Niflmýrr, the dead who could not cross. They drift over the marsh only at night; lift one to jar it.',
+          sv: 'Heiðr vill ha tre irrbloss-glöder från Niflmýrr, de döda som inte kunde ta sig över. De svävar över kärret bara om natten; lyft en för att fånga den i krukan.',
+        },
+      },
+      {
+        when: { k: 'item', id: 'wisp_ember', gte: 3 },
+        text: {
+          en: 'Three wisp embers burn in the jar. Bring them to Heiðr in Myrkviðr.',
+          sv: 'Tre irrbloss-glöder brinner i krukan. Ta dem till Heiðr i Myrkviðr.',
+        },
+      },
+      {
+        when: flag('q_ljos_done'),
+        text: {
+          en: 'Heiðr sang the embers into Ljós, the light-song: it burns off fog and shows what hides.',
+          sv: 'Heiðr sjöng glöderna till Ljós, ljussången: den bränner bort dimma och visar det som gömmer sig.',
+        },
+      },
+    ],
+  },
   q_axes: {
     id: 'q_axes',
     name: { en: 'The axe range', sv: 'Yxbanan' },

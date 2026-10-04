@@ -5,6 +5,10 @@ import { all, flag, not } from './util';
 export const HEIDR: DialogueDef = {
   entry: [
     { when: not(flag('n_heidr_met')), node: 'meet' },
+    { when: flag('q_ljos_done'), node: 'lit' },
+    { when: all(flag('q_ljos_asked'), { k: 'item', id: 'wisp_ember', gte: 3 }), node: 'embers' },
+    { when: flag('q_ljos_asked'), node: 'ljos_wait' },
+    { when: flag('st_rime_open'), node: 'ljos' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: all(flag('st_myrland_reached'), not(flag('q_rs2_mill'))), node: 'serpent' },
     { when: flag('q_volva_done'), node: 'after' },
@@ -75,6 +79,51 @@ export const HEIDR: DialogueDef = {
       text: {
         en: 'The smoke shows me lights on an island in a frozen lake, and one burning brighter than the rest.',
         sv: 'Röken visar mig ljus på en ö i en frusen sjö, och ett som brinner starkare än de andra.',
+      },
+    },
+    ljos: {
+      text: {
+        en: 'You went through the rime. I saw it: the smoke went grey as marsh-fog. The lights over Niflmýrr are the dead who could not cross.',
+        sv: 'Du gick genom rimfrosten. Jag såg det: röken blev grå som kärrdimma. Ljusen över Niflmýrr är de döda som inte kunde ta sig över.',
+      },
+      next: 'ljos2',
+    },
+    ljos2: {
+      text: {
+        en: 'Bring me three of them in a jar, at night. Lift one gently, it will come. I will sing them into a light that fog cannot drink.',
+        sv: 'Ge mig tre av dem i en kruka, om natten. Lyft en varsamt, så kommer den. Jag ska sjunga dem till ett ljus som dimman inte kan dricka.',
+      },
+      do: [{ k: 'set', flag: 'q_ljos_asked', value: true }],
+    },
+    ljos_wait: {
+      text: {
+        en: 'Three embers, from the marsh, at night. The dead are patient. I am less so.',
+        sv: 'Tre glöder, från kärret, om natten. De döda är tålmodiga. Det är inte jag.',
+      },
+    },
+    embers: {
+      text: {
+        en: 'Three. Hear them hum? They want to be somewhere. Hold still, and listen to the song I make of them.',
+        sv: 'Tre. Hör du hur de surrar? De vill vara någonstans. Stå still, och lyssna på sången jag gör av dem.',
+      },
+      do: [
+        { k: 'take', item: 'wisp_ember', n: 3 },
+        { k: 'learn', galdr: 'ljos' },
+        { k: 'set', flag: 'q_ljos_done', value: true },
+        { k: 'sfx', id: 'sfx_ljos' },
+      ],
+      next: 'embers2',
+    },
+    embers2: {
+      text: {
+        en: 'Ljós. Sing it in the fog and the fog forgets itself. What hides in the dark will not hide from it. (Ready it in the pause menu.)',
+        sv: 'Ljós. Sjung den i dimman så glömmer dimman sig själv. Det som gömmer sig i mörkret kan inte gömma sig för den. (Gör den redo i pausmenyn.)',
+      },
+    },
+    lit: {
+      text: {
+        en: 'The embers went quiet in your song. I think they have crossed now. That is more than most of us get.',
+        sv: 'Glöderna tystnade i din sång. Jag tror de har tagit sig över nu. Det är mer än de flesta av oss får.',
       },
     },
     fimbul: {

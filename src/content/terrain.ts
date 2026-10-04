@@ -75,6 +75,7 @@ export const TERRAIN_IDS = [
   'blackwater',
   'snag',
   'mire',
+  'drowned_path',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -206,11 +207,13 @@ export const TERRAIN = {
   /** A drop into the barrow's depths: no footing, but arrows and the boomerang fly over it. */
   pit: { solid: true, low: true },
   /** Hidden floor over the pits: sound underfoot, but drawn as the pit it spans; only light shows it. */
-  ghost: { solid: false },
+  ghost: { solid: false, hidden: true },
   /** Niflmýrr's still black pools: no footing, and so cold and dead that no winter skins them with ice. */
   blackwater: { solid: true, low: true },
   /** A dead tree in the fog marsh, grey and barkless. */
   snag: { solid: true, decor: { art: ['decor_snag'], w: 1, h: 1 } },
   /** Niflmýrr's ground: grey-green sedge over sodden peat. */
   mire: { solid: false },
+  /** A drowned causeway just under the black water: sound underfoot, but only light shows it. */
+  drowned_path: { solid: false, hidden: true },
 } as const satisfies Record<TerrainId, TerrainDef>;

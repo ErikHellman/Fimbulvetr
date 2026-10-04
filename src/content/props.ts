@@ -150,6 +150,17 @@ export const PROP_DEFS = {
     wakes: true,
     loot: ['silver', 'silver', 'silver'],
   },
+  /** A wisp ember drifting over Niflmýrr at night: a soul that could not cross. Lifting it jars it. */
+  wisp_ember: {
+    id: 'wisp_ember',
+    art: 'prop_wisp_ember',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: false,
+    throwDamage: 0,
+    catches: 'wisp_ember',
+  },
   /** A pot stuffed with old arrows: breaks to a blade, and spills a bundle once the bow is owned. */
   arrow_pot: {
     id: 'arrow_pot',

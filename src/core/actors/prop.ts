@@ -1,4 +1,4 @@
-import type { PropId } from '@content/ids';
+import type { ItemId, PropId } from '@content/ids';
 import type { DropKind } from '../combat/drops';
 import type { Box } from '../math/box';
 import type { Vec } from '../math/vec';
@@ -32,6 +32,8 @@ export interface PropDef {
   readonly blast?: boolean;
   /** Grave-gold: lifting it wakes every sleeping dead on the screen. */
   readonly wakes?: boolean;
+  /** Caught rather than lifted (a wisp ember in a jar): it goes into the bag as this item, and is gone. */
+  readonly catches?: ItemId;
 }
 
 export function createProp(id: number, def: PropDef, pos: Vec, thingIndex: number): Entity {

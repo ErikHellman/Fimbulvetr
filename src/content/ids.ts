@@ -40,7 +40,7 @@ export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] 
 /** Kept for good and never used from a slot: mead horns (what mead is carried in) and the winter cloak. */
 export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
 /** Things carried for someone: a quest's token or a brew's ingredients. */
-export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
+export const QUEST_ITEMS = ['charred_stave', 'fen_moss', 'wisp_ember'] as const;
 /** The trading chain's goods (`q_trade`): each is traded on for the next. */
 export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_hook', 'trade_comb'] as const;
 /** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
@@ -169,6 +169,7 @@ export const SFX = [
   'sfx_breath',
   'sfx_melt',
   'sfx_is',
+  'sfx_ljos',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -254,6 +255,7 @@ export const QUESTS = [
   'q_amber',
   'q_burbot',
   'q_act2',
+  'q_ljos',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -341,6 +343,7 @@ export const PROPS = [
   'crate_b',
   'crate_c',
   'axe',
+  'wisp_ember',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 

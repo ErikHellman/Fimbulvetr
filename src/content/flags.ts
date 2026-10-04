@@ -225,6 +225,12 @@ export const FLAGS = {
   n_bragi_met: { t: 'bool' },
   /** Hrafn the seal-hunter, met in his hut on Niflmýrr's shore (M6a). */
   n_hrafn_met: { t: 'bool' },
+  /** Heiðr's embers (`q_ljos`): asked for three wisp embers, each one caught, and Ljós taught. */
+  q_ljos_asked: { t: 'bool' },
+  w_ember_jars: { t: 'bool' },
+  w_ember_causeway: { t: 'bool' },
+  w_ember_strand: { t: 'bool' },
+  q_ljos_done: { t: 'bool' },
   /** The skald's verses bought: each marks a secret on the map (see content/verses.ts). */
   w_verse_deadwood: { t: 'bool' },
   w_verse_cairns: { t: 'bool' },

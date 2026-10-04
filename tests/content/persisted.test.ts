@@ -103,6 +103,7 @@ const PERSISTED = [
   'hp_upp_bay',
   'nif_k_jars',
   'hp_nif_cairns',
+  'hp_nif_deadwood',
   'nif_c_cave',
 ] as const;
 

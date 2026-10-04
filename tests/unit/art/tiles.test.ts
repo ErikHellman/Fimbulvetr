@@ -58,14 +58,15 @@ describe('tileset', () => {
       else if (id === 'rapids') expect(e, id).toMatchObject({ frames: 4, frameMs: 90 });
       else if (id === 'spring') expect(e, id).toMatchObject({ frames: 4, frameMs: 240 });
       else if (id === 'sap') expect(e, id).toMatchObject({ frames: 4, frameMs: 260 });
-      else if (id === 'blackwater') expect(e, id).toMatchObject({ frames: 4, frameMs: 400 });
+      else if (id === 'blackwater' || id === 'drowned_path')
+        expect(e, id).toMatchObject({ frames: 4, frameMs: 400 });
       else expect(e.frames, id).toBe(1);
     }
   });
 
   it('lists one tile animation per variant of each animated water and the sap, frame-major', () => {
     const anims = tileAnimations(ts);
-    expect(anims).toHaveLength(7 * 47);
+    expect(anims).toHaveLength(8 * 47);
     const s = ts.entries.water.start;
     expect(anims.find((a) => a.tile === s + 46)).toEqual({
       tile: s + 46,

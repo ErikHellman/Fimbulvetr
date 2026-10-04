@@ -658,4 +658,14 @@ export const SFX_BANK = {
     release: 0.3,
     volume: 0.22,
   },
+  /** Ljós sung: a soft rising chime that blooms and hangs. */
+  sfx_ljos: {
+    wave: 'sine',
+    freq: 520,
+    freqEnd: 1560,
+    attack: 0.05,
+    sustain: 0.35,
+    release: 0.6,
+    volume: 0.28,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

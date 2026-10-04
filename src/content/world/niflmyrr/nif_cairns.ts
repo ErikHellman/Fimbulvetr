@@ -5,8 +5,11 @@ export const nifCairns: ScreenDef = {
   region: 'niflmyrr',
   purpose:
     'Sunken cairns: the old dead were laid in a pool here, and their stones stand out of the black water. The Gjöll turns south under a plank bridge, down towards the camp.',
-  /** On the islet in the still pool: Ís (or winter) lays a floor of ice out to it. */
-  things: [{ k: 'piece', id: 'hp_nif_cairns', at: { x: 17, y: 10 } }],
+  /**
+   * In a ring of cairns on the islet in the still pool, open only from the east (no boomerang line reaches it):
+   * Ís (or winter) lays a floor of ice out to it.
+   */
+  things: [{ k: 'piece', id: 'hp_nif_cairns', at: { x: 17, y: 9 } }],
   /** Where Niflmýrr's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 6, y: 13 },
@@ -22,10 +25,10 @@ export const nifCairns: ScreenDef = {
     '#***i*******************6***vvvvvvvvvvvv',
     '#***********~~~~~~~~~~~*****vvvvvvvvvvvv',
     '##***6******~~~~~~~~~~~*****vvvvvvvvvvvv',
-    '##**********~~~~~~~~~~~*****vvvvvvvvvvvv',
-    '#***********~~~i****~~~*****vvvv*******#',
-    '************~~~****i~~~****6vvvv***6***#',
-    '************~~~~~~~~~~~****vvvv********#',
+    '##**********~~**iii**~~*****vvvvvvvvvvvv',
+    '#***********~~**i**i*~~*****vvvv*******#',
+    '************~~**ii***~~****6vvvv***6***#',
+    '************~~~~~~~i~~~****vvvv********#',
     '****6********~~~~~~~~~****pppppppp******',
     '*********i*****************pppppp*******',
     '#******************6********vvvv********',

@@ -345,4 +345,34 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
     expect(cold.finishable).toBe(false);
     expect(cold.screens).not.toContain('nif_gorge');
   });
+
+  it('reaches the cairns pool’s heart piece in summer only with Ís (a stave will do)', () => {
+    const got = (s: GameState) => s.world.pieces.includes('hp_nif_cairns');
+    const atTheCairns = (frost: 'none' | 'galdr' | 'stave'): GameState => {
+      const s = underTheFimbulvetr();
+      s.hero.screen = 'nif_cairns';
+      s.hero.x = 17 * TILE + TILE / 2;
+      s.hero.y = 4 * TILE + TILE - 1;
+      if (frost === 'galdr') s.inv.galdr = [...s.inv.galdr, 'is'];
+      if (frost === 'stave') s.inv.items = { ...s.inv.items, stave_is: 1 };
+      return s;
+    };
+    const cairns = { season: 'summer', within: ['nif_cairns'] } as const;
+    expect(solve(DB, atTheCairns('none'), got, cairns).finishable).toBe(false);
+    expect(solve(DB, atTheCairns('galdr'), got, cairns).finishable).toBe(true);
+    expect(solve(DB, atTheCairns('stave'), got, cairns).finishable).toBe(true);
+    expect(solve(DB, atTheCairns('none'), got, { ...cairns, season: 'winter' }).finishable).toBe(true);
+  });
+
+  it('walks the dead wood’s drowned path to its heart piece', () => {
+    const s = underTheFimbulvetr();
+    s.hero.screen = 'nif_deadwood';
+    s.hero.x = 8 * TILE + TILE / 2;
+    s.hero.y = 14 * TILE + TILE - 1;
+    const r = solve(DB, s, (g) => g.world.pieces.includes('hp_nif_deadwood'), {
+      season: 'summer',
+      within: ['nif_deadwood'],
+    });
+    expect(r.finishable).toBe(true);
+  });
 });

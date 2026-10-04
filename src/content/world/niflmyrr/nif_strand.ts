@@ -1,11 +1,21 @@
 import type { ScreenDef } from '@core/world/screen';
+import { all, flag, not } from '../../dialogue/util';
 
 export const nifStrand: ScreenDef = {
   id: 'nif_strand',
   region: 'niflmyrr',
   purpose:
     "The north strand: dead reeds, pale sand and a fisher's boat rotting where the lake left it. Sævatn goes out grey to the west; in winter its ice reaches the shore.",
-  things: [],
+  things: [
+    /** A wisp ember for Heiðr (`q_ljos`), drifting here at night until it is caught. */
+    {
+      k: 'prop',
+      id: 'wisp_ember',
+      at: { x: 34, y: 8 },
+      when: all({ k: 'phase', is: 'night' }, flag('q_ljos_asked'), not(flag('w_ember_strand'))),
+      onBreak: [{ k: 'set', flag: 'w_ember_strand', value: true }],
+    },
+  ],
   /** Where Niflmýrr's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 27, y: 12 },

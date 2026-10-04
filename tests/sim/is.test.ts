@@ -6,7 +6,7 @@ import type { ContentDb } from '@core/sim/db';
 import type { Thing } from '@core/world/screen';
 import { coverAt } from '@core/world/cover';
 import { Harness, frameOf } from './harness';
-import { crossTo, talkTo, walkTo } from './walk';
+import { crossTo, face, talkTo, walkTo } from './walk';
 import { tileFeet } from '@core/world/screen';
 
 /** At the cairns pool's north shore in summer, an Ís stave readied in slot K (two carried). */
@@ -35,17 +35,21 @@ describe('an Ís rune-stave', () => {
     expect(h.sim.state.hero.seidr).toBe(seidr);
     expect(h.events).toContainEqual({ t: 'sfx', id: 'sfx_is' });
     expect([iceAt(h, 16, 6), iceAt(h, 17, 7), iceAt(h, 18, 7)]).toEqual([true, true, true]);
-    expect(iceAt(h, 17, 8)).toBe(false);
+    expect(iceAt(h, 16, 8)).toBe(false);
   });
 
-  it('two casts make a road of ice out to the islet and its heart piece', () => {
+  it('two casts spend both staves; ice from the east shore reaches the islet and its heart piece', () => {
     const h = byThePool();
     h.press(['item1']).idle(30);
-    walkTo(h, 17, 7);
+    walkTo(h, 24, 9);
+    face(h, 'w');
     h.press(['item1']).idle(30);
     expect(h.sim.state.inv.items.stave_is ?? 0).toBe(0);
     expect(h.sim.state.inv.slots[0]).toBeNull();
-    walkTo(h, 17, 10);
+    walkTo(h, 19, 10);
+    walkTo(h, 18, 10);
+    walkTo(h, 18, 9);
+    walkTo(h, 17, 9);
     expect(h.sim.state.world.pieces).toContain('hp_nif_cairns');
   });
 

@@ -30,6 +30,8 @@ export const LANTERN_FOG_RADIUS = 112;
 export const FIRE_RADIUS = 28;
 /** An awake warp stone's faint glow. */
 export const WARP_RADIUS = 28;
+/** A wisp ember's faint glow. */
+export const EMBER_RADIUS = 22;
 
 export interface Place {
   readonly indoor: boolean;

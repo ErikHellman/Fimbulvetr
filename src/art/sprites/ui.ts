@@ -364,6 +364,19 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '.u....u.',
     '..uu.u..',
   ],
+  /** Ljós: a light with rays all round it. */
+  galdr_ljos: [
+    'y...y..y',
+    '.y..y.y.',
+    '..bbbb..',
+    'yybYYbyy',
+    '..bYYb..',
+    '..bbbb..',
+    '.y..y.y.',
+    'y...y..y',
+  ],
+  /** Ís: a six-armed frost star. */
+  galdr_is: ['...k....', '.k.k.k..', '..kkk...', 'kkk.kkk.', '..kkk...', '.k.k.k..', '...k....', '........'],
   galdr_eldr: [
     '...y....',
     '..yY....',

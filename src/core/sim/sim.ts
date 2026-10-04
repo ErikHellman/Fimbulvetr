@@ -22,6 +22,7 @@ import {
   LANTERN_FOG_RADIUS,
   LANTERN_RADIUS,
   WARP_RADIUS,
+  EMBER_RADIUS,
   darknessOf,
   fogOf,
   type Light,
@@ -51,6 +52,7 @@ import { stepBombs } from './systems/bombs';
 import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
 import { stepRiders } from './systems/mara';
+import { LJOS, ljosBurns, stepLjos } from './systems/ljos';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
@@ -228,7 +230,8 @@ export class Sim implements SimRt {
       weather: this.weather(),
       misty: misty(this),
     });
-    if (amount === 0) return { amount: 0, r: 0 };
+    // Ljós burns the fog away while it lasts.
+    if (amount === 0 || ljosBurns(this)) return { amount: 0, r: 0 };
     return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
   }
 
@@ -262,6 +265,8 @@ export class Sim implements SimRt {
     const out: Light[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });
+    if (ljosBurns(this))
+      out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LJOS.radius, hero: true });
     // Burning tiles and walls of fire (a gate drawn as fire) glow.
     for (const e of this.actors)
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
@@ -271,6 +276,10 @@ export class Sim implements SimRt {
     for (const e of this.actors)
       if (e.kind === 'fixture' && e.def === 'warp' && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 16, r: WARP_RADIUS });
+    // Wisp embers drifting over the marsh glow faintly.
+    for (const e of this.actors)
+      if (e.kind === 'prop' && e.def === 'wisp_ember')
+        out.push({ x: e.pos.x, y: e.pos.y - 8, r: EMBER_RADIUS });
     // Bog-lights shine.
     for (const e of this.actors) {
       const glow = e.kind === 'enemy' ? this.db.enemies[e.def as EnemyId].glow : undefined;
@@ -287,6 +296,7 @@ export class Sim implements SimRt {
     const lights: GhostLight[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       lights.push({ x: this.hero.pos.x, y: this.hero.pos.y - 8, r: GHOST_LANTERN });
+    if (ljosBurns(this)) lights.push({ x: this.hero.pos.x, y: this.hero.pos.y - 8, r: LJOS.ghost });
     for (const e of this.actors)
       if (e.kind === 'fixture' && e.def === 'brazier' && e.mem['on'] === 1)
         lights.push({ x: e.pos.x, y: e.pos.y - 8, r: GHOST_BRAZIER });
@@ -373,6 +383,7 @@ export class Sim implements SimRt {
     castGaldr(this, input);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
     const ctx = actorCtx(this);
+    stepLjos(this);
     runEnemies(this, ctx);
     stepRiders(this);
     runCritters(this, ctx);

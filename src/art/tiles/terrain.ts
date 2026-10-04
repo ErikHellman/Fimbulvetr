@@ -457,6 +457,23 @@ function mire(p: Painter): void {
 }
 
 /** Niflmýrr (M6a): the sedge mire, black pools that never freeze, and the ground under a dead tree. */
+/** Niflmýrr's still black pools (and the drowned path that hides under them). */
+const BLACKWATER: TerrainArt = {
+  autotile: true,
+  variants: 0,
+  frames: 4,
+  frameMs: 400,
+  group: 'water',
+  paint: (p, v) => {
+    mire(p);
+    region(p, v.mask, 3, '#1c2224', '#3a4642', '#283032', 0.12);
+    // A slow glint sliding across the still surface.
+    const gx = (nextInt(p.rng, 2, 9) + v.frame * 2) % 16;
+    const gy = nextInt(p.rng, 5, 11);
+    if (insideBlob(v.mask, gx, gy, 4)) p.rect(gx, gy, 2, 1, '#5a6a68');
+  },
+};
+
 const NIFLMYRR = {
   mire: {
     autotile: false,
@@ -465,21 +482,10 @@ const NIFLMYRR = {
       mire(p);
     },
   },
-  blackwater: {
-    autotile: true,
-    variants: 0,
-    frames: 4,
-    frameMs: 400,
-    group: 'water',
-    paint: (p, v) => {
-      mire(p);
-      region(p, v.mask, 3, '#1c2224', '#3a4642', '#283032', 0.12);
-      // A slow glint sliding across the still surface.
-      const gx = (nextInt(p.rng, 2, 9) + v.frame * 2) % 16;
-      const gy = nextInt(p.rng, 5, 11);
-      if (insideBlob(v.mask, gx, gy, 4)) p.rect(gx, gy, 2, 1, '#5a6a68');
-    },
-  },
+  blackwater: BLACKWATER,
+  /** Drawn as the black water it runs under: only light shows it. */
+  drowned_path: BLACKWATER,
+
   snag: {
     autotile: false,
     variants: 1,

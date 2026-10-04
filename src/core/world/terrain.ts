@@ -21,6 +21,8 @@ export interface TerrainDef {
   readonly slow?: number;
   /** Solid underfoot but open above (water, sap): the boomerang flies over it. */
   readonly low?: boolean;
+  /** Hidden floor: sound underfoot, but drawn as what it spans; only light shows it (see world/ghost.ts). */
+  readonly hidden?: boolean;
   /** Its footing follows the screen's water level (see world/water.ts); the terrain itself is as at level 0. */
   readonly rise?: TerrainRise;
 }

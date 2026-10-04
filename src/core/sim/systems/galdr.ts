@@ -6,6 +6,7 @@ import type { SimRt } from '../rt';
 import { castBragd } from './bragd';
 import { castEldr } from './eldr';
 import { castIs } from './is';
+import { castLjos } from './ljos';
 import { heroCtx } from './hero';
 import { startStory } from './story';
 
@@ -40,6 +41,10 @@ const SONGS: Partial<Record<GaldrId, Song>> = {
   },
   is: (rt, input) => {
     castIs(rt, input);
+    return 'pay';
+  },
+  ljos: (rt) => {
+    castLjos(rt);
     return 'pay';
   },
   farvegr,

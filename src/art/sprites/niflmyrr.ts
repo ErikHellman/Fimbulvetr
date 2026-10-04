@@ -51,8 +51,22 @@ function sunk(look: Look, side: Side, sink: number, eyes: string): Raster {
   return r;
 }
 
+/** A wisp ember hovering a hand above the mire: a pale green-gold flame with a white heart. */
+function ember(bob: number): Raster {
+  const r = createRaster(12, 16);
+  const y = 6 - bob;
+  ellipse(r, 6, y, 4.5, 5, () => [190, 230, 140, 90]);
+  ellipse(r, 6, y, 3, 3.4, () => [214, 240, 150, 220]);
+  ellipse(r, 6, y + 0.5, 1.4, 1.6, () => [250, 255, 230, 255]);
+  // Its faint reflection on the wet ground.
+  ellipse(r, 6, 14, 2.5, 0.8, () => [190, 230, 140, 70]);
+  return r;
+}
+
 export function niflmyrrFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [];
+  for (let i = 0; i < 2; i++)
+    out.push({ name: `prop_wisp_ember_idle_s_${i}`, raster: ember(i), ox: 6, oy: 15 });
   const add = (art: string, anim: string, side: Side, i: number, raster: Raster): void => {
     out.push({ name: `${art}_${anim}_${side}_${i}`, raster, ox: 16, oy: 30 });
     if (side === 'w') out.push({ name: `${art}_${anim}_e_${i}`, raster: flipX(raster), ox: 16, oy: 30 });
@@ -95,6 +109,7 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const a = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const NIFLMYRR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  prop_wisp_ember: { idle: { frames: 2, fps: 3, loop: true, dirs: ['s'] } },
   enemy_mara: {
     hide: a(2, 2),
     idle: a(1, 1),

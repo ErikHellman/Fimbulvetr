@@ -25,7 +25,9 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * other than bosses are assumed beaten with the sword.
  *
  * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
- * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored.
+ * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored. Once Ís can be
+ * sung (the galdr or a stave), still water is walkable in any season. Hidden floor (the ghost floor, the
+ * drowned path) is floor, as it is to the sim: light only shows it.
  */
 
 export interface SolveOptions {
@@ -272,7 +274,7 @@ function settle(w: World, state: GameState, origin: number): Node {
 interface Ground {
   /** Gates, locks, shutters, chests, switches, braziers left shut or standing. */
   readonly blocked: ReadonlySet<number>;
-  /** Lowered drawbridges. */
+  /** Lowered drawbridges, and still water once Ís can floor it. */
   readonly open: ReadonlySet<number>;
 }
 
@@ -280,9 +282,20 @@ function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null)
   return { blocked: blockedTiles(w, state, reach), open: bridgeTiles(w, state) };
 }
 
-/** Tiles of drawbridges that are down. */
+/**
+ * Tiles of drawbridges that are down, and every tile of still water (outside screens with a water level)
+ * once Ask can sing Ís, from the galdr or a stave: the frost lays a floor tile by tile, as far as needed.
+ */
 function bridgeTiles(w: World, state: GameState): Set<number> {
   const out = new Set<number>();
+  if (state.inv.galdr.includes('is') || has(state, 'stave_is'))
+    for (const id of w.ids) {
+      if (w.db.screens[id].water !== undefined) continue;
+      const g = w.grids[w.idx.get(id) ?? 0];
+      g?.cells.forEach((cell, i) => {
+        if (cell === 'water') out.add(w.tile(id, i % SCREEN_COLS, Math.floor(i / SCREEN_COLS)));
+      });
+    }
   const ctx = ctxOf(w, state);
   for (const id of w.ids)
     for (const t of w.db.screens[id].things) {

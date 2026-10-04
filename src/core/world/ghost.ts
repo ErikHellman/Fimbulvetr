@@ -15,7 +15,7 @@ export interface GhostLight {
 }
 
 /**
- * The hidden-floor tiles (`ghost` terrain) whose centres lie within one of the lights. The sim never cares:
+ * The hidden-floor tiles (`TerrainDef.hidden`: the barrow's ghost floor, Niflmýrr's drowned path) whose centres lie within one of the lights. The sim never cares:
  * a ghost floor is floor. Only the picture needs to know which ones show.
  */
 export function shownGhosts(
@@ -26,7 +26,7 @@ export function shownGhosts(
   if (lights.length === 0) return [];
   const out: TilePos[] = [];
   grid.cells.forEach((cell, i) => {
-    if (cell !== 'ghost' || terrain[cell].solid) return;
+    if (terrain[cell].hidden !== true || terrain[cell].solid) return;
     const x = i % SCREEN_COLS;
     const y = Math.floor(i / SCREEN_COLS);
     const cx = x * 16 + 8;
