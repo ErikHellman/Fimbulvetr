@@ -6,6 +6,7 @@ import { itemMax } from '../items/defs';
 import { dungeonOf } from '../state/dungeons';
 import type { FlagValue } from '../state/flags';
 import type { SimRt } from '../sim/rt';
+import { wakeTheDead } from '../sim/systems/wake';
 
 /** Silver caps by purse size. */
 export const PURSE_CAP = [100, 300, 999] as const;
@@ -40,7 +41,9 @@ export type Effect =
   | { readonly k: 'sleep'; readonly until: number }
   | { readonly k: 'sfx'; readonly id: SfxId }
   /** A piece of heart handed over (a reward), counted like one picked up; `id` is saved in `world.pieces`. */
-  | { readonly k: 'piece'; readonly id: string };
+  | { readonly k: 'piece'; readonly id: string }
+  /** Every sleeper on the screen rises (a grave-ring laid back on its mound). */
+  | { readonly k: 'wake' };
 
 export function applyEffect(e: Effect, rt: SimRt): void {
   const s = rt.state;
@@ -115,6 +118,9 @@ export function applyEffect(e: Effect, rt: SimRt): void {
       break;
     case 'piece':
       grantPiece(rt, e.id);
+      break;
+    case 'wake':
+      wakeTheDead(rt);
       break;
   }
 }

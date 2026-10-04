@@ -95,6 +95,17 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     '..llll..',
     '........',
   ],
+  /** A gold ring from a barrow, cold and greenish. */
+  grave_ring: [
+    '........',
+    '..gggg..',
+    '.gGvvGg.',
+    '.gv..vg.',
+    '.gv..vg.',
+    '.gGvvGg.',
+    '..gggg..',
+    '........',
+  ],
   /** A bronze sheep's bell on its leather strap. */
   trade_bell: [
     '.wwwww..',

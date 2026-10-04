@@ -1,4 +1,14 @@
-import type { ScreenDef } from '@core/world/screen';
+import type { Cond } from '@core/story/cond';
+import type { ScreenDef, Thing } from '@core/world/screen';
+
+/** Night, with the stolen grave-ring in Ask's bag. */
+const RING_NIGHT: Cond = {
+  k: 'all',
+  of: [
+    { k: 'phase', is: 'night' },
+    { k: 'item', id: 'grave_ring' },
+  ],
+};
 
 export const hauBarrows: ScreenDef = {
   id: 'hau_barrows',
@@ -18,6 +28,27 @@ export const hauBarrows: ScreenDef = {
     /** The cracked flank of the eastern grave-hill: a bomb opens the hollow and its piece of heart. */
     { k: 'crack', id: 'hau_k_barrows', at: { x: 31, y: 8 }, w: 1, h: 1, art: 'rock' },
     { k: 'piece', id: 'hp_hau_barrows', at: { x: 31, y: 4 } },
+    /**
+     * Geirmundr's stolen grave-ring goes back on the north-west mound, at night (`q_barrow_ring`). Its three
+     * wights lie asleep round the mound while Ask carries the ring after dark, and rise as it is laid.
+     */
+    {
+      k: 'use',
+      at: { x: 3, y: 3 },
+      script: 'ring_laid',
+      when: { k: 'all', of: [RING_NIGHT, { k: 'not', c: { k: 'flag', id: 'q_ring_laid' } }] },
+    },
+    ...[
+      [1, 5],
+      [6, 4],
+      [5, 6],
+    ].map(([x = 0, y = 0]): Thing => ({
+      k: 'enemy',
+      id: 'haugbui',
+      at: { x, y },
+      when: RING_NIGHT,
+      asleep: true,
+    })),
     /** At night the barrow-wights climb out of their mounds. */
     { k: 'enemy', id: 'haugbui', at: { x: 13, y: 10 }, when: { k: 'phase', is: 'night' } },
     { k: 'enemy', id: 'haugbui', at: { x: 24, y: 9 }, when: { k: 'phase', is: 'night' } },

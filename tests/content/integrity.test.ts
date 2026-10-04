@@ -199,13 +199,22 @@ describe('world layout', () => {
 });
 
 describe('the sleeping dead', () => {
-  it('lie only where grave-gold can wake them', () => {
+  it('lie only where grave-gold or a script can wake them', () => {
+    const wakers = new Set(
+      Object.entries(DB.scripts).flatMap(([sid, def]) =>
+        JSON.stringify(def).includes('"k":"wake"') ? [sid] : [],
+      ),
+    );
     for (const id of SCREEN_IDS) {
       const things = SCREENS[id].things;
       if (!things.some((t) => t.k === 'enemy' && t.asleep === true)) continue;
       expect(
-        things.some((t) => t.k === 'prop' && DB.props[t.id].wakes === true),
-        `${id} has sleepers but no grave-gold`,
+        things.some(
+          (t) =>
+            (t.k === 'prop' && DB.props[t.id].wakes === true) ||
+            ((t.k === 'use' || t.k === 'trigger') && wakers.has(t.script)),
+        ),
+        `${id} has sleepers but nothing to wake them`,
       ).toBe(true);
     }
   });

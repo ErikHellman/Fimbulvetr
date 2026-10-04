@@ -89,9 +89,32 @@ const herdLost: ScriptDef = {
   ],
 };
 
+/** The grave-ring laid back on its mound: its three wights rise. */
+const ringLaid: ScriptDef = {
+  steps: [
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Ask lays the ring in the frost on the mound. The ground under it sighs.',
+        sv: 'Ask lägger ringen i rimfrosten på högen. Marken under den suckar.',
+      },
+    },
+    {
+      k: 'do',
+      effects: [
+        { k: 'take', item: 'grave_ring' },
+        { k: 'set', flag: 'q_ring_laid', value: true },
+        { k: 'wake' },
+      ],
+    },
+  ],
+};
+
 export const LOWLAND_SCRIPTS: Readonly<
-  Record<'find_bell' | 'herd_start' | 'herd_won' | 'herd_lost', ScriptDef>
+  Record<'find_bell' | 'herd_start' | 'herd_won' | 'herd_lost' | 'ring_laid', ScriptDef>
 > = {
+  ring_laid: ringLaid,
   find_bell: findBell,
   herd_start: herdStart,
   herd_won: herdWon,

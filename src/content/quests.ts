@@ -601,4 +601,31 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_barrow_ring: {
+    id: 'q_barrow_ring',
+    name: { en: 'The grave-ring', sv: 'Gravringen' },
+    stages: [
+      {
+        when: flag('q_ring_given'),
+        text: {
+          en: 'Geirmundr stole a ring from the north-west mound in the barrow field. Lay it back on the mound at night.',
+          sv: 'Geirmundr stal en ring från högen i nordväst på gravfältet. Lägg tillbaka den på högen om natten.',
+        },
+      },
+      {
+        when: flag('q_ring_laid'),
+        text: {
+          en: 'The ring is back on its mound, and its wights rose. Tell Geirmundr.',
+          sv: 'Ringen ligger på sin hög igen, och dess vättar steg upp. Berätta för Geirmundr.',
+        },
+      },
+      {
+        when: flag('q_barrow_ring_done'),
+        text: {
+          en: 'Geirmundr sleeps again, and gave Ask a quiver for more arrows.',
+          sv: 'Geirmundr sover igen, och gav Ask ett koger för fler pilar.',
+        },
+      },
+    ],
+  },
 };

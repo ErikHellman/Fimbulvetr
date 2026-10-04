@@ -183,6 +183,10 @@ export const FLAGS = {
   q_steinn_asked: { t: 'bool' },
   q_steinn_answer: { t: 'bool' },
   q_steinn_done: { t: 'bool' },
+  /** Geirmundr's grave-ring (`q_barrow_ring`): given to Ask, laid back on its mound at night, Geirmundr's thanks. */
+  q_ring_given: { t: 'bool' },
+  q_ring_laid: { t: 'bool' },
+  q_barrow_ring_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

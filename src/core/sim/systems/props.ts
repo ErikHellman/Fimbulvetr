@@ -17,6 +17,7 @@ import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
 import { spillDrop } from './pickups';
 import { applyAll, probeBox } from './story';
+import { wakeTheDead } from './wake';
 
 export const propDef = (rt: SimRt, e: Entity): PropDef => rt.db.props[e.def as PropId];
 const isCarried = (e: Entity): boolean => mem(e, 'carried') === 1;
@@ -81,17 +82,6 @@ export function tryLift(rt: SimRt): boolean {
   changeState(HERO_MACHINE, rt.hero, 'lift', heroCtx(rt, EMPTY_FRAME));
   rt.emit({ t: 'sfx', id: 'sfx_lift' });
   return true;
-}
-
-/** Grave-gold lifted: every sleeper on the screen wakes and rises. */
-function wakeTheDead(rt: SimRt): void {
-  const sleepers = rt.actors.filter((a) => a.kind === 'enemy' && mem(a, 'asleep') === 1);
-  if (sleepers.length === 0) return;
-  for (const e of sleepers) {
-    e.mem['asleep'] = 0;
-    e.iframes = 0;
-  }
-  rt.emit({ t: 'sfx', id: 'sfx_wake' });
 }
 
 /** Carried props ride overhead; interact throws (while moving) or sets down (standing); throws fly. */
