@@ -420,6 +420,16 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     bottom: '#3a3a3a',
     apron: '#8a8070',
   },
+  /** A thrall bled almost to nothing at the drained camp: grey-white skin, rags, a chain at the ankle. */
+  thrall: {
+    skin: '#b8beb6',
+    hair: '#6a6a62',
+    hairStyle: 'long',
+    beard: '#7a7a70',
+    top: '#5a564a',
+    legs: 'pants',
+    bottom: '#45423a',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

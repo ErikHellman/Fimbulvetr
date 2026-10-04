@@ -219,6 +219,8 @@ export const FLAGS = {
   q_burbot_done: { t: 'bool' },
   /** Out of the gorge and into Niflmýrr's fog (M6a). */
   st_niflmyrr_reached: { t: 'bool' },
+  /** The bled thrall at the drained camp told why the captives were taken (the twist, M6a). */
+  st_twist_heard: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

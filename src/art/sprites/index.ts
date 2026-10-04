@@ -15,6 +15,7 @@ import type { SpriteFrame } from './types';
 import { UI_ANIMS, uiFrames } from './ui';
 import { HAUGAR_ANIMS, haugarFrames } from './haugar';
 import { PASS_ANIMS, passFrames } from './pass';
+import { NIFLMYRR_ANIMS, niflmyrrFrames } from './niflmyrr';
 
 export type { SpriteFrame } from './types';
 
@@ -35,6 +36,7 @@ export const ANIMS: AnimTable = {
   ...SOKKVA_ANIMS,
   ...HAUGAR_ANIMS,
   ...PASS_ANIMS,
+  ...NIFLMYRR_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -53,6 +55,7 @@ export function buildSprites(): SpriteFrame[] {
     ...sokkvaFrames(),
     ...haugarFrames(),
     ...passFrames(),
+    ...niflmyrrFrames(),
     missingFrame(),
   ];
 }

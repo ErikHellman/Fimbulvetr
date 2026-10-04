@@ -118,6 +118,12 @@ import { nifDeadwood } from './niflmyrr/nif_deadwood';
 import { nifCamp } from './niflmyrr/nif_camp';
 import { nifShore } from './niflmyrr/nif_shore';
 import { nifIntHut } from './niflmyrr/nif_int_hut';
+import { nifGate } from './niflmyrr/nif_gate';
+import { nifGjoll } from './niflmyrr/nif_gjoll';
+import { nifJars } from './niflmyrr/nif_jars';
+import { nifCairns } from './niflmyrr/nif_cairns';
+import { nifStrand } from './niflmyrr/nif_strand';
+import { nifIntCave } from './niflmyrr/nif_int_cave';
 
 export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   test_a: testA,
@@ -238,4 +244,10 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   nif_camp: nifCamp,
   nif_shore: nifShore,
   nif_int_hut: nifIntHut,
+  nif_gate: nifGate,
+  nif_gjoll: nifGjoll,
+  nif_jars: nifJars,
+  nif_cairns: nifCairns,
+  nif_strand: nifStrand,
+  nif_int_cave: nifIntCave,
 };

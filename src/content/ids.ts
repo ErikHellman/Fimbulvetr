@@ -94,6 +94,8 @@ export const ENEMIES = [
   'haugvordr',
   'haugkonungr',
   'styrr_duel',
+  'mara',
+  'fog_draugr',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -213,6 +215,8 @@ export const NPCS = [
   'hildr',
   'geirmundr',
   'hallsteinn',
+  // Niflmýrr
+  'thrall',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 

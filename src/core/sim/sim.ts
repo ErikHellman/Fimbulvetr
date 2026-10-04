@@ -50,6 +50,7 @@ import { collectPickups } from './systems/pickups';
 import { stepBombs } from './systems/bombs';
 import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
+import { stepRiders } from './systems/mara';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
@@ -373,6 +374,7 @@ export class Sim implements SimRt {
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
     const ctx = actorCtx(this);
     runEnemies(this, ctx);
+    stepRiders(this);
     runCritters(this, ctx);
     scheduleNpcs(this);
     stepNpcs(this);

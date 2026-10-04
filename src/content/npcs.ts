@@ -59,6 +59,7 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   hildr: { en: 'Hildr', sv: 'Hildr' },
   geirmundr: { en: 'Geirmundr', sv: 'Geirmundr' },
   hallsteinn: { en: 'Hallsteinn', sv: 'Hallsteinn' },
+  thrall: { en: 'A bled thrall', sv: 'En tappad träl' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -224,4 +225,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   ]),
   /** At the pass door, day and night. */
   hallsteinn: npc('hallsteinn', [{ screen: 'hau_pass', at: { x: 22, y: 6 }, facing: 's' }]),
+  /** Chained in the drained camp's ring of flags until he has told what he knows; then he is dust. */
+  thrall: npc('thrall', [
+    { when: not(flag('st_twist_heard')), screen: 'nif_camp', at: { x: 16, y: 9 }, facing: 's' },
+  ]),
 };

@@ -101,6 +101,8 @@ const PERSISTED = [
   'hp_ask_village',
   'hp_upp_range',
   'hp_upp_bay',
+  'nif_k_jars',
+  'nif_c_cave',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

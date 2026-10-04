@@ -100,25 +100,36 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
       ],
     },
   },
-  /** Niflmýrr: the drowned dead walk the fog marsh, and bog-lights drift over the pools by night. */
+  /**
+   * Niflmýrr: fog-draugr wait in the mist by day and night; by night the mara ride and the drowned dead
+   * walk, and bog-lights drift over the pools (ravens instead in winter).
+   */
   niflmyrr: {
     count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
     entries: {
       summer: [
-        { id: 'draugr', weight: 2 },
-        { id: 'myrljos', weight: 2, time: 'night' },
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'myrljos', weight: 1, time: 'night' },
       ],
       autumn: [
-        { id: 'draugr', weight: 2 },
-        { id: 'myrljos', weight: 2, time: 'night' },
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'myrljos', weight: 1, time: 'night' },
       ],
       winter: [
-        { id: 'draugr', weight: 2 },
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
         { id: 'rime_raven', weight: 1, time: 'night' },
       ],
       spring: [
-        { id: 'draugr', weight: 2 },
-        { id: 'myrljos', weight: 2, time: 'night' },
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'myrljos', weight: 1, time: 'night' },
       ],
     },
   },

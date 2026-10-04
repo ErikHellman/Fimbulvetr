@@ -118,6 +118,12 @@ export const SCREEN_IDS = [
   'nif_camp',
   'nif_shore',
   'nif_int_hut',
+  'nif_gate',
+  'nif_gjoll',
+  'nif_jars',
+  'nif_cairns',
+  'nif_strand',
+  'nif_int_cave',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

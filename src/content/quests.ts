@@ -774,6 +774,13 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Niflmýrr: ett kärr av dimma och rastlösa döda. Någonstans där finns de tillfångatagna, och Embla.',
         },
       },
+      {
+        when: flag('st_twist_heard'),
+        text: {
+          en: 'The captives are being bled to unmake the oath that holds the Rime King. Embla got away, west over the lake. Helgrind’s gate stands north of the Gjöll.',
+          sv: 'De tillfångatagna tappas på blod för att lösa eden som håller Rimkungen. Embla kom undan, västerut över sjön. Helgrinds port står norr om Gjöll.',
+        },
+      },
     ],
   },
 };

@@ -581,4 +581,56 @@ export const ENEMY_DEFS = {
       },
     },
   },
+  /**
+   * The mara (Niflmýrr, by night): unseen until three tiles off, it shows itself crouched (400 ms) and
+   * leaps. Landed, it rides Ask and drains seiðr until a roll throws it off (see mara.ts, systems/mara.ts).
+   */
+  mara: {
+    id: 'mara',
+    art: 'enemy_mara',
+    hp: 6,
+    body: { x: -5, y: -6, w: 10, h: 6 },
+    hurt: { x: -7, y: -22, w: 14, h: 22 },
+    behaviour: 'mara',
+    weak: ['fire'],
+    knockResist: 0.3,
+    immortal: false,
+    solid: false,
+    flies: true,
+    stunnable: 90,
+    drops: { heart: 2, silver: 2, seidr: 3, none: 3 },
+  },
+  /**
+   * A fog-draugr (Niflmýrr and Helgrind): a faint swirl in the mist until Ask passes with their back to it,
+   * then it rises behind them, stalks, raises its blade (400 ms) and cuts.
+   */
+  fog_draugr: {
+    id: 'fog_draugr',
+    art: 'enemy_fog_draugr',
+    hp: 6,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -7, y: -26, w: 14, h: 26 },
+    behaviour: 'fog_draugr',
+    weak: ['fire'],
+    knockResist: 0.3,
+    immortal: false,
+    solid: false,
+    attacks: {
+      swing: {
+        from: 0,
+        to: 5,
+        boxes: {
+          e: { x: 0, y: -24, w: 22, h: 24 },
+          w: { x: -22, y: -24, w: 22, h: 24 },
+          s: { x: -12, y: -12, w: 24, h: 22 },
+          n: { x: -12, y: -34, w: 24, h: 24 },
+        },
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    stunnable: 120,
+    drops: { heart: 3, silver: 3, none: 3 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;
