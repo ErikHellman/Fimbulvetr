@@ -148,6 +148,8 @@ export const FLAGS = {
   q_duel_won: { t: 'bool' },
   /** Styrr's last lesson: Bragð, the sword beam. */
   st_bragd_learned: { t: 'bool' },
+  /** The rime across the gorge beyond the pass has melted (M6 opens the road north). */
+  st_rime_open: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

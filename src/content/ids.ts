@@ -264,6 +264,7 @@ export const SCRIPTS = [
   'shop_geirmundr',
   'duel_lost',
   'duel_won',
+  'pass_open',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

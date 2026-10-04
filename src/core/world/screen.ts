@@ -230,8 +230,8 @@ export type Thing =
       readonly do: readonly Effect[];
     };
 
-/** A gate's look: `slab` is a barrow's stone door. */
-export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab';
+/** A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass. */
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime';
 
 export interface ScreenDef {
   readonly id: ScreenId;

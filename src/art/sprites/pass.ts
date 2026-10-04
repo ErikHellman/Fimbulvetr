@@ -1,6 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
-import { rect } from '../draw';
+import { line, rect } from '../draw';
+import { outline } from '../outline';
 import { C } from '../palette';
 import { createRaster, flipX, hex, type Raster } from '../raster';
 import { flipY, roundShield } from './haugar';
@@ -74,6 +75,33 @@ function beamUp(i: number): Raster {
   return r;
 }
 
+const ICE = hex('#cfe8f2');
+const ICE_SHADE = hex('#8fb8cc');
+const ICE_LIGHT = hex('#f4fcff');
+const INK = hex(C.ink);
+
+/**
+ * One tile of the rime wall across the gorge (18×34, like a slab gate): blue-white ice heaped higher than
+ * a man, with cracks of pale light. `open`, only meltwater on the ground.
+ */
+function rime(open: boolean): Raster {
+  const r = createRaster(18, 34);
+  const base = 31;
+  if (open) {
+    rect(r, 1, base - 2, 16, 2, ICE_SHADE);
+    return outline(r, INK, 1);
+  }
+  rect(r, 1, 6, 16, base - 6, ICE);
+  rect(r, 12, 6, 5, base - 6, ICE_SHADE);
+  rect(r, 3, 3, 6, 4, ICE);
+  rect(r, 9, 4, 5, 3, ICE_SHADE);
+  rect(r, 2, 7, 3, 12, ICE_LIGHT);
+  line(r, 6, 10, 9, 18, ICE_SHADE);
+  line(r, 9, 18, 7, 25, ICE_SHADE);
+  line(r, 11, 13, 13, 21, ICE_LIGHT);
+  return outline(r, INK, 1);
+}
+
 export function passFrames(): SpriteFrame[] {
   const frames: SpriteFrame[] = [];
   for (const side of ['s', 'n', 'w'] as const) {
@@ -102,14 +130,20 @@ export function passFrames(): SpriteFrame[] {
       { name: `fx_bragd_fly_s_${String(i)}`, raster: flipY(up), ox: 5, oy: 10 },
     );
   }
+  frames.push(
+    { name: 'fix_rime_closed_s_0', raster: rime(false), ox: 9, oy: 31 },
+    { name: 'fix_rime_open_s_0', raster: rime(true), ox: 9, oy: 31 },
+  );
   return frames;
 }
 
 const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
+const one = (frames: number, fps: number): AnimDef => ({ frames, fps, loop: true, dirs: ['s'] });
 const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const PASS_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fx_bragd: { fly: all(2, 12) },
+  fix_rime: { closed: one(1, 1), open: one(1, 1) },
   enemy_styrr: {
     idle: all(1, 1),
     walk: all(4, 5),

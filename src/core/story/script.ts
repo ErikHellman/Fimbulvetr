@@ -51,7 +51,14 @@ export type Step =
    * Farvegr's picker: the woken warp stones and "stay". Choosing a stone pays the galdr's seiðr and
    * carries Ask there through a fade; cancelling costs nothing.
    */
-  | { readonly k: 'farvegr' };
+  | { readonly k: 'farvegr' }
+  /**
+   * The Rime King's breath pours out over the land: a shake, a long wind and a white wave rolling over
+   * the screen (StoryUi `breath`); it holds the stage for `BREATH_TICKS`.
+   */
+  | { readonly k: 'breath' }
+  /** The credits roll: `CREDITS_TICKS`, or until confirm once `CREDITS_SKIP` ticks have passed. */
+  | { readonly k: 'credits' };
 
 export interface ScriptDef {
   readonly steps: readonly Step[];

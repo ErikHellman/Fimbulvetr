@@ -54,8 +54,76 @@ const duelWon: ScriptDef = {
   ],
 };
 
+/**
+ * The end of Act I: the three seals flare, the door opens, the Rime King's breath pours out over the
+ * lowlands and the world snaps to winter: the Fimbulvetr. Then the credits, and the gorge iced shut.
+ */
+const passOpen: ScriptDef = {
+  steps: [
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Ask lays a hand on the great door. It is warm. One by one the three seals answer.',
+        sv: 'Ask lägger handen på den stora dörren. Den är varm. En efter en svarar de tre sigillen.',
+      },
+    },
+    { k: 'do', effects: [{ k: 'sfx', id: 'sfx_seal' }] },
+    { k: 'wait', ticks: 30 },
+    { k: 'do', effects: [{ k: 'sfx', id: 'sfx_seal' }] },
+    { k: 'wait', ticks: 30 },
+    { k: 'do', effects: [{ k: 'sfx', id: 'sfx_seal' }] },
+    { k: 'wait', ticks: 30 },
+    {
+      k: 'do',
+      effects: [
+        { k: 'set', flag: 'st_pass_open', value: true },
+        { k: 'sfx', id: 'sfx_gate' },
+      ],
+    },
+    { k: 'wait', ticks: 50 },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Stone grinds on stone, and the door stands open. Beyond it the gorge climbs north, and at its end the mountain glows from within, blue as a cold forge.',
+        sv: 'Sten skaver mot sten, och dörren står öppen. Bortom den stiger klyftan mot norr, och vid dess slut glöder berget inifrån, blått som en kall smedja.',
+      },
+    },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Then the mountain breathes out.',
+        sv: 'Då andas berget ut.',
+      },
+    },
+    { k: 'breath' },
+    { k: 'do', effects: [{ k: 'setSeason', season: 'winter' }] },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Frost runs over the heather. The tarn locks white, and across the lowlands every field goes still under snow. Whatever the calendar said, it is winter now.',
+        sv: 'Frosten rinner över ljungen. Tjärnen låser sig vit, och över hela låglandet stelnar varje åker under snö. Vad kalendern än sade är det vinter nu.',
+      },
+    },
+    { k: 'card', text: { en: 'The Fimbulvetr.', sv: 'Fimbulvintern.' } },
+    { k: 'credits' },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'At the gorge’s end the breath has frozen into a wall of ice. The road north is shut, for now. Askdalr will have felt this cold: home first.',
+        sv: 'Vid klyftans slut har andedräkten frusit till en mur av is. Vägen norrut är stängd, för tillfället. Askdalr har känt den här kölden: hem först.',
+      },
+    },
+  ],
+};
+
 /** Scripts of the Act I finale: the last duel, the pass, the Fimbulvetr. */
-export const PASS_SCRIPTS: Readonly<Record<'duel_lost' | 'duel_won', ScriptDef>> = {
+export const PASS_SCRIPTS: Readonly<Record<'duel_lost' | 'duel_won' | 'pass_open', ScriptDef>> = {
   duel_lost: duelLost,
   duel_won: duelWon,
+  pass_open: passOpen,
 };
