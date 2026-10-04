@@ -175,6 +175,10 @@ export const FLAGS = {
   w_ask_leaf_eye: { t: 'bool' },
   /** All four leaves handed back to Gyða. */
   q_pages_done: { t: 'bool' },
+  /** Önundr's troll hunt (`q_trolls`): asked, trolls the sunrise caught in the troll wood, rewarded. */
+  q_trolls_asked: { t: 'bool' },
+  q_trolls_stoned: { t: 'int', max: 5 },
+  q_trolls_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

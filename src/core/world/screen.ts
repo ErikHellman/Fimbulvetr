@@ -48,6 +48,8 @@ export type Thing =
       readonly at: TilePos;
       readonly when?: Cond;
       readonly onDeath?: readonly Effect[];
+      /** Applies when the sunrise turns it to stone (a troll with `petrify`). */
+      readonly onStone?: readonly Effect[];
       readonly asleep?: true;
     }
   | DoorThing

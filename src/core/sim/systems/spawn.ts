@@ -108,8 +108,8 @@ function spawnThings(rt: SimRt): Entity[] {
         if (!evalCond(thing.when, ctx) || (def.boss !== undefined && def.boss.mini !== true && bossDown(rt)))
           break;
         const e = createEnemy(rt.newId(), def, tileFeet(thing.at));
-        // The thing index is only kept for enemies that do something when they die.
-        if (thing.onDeath !== undefined) e.mem['thing'] = index;
+        // The thing index is only kept for enemies that do something when they die or turn to stone.
+        if (thing.onDeath !== undefined || thing.onStone !== undefined) e.mem['thing'] = index;
         if (thing.asleep === true) {
           e.mem['asleep'] = 1;
           e.iframes = 2;

@@ -1,4 +1,4 @@
-import type { ScreenDef } from '@core/world/screen';
+import type { ScreenDef, Thing } from '@core/world/screen';
 
 export const myrTrollskog: ScreenDef = {
   id: 'myr_trollskog',
@@ -9,9 +9,20 @@ export const myrTrollskog: ScreenDef = {
     /** The stone in the ring's gap: a troll the sun caught. Lift it and throw it. */
     { k: 'prop', id: 'troll_stone', at: { x: 28, y: 12 } },
     { k: 'piece', id: 'hp_myr_trollskog', at: { x: 28, y: 8 } },
-    /** Two old trolls walk the wood every night; the sunrise turns them to stone where they stand. */
-    { k: 'enemy', id: 'forest_troll', at: { x: 12, y: 9 }, when: { k: 'phase', is: 'night' } },
-    { k: 'enemy', id: 'forest_troll', at: { x: 20, y: 15 }, when: { k: 'phase', is: 'night' } },
+    /**
+     * Two old trolls walk the wood every night; the sunrise turns them to stone where they stand, and each
+     * counts for Önundr's hunt (`q_trolls`).
+     */
+    ...[
+      [12, 9],
+      [20, 15],
+    ].map(([x = 0, y = 0]): Thing => ({
+      k: 'enemy',
+      id: 'forest_troll',
+      at: { x, y },
+      when: { k: 'phase', is: 'night' },
+      onStone: [{ k: 'add', flag: 'q_trolls_stoned', n: 1 }],
+    })),
   ],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
   spawns: [

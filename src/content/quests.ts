@@ -550,4 +550,28 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_trolls: {
+    id: 'q_trolls',
+    name: { en: 'Troll stones', sv: 'Trollstenar' },
+    stages: [
+      {
+        when: flag('q_trolls_asked'),
+        text: {
+          en: 'Önundr wants five trolls caught by the sunrise in the troll wood, over as many nights as it takes.',
+          sv: 'Önundr vill att fem troll fångas av soluppgången i trollskogen, under så många nätter det behövs.',
+        },
+      },
+      {
+        when: atLeast('q_trolls_stoned', 5),
+        text: { en: 'Five troll stones. Tell Önundr.', sv: 'Fem trollstenar. Berätta för Önundr.' },
+      },
+      {
+        when: flag('q_trolls_done'),
+        text: {
+          en: 'Önundr gave Ask an arm-ring of stamina for the five troll stones.',
+          sv: 'Önundr gav Ask en armring av uthållighet för de fem trollstenarna.',
+        },
+      },
+    ],
+  },
 };

@@ -231,6 +231,7 @@ export const QUESTS = [
   'q_trade',
   'q_herd',
   'q_pages',
+  'q_trolls',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 

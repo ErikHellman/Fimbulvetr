@@ -2,10 +2,12 @@ import type { EnemyId } from '@content/ids';
 import { createProp } from '../../actors/prop';
 import { isNight } from '../../clock/clock';
 import type { SimRt } from '../rt';
+import { applyAll } from './story';
 
 /**
  * Sunrise turns every troll still out to stone where it stands: the enemy becomes its `petrify` prop (a
- * rock to lift and break for loot). Nothing is checked while no such enemy is on screen.
+ * rock to lift and break for loot), and its thing's `onStone` applies. Nothing is checked while no such
+ * enemy is on screen.
  */
 export function petrifyAtDawn(rt: SimRt): void {
   const trolls = rt.actors.filter(
@@ -18,6 +20,9 @@ export function petrifyAtDawn(rt: SimRt): void {
     const stone = createProp(rt.newId(), rt.db.props[prop], troll.pos, -1);
     stone.facing = troll.facing;
     rt.actors = rt.actors.map((a) => (a === troll ? stone : a));
+    const index = troll.mem['thing'];
+    const thing = index === undefined ? undefined : rt.db.screens[rt.screen.id].things[index];
+    if (thing?.k === 'enemy' && thing.onStone !== undefined) applyAll(rt, thing.onStone);
   }
   rt.emit({ t: 'sfx', id: 'sfx_stone' });
   rt.emit({ t: 'shake', amount: 3 });
