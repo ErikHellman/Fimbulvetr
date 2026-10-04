@@ -6,6 +6,7 @@ export const HRAFNKELL: DialogueDef = {
   entry: [
     { when: not(flag('n_hrafnkell_met')), node: 'meet' },
     { when: evening, node: 'night' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { node: 'day' },
   ],
   nodes: {
@@ -33,6 +34,12 @@ export const HRAFNKELL: DialogueDef = {
       text: {
         en: 'The shop is shut, friend. Come to the counter in the morning. Tonight I drink my own stock.',
         sv: 'Boden är stängd, min vän. Kom till disken i morgon. I kväll dricker jag mitt eget lager.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'Lamp oil and mead, that is all anyone buys now. Light and forgetting. I have stocked up on both.',
+        sv: 'Lampolja och mjöd, det är allt någon köper nu. Ljus och glömska. Jag har fyllt på med båda.',
       },
     },
   },

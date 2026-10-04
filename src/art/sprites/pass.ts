@@ -102,6 +102,48 @@ function rime(open: boolean): Raster {
   return outline(r, INK, 1);
 }
 
+const CHAR = hex('#2a2420');
+const CHAR_LIGHT = hex('#4a3a2e');
+const EMBER = hex('#8a4a2a');
+const PLANK = hex('#8a6a44');
+const PLANK_SHADE = hex('#5e4630');
+
+/** A patch of burned turf on a roof (16×16, one tile): black char with ragged edges and a last ember. */
+function scorch(): Raster {
+  const r = createRaster(16, 16);
+  rect(r, 2, 3, 12, 10, CHAR);
+  rect(r, 4, 1, 7, 3, CHAR);
+  rect(r, 1, 6, 2, 5, CHAR);
+  rect(r, 13, 5, 2, 6, CHAR);
+  rect(r, 5, 13, 6, 2, CHAR);
+  rect(r, 5, 5, 3, 2, CHAR_LIGHT);
+  rect(r, 9, 8, 3, 2, CHAR_LIGHT);
+  rect(r, 7, 10, 1, 1, EMBER);
+  return r;
+}
+
+/** Fallen, charred beams on the ground (16×16): what is left of a fold or a byre. */
+function rubble(): Raster {
+  const r = createRaster(16, 16);
+  line(r, 1, 11, 14, 6, CHAR);
+  line(r, 1, 12, 14, 7, CHAR);
+  line(r, 3, 4, 12, 13, CHAR_LIGHT);
+  line(r, 4, 4, 13, 13, CHAR);
+  rect(r, 6, 12, 4, 2, CHAR);
+  rect(r, 9, 9, 1, 1, EMBER);
+  return outline(r, INK, 1);
+}
+
+/** Planks nailed across a door (16×16): nobody lives here now. */
+function boards(): Raster {
+  const r = createRaster(16, 16);
+  line(r, 2, 4, 13, 7, PLANK);
+  line(r, 2, 5, 13, 8, PLANK_SHADE);
+  line(r, 2, 10, 13, 12, PLANK);
+  line(r, 2, 11, 13, 13, PLANK_SHADE);
+  return outline(r, INK, 1);
+}
+
 export function passFrames(): SpriteFrame[] {
   const frames: SpriteFrame[] = [];
   for (const side of ['s', 'n', 'w'] as const) {
@@ -130,6 +172,13 @@ export function passFrames(): SpriteFrame[] {
       { name: `fx_bragd_fly_s_${String(i)}`, raster: flipY(up), ox: 5, oy: 10 },
     );
   }
+  for (const [art, raster] of [
+    ['scorch', scorch()],
+    ['rubble', rubble()],
+    ['boards', boards()],
+  ] as const) {
+    frames.push({ name: `fix_${art}_idle_s_0`, raster, ox: 8, oy: 14 });
+  }
   frames.push(
     { name: 'fix_rime_closed_s_0', raster: rime(false), ox: 9, oy: 31 },
     { name: 'fix_rime_open_s_0', raster: rime(true), ox: 9, oy: 31 },
@@ -144,6 +193,9 @@ const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fp
 export const PASS_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   fx_bragd: { fly: all(2, 12) },
   fix_rime: { closed: one(1, 1), open: one(1, 1) },
+  fix_scorch: { idle: one(1, 1) },
+  fix_rubble: { idle: one(1, 1) },
+  fix_boards: { idle: one(1, 1) },
   enemy_styrr: {
     idle: all(1, 1),
     walk: all(4, 5),

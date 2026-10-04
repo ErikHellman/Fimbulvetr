@@ -1,4 +1,19 @@
-import type { ScreenDef } from '@core/world/screen';
+import type { ScreenDef, Thing } from '@core/world/screen';
+import { afterRaid } from '../../dialogue/util';
+
+/** The captives' houses, boarded up since the raid. */
+const SHUT: Thing[] = [
+  [31, 5],
+  [8, 18],
+  [31, 18],
+].map(([x = 0, y = 0]): Thing => ({
+  k: 'scenery',
+  at: { x, y },
+  w: 1,
+  h: 1,
+  art: 'boards',
+  shown: afterRaid,
+}));
 
 export const askVillage: ScreenDef = {
   id: 'ask_village',
@@ -19,6 +34,7 @@ export const askVillage: ScreenDef = {
         sv: 'Byns brunn. Någon har ristat ett får i den.',
       },
     },
+    ...SHUT,
   ],
   map: [
     'TTTTTTTTTTTTTTTTTT,,,,TTTTTTTTTTTTTTTTTT',

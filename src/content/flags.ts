@@ -152,6 +152,12 @@ export const FLAGS = {
   st_rime_open: { t: 'bool' },
   /** Sölvi taught Hlíf, the ward-song, once the pass was open. */
   st_hlif_learned: { t: 'bool' },
+  /** The farm rebuilt so far: 1 the longhouse's roof, 2 the fold and byre (3–5 need ore, later). */
+  q_farm: { t: 'int', max: 5 },
+  /** Ask came home to Askdalr after the pass opened, into the Fimbulvetr. */
+  st_home_winter: { t: 'bool' },
+  /** Gyða told Ask the Rime King's binding was sworn on blood, and of her rune-record's lost leaves. */
+  st_blood_told: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

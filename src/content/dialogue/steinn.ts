@@ -3,7 +3,11 @@ import { flag, not } from './util';
 
 /** Steinn, an old huscarl by the mead-hall fire. He stood with Halvar at the binding and will not say so. */
 export const STEINN: DialogueDef = {
-  entry: [{ when: not(flag('n_steinn_met')), node: 'meet' }, { node: 'day' }],
+  entry: [
+    { when: not(flag('n_steinn_met')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
+    { node: 'day' },
+  ],
   nodes: {
     meet: {
       text: {
@@ -37,6 +41,12 @@ export const STEINN: DialogueDef = {
       text: {
         en: 'The fire is warm, the mead is thin, and the winters grow longer. I have seen this before, lad. Once.',
         sv: 'Elden är varm, mjödet är tunt, och vintrarna blir längre. Jag har sett det här förut, pojk. En gång.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'This is the cold I saw once, lad. It came down from the mountain the same way. And then, too, a man walked up to meet it.',
+        sv: 'Det här är kölden jag såg en gång, pojk. Den kom ner från berget på samma sätt. Och då, också, gick en man upp för att möta den.',
       },
     },
   },

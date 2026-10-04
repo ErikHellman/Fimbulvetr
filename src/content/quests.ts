@@ -319,6 +319,40 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_fimbulvetr: {
+    id: 'q_fimbulvetr',
+    name: { en: 'The Fimbulvetr', sv: 'Fimbulvintern' },
+    stages: [
+      {
+        when: flag('st_stone3_lit'),
+        text: {
+          en: 'Three stones burn. Go to the runestone pass, north of the barrows.',
+          sv: 'Tre stenar brinner. Gå till runstenspasset, norr om högarna.',
+        },
+      },
+      {
+        when: flag('st_pass_open'),
+        text: {
+          en: 'The pass is open, and the mountain breathed winter over the land. Go home to Askdalr.',
+          sv: 'Passet är öppet, och berget andades vinter över landet. Gå hem till Askdalr.',
+        },
+      },
+      {
+        when: flag('st_home_winter'),
+        text: {
+          en: 'Askdalr lies in rime. Halvar knows this cold, and Gyða may know why it came.',
+          sv: 'Askdalr ligger i rimfrost. Halvar känner igen den här kölden, och Gyða vet kanske varför den kom.',
+        },
+      },
+      {
+        when: flag('st_blood_told'),
+        text: {
+          en: 'The pass is open, but the road north is buried in rime.',
+          sv: 'Passet är öppet, men vägen norrut ligger begravd i rimfrost.',
+        },
+      },
+    ],
+  },
   q_fisher: {
     id: 'q_fisher',
     name: { en: 'Gamli', sv: 'Gamle' },

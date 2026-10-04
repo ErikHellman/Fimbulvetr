@@ -121,9 +121,35 @@ const passOpen: ScriptDef = {
   ],
 };
 
-/** Scripts of the Act I finale: the last duel, the pass, the Fimbulvetr. */
-export const PASS_SCRIPTS: Readonly<Record<'duel_lost' | 'duel_won' | 'pass_open', ScriptDef>> = {
+/** Ask's first steps into the farmyard after the pass opened: Askdalr under the Fimbulvetr. */
+const homeWinter: ScriptDef = {
+  steps: [
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Askdalr lies white and still. The well has frozen to its rim, and the smoke from the longhouse rises straight up into a sky like iron.',
+        sv: 'Askdalr ligger vitt och stilla. Brunnen har frusit ända upp till kanten, och röken från långhuset stiger rakt upp mot en himmel som järn.',
+      },
+    },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Under the snow the burned roof still shows black. Halvar will want to hear what happened at the pass.',
+        sv: 'Under snön syns det brända taket fortfarande svart. Halvar vill nog höra vad som hände vid passet.',
+      },
+    },
+    { k: 'do', effects: [{ k: 'set', flag: 'st_home_winter', value: true }] },
+  ],
+};
+
+/** Scripts of the Act I finale: the last duel, the pass, the Fimbulvetr and the homecoming. */
+export const PASS_SCRIPTS: Readonly<
+  Record<'duel_lost' | 'duel_won' | 'pass_open' | 'home_winter', ScriptDef>
+> = {
   duel_lost: duelLost,
   duel_won: duelWon,
   pass_open: passOpen,
+  home_winter: homeWinter,
 };

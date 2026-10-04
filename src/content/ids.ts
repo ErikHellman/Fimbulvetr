@@ -220,6 +220,7 @@ export const QUESTS = [
   'q_fisher',
   'q_runestone_3',
   'q_huscarl',
+  'q_fimbulvetr',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -265,6 +266,7 @@ export const SCRIPTS = [
   'duel_lost',
   'duel_won',
   'pass_open',
+  'home_winter',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

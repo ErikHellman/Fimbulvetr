@@ -16,6 +16,7 @@ export const STYRR: DialogueDef = {
   entry: [
     { when: not(flag('n_styrr_met')), node: 'meet' },
     { when: all(flag('t_parry'), not(flag('q_duel_asked'))), node: 'challenge' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('q_duel_won'), node: 'won' },
     { when: all(flag('st_barrow_open'), not(flag('st_stone3_lit'))), node: 'opened' },
     { when: flag('st_stone3_lit'), node: 'lit' },
@@ -188,6 +189,13 @@ export const STYRR: DialogueDef = {
       text: {
         en: 'Three stones burning, and a farmhand did it. Halvar would laugh. Then he would say nothing for a week.',
         sv: 'Tre stenar som brinner, och en dräng gjorde det. Halvar skulle skratta. Sedan skulle han inte säga något på en vecka.',
+      },
+      next: 'menu',
+    },
+    fimbul: {
+      text: {
+        en: 'So the old cold is back. I stood in it once, with Halvar beside me. Ask him about it. He will not answer, but ask.',
+        sv: 'Så den gamla kölden är tillbaka. Jag stod i den en gång, med Halvar vid min sida. Fråga honom om det. Han svarar inte, men fråga.',
       },
       next: 'menu',
     },

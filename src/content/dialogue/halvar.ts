@@ -9,6 +9,7 @@ export const HALVAR: DialogueDef = {
     { when: raidNight, node: 'raid' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
+    { when: flag('st_home_winter'), node: 'winter' },
     { when: all(afterRaid, flag('n_styrr_met'), not(flag('st_stone3_lit'))), node: 'styrr' },
     { when: afterRaid, node: 'after' },
     { when: all(day(1), not(flag('st_intro_seen'))), node: 'intro' },
@@ -190,6 +191,19 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'Bring them home, Ask. Bring her home. I will mend, and I will be here.',
         sv: 'För hem dem, Ask. För hem henne. Jag blir bättre, och jag finns här.',
+      },
+    },
+    winter: {
+      text: {
+        en: 'So it has come. I know this cold, Ask. I stood in it once, far in the north. Do not ask me how. Not yet.',
+        sv: 'Så har den kommit. Jag känner den här kölden, Ask. Jag stod i den en gång, långt i norr. Fråga mig inte hur. Inte än.',
+      },
+      next: 'winter2',
+    },
+    winter2: {
+      text: {
+        en: 'Go to Gyða. If anyone knows why the mountain breathed, she does. I will mend in this bed until the roof does.',
+        sv: 'Gå till Gyða. Om någon vet varför berget andades så är det hon. Jag får läka i den här sängen tills taket gör det.',
       },
     },
   },
