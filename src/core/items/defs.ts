@@ -1,4 +1,4 @@
-import type { ItemId } from '@content/ids';
+import type { GaldrId, ItemId } from '@content/ids';
 import type { L10n } from '../i18n/t';
 
 export interface GaldrDef {
@@ -38,6 +38,8 @@ export interface ItemDef {
   readonly ammo?: { readonly bag: ItemId; readonly step: number };
   /** A sub-item that spends another item as ammunition (the bow fires arrows); the HUD shows that count. */
   readonly fires?: ItemId;
+  /** A rune-stave: from a slot it sings this galdr once, for no seiðr, and is used up. */
+  readonly stave?: GaldrId;
   /** Given with it the first time (the bow comes with a full quiver). */
   readonly comes?: { readonly item: ItemId; readonly n: number };
 }

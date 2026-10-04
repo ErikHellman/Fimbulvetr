@@ -111,6 +111,7 @@ export const TUNING: Tuning = {
   },
   fire: { burnTicks: 90, spreadAt: 50, amount: 2, knock: 3, scorch: 30 },
   eldr: { speed: 4, range: 176, damage: 4 },
+  is: { speed: 4, range: 176, freeze: 240 },
   armor: {
     wool_tunic: { reduce: 0 },
     byrnie: { reduce: 0.25 },

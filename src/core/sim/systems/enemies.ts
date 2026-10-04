@@ -46,6 +46,13 @@ export function runEnemies(rt: SimRt, ctx: ActorCtx): void {
       e.vel = { x: 0, y: 0 };
       continue;
     }
+    // Frozen by Ís: it stands in the ice, neither moving nor striking, until it thaws or shatters.
+    const frozen = mem(e, 'frozen');
+    if (frozen > 0) {
+      e.mem['frozen'] = frozen - 1;
+      e.vel = { x: 0, y: 0 };
+      continue;
+    }
     const stun = mem(e, 'stun');
     if (stun > 0) {
       e.mem['stun'] = stun - 1;

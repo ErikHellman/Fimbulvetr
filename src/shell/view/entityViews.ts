@@ -40,8 +40,12 @@ export class EntityViews {
       // A lowered drawbridge lies flat: anyone standing on its tile is drawn over it.
       sprite.setDepth(e.kind === 'fixture' && e.def === 'bridge' ? p.y - TILE : p.y);
       const stun = e.mem['stun'] ?? 0;
+      const frozen = e.mem['frozen'] ?? 0;
       if (e.flash > 0 && Math.floor(e.flash / 2) % 2 === 0)
         sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
+      // Frozen in Ís: rimed pale blue-white, flickering in its last second.
+      else if (frozen > 0 && (frozen > 60 || Math.floor(frozen / 6) % 2 === 0))
+        sprite.setTint(0xd8f4ff).setTintMode(Phaser.TintModes.ADD);
       // Stunned: a cold blue cast, flickering off in the last second before it wears off.
       else if (stun > 0 && (stun > 60 || Math.floor(stun / 6) % 2 === 0))
         sprite.setTint(0x8fb0ff).setTintMode(Phaser.TintModes.MULTIPLY);

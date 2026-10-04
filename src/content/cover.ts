@@ -50,6 +50,18 @@ export const COVER_DEFS = {
     cut: false,
     sink: true,
   },
+  /**
+   * Ís laid on still water by the ice-song, in any season: walkable, fire melts it. It never grows; the
+   * song places it, and it thaws when Ask leaves the screen (it is never saved).
+   */
+  is_ice: {
+    id: 'is_ice',
+    seasons: ['spring', 'summer', 'autumn', 'winter'],
+    slow: 1,
+    cut: false,
+    walk: true,
+    melts: true,
+  },
 } as const satisfies Record<CoverId, CoverDef>;
 
 /** Map characters that also grow cover. LEGEND maps the same characters to the terrain beneath. */

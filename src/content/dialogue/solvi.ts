@@ -2,12 +2,14 @@ import type { DialogueDef } from '@core/story/dialogue';
 import { all, flag, not } from './util';
 
 const HLIF = 120;
+const STAVE = 40;
 
 /** Sölvi the rune-carver, among his standing stones. He teaches Ask Eldr, for a stave from Skeggi's kiln. */
 export const SOLVI: DialogueDef = {
   entry: [
     { when: not(flag('n_solvi_met')), node: 'meet' },
     { when: all(flag('st_pass_open'), not(flag('st_hlif_learned'))), node: 'hlif' },
+    { when: all(flag('st_rime_open'), flag('st_hlif_learned')), node: 'staves' },
     { when: flag('st_hlif_learned'), node: 'warded' },
     { when: all(flag('st_eldr_learned'), not(flag('q_rs2_mill'))), node: 'stone2' },
     { when: all(flag('st_stone2_lit'), not(flag('st_barrow_open'))), node: 'stone3' },
@@ -55,6 +57,39 @@ export const SOLVI: DialogueDef = {
       text: {
         en: 'The runes are free. The stone they are cut in is not, and neither is my supper.',
         sv: 'Runorna är gratis. Stenen de ristas i är det inte, och inte heller min kvällsmat.',
+      },
+    },
+    staves: {
+      text: {
+        en: 'You melted the rime? Then the north is open, and it is colder than fire can mend. I have cut Ís on staves: frost for a foe, a floor on still water. One song each.',
+        sv: 'Du smälte rimfrosten? Då är norr öppet, och där är det kallare än eld kan bota. Jag har ristat Ís på stavar: frost åt en fiende, ett golv på stilla vatten. En sång var.',
+      },
+      choices: [
+        {
+          text: {
+            en: `An Ís stave (${String(STAVE)} silver).`,
+            sv: `En Ís-stav (${String(STAVE)} silver).`,
+          },
+          when: all({ k: 'silver', gte: STAVE }, not({ k: 'item', id: 'stave_is', gte: 3 })),
+          do: [
+            { k: 'silver', n: -STAVE },
+            { k: 'give', item: 'stave_is' },
+            { k: 'sfx', id: 'sfx_itemget' },
+          ],
+          next: 'stave_sold',
+        },
+        {
+          text: { en: `An Ís stave (${String(STAVE)} silver)…`, sv: `En Ís-stav (${String(STAVE)} silver)…` },
+          when: all(not({ k: 'silver', gte: STAVE }), not({ k: 'item', id: 'stave_is', gte: 3 })),
+          next: 'hlif_poor',
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    stave_sold: {
+      text: {
+        en: 'Put it in your hand, not your song: it sings once, for nothing, and then it is kindling. Three is all a sane person carries.',
+        sv: 'Ha den i handen, inte i sången: den sjunger en gång, gratis, och sedan är den tändved. Tre är allt en vettig människa bär.',
       },
     },
     warded: {

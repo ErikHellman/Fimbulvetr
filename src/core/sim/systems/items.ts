@@ -5,6 +5,7 @@ import type { SimRt } from '../rt';
 import { lightBrazier } from './fixtures';
 import { shootArrow, throwBoomerang } from './projectiles';
 import { placeBomb } from './bombs';
+import { singStave } from './galdr';
 import { probeBox } from './story';
 import { owns } from '../../items/defs';
 
@@ -26,6 +27,11 @@ export function useItems(rt: SimRt, input: InputFrame): void {
   const slots = rt.state.inv.slots;
   const item = wasPressed(input, 'item1') ? slots[0] : wasPressed(input, 'item2') ? slots[1] : null;
   if (item === null) return;
+  const stave = rt.db.items[item].stave;
+  if (stave !== undefined) {
+    if (singStave(rt, input, stave)) applyEffect({ k: 'take', item }, rt);
+    return;
+  }
   USES[item]?.(rt, input);
 }
 

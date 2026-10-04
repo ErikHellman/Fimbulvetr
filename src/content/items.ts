@@ -1,6 +1,6 @@
 import type { L10n } from '@core/i18n/t';
 import type { DungeonGift, ItemDef } from '@core/items/defs';
-import { ITEMS, SUB_ITEMS, type ItemId } from './ids';
+import { ITEMS, SUB_ITEMS, type GaldrId, type ItemId } from './ids';
 
 export const ITEM_NAMES = {
   lantern: { en: 'Lantern', sv: 'Lykta' },
@@ -41,6 +41,7 @@ export const ITEM_NAMES = {
   grave_ring: { en: 'Grave-ring', sv: 'Gravring' },
   honey: { en: 'Wild honey', sv: 'Vildhonung' },
   amber: { en: 'Amber', sv: 'Bärnsten' },
+  stave_is: { en: 'Ís rune-stave', sv: 'Ís-runstav' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {
@@ -62,10 +63,15 @@ const MAX: Partial<Record<ItemId, number>> = {
   fen_moss: 9,
   rune_leaf: 4,
   amber: 3,
+  stave_is: 3,
 };
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
 const FOUND: Partial<Record<ItemId, L10n>> = {
+  stave_is: {
+    en: 'You got an Ís rune-stave! Ready it in an item slot: it sings Ís once, for no seiðr, then it is spent. Frost freezes foes and lays ice on still water.',
+    sv: 'Du fick en Ís-runstav! Lägg den i en föremålsplats: den sjunger Ís en gång, utan seiðr, och sedan är den förbrukad. Frosten fryser fiender och lägger is på stilla vatten.',
+  },
   rune_leaf: {
     en: 'You found a torn leaf of Gyða’s rune-record! Bring it to her in the hof.',
     sv: 'Du hittade ett rivet blad ur Gyðas runkrönika! Ge det till henne i hovet.',
@@ -123,6 +129,8 @@ const DUNGEON: Partial<Record<ItemId, DungeonGift>> = {
 const HEAL: Partial<Record<ItemId, number>> = { flatbread: 6, cheese: 6, mead_red: 80, mead_blue: 80 };
 /** Green and blue mead fill the seiðr bar. */
 const SEIDR: Partial<Record<ItemId, number>> = { mead_green: 30, mead_blue: 30 };
+/** What each rune-stave sings. */
+const STAVE: Partial<Record<ItemId, GaldrId>> = { stave_is: 'is' };
 const IN_HORN: ReadonlySet<ItemId> = new Set(['mead_red', 'mead_green', 'mead_blue']);
 
 export const ITEM_DEFS = Object.fromEntries(
@@ -134,7 +142,7 @@ export const ITEM_DEFS = Object.fromEntries(
     const def: ItemDef = {
       name,
       found: FOUND[id] ?? { en: `You found: ${name.en}!`, sv: `Du hittade: ${name.sv}!` },
-      slot: (SUB_ITEMS as readonly string[]).includes(id),
+      slot: (SUB_ITEMS as readonly string[]).includes(id) || STAVE[id] !== undefined,
       max: MAX[id] ?? 1,
       ...(heal === undefined ? {} : { heal }),
       ...(dungeon === undefined ? {} : { dungeon }),
@@ -143,6 +151,7 @@ export const ITEM_DEFS = Object.fromEntries(
       ...(IN_HORN.has(id) ? { horn: true } : {}),
       ...(id === 'seidr_upgrade' ? { maxSeidr: 5 } : {}),
       ...(id === 'purse' ? { purse: true } : {}),
+      ...(STAVE[id] === undefined ? {} : { stave: STAVE[id] }),
       ...(id === 'bombs' ? { ammo: { bag: 'bomb_bag' as const, step: 10 } } : {}),
       ...(id === 'arrows' ? { ammo: { bag: 'quiver' as const, step: 20 } } : {}),
       ...(id === 'bow' ? { fires: 'arrows' as const, comes: { item: 'arrows' as const, n: 30 } } : {}),

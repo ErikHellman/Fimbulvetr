@@ -47,6 +47,8 @@ export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_h
 export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
 /** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
 export const FETCH_ITEMS = ['honey', 'amber'] as const;
+/** Rune-staves: each sings its galdr once, from an item slot, for no seiðr. */
+export const STAVES = ['stave_is'] as const;
 export const ITEMS = [
   ...SUB_ITEMS,
   ...CONSUMABLES,
@@ -57,6 +59,7 @@ export const ITEMS = [
   ...TRADE_ITEMS,
   ...LORE_ITEMS,
   ...FETCH_ITEMS,
+  ...STAVES,
 ] as const;
 export type ItemId = (typeof ITEMS)[number];
 
@@ -165,6 +168,7 @@ export const SFX = [
   'sfx_seal',
   'sfx_breath',
   'sfx_melt',
+  'sfx_is',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -348,5 +352,5 @@ export type CritterId = (typeof CRITTERS)[number];
  * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
  * grow from the terrain beneath by season (see CoverDef.grows).
  */
-export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood'] as const;
+export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood', 'is_ice'] as const;
 export type CoverId = (typeof COVERS)[number];

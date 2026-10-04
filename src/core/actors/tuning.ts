@@ -70,6 +70,15 @@ export interface PushTuning {
 }
 
 /** The Eldr galdr's bolt of fire. */
+export interface IsTuning {
+  /** px per tick. */
+  readonly speed: number;
+  /** px flown before it melts away. */
+  readonly range: number;
+  /** Ticks a foe stays frozen. */
+  readonly freeze: number;
+}
+
 export interface EldrTuning {
   /** px per tick. */
   readonly speed: number;
@@ -151,6 +160,7 @@ export interface Tuning {
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
   readonly fire: FireTuning;
   readonly eldr: EldrTuning;
+  readonly is: IsTuning;
   /** Share of each blow an armour takes off (rounded; a blow always deals at least 1). */
   readonly armor: Readonly<Record<ArmorId, { readonly reduce: number }>>;
   /** Typewriter speed, characters per second. */

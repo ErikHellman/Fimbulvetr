@@ -154,6 +154,8 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     '..sss...',
     '........',
   ],
+  /** An Ís rune-stave: a short ash stave with frost-blue runes cut down it. */
+  stave_is: ['......w.', '.....wk.', '....wW..', '...kw...', '..wW....', '.kw.....', 'wW......', 'w.......'],
   /** A comb of walrus ivory, its back carved. */
   trade_comb: [
     '........',

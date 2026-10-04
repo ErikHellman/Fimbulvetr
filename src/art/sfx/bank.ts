@@ -648,4 +648,14 @@ export const SFX_BANK = {
     release: 0.6,
     volume: 0.3,
   },
+  /** Ís sung, or a foe frozen: a bright, glassy crackle falling away. */
+  sfx_is: {
+    wave: 'square',
+    freq: 2600,
+    freqEnd: 1300,
+    attack: 0,
+    sustain: 0.08,
+    release: 0.3,
+    volume: 0.22,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

@@ -29,7 +29,7 @@ function holes(p: Painter, n: number): void {
   for (let i = 0; i < n; i++) setPixel(p.r, nextInt(p.rng, 0, 15), nextInt(p.rng, 0, 15), [0, 0, 0, 0]);
 }
 
-export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
+const ART: Readonly<Record<Exclude<CoverId, 'is_ice'>, CoverArt>> = {
   /** Spring floodwater over the shoal: brown with silt, streaked with foam. */
   flood: {
     standing: (p) => {
@@ -119,4 +119,10 @@ export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
       p.rect(10, 9, 3, 2, C.iceLight);
     },
   },
+};
+
+export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
+  ...ART,
+  /** Ís laid by the ice-song looks like the winter ice it imitates. */
+  is_ice: ART.ice,
 };

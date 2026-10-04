@@ -281,6 +281,11 @@ describe('content art', () => {
     for (const id of TRADE_ITEMS) expect(byName.has(`item_${id}_idle_s_0`), id).toBe(true);
   });
 
+  it('has an icon for every rune-stave', async () => {
+    const { STAVES } = await import('@content/ids');
+    for (const id of STAVES) expect(byName.has(`item_${id}_idle_s_0`), id).toBe(true);
+  });
+
   it('has a menu icon for every arm-ring', async () => {
     const { RINGS } = await import('@content/ids');
     for (const id of RINGS) expect(ANIMS[id]?.['idle'], id).toBeDefined();
