@@ -1,9 +1,11 @@
+import type { ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
 import type { WeatherKind } from '../clock/types';
 import type { Dir4 } from '../math/dir';
 import type { Vec } from '../math/vec';
 import type { GameState } from '../state/gameState';
+import type { Cond } from '../story/cond';
 import type { StoryRun } from '../story/script';
 import type { CollisionGrid } from '../world/collision';
 import type { CoverGrid } from '../world/cover';
@@ -52,6 +54,16 @@ export interface LoadedScreen {
 }
 
 /** What systems may read and change. `Sim` implements it; systems are plain functions over it. */
+/** A running trial (the story step `trial`): play-ticks left of `of`, on `screen`. Never saved. */
+export interface Trial {
+  left: number;
+  readonly of: number;
+  readonly screen: ScreenId;
+  readonly done: Cond;
+  readonly win: ScriptId;
+  readonly fail: ScriptId;
+}
+
 export interface SimRt {
   readonly db: ContentDb;
   readonly state: GameState;
@@ -67,6 +79,8 @@ export interface SimRt {
   readonly rolled: boolean;
   /** Dev: the weather everywhere outdoors (undefined when off, so it never changes the hash). */
   weatherOverride?: WeatherKind;
+  /** A trial against the sand (undefined when none, so it never changes the hash). */
+  sand?: Trial;
   /** Dev: the hero takes no damage (undefined when off, so it never changes the hash). */
   god?: boolean;
   emit(event: SimEvent): void;

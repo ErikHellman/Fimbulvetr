@@ -132,8 +132,17 @@ export interface BoomerangTuning {
   readonly range: number;
 }
 
+/** What the arm-rings do while worn. */
+export interface RingTuning {
+  /** The arm-ring of stamina scales the wait between rolls by this. */
+  readonly staminaRoll: number;
+  /** The arm-ring of thrift scales shop prices by this (rounded up). */
+  readonly thriftPrice: number;
+}
+
 export interface Tuning {
   readonly hero: HeroTuning;
+  readonly rings: RingTuning;
   readonly boomerang: BoomerangTuning;
   readonly bow: BowTuning;
   readonly throw: ThrowTuning;

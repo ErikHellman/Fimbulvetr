@@ -276,6 +276,11 @@ describe('content art', () => {
     for (const g of taught) expect(ANIMS[`galdr_${g}`]?.['idle'], g).toBeDefined();
   });
 
+  it('has a menu icon for every arm-ring', async () => {
+    const { RINGS } = await import('@content/ids');
+    for (const id of RINGS) expect(ANIMS[id]?.['idle'], id).toBeDefined();
+  });
+
   it('has an idle animation for every decor art the terrain names', async () => {
     const { TERRAIN } = await import('@content/terrain');
     const arts = Object.values(TERRAIN).flatMap((d) => ('decor' in d ? [...d.decor.art] : []));

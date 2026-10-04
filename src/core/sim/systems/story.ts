@@ -31,7 +31,7 @@ import {
   type FishPhase,
   type FishResult,
 } from '../../story/fishing';
-import { buyRow, visibleStock, wareOf, type BuyResult, type Ware } from '../../story/shop';
+import { buyRow, priceOf, visibleStock, wareOf, type BuyResult, type Ware } from '../../story/shop';
 import {
   FADE_STEP_TICKS,
   MAX_INSTANT_STEPS,
@@ -235,6 +235,16 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
     case 'farvegr':
       run.warps = { cursor: 0 };
       return true;
+    case 'trial':
+      rt.sand = {
+        left: step.ticks,
+        of: step.ticks,
+        screen: rt.screen.id,
+        done: step.done,
+        win: step.win,
+        fail: step.fail,
+      };
+      return false;
     case 'breath':
       rt.emit({ t: 'sfx', id: 'sfx_breath' });
       rt.emit({ t: 'shake', amount: 4 });
@@ -297,6 +307,7 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
     case 'warp':
     case 'if':
     case 'run':
+    case 'trial':
       return false;
   }
 }
@@ -461,7 +472,8 @@ export function storyUi(rt: SimRt): StoryUi {
       name: shop.name,
       rows: visibleStock(shop, condCtx(rt)).map((s) => {
         const ware = wareOf(s);
-        return 'item' in ware ? { item: ware.item, ware, price: s.price } : { ware, price: s.price };
+        const price = priceOf(rt, s.price);
+        return 'item' in ware ? { item: ware.item, ware, price } : { ware, price };
       }),
       cursor: run.shop.cursor,
       last: run.shop.last,

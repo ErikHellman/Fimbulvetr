@@ -57,6 +57,17 @@ export type Step =
    * the screen (StoryUi `breath`); it holds the stage for `BREATH_TICKS`.
    */
   | { readonly k: 'breath' }
+  /**
+   * Starts a trial against the sand: `done` must hold within `ticks` of play on this screen, or `fail`
+   * runs (also on leaving the screen); once it holds, `win` runs. Instant; the trial is never saved.
+   */
+  | {
+      readonly k: 'trial';
+      readonly ticks: number;
+      readonly done: Cond;
+      readonly win: ScriptId;
+      readonly fail: ScriptId;
+    }
   /** The credits roll: `CREDITS_TICKS`, or until confirm once `CREDITS_SKIP` ticks have passed. */
   | { readonly k: 'credits' };
 

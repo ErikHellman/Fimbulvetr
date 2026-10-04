@@ -35,6 +35,8 @@ export interface HeroCtx {
   readonly armed: boolean;
   /** Styrr's dash thrust is learned: the sword pressed mid-roll lunges. */
   readonly dash: boolean;
+  /** Ticks after a roll before the next (the arm-ring of stamina shortens it). */
+  readonly rollCooldown: number;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -189,7 +191,7 @@ const roll: HeroDef = {
     return e.fsm.t >= h.rollTicks - 1 ? 'move' : undefined;
   },
   exit(e, c) {
-    e.mem['rollCd'] = c.tuning.hero.rollCooldown;
+    e.mem['rollCd'] = c.rollCooldown;
     still(e);
   },
 };
@@ -211,7 +213,7 @@ const thrust: HeroDef = {
   },
   exit(e, c) {
     e.mem['thrustOn'] = 0;
-    e.mem['rollCd'] = c.tuning.hero.rollCooldown;
+    e.mem['rollCd'] = c.rollCooldown;
     still(e);
   },
 };

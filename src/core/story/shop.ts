@@ -33,6 +33,11 @@ export function wareOf(entry: StockEntry): Ware {
   return { galdr: entry.galdr };
 }
 
+/** What a ware costs Ask now: the arm-ring of thrift takes its share off, rounded up. */
+export function priceOf(rt: SimRt, price: number): number {
+  return rt.state.inv.ring === 'ring_thrift' ? Math.ceil(price * rt.db.tuning.rings.thriftPrice) : price;
+}
+
 export type BuyResult = 'ok' | 'poor' | 'owned' | 'full' | 'unknown';
 
 export function visibleStock(shop: ShopDef, ctx: CondCtx): readonly StockEntry[] {
@@ -76,8 +81,9 @@ function refusal(rt: SimRt, entry: StockEntry): BuyResult | null {
 function purchase(rt: SimRt, entry: StockEntry): BuyResult {
   const no = refusal(rt, entry);
   if (no !== null) return no;
-  if (rt.state.hero.silver < entry.price) return 'poor';
-  rt.state.hero.silver -= entry.price;
+  const price = priceOf(rt, entry.price);
+  if (rt.state.hero.silver < price) return 'poor';
+  rt.state.hero.silver -= price;
   const inv = rt.state.inv;
   if ('item' in entry) giveItem(rt, entry.item, entry.n ?? 1);
   else if ('weapon' in entry) inv.weapon = entry.weapon;

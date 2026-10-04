@@ -158,6 +158,10 @@ export const FLAGS = {
   st_home_winter: { t: 'bool' },
   /** Gyða told Ask the Rime King's binding was sworn on blood, and of her rune-record's lost leaves. */
   st_blood_told: { t: 'bool' },
+  /** Arm-rings owned (one is worn at a time: `inv.ring`). Stamina halves the wait between rolls. */
+  w_ring_stamina: { t: 'bool' },
+  /** Thrift takes a quarter off shop prices, rounded up. */
+  w_ring_thrift: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

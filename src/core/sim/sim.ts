@@ -33,7 +33,7 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
-import type { Entry, LoadedScreen, Mode, SimRt, Transition } from './rt';
+import type { Entry, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
 import { tickWorldClock } from './systems/clock';
 import { killEnemy, resolveAttacks, resolveSword } from './systems/combat';
 import { coverFor, cutCover, refreshCover } from './systems/cover';
@@ -54,6 +54,8 @@ import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
+import { ringFlag } from '../items/rings';
+import { stepTrial } from './systems/trial';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
 import { outdoors, skyOf, windOf } from './systems/weather';
@@ -102,6 +104,7 @@ export class Sim implements SimRt {
   /** Dev switches; undefined when off so they never change the hash. */
   god?: boolean;
   weatherOverride?: WeatherKind;
+  sand?: Trial;
   tick = 0;
   readonly rolled: boolean;
   private events: SimEvent[] = [];
@@ -222,12 +225,17 @@ export class Sim implements SimRt {
     return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
   }
 
-  /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
   /** Hlíf's ward on Ask: the hits it still holds and the ticks it has left (both 0 when there is none). */
   ward(): { readonly hits: number; readonly ticks: number } {
     return { hits: mem(this.hero, 'ward'), ticks: mem(this.hero, 'wardT') };
   }
 
+  /** The running trial's sand: play-ticks left of all it had, or null when there is none. */
+  trial(): { readonly left: number; readonly of: number } | null {
+    return this.sand === undefined ? null : { left: this.sand.left, of: this.sand.of };
+  }
+
+  /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
   boss(): BossView | null {
     for (const e of this.actors) {
       if (e.kind !== 'enemy') continue;
@@ -294,6 +302,7 @@ export class Sim implements SimRt {
         entry: this.entry,
         god: this.god,
         weatherOverride: this.weatherOverride,
+        sand: this.sand,
         fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
@@ -382,6 +391,7 @@ export class Sim implements SimRt {
     if (this.mode === 'play') checkEdges(this);
     if (this.mode === 'play') checkDoors(this);
     if (this.mode === 'play') checkTriggers(this);
+    if (this.mode === 'play') stepTrial(this);
   }
 
   private apply(c: Command): void {
@@ -420,6 +430,9 @@ export class Sim implements SimRt {
         if (known.includes(c.galdr)) this.state.inv.galdr = [c.galdr, ...known.filter((g) => g !== c.galdr)];
         break;
       }
+      case 'ring':
+        if (c.id === null || this.state.flags[ringFlag(c.id)] === true) this.state.inv.ring = c.id;
+        break;
       case 'setHp':
         this.hero.hp = Math.max(0, Math.min(this.hero.maxHp, Math.floor(c.hp)));
         break;

@@ -1,4 +1,5 @@
 import { GALDR_DEFS } from '@content/galdr';
+import { RING_NAMES } from '@content/gear';
 import * as Phaser from 'phaser';
 import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
@@ -79,6 +80,8 @@ const CAVE = 0x6e6258;
 const CAVE_SEEN = 0x9a8a78;
 /** Along the bottom edge, clear of the HUD and of whatever the room keeps at its top. */
 const BOSS_BAR = { w: 160, h: 6, y: GAME_H - 14 };
+/** A trial's sand, centred along the top between the hearts and the item slots. */
+const TRIAL_BAR = { w: 120, h: 4, y: 10 };
 const PAPER = 0xf2ead8;
 const DIM = 0x9c9486;
 const BOX = { x: 20, y: GAME_H - 84, w: GAME_W - 40, h: 76 };
@@ -142,6 +145,7 @@ export class UiScene extends Phaser.Scene {
   private keyIcon!: Phaser.GameObjects.Image;
   private keyText!: Phaser.GameObjects.BitmapText;
   private bossBar!: Phaser.GameObjects.Graphics;
+  private trialBar!: Phaser.GameObjects.Graphics;
   private bossName!: Phaser.GameObjects.BitmapText;
 
   constructor() {
@@ -162,6 +166,7 @@ export class UiScene extends Phaser.Scene {
     this.keyIcon = this.add.image(5, 41, keyRef.key, keyRef.frame).setOrigin(0, 0).setVisible(false);
     this.keyText = this.text(16, 41, '', PAPER);
     this.bossBar = this.add.graphics();
+    this.trialBar = this.add.graphics();
     this.bossName = this.text(0, 0, '', PAPER);
     for (let i = 0; i < 2; i++) {
       const x = GAME_W - 56 + i * 26;
@@ -212,6 +217,7 @@ export class UiScene extends Phaser.Scene {
     this.link = link;
     this.drawHud();
     this.drawBoss();
+    this.drawTrial();
     this.drawStory(link.sim.storyUi());
     this.drawGameOver();
     this.drawMenu();
@@ -282,6 +288,10 @@ export class UiScene extends Phaser.Scene {
         const ready = item.ready ? `  ${t(UI.menu_ready, lang)}` : '';
         return `${mark}     ${t(GALDR_DEFS[item.id].name, lang)}${ready}`;
       }
+      if (item.kind === 'ring') {
+        const worn = item.worn ? `  ${t(UI.menu_worn, lang)}` : '';
+        return `${mark}     ${t(RING_NAMES[item.id], lang)}${worn}`;
+      }
       const slot = item.slot === 0 ? '  [K]' : item.slot === 1 ? '  [L]' : '';
       const count = item.kind === 'food' ? `  x${String(item.count)}` : '';
       return `${mark}     ${this.itemName(item.id, lang)}${count}${slot}`;
@@ -294,7 +304,11 @@ export class UiScene extends Phaser.Scene {
         this.menuIcons.push(icon);
       }
       const ref = this.link.frames.get(
-        item.kind === 'galdr' ? `galdr_${item.id}_idle_s_0` : `item_${item.id}_idle_s_0`,
+        item.kind === 'galdr'
+          ? `galdr_${item.id}_idle_s_0`
+          : item.kind === 'ring'
+            ? `${item.id}_idle_s_0`
+            : `item_${item.id}_idle_s_0`,
       );
       icon
         .setTexture(ref.key, ref.frame)
@@ -439,6 +453,22 @@ export class UiScene extends Phaser.Scene {
   private frameRef(name: string): { key: string; frame: string } {
     const ref = (this.registry.get(UI_LINK) as UiLink | undefined)?.frames.get(name);
     return ref ?? { key: '__MISSING', frame: '' };
+  }
+
+  /** A trial's sand running out, along the top while one runs: gold draining from full to empty. */
+  private drawTrial(): void {
+    const sand = this.link.sim.trial();
+    this.trialBar.clear();
+    if (sand === null) return;
+    const x = Math.round((GAME_W - TRIAL_BAR.w) / 2);
+    const fill = Math.round(((TRIAL_BAR.w - 2) * Math.max(0, sand.left)) / Math.max(1, sand.of));
+    this.trialBar
+      .fillStyle(INK, 0.85)
+      .fillRect(x - 1, TRIAL_BAR.y - 1, TRIAL_BAR.w + 2, TRIAL_BAR.h + 2)
+      .fillStyle(GOLD, 1)
+      .fillRect(x, TRIAL_BAR.y, fill, TRIAL_BAR.h)
+      .lineStyle(1, PAPER, 1)
+      .strokeRect(x - 0.5, TRIAL_BAR.y - 0.5, TRIAL_BAR.w + 1, TRIAL_BAR.h + 1);
   }
 
   /** A boss's name and health along the bottom while one is on screen. */

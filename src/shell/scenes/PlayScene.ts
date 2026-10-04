@@ -29,7 +29,7 @@ import { LETTERBOX } from '@shell/scale';
 import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
-import { menuItems, openMenu, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
+import { menuItems, openMenu, ownedRings, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
 import { EntityViews } from '@shell/view/entityViews';
 import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
@@ -170,7 +170,7 @@ export class PlayScene extends Phaser.Scene {
           ? null
           : {
               state: this.menu,
-              items: menuItems(this.sim.state.inv, this.services.db.items),
+              items: menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
               settings:
                 this.settingsMenu === null
                   ? null
@@ -296,7 +296,11 @@ export class PlayScene extends Phaser.Scene {
   private updateMenu(frame: InputFrame): void {
     const menu = this.menu;
     if (menu === null) return;
-    const r = stepMenu(menu, frame, menuItems(this.sim.state.inv, this.services.db.items));
+    const r = stepMenu(
+      menu,
+      frame,
+      menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
+    );
     for (const a of r.actions) {
       if (a.k === 'settings') {
         this.settingsMenu = openSettings();
@@ -304,6 +308,7 @@ export class PlayScene extends Phaser.Scene {
       } else if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
       else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
       else if (a.k === 'ready') this.sim.command({ t: 'ready', galdr: a.galdr });
+      else if (a.k === 'ring') this.sim.command({ t: 'ring', id: a.id });
       else if (a.k === 'startOver') {
         const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
         this.services.saves.autosaver.request(state);

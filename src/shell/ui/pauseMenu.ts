@@ -1,9 +1,13 @@
-import { ITEMS, type GaldrId, type ItemId } from '@content/ids';
+import { ITEMS, RINGS, type GaldrId, type ItemId, type RingId } from '@content/ids';
 import { wasPressed, type Action, type InputFrame } from '@core/input/actions';
 import type { ItemDef } from '@core/items/defs';
-import type { InventoryState } from '@core/state/gameState';
+import { ringFlag } from '@core/items/rings';
+import type { GameState, InventoryState } from '@core/state/gameState';
 
 /** The pause menu: pure state and input handling, drawn by the UI scene. The sim does not run meanwhile. */
+
+/** The arm-rings Ask owns (their `w_ring_*` flags set), in ring order. */
+export const ownedRings = (s: GameState): RingId[] => RINGS.filter((id) => s.flags[ringFlag(id)] === true);
 
 export const MENU_TABS = ['items', 'gear', 'map', 'quests', 'system'] as const;
 export type MenuTab = (typeof MENU_TABS)[number];
@@ -19,8 +23,8 @@ export interface MenuState {
 }
 
 /**
- * One line of the items tab: an owned sub-item (for the K/L slots), food (to eat), or a galdr known (to
- * ready for the galdr button; `ready` is the one it sings now).
+ * One line of the items tab: an owned sub-item (for the K/L slots), food (to eat), a galdr known (to
+ * ready for the galdr button; `ready` is the one it sings now), or an arm-ring owned (to wear; `worn`).
  */
 export type MenuItem =
   | {
@@ -36,6 +40,13 @@ export type MenuItem =
       readonly kind: 'galdr';
       readonly slot: null;
       readonly ready: boolean;
+    }
+  | {
+      readonly id: RingId;
+      readonly count: 0;
+      readonly kind: 'ring';
+      readonly slot: null;
+      readonly worn: boolean;
     };
 
 export type MenuAction =
@@ -43,6 +54,8 @@ export type MenuAction =
   | { readonly k: 'equip'; readonly slot: 0 | 1; readonly item: ItemId }
   | { readonly k: 'eat'; readonly item: ItemId }
   | { readonly k: 'ready'; readonly galdr: GaldrId }
+  /** Wear this arm-ring, or take the worn one off (null). */
+  | { readonly k: 'ring'; readonly id: RingId | null }
   /** Open the settings menu (the scene runs it over the system tab). */
   | { readonly k: 'settings' }
   | { readonly k: 'startOver' };
@@ -51,8 +64,15 @@ export function openMenu(tab: MenuTab = 'items'): MenuState {
   return { tab, cursor: 0, confirm: false };
 }
 
-/** What the items tab lists: owned sub-items, then food and mead, both in registry order, then the galdr known. */
-export function menuItems(inv: InventoryState, defs: Readonly<Record<ItemId, ItemDef>>): MenuItem[] {
+/**
+ * What the items tab lists: owned sub-items, then food and mead, both in registry order, then the galdr
+ * known, then the arm-rings owned (`rings`, from their flags).
+ */
+export function menuItems(
+  inv: InventoryState,
+  defs: Readonly<Record<ItemId, ItemDef>>,
+  rings: readonly RingId[] = [],
+): MenuItem[] {
   const owned = ITEMS.filter((id) => (inv.items[id] ?? 0) > 0);
   const slotOf = (id: ItemId): 0 | 1 | null => (inv.slots[0] === id ? 0 : inv.slots[1] === id ? 1 : null);
   const subs = owned.filter((id) => defs[id].slot);
@@ -66,6 +86,13 @@ export function menuItems(inv: InventoryState, defs: Readonly<Record<ItemId, Ite
       kind: 'galdr' as const,
       slot: null,
       ready: i === 0,
+    })),
+    ...rings.map((id) => ({
+      id,
+      count: 0 as const,
+      kind: 'ring' as const,
+      slot: null,
+      worn: inv.ring === id,
     })),
   ];
 }
@@ -110,6 +137,9 @@ export function stepMenu(
     if (item.kind === 'galdr') {
       if (any(frame, ['confirm', 'interact', 'galdr']))
         return { state, actions: [{ k: 'ready', galdr: item.id }] };
+    } else if (item.kind === 'ring') {
+      if (any(frame, ['confirm', 'interact']))
+        return { state, actions: [{ k: 'ring', id: item.worn ? null : item.id }] };
     } else if (item.kind === 'sub') {
       if (wasPressed(frame, 'item2')) return { state, actions: [{ k: 'equip', slot: 1, item: item.id }] };
       if (any(frame, ['item1', 'confirm', 'interact']))

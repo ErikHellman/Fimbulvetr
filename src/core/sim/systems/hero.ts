@@ -14,6 +14,10 @@ export function heroCtx(rt: SimRt, input: InputFrame): HeroCtx {
     hasShield: rt.state.inv.shield,
     armed: rt.state.inv.weapon !== 'none',
     dash: rt.state.flags.t_dash === true,
+    rollCooldown:
+      rt.state.inv.ring === 'ring_stamina'
+        ? Math.ceil(rt.db.tuning.hero.rollCooldown * rt.db.tuning.rings.staminaRoll)
+        : rt.db.tuning.hero.rollCooldown,
     ledgeHop: (dir) => ledgeHop(rt.screen.collision, at(rt.hero.body, rt.hero.pos), dir, heroSolidAt(rt)),
     emit: (ev) => {
       rt.emit(ev);

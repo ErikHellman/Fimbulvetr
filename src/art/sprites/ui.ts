@@ -202,6 +202,50 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '.iiiiii.',
     '........',
   ],
+  /** The arm-ring of stamina: a green stone. */
+  ring_stamina: [
+    '........',
+    '..bbbb..',
+    '.b.vv.b.',
+    'b..vv..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
+  /** The arm-ring of thrift: a silver stone. */
+  ring_thrift: [
+    '........',
+    '..bbbb..',
+    '.b.ll.b.',
+    'b..ll..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
+  /** The arm-ring of the beacon: an ember. */
+  ring_beacon: [
+    '........',
+    '..bbbb..',
+    '.b.yy.b.',
+    'b..yy..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
+  /** The arm-ring of the berserker: a blood-red stone. */
+  ring_berserker: [
+    '........',
+    '..bbbb..',
+    '.b.rr.b.',
+    'b..rr..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
   /** Farvegr: a path of runes winding to a standing stone. */
   galdr_farvegr: [
     '......i.',

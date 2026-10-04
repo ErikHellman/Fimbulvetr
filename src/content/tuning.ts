@@ -117,6 +117,7 @@ export const TUNING: Tuning = {
     ember_byrnie: { reduce: 0.4 },
     runeplate: { reduce: 0.5 },
   },
+  rings: { staminaRoll: 0.5, thriftPrice: 0.75 },
   textCps: 45,
   enemyIframes: 6,
   knockDecay: 0.8,
