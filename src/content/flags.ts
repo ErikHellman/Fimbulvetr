@@ -194,6 +194,9 @@ export const FLAGS = {
   q_crate_c: { t: 'bool' },
   q_crates_home: { t: 'int', max: 3 },
   q_crates_done: { t: 'bool' },
+  /** Þórdís's wild honey (`q_honey`): asked, and the honey brought. */
+  q_honey_asked: { t: 'bool' },
+  q_honey_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -655,4 +655,31 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_honey: {
+    id: 'q_honey',
+    name: { en: 'Wild honey', sv: 'Vildhonung' },
+    stages: [
+      {
+        when: flag('q_honey_asked'),
+        text: {
+          en: 'Þórdís wants the comb of the wild hive in the Myrkviðr pines, east of the forest road. Summer or autumn only; smoke the bees with the lantern.',
+          sv: 'Þórdís vill ha vaxkakan från den vilda kupan bland tallarna i Myrkviðr, öster om skogsvägen. Bara sommar eller höst; rök bina med lyktan.',
+        },
+      },
+      {
+        when: { k: 'item', id: 'honey' },
+        text: {
+          en: 'A slab of wild honeycomb. Bring it to Þórdís in Uppvík’s mead hall.',
+          sv: 'En kaka vild honung. Ta den till Þórdís i Uppvíks mjödhall.',
+        },
+      },
+      {
+        when: flag('q_honey_done'),
+        text: {
+          en: 'Þórdís brews honey-mead, and gave Ask a mead horn.',
+          sv: 'Þórdís brygger honungsmjöd, och gav Ask ett mjödhorn.',
+        },
+      },
+    ],
+  },
 };

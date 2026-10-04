@@ -111,9 +111,92 @@ const ringLaid: ScriptDef = {
   ],
 };
 
+/** The wild bees' hive in the pines: honey for Þórdís in summer or autumn, if the lantern smokes the bees. */
+const hive: ScriptDef = {
+  steps: [
+    {
+      k: 'if',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'q_honey_asked' },
+          { k: 'not', c: { k: 'flag', id: 'q_honey_done' } },
+          { k: 'not', c: { k: 'item', id: 'honey' } },
+        ],
+      },
+      then: [
+        {
+          k: 'if',
+          when: {
+            k: 'any',
+            of: [
+              { k: 'season', is: 'summer' },
+              { k: 'season', is: 'autumn' },
+            ],
+          },
+          then: [
+            {
+              k: 'if',
+              when: { k: 'owns', id: 'lantern' },
+              then: [
+                {
+                  k: 'say',
+                  who: null,
+                  text: {
+                    en: 'Ask holds the lantern under the hive. The smoke makes the bees drowsy, and a slab of comb comes away.',
+                    sv: 'Ask håller lyktan under kupan. Röken gör bina dåsiga, och en kaka vax lossnar.',
+                  },
+                },
+                {
+                  k: 'do',
+                  effects: [
+                    { k: 'give', item: 'honey' },
+                    { k: 'sfx', id: 'sfx_itemget' },
+                  ],
+                },
+              ],
+              else: [
+                {
+                  k: 'say',
+                  who: null,
+                  text: {
+                    en: 'The bees boil out of the hive, furious. Without smoke to calm them, nobody gets near the comb.',
+                    sv: 'Bina väller ut ur kupan, rasande. Utan rök som lugnar dem kommer ingen nära vaxkakan.',
+                  },
+                },
+              ],
+            },
+          ],
+          else: [
+            {
+              k: 'say',
+              who: null,
+              text: {
+                en: 'The bees are balled up asleep in the cold, the comb frozen hard. Come back in summer or autumn.',
+                sv: 'Bina sover i en klunga i kylan, och kakan är frusen hård. Kom tillbaka på sommaren eller hösten.',
+              },
+            },
+          ],
+        },
+      ],
+      else: [
+        {
+          k: 'say',
+          who: null,
+          text: {
+            en: 'A wild bees’ hive, high in the pine. Better left alone.',
+            sv: 'En vildbikupa, högt uppe i tallen. Bäst att låta den vara.',
+          },
+        },
+      ],
+    },
+  ],
+};
+
 export const LOWLAND_SCRIPTS: Readonly<
-  Record<'find_bell' | 'herd_start' | 'herd_won' | 'herd_lost' | 'ring_laid', ScriptDef>
+  Record<'find_bell' | 'herd_start' | 'herd_won' | 'herd_lost' | 'ring_laid' | 'hive', ScriptDef>
 > = {
+  hive,
   ring_laid: ringLaid,
   find_bell: findBell,
   herd_start: herdStart,

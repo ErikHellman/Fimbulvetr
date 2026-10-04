@@ -45,6 +45,8 @@ export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
 export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_hook'] as const;
 /** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
 export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
+/** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
+export const FETCH_ITEMS = ['honey', 'amber'] as const;
 export const ITEMS = [
   ...SUB_ITEMS,
   ...CONSUMABLES,
@@ -54,6 +56,7 @@ export const ITEMS = [
   ...QUEST_ITEMS,
   ...TRADE_ITEMS,
   ...LORE_ITEMS,
+  ...FETCH_ITEMS,
 ] as const;
 export type ItemId = (typeof ITEMS)[number];
 
@@ -235,6 +238,7 @@ export const QUESTS = [
   'q_steinn',
   'q_barrow_ring',
   'q_crates',
+  'q_honey',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -286,6 +290,7 @@ export const SCRIPTS = [
   'herd_won',
   'herd_lost',
   'ring_laid',
+  'hive',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

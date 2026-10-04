@@ -38,6 +38,8 @@ export const ITEM_NAMES = {
   rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
   mail_clasp: { en: 'Ring-mail clasp', sv: 'Brynjespänne' },
   grave_ring: { en: 'Grave-ring', sv: 'Gravring' },
+  honey: { en: 'Wild honey', sv: 'Vildhonung' },
+  amber: { en: 'Amber', sv: 'Bärnsten' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {
@@ -58,6 +60,7 @@ const MAX: Partial<Record<ItemId, number>> = {
   horn: 4,
   fen_moss: 9,
   rune_leaf: 4,
+  amber: 3,
 };
 
 /** What a chest says. Items without a line here say "You found: <name>!". */

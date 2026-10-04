@@ -106,6 +106,10 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     '..gggg..',
     '........',
   ],
+  /** A dripping piece of honeycomb. */
+  honey: ['........', '.yyyyyy.', 'yYyYyYyy', 'yyYyYyYy', 'yYyYyYyy', '.yyyyyy.', '...Y....', '...Y....'],
+  /** A lump of amber, warm-gold. */
+  amber: ['........', '...yy...', '..yYYy..', '.yYyyYy.', '.yyYyyY.', '..YyyY..', '...YY...', '........'],
   /** A bronze sheep's bell on its leather strap. */
   trade_bell: [
     '.wwwww..',

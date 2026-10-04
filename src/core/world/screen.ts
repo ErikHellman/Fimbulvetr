@@ -246,9 +246,9 @@ export type Thing =
 
 /**
  * Scenery that comes and goes with the story: what the raid left (scorched roofs, a burned fold, boarded
- * doors), and Hildr's wattle hurdles on the heath.
+ * doors), Hildr's wattle hurdles on the heath, and the wild bees' hive in the pines.
  */
-export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle';
+export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive';
 
 /** A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass. */
 export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime';
