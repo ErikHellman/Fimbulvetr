@@ -41,6 +41,8 @@ export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] 
 export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
 /** Things carried for someone: a quest's token or a brew's ingredients. */
 export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
+/** The trading chain's goods (`q_trade`): each is traded on for the next. */
+export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_hook'] as const;
 export const ITEMS = [
   ...SUB_ITEMS,
   ...CONSUMABLES,
@@ -48,6 +50,7 @@ export const ITEMS = [
   ...DUNGEON_ITEMS,
   ...KEEPSAKES,
   ...QUEST_ITEMS,
+  ...TRADE_ITEMS,
 ] as const;
 export type ItemId = (typeof ITEMS)[number];
 
@@ -222,6 +225,7 @@ export const QUESTS = [
   'q_huscarl',
   'q_fimbulvetr',
   'q_farm',
+  'q_trade',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -268,6 +272,7 @@ export const SCRIPTS = [
   'duel_won',
   'pass_open',
   'home_winter',
+  'find_bell',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

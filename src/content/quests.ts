@@ -465,4 +465,42 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_trade: {
+    id: 'q_trade',
+    name: { en: 'Trades', sv: 'Byteshandel' },
+    stages: [
+      {
+        when: { k: 'item', id: 'trade_bell' },
+        text: {
+          en: 'Ulf’s sheep’s bell, from the ashes of the fold. Someone who still has sheep could use it.',
+          sv: 'Ulfs fårskälla, ur fållans aska. Någon som fortfarande har får kunde ha nytta av den.',
+        },
+      },
+      {
+        when: atLeast('q_trade', 1),
+        text: {
+          en: 'Hildr gave a raw fleece for the bell. Someone in Uppvík spins.',
+          sv: 'Hildr gav en fäll råull för skällan. Någon i Uppvík spinner.',
+        },
+      },
+      {
+        when: atLeast('q_trade', 2),
+        text: {
+          en: 'Jórunn spun the fleece into yarn, too coarse for a cloak but good for nets. Kári in Mýrland mends his.',
+          sv: 'Jórunn spann ullen till garn, för grovt till en mantel men bra till nät. Kári i Mýrland lagar sina.',
+        },
+      },
+      {
+        when: atLeast('q_trade', 3),
+        text: {
+          en: 'Kári gave Gamli’s bone hook for the yarn. A seal-hunter past the pass would kill for it.',
+          sv: 'Kári gav Gamles benkrok för garnet. En sälfångare bortom passet skulle döda för den.',
+        },
+      },
+      {
+        when: atLeast('q_trade', 7),
+        text: { en: 'Every trade is made.', sv: 'Alla byten är gjorda.' },
+      },
+    ],
+  },
 };

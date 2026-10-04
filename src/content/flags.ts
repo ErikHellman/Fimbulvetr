@@ -164,6 +164,8 @@ export const FLAGS = {
   w_ring_thrift: { t: 'bool' },
   /** Halvar asked Ask to rebuild the farm (`q_farm`). */
   st_farm_asked: { t: 'bool' },
+  /** Trades made in the trading chain: 1 the bell for a fleece, 2 yarn, 3 Gamli's hook (4–7 later). */
+  q_trade: { t: 'int', max: 7 },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

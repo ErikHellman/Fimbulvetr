@@ -31,6 +31,10 @@ export const ITEM_NAMES = {
   winter_cloak: { en: 'Winter cloak', sv: 'Vintermantel' },
   charred_stave: { en: 'Charred stave', sv: 'Förkolnad stav' },
   fen_moss: { en: 'Fen-moss', sv: 'Kärrmossa' },
+  trade_bell: { en: 'Sheep’s bell', sv: 'Fårskälla' },
+  trade_fleece: { en: 'Raw fleece', sv: 'Råull' },
+  trade_yarn: { en: 'Spun yarn', sv: 'Spunnet garn' },
+  trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {

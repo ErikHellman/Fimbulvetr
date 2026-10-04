@@ -82,6 +82,50 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'W.......',
   ],
   fen_moss: ['........', '..v..v..', '.vVvvVv.', 'vvVvvvVv', 'VvvVvVvv', '.vVvvvV.', '..VvvV..', '........'],
+  /** A bronze sheep's bell on its leather strap. */
+  trade_bell: [
+    '.wwwww..',
+    'w.....w.',
+    '..ggg...',
+    '.gGGgg..',
+    '.gGggg..',
+    'gGgggGg.',
+    'ggggggg.',
+    '...e....',
+  ],
+  /** A rolled fleece, raw and grey-white. */
+  trade_fleece: [
+    '........',
+    '..ssss..',
+    '.sSssSs.',
+    'ssssSsss',
+    'sSssssSs',
+    'ssSssSss',
+    '.ssssss.',
+    '........',
+  ],
+  /** A skein of spun yarn. */
+  trade_yarn: [
+    '........',
+    '.bbbbbb.',
+    'bBbBbBbb',
+    'bbBbBbBb',
+    'bBbBbBbb',
+    'bbBbBbBb',
+    '.bbbbbb.',
+    '........',
+  ],
+  /** A curved hook of old bone. */
+  trade_hook: [
+    '....ss..',
+    '...s..s.',
+    '......s.',
+    '......s.',
+    '.s....s.',
+    '.ss..s..',
+    '..sss...',
+    '........',
+  ],
   /** A round iron bomb, its fuse spitting sparks. */
   bombs: ['.....y.y', '......Y.', '....ww..', '..iiii..', '.iliiii.', '.iiiiii.', '.iiiiiL.', '..iiLL..'],
   /** A short hunting bow, strung. */

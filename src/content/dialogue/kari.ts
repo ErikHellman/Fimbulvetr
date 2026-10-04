@@ -6,6 +6,7 @@ export const KARI: DialogueDef = {
   entry: [
     { when: not(flag('n_kari_met')), node: 'meet' },
     { when: all(flag('q_fish_gamli'), not(flag('q_fisher_done'))), node: 'gamli' },
+    { when: { k: 'item', id: 'trade_yarn' }, node: 'yarn' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('q_fisher_done'), node: 'after' },
     { when: evening, node: 'night' },
@@ -13,6 +14,31 @@ export const KARI: DialogueDef = {
     { node: 'day' },
   ],
   nodes: {
+    yarn: {
+      text: {
+        en: 'Yarn? Good yarn, too. My nets are more hole than net since the ice came. What do you want for it?',
+        sv: 'Garn? Och gott garn. Mina nät är mer hål än nät sedan isen kom. Vad vill du ha för det?',
+      },
+      choices: [
+        {
+          text: { en: 'Trade him the yarn.', sv: 'Byt bort garnet.' },
+          do: [
+            { k: 'take', item: 'trade_yarn' },
+            { k: 'give', item: 'trade_hook' },
+            { k: 'set', flag: 'q_trade', value: 3 },
+            { k: 'sfx', id: 'sfx_itemget' },
+          ],
+          next: 'hook',
+        },
+        { text: { en: 'Not yet.', sv: 'Inte än.' } },
+      ],
+    },
+    hook: {
+      text: {
+        en: 'Take this: the bone hook Gamli carried in his jaw for twenty winters. There is a seal-hunter past the pass who would kill for it.',
+        sv: 'Ta den här: benkroken som Gamle bar i käften i tjugo vintrar. Det finns en sälfångare bortom passet som skulle döda för den.',
+      },
+    },
     meet: {
       text: {
         en: 'Mind the planks, they are older than me. Kári. I fish this cove because the warm springs keep it open when the lake freezes.',

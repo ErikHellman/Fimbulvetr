@@ -5,6 +5,7 @@ import { flag, not } from './util';
 export const HILDR: DialogueDef = {
   entry: [
     { when: not(flag('n_hildr_met')), node: 'meet' },
+    { when: { k: 'item', id: 'trade_bell' }, node: 'bell' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { when: flag('st_barrow_open'), node: 'opened' },
@@ -49,6 +50,31 @@ export const HILDR: DialogueDef = {
       text: {
         en: 'The dead lie quiet since you came up out of the hill. I sleep with the door open now. Well, a little open.',
         sv: 'De döda ligger stilla sedan du kom upp ur kullen. Jag sover med dörren öppen nu. Nåja, lite öppen.',
+      },
+    },
+    bell: {
+      text: {
+        en: 'That is Ulf’s bell, I would know its note anywhere. My bellwether lost hers in the cold, and the flock will not follow a quiet ewe.',
+        sv: 'Det där är Ulfs skälla, jag känner igen klangen var som helst. Min skällgumma tappade sin i kölden, och hjorden följer inte ett tyst får.',
+      },
+      choices: [
+        {
+          text: { en: 'Give her the bell.', sv: 'Ge henne skällan.' },
+          do: [
+            { k: 'take', item: 'trade_bell' },
+            { k: 'give', item: 'trade_fleece' },
+            { k: 'set', flag: 'q_trade', value: 1 },
+            { k: 'sfx', id: 'sfx_itemget' },
+          ],
+          next: 'fleece',
+        },
+        { text: { en: 'Not yet.', sv: 'Inte än.' } },
+      ],
+    },
+    fleece: {
+      text: {
+        en: 'Here, a fleece for it, the best I sheared this year. Raw as it comes; someone in Uppvík spins.',
+        sv: 'Här, en fäll för den, den bästa jag klippte i år. Rå som den är; någon i Uppvík spinner.',
       },
     },
     fimbul: {
