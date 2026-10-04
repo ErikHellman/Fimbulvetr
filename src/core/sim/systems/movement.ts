@@ -1,7 +1,7 @@
 import type { EnemyId } from '@content/ids';
 import type { EnemyDef } from '../../actors/enemies/defs';
 import { mem, type Entity } from '../../actors/entity';
-import { at, type Box } from '../../math/box';
+import { at, overlaps, type Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
 import { length, scale } from '../../math/vec';
 import { gridSolidAt, moveBox, speedAt, type SolidAt } from '../../world/collision';
@@ -22,7 +22,12 @@ export function blocksHero(rt: SimRt, e: Entity): boolean {
 }
 
 export function moveAll(rt: SimRt): void {
-  const obstacles = rt.actors.filter((e) => blocksHero(rt, e)).map((e) => at(e.body, e.pos));
+  // A solid foe that walked into Ask (a charge, a fetch) never pins Ask: only boxes clear of Ask block.
+  const me = at(rt.hero.body, rt.hero.pos);
+  const obstacles = rt.actors
+    .filter((e) => blocksHero(rt, e))
+    .map((e) => at(e.body, e.pos))
+    .filter((b) => !overlaps(b, me));
   // Aboard a moving raft, Ask goes where the raft goes (see `stepRafts`).
   if (mem(rt.hero, 'raft') !== 1) moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles);
   const walls = gridSolidAt(rt.screen.collision, () => true);

@@ -21,6 +21,18 @@ function river(extra: Thing[] = []): ContentDb {
 const raftOf = (h: Harness) => h.sim.actors.find((a) => a.kind === 'fixture' && a.def === 'raft');
 
 describe('a raft', () => {
+  it('is footing on all four deck tiles while it rests', () => {
+    const h = new Harness({ db: river(), tile: [9, 10], facing: 'e' });
+    const g = h.sim.screen.collision;
+    for (const [x, y] of [
+      [10, 9],
+      [11, 9],
+      [10, 10],
+      [11, 10],
+    ] as const)
+      expect(g.flags[y * g.cols + x], `${String(x)},${String(y)}`).toBe(0);
+  });
+
   it('rests at its stop as footing, then sets off and rests at the far stop', () => {
     const h = new Harness({ db: river(), tile: [9, 10], facing: 'e' });
     walkTo(h, 10, 10);
@@ -31,6 +43,19 @@ describe('a raft', () => {
     expect(heroTile(h.sim)).toEqual([28, 10]);
     walkTo(h, 31, 10);
     expect(heroTile(h.sim)).toEqual([31, 10]);
+  });
+
+  it('keeps Ask aboard when the grapple is thrown at nothing mid-river', () => {
+    const h = new Harness({ db: river(), tile: [9, 10], facing: 'e' });
+    h.sim.state.inv.items.grapple = 1;
+    h.sim.state.inv.slots = ['grapple', null];
+    walkTo(h, 10, 10);
+    h.until(() => mem(raftOf(h) ?? h.sim.hero, 'moving') === 1, RAFT.wait + 10);
+    h.idle(40);
+    h.press(['item1']);
+    h.until((s) => s.hero.fsm.s === 'move', 120);
+    h.until(() => mem(raftOf(h) ?? h.sim.hero, 'moving') === 0, 18 * 16 + 20);
+    expect(heroTile(h.sim)).toEqual([28, 10]);
   });
 
   it('keeps Ask aboard while it moves: walking off into the water goes nowhere', () => {

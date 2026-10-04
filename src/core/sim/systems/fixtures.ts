@@ -50,6 +50,7 @@ const KINDS: Readonly<
   warp: { solid: 'always', anims: ['awake', 'dormant'] },
   seal: { solid: 'always', anims: ['lit', 'dark'] },
   post: { solid: 'always' },
+  raft: { solid: 'never' },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 

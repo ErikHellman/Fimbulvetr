@@ -58,10 +58,14 @@ function aboard(rt: SimRt, e: Entity): boolean {
   return x >= deck.x && x < deck.x + deck.w && y >= deck.y && y < deck.y + deck.h;
 }
 
+/** Whether the grapple has hooked a post and is pulling Ask along its chain (a throw at anything else is not). */
+const pulled = (rt: SimRt): boolean =>
+  rt.actors.some((a) => a.kind === 'projectile' && a.def === 'grapple' && a.fsm.s === 'pull');
+
 /**
  * Rafts rest, then set off for their next stop (turning back at either end of the path), carrying Ask if
  * Ask's feet were on the deck as it left. Aboard and moving, Ask cannot walk (`hero.mem.raft`); a grapple
- * pull off the deck leaves the raft behind.
+ * pull to a post leaves the raft behind, while a throw at a foe or at nothing keeps Ask aboard.
  */
 export function stepRafts(rt: SimRt): void {
   let restamp = false;
@@ -81,13 +85,13 @@ export function stepRafts(rt: SimRt): void {
       }
       e.mem['stop'] = next;
       e.mem['moving'] = 1;
-      e.mem['ride'] = aboard(rt, e) && rt.hero.fsm.s !== 'chain' ? 1 : 0;
+      e.mem['ride'] = aboard(rt, e) && !pulled(rt) ? 1 : 0;
       restamp = true;
     }
     const to = restAt(stopsOf(rt, e)[mem(e, 'stop')] ?? { x: mem(e, 'tx'), y: mem(e, 'ty') });
     const dx = Math.sign(to.x - e.pos.x) * Math.min(RAFT.speed, Math.abs(to.x - e.pos.x));
     const dy = Math.sign(to.y - e.pos.y) * Math.min(RAFT.speed, Math.abs(to.y - e.pos.y));
-    if (mem(e, 'ride') === 1 && rt.hero.fsm.s === 'chain') e.mem['ride'] = 0;
+    if (mem(e, 'ride') === 1 && pulled(rt)) e.mem['ride'] = 0;
     e.pos = { x: e.pos.x + dx, y: e.pos.y + dy };
     if (mem(e, 'ride') === 1) {
       rt.hero.pos = { x: rt.hero.pos.x + dx, y: rt.hero.pos.y + dy };

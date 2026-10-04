@@ -130,4 +130,9 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] New lines after the rime, solver proofs, route, e2e, v1-m6a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M6b Helgrind (D4) — Part 2
+    - [x] The grapple and posts; rafts; fog rooms
+    - [x] Hel-hounds, Garmr and Thane Náströnd
+    - [x] Helgrind's 22 rooms, Kolbeinn's word, Ulf and Tófa freed and home
+    - [x] Solver proofs, route, e2e, v1-m6b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

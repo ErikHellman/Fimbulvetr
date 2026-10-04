@@ -125,3 +125,14 @@ describe('Náströnd', () => {
     h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'flail', NASTROND.flailEvery + 40);
   });
 });
+
+describe('a solid foe that walks into Ask', () => {
+  it('never pins Ask: Ask can step out of a foe it already overlaps', () => {
+    const h = new Harness({ db: arena([['garmr', 10, 10]]), tile: [10, 10], facing: 'e' });
+    const x = h.sim.hero.pos.x;
+    h.step(frameOf(['right']))
+      .step(frameOf(['right']))
+      .step(frameOf(['right']));
+    expect(h.sim.hero.pos.x).toBeGreaterThan(x);
+  });
+});
