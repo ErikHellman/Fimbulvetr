@@ -631,6 +631,128 @@ export const ENEMY_DEFS = {
       },
     },
     stunnable: 120,
+    light: true,
     drops: { heart: 3, silver: 3, none: 3 },
+  },
+  /** Hel's black hounds: stalk like vargr, and lunge in pairs (see helhound.ts). Light enough to drag. */
+  helhound: {
+    id: 'helhound',
+    art: 'enemy_helhound',
+    hp: 6,
+    body: { x: -7, y: -8, w: 14, h: 8 },
+    hurt: { x: -10, y: -16, w: 20, h: 16 },
+    behaviour: 'helhound',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    touch: { amount: 1, knock: 2, tags: 0 },
+    attacks: {
+      lunge: {
+        from: 0,
+        to: 13,
+        boxes: around({ x: -9, y: -14, w: 18, h: 14 }),
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    stunnable: 120,
+    light: true,
+    weak: ['fire'],
+    drops: { heart: 3, silver: 3, none: 4 },
+  },
+  /**
+   * Garmr, the hound at Hel's gate (see garmr.ts): its hide turns every blow until the grapple, hooked in its
+   * collar ring, drags it off its feet. A mini-boss: the grapple chest lies at its feet.
+   */
+  garmr: {
+    id: 'garmr',
+    art: 'enemy_garmr',
+    hp: 24,
+    body: { x: -14, y: -10, w: 28, h: 10 },
+    hurt: { x: -18, y: -30, w: 36, h: 30 },
+    behaviour: 'garmr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    needs: ['grapple'],
+    boss: { name: { en: 'Garmr', sv: 'Garm' }, mini: true },
+    touch: { amount: 2, knock: 5, tags: 0 },
+    attacks: {
+      breath: {
+        from: 0,
+        to: 26,
+        boxes: {
+          e: { x: 4, y: -34, w: 52, h: 40 },
+          w: { x: -56, y: -34, w: 52, h: 40 },
+          s: { x: -26, y: -4, w: 52, h: 48 },
+          n: { x: -26, y: -74, w: 52, h: 48 },
+        },
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+      lunge: {
+        from: 0,
+        to: 19,
+        boxes: around({ x: -18, y: -28, w: 36, h: 28 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+  },
+  /**
+   * Thane Náströnd, the Hollow (see nastrond.ts): a draugr lord behind a tower shield the grapple tears
+   * away. Three phases; the boss of Helgrind.
+   */
+  nastrond: {
+    id: 'nastrond',
+    art: 'enemy_nastrond',
+    hp: 30,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -44, w: 28, h: 44 },
+    behaviour: 'nastrond',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    needs: ['grapple'],
+    boss: { name: { en: 'Náströnd', sv: 'Náströnd' } },
+    attacks: {
+      cut: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -40, w: 32, h: 40 },
+          w: { x: -32, y: -40, w: 32, h: 40 },
+          s: { x: -20, y: -14, w: 40, h: 32 },
+          n: { x: -20, y: -50, w: 40, h: 32 },
+        },
+        amount: 4,
+        knock: 6,
+        tags: 0,
+      },
+      flail: {
+        from: 4,
+        to: 20,
+        boxes: around({ x: -48, y: -60, w: 96, h: 76 }),
+        amount: 4,
+        knock: 8,
+        tags: 0,
+      },
+    },
+  },
+  /** Náströnd's tower shield, lying where the grapple flung it until he takes it up (see nastrond.ts). */
+  tower_shield: {
+    id: 'tower_shield',
+    art: 'enemy_tower_shield',
+    hp: 1,
+    body: { x: -8, y: -6, w: 16, h: 6 },
+    hurt: { x: -8, y: -14, w: 16, h: 14 },
+    behaviour: 'tower_shield',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    guard: true,
   },
 } as const satisfies Record<EnemyId, EnemyDef>;

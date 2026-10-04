@@ -99,6 +99,10 @@ export const ENEMIES = [
   'styrr_duel',
   'mara',
   'fog_draugr',
+  'helhound',
+  'garmr',
+  'nastrond',
+  'tower_shield',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 

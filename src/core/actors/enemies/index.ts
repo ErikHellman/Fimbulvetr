@@ -21,6 +21,9 @@ import { KING_MACHINE } from './king';
 import { HUSCARL_MACHINE } from './huscarl';
 import { MARA_MACHINE } from './mara';
 import { FOG_DRAUGR_MACHINE } from './fog';
+import { HELHOUND_MACHINE } from './helhound';
+import { GARMR_MACHINE } from './garmr';
+import { NASTROND_MACHINE, TOWER_SHIELD_MACHINE } from './nastrond';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -45,6 +48,10 @@ const MACHINES = {
   huscarl: HUSCARL_MACHINE,
   mara: MARA_MACHINE,
   fog_draugr: FOG_DRAUGR_MACHINE,
+  helhound: HELHOUND_MACHINE,
+  garmr: GARMR_MACHINE,
+  nastrond: NASTROND_MACHINE,
+  tower_shield: TOWER_SHIELD_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -76,6 +83,10 @@ const START: Readonly<Record<BehaviourId, string>> = {
   huscarl: 'stand',
   mara: 'drift',
   fog_draugr: 'hidden',
+  helhound: 'prowl',
+  garmr: 'sleep',
+  nastrond: 'throne',
+  tower_shield: 'lie',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {
