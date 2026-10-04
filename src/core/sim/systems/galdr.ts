@@ -3,6 +3,7 @@ import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE } from '../../actors/hero';
 import { wasPressed, type InputFrame } from '../../input/actions';
 import type { SimRt } from '../rt';
+import { castBragd } from './bragd';
 import { castEldr } from './eldr';
 import { heroCtx } from './hero';
 import { startStory } from './story';
@@ -28,6 +29,10 @@ const SONGS: Partial<Record<GaldrId, Song>> = {
     return 'pay';
   },
   farvegr,
+  bragd: (rt) => {
+    castBragd(rt);
+    return 'pay';
+  },
 };
 
 /**

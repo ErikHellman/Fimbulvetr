@@ -303,6 +303,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Du kan pareringen: lyft skölden precis när ett hugg träffar, så står den som högg öppen. Styrr har mer att lära ut, en dag.',
         },
       },
+      {
+        when: flag('q_duel_asked'),
+        text: {
+          en: 'Styrr has one lesson left, and he does not sell it: beat him in a duel in his yard. Pierce his shield with the thrust, and parry his heavy blow.',
+          sv: 'Styrr har en lektion kvar, och den säljer han inte: besegra honom i en tvekamp på hans gård. Genomborra hans sköld med stöten, och parera hans tunga hugg.',
+        },
+      },
+      {
+        when: flag('st_bragd_learned'),
+        text: {
+          en: 'You beat Styrr in his yard and learned Bragð: sung, the blade sends a beam that pierces a shield.',
+          sv: 'Du besegrade Styrr på hans gård och lärde dig Bragð: sjungen sänder klingan en stråle som genomborrar en sköld.',
+        },
+      },
     ],
   },
   q_fisher: {

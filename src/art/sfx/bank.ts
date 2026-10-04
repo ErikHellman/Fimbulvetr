@@ -597,4 +597,45 @@ export const SFX_BANK = {
     release: 0.1,
     volume: 0.25,
   },
+  /** Bragð: the blade sings, a bright ringing sweep up through the air. */
+  sfx_bragd: {
+    wave: 'square',
+    freq: 660,
+    freqEnd: 1980,
+    attack: 0.01,
+    sustain: 0.12,
+    release: 0.25,
+    volume: 0.28,
+    duty: 0.3,
+  },
+  /** Hlíf's ward taking a blow: a soft glassy chime. */
+  sfx_ward: {
+    wave: 'triangle',
+    freq: 1320,
+    freqEnd: 990,
+    attack: 0,
+    sustain: 0.06,
+    release: 0.35,
+    volume: 0.3,
+  },
+  /** A seal of the pass flaring: a deep stone hum rising. */
+  sfx_seal: {
+    wave: 'triangle',
+    freq: 110,
+    freqEnd: 220,
+    attack: 0.05,
+    sustain: 0.3,
+    release: 0.3,
+    volume: 0.35,
+  },
+  /** The Rime King's breath pouring out over the lowlands: a long rushing wind. */
+  sfx_breath: {
+    wave: 'noise',
+    freq: 900,
+    freqEnd: 300,
+    attack: 0.4,
+    sustain: 1.2,
+    release: 1.2,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

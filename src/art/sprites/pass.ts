@@ -2,8 +2,8 @@ import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { rect } from '../draw';
 import { C } from '../palette';
-import { flipX, hex, type Raster } from '../raster';
-import { roundShield } from './haugar';
+import { createRaster, flipX, hex, type Raster } from '../raster';
+import { flipY, roundShield } from './haugar';
 import { LOOKS, drawPerson, type Side } from './people';
 import type { SpriteFrame } from './types';
 
@@ -43,6 +43,37 @@ function styrr(side: Side, phase: number, pose: DuelPose): Raster {
   return r;
 }
 
+const BEAM = hex('#e8f8ff');
+const BEAM_EDGE = hex(C.rune);
+const BEAM_DIM = hex('#4c8ea0');
+
+/**
+ * Bragð's beam flying east: a bright blade-shaped streak with a pale trail (20×10, its point at the
+ * right). `i` shimmers the trail.
+ */
+function beamSide(i: number): Raster {
+  const r = createRaster(20, 10);
+  rect(r, 2 + i, 4, 4, 2, BEAM_DIM);
+  rect(r, 6, 3, 8, 4, BEAM_EDGE);
+  rect(r, 7, 4, 9, 2, BEAM);
+  rect(r, 14, 3, 2, 4, BEAM_EDGE);
+  rect(r, 16, 4, 2, 2, BEAM_EDGE);
+  return r;
+}
+
+/** The beam flying north: the side streak turned on end (10×20, its point at the top). */
+function beamUp(i: number): Raster {
+  const side = beamSide(i);
+  const r = createRaster(10, 20);
+  for (let y = 0; y < 20; y++)
+    for (let x = 0; x < 10; x++) {
+      const from = (x * 20 + (19 - y)) * 4;
+      const to = (y * 10 + x) * 4;
+      for (let k = 0; k < 4; k++) r.data[to + k] = side.data[from + k] ?? 0;
+    }
+  return r;
+}
+
 export function passFrames(): SpriteFrame[] {
   const frames: SpriteFrame[] = [];
   for (const side of ['s', 'n', 'w'] as const) {
@@ -61,6 +92,16 @@ export function passFrames(): SpriteFrame[] {
     add('heavy', 0, styrr(side, 0, 'heavy'));
     add('hurt', 0, styrr(side, 2, 'hurt'));
   }
+  for (let i = 0; i < 2; i++) {
+    const side = beamSide(i);
+    const up = beamUp(i);
+    frames.push(
+      { name: `fx_bragd_fly_e_${String(i)}`, raster: side, ox: 10, oy: 5 },
+      { name: `fx_bragd_fly_w_${String(i)}`, raster: flipX(side), ox: 10, oy: 5 },
+      { name: `fx_bragd_fly_n_${String(i)}`, raster: up, ox: 5, oy: 10 },
+      { name: `fx_bragd_fly_s_${String(i)}`, raster: flipY(up), ox: 5, oy: 10 },
+    );
+  }
   return frames;
 }
 
@@ -68,6 +109,7 @@ const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const all = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const PASS_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  fx_bragd: { fly: all(2, 12) },
   enemy_styrr: {
     idle: all(1, 1),
     walk: all(4, 5),

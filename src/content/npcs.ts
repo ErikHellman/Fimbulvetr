@@ -1,7 +1,18 @@
 import type { NpcDef } from '@core/actors/npc';
 import type { L10n } from '@core/i18n/t';
 import type { Cond } from '@core/story/cond';
-import { afterRaid, all, any, daytime, evening, eveningDue, not, raid, raidNight } from './dialogue/util';
+import {
+  afterRaid,
+  all,
+  any,
+  daytime,
+  evening,
+  eveningDue,
+  flag,
+  not,
+  raid,
+  raidNight,
+} from './dialogue/util';
 import type { NpcId } from './ids';
 
 /** Names as shown above their lines. Old Norse names are the same in both languages. */
@@ -184,7 +195,10 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: { k: 'not', c: night }, screen: 'myl_reeds', at: { x: 10, y: 4 }, facing: 's' },
   ]),
   /** Styrr keeps to his cottage: by the hearth by day, by the door at night. */
-  styrr: npc('styrr', [{ screen: 'hau_int_styrr', at: { x: 22, y: 11 }, facing: 's' }]),
+  /** In his cottage; out in the yard (as a duellist, not here) while the last duel is on. */
+  styrr: npc('styrr', [
+    { when: not(flag('ev_duel_on')), screen: 'hau_int_styrr', at: { x: 22, y: 11 }, facing: 's' },
+  ]),
   /** With her sheep on the heath by day; home before dark. */
   hildr: npc('hildr', [
     { when: { k: 'not', c: night }, screen: 'hau_heath', at: { x: 17, y: 5 }, facing: 's' },

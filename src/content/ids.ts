@@ -149,6 +149,10 @@ export const SFX = [
   'sfx_wake',
   'sfx_gem',
   'sfx_axe',
+  'sfx_bragd',
+  'sfx_ward',
+  'sfx_seal',
+  'sfx_breath',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

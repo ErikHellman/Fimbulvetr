@@ -188,7 +188,7 @@ function arrowUp(): Raster {
   return outline(r, INK, 1);
 }
 
-function flipY(src: Raster): Raster {
+export function flipY(src: Raster): Raster {
   const r = createRaster(src.w, src.h);
   for (let y = 0; y < src.h; y++)
     for (let x = 0; x < src.w; x++) {

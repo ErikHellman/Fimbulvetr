@@ -15,6 +15,8 @@ const rich = (n: number) => ({ k: 'silver', gte: n }) as const;
 export const STYRR: DialogueDef = {
   entry: [
     { when: not(flag('n_styrr_met')), node: 'meet' },
+    { when: all(flag('t_parry'), not(flag('q_duel_asked'))), node: 'challenge' },
+    { when: flag('q_duel_won'), node: 'won' },
     { when: all(flag('st_barrow_open'), not(flag('st_stone3_lit'))), node: 'opened' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { node: 'menu' },
@@ -106,12 +108,49 @@ export const STYRR: DialogueDef = {
           next: 'wait',
         },
         {
+          text: { en: 'I am ready for the duel.', sv: 'Jag är redo för tvekampen.' },
+          when: all(flag('q_duel_asked'), not(flag('q_duel_won'))),
+          do: [
+            { k: 'heal', n: 0 },
+            { k: 'set', flag: 'ev_duel_on', value: true },
+          ],
+          next: 'duel',
+        },
+        {
           text: { en: 'Tell me of the barrow-watch again.', sv: 'Berätta om gravvakten igen.' },
           when: not(flag('st_barrow_open')),
           next: 'barrow2',
         },
         { text: { en: 'Farewell.', sv: 'Farväl.' } },
       ],
+    },
+    challenge: {
+      text: {
+        en: 'The thrust and the parry, both. Then there is one lesson left, and I do not sell it. You win it, in my yard, against me.',
+        sv: 'Stöten och pareringen, båda två. Då finns en lektion kvar, och den säljer jag inte. Den vinner du, på min gård, mot mig.',
+      },
+      do: [{ k: 'set', flag: 'q_duel_asked', value: true }],
+      next: 'challenge2',
+    },
+    challenge2: {
+      text: {
+        en: 'Blunt edges and old bones. Nobody dies, though you may wish you had. When you can stand it, say so.',
+        sv: 'Slöa eggar och gamla ben. Ingen dör, fast du kanske önskar att du hade gjort det. När du står ut med det, säg till.',
+      },
+      next: 'menu',
+    },
+    duel: {
+      text: {
+        en: 'Out to the yard, then. My shield does not open for a plain cut, and when I lift the blade high, meet it or be gone.',
+        sv: 'Ut på gården, då. Min sköld öppnar sig inte för ett vanligt hugg, och när jag lyfter klingan högt, möt den eller var borta.',
+      },
+    },
+    won: {
+      text: {
+        en: 'My shoulder will remember you all winter. Sing the blade well, and remember who taught you.',
+        sv: 'Min axel kommer att minnas dig hela vintern. Sjung klingan väl, och kom ihåg vem som lärde dig.',
+      },
+      next: 'menu',
     },
     poor: {
       text: {
