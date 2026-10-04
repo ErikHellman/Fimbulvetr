@@ -213,6 +213,28 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     'u..u....',
     '.uu.....',
   ],
+  /** Bragð: a blade with its beam flying off the point. */
+  galdr_bragd: [
+    '.....u.u',
+    '......uu',
+    '.....luu',
+    '....lL..',
+    '.g.lL...',
+    '..gL....',
+    '.wgg....',
+    'W.......',
+  ],
+  /** Hlíf: a ring of runes. */
+  galdr_hlif: [
+    '..u.uu..',
+    '.u....u.',
+    'u......u',
+    'u......u',
+    '.......u',
+    'u......u',
+    '.u....u.',
+    '..uu.u..',
+  ],
   galdr_eldr: [
     '...y....',
     '..yY....',

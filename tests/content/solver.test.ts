@@ -305,3 +305,31 @@ describe('the progression solver on Haugar, in every season', () => {
     expect(solve(NO_BOOMERANG, noBoomerang(), nothing, { season: 'winter' }).pieces).toContain('hp_hau_tarn');
   });
 });
+
+/** Where M5a leaves Ask: the pass open and the lowlands under the Fimbulvetr. */
+function underTheFimbulvetr(): GameState {
+  const s = newGame(1, NEW_GAME);
+  applyPreset(s, DEV_PRESETS.haubow);
+  Object.assign(s.flags, { st_pass_open: true, st_home_winter: true });
+  return s;
+}
+
+describe('the progression solver after the pass opens (the Fimbulvetr, M5a)', () => {
+  it('leads home from the pass over every lowland region in winter, and nothing strands Ask', () => {
+    const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter' });
+    for (const id of [
+      'hau_pass',
+      'hau_circle',
+      'hau_huscarl',
+      'hau_int_styrr',
+      'ask_farmyard',
+      'ask_village',
+      'ask_int_longhouse',
+      'ask_int_hof',
+      'upp_int_runehall',
+      'myl_ferry',
+    ] as const)
+      expect(r.screens, id).toContain(id);
+    expect(r.stranded).toEqual([]);
+  });
+});
