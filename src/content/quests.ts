@@ -682,6 +682,33 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_amber: {
+    id: 'q_amber',
+    name: { en: 'Amber for the south', sv: 'Bärnsten till södern' },
+    stages: [
+      {
+        when: flag('q_amber_asked'),
+        text: {
+          en: 'Ragna wants three lumps of Mýrland amber for her ship’s hold: in Auðr’s cut reeds, under Ljótr’s peat, and in the mud by the warm springs (spring only).',
+          sv: 'Ragna vill ha tre klumpar bärnsten från Mýrland till skeppets lastrum: i Auðrs skurna vass, under Ljótrs torv och i leran vid de varma källorna (bara på våren).',
+        },
+      },
+      {
+        when: { k: 'item', id: 'amber', gte: 3 },
+        text: {
+          en: 'Three lumps of amber. Bring them to Ragna by Uppvík’s shore.',
+          sv: 'Tre klumpar bärnsten. Ta dem till Ragna vid Uppvíks strand.',
+        },
+      },
+      {
+        when: flag('q_amber_done'),
+        text: {
+          en: 'Ragna has her amber, and gave Ask the arm-ring of thrift.',
+          sv: 'Ragna har fått sin bärnsten, och gav Ask armringen av sparsamhet.',
+        },
+      },
+    ],
+  },
   q_axes: {
     id: 'q_axes',
     name: { en: 'The axe range', sv: 'Yxbanan' },

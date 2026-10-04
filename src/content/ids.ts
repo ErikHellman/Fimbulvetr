@@ -240,6 +240,7 @@ export const QUESTS = [
   'q_crates',
   'q_honey',
   'q_axes',
+  'q_amber',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -295,6 +296,9 @@ export const SCRIPTS = [
   'axes_start',
   'axes_won',
   'axes_lost',
+  'amber_reeds',
+  'amber_peat',
+  'amber_mud',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

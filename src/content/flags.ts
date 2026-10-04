@@ -207,6 +207,12 @@ export const FLAGS = {
   q_axe_t5: { t: 'bool' },
   q_axes_hit: { t: 'int', max: 5 },
   q_axes_done: { t: 'bool' },
+  /** Ragna's amber (`q_amber`): asked, each of the three lumps found (reeds, peat, spring mud), and brought. */
+  q_amber_asked: { t: 'bool' },
+  q_amber_reeds: { t: 'bool' },
+  q_amber_peat: { t: 'bool' },
+  q_amber_mud: { t: 'bool' },
+  q_amber_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;
