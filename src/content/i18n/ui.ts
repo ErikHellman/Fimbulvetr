@@ -82,6 +82,8 @@ export const UI = {
   gear_seidr: { en: 'Seiðr: {n} of {max}', sv: 'Seiðr: {n} av {max}' },
   gear_horns: { en: 'Mead horns: {n} ({full} full)', sv: 'Mjödhorn: {n} ({full} fulla)' },
   gear_purse: { en: 'Purse: holds {n} silver', sv: 'Pung: rymmer {n} silver' },
+  /** The tag under the title while the game is a demo (M5). */
+  title_demo: { en: 'Demo', sv: 'Demo' },
   title_subtitle: { en: 'The great winter is coming', sv: 'Den stora vintern kommer' },
   title_press: { en: 'Press any key', sv: 'Tryck på valfri tangent' },
   title_continue: { en: 'Continue', sv: 'Fortsätt' },

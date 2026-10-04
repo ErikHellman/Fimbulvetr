@@ -7,6 +7,10 @@ import type { SlotId } from '@shell/platform/saveStore';
  * replaces an autosave.
  */
 
+/** The corner line under the demo tag: the version, and the build it came from (none in dev). */
+export const versionLabel = (version: string, build: string): string =>
+  build === 'dev' ? `v${version}` : `v${version} (${build})`;
+
 export type TitleRow = 'continue' | 'new' | 'load' | 'import' | 'export' | 'settings';
 /** Rows of the load page: the manual slots, the backup autosave, then back. */
 export const LOAD_ROWS = ['s1', 's2', 's3', 'auto_prev', 'back'] as const satisfies readonly (

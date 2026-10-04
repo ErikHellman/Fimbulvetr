@@ -8,6 +8,7 @@ import {
   titleRows,
   type TitleAction,
   type TitleInfo,
+  versionLabel,
 } from '@shell/ui/titleMenu';
 import { frameOf } from '../../sim/harness';
 
@@ -86,5 +87,12 @@ describe('title menu', () => {
     expect(run(i, 'any', ['down'], ['down'], ['confirm']).actions).toEqual([{ k: 'import' }]);
     expect(run(i, 'any', ['down'], ['down'], ['down'], ['confirm']).actions).toEqual([{ k: 'export' }]);
     expect(run(i, 'any', ['up'], ['confirm']).actions).toEqual([{ k: 'settings' }]);
+  });
+});
+
+describe('the version line', () => {
+  it('shows the version, and the build when there is one', () => {
+    expect(versionLabel('0.5.0', 'dev')).toBe('v0.5.0');
+    expect(versionLabel('0.5.0', 'abc1234')).toBe('v0.5.0 (abc1234)');
   });
 });

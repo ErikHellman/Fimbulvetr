@@ -314,22 +314,16 @@ function underTheFimbulvetr(): GameState {
   return s;
 }
 
-describe('the progression solver after the pass opens (the Fimbulvetr, M5a)', () => {
-  it('leads home from the pass over every lowland region in winter, and nothing strands Ask', () => {
+describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
+  it('reaches every lowland screen and every M5b side-quest spot in winter, and nothing strands Ask', () => {
     const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter' });
-    for (const id of [
-      'hau_pass',
-      'hau_circle',
-      'hau_huscarl',
-      'hau_int_styrr',
-      'ask_farmyard',
-      'ask_village',
-      'ask_int_longhouse',
-      'ask_int_hof',
-      'upp_int_runehall',
-      'myl_ferry',
-    ] as const)
-      expect(r.screens, id).toContain(id);
+    const lowland = SCREEN_IDS.filter(
+      (id) => DB.screens[id].dungeon === undefined && !id.startsWith('test_'),
+    );
+    for (const id of lowland) expect(r.screens, id).toContain(id);
+    expect(r.scripts).toEqual(
+      expect.arrayContaining(['find_bell', 'hive', 'amber_reeds', 'amber_peat', 'amber_mud', 'ice_hole']),
+    );
     expect(r.stranded).toEqual([]);
   });
 });
