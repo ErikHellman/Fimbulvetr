@@ -31,6 +31,9 @@ const FARM_DAYS: DialogueDef = daily(
 /** Gyða, the goði, keeps the rune-records in the hof. The morning after the raid she tells the legend. */
 export const GYDA: DialogueDef = {
   entry: [
+    { when: flag('q_pages_done'), node: 'pages_done' },
+    { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
+    { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
     { when: flag('st_blood_told'), node: 'leaves' },
     { when: flag('st_home_winter'), node: 'blood' },
     { when: flag('st_uppvik_reached'), node: 'uppvik' },
@@ -133,6 +136,54 @@ export const GYDA: DialogueDef = {
       text: {
         en: 'The lost leaves of my rune-record are out there somewhere, in the snow. If you come across them, bring them to me.',
         sv: 'De förlorade bladen ur min runkrönika finns någonstans där ute, i snön. Om du hittar dem, ge dem till mig.',
+      },
+      next: 'leaves2',
+    },
+    leaves2: {
+      text: {
+        en: 'Four leaves, one blown into each corner of the lowlands. The runes still call to each other: an eye watches one on our ridge, and the dark keeps one under a Haugar cairn.',
+        sv: 'Fyra blad, ett blåst till vart hörn av låglandet. Runorna ropar fortfarande på varandra: ett öga vakar över ett på vår ås, och mörkret gömmer ett under ett röse i Haugar.',
+      },
+      next: 'leaves3',
+    },
+    leaves3: {
+      text: {
+        en: 'One lies in the drifts by the old mound in Myrkviðr, and one in Mýrland, behind stone that must be broken.',
+        sv: 'Ett ligger i drivorna vid den gamla högen i Myrkviðr, och ett i Mýrland, bakom sten som måste brytas.',
+      },
+    },
+    pages_some: {
+      text: {
+        en: 'A leaf! My own hand, from long ago. Find the others, child; one leaf of an oath is only a promise.',
+        sv: 'Ett blad! Min egen hand, för länge sedan. Hitta de andra, barn; ett blad av en ed är bara ett löfte.',
+      },
+      next: 'leaves2',
+    },
+    pages: {
+      text: {
+        en: 'All four. Let me read… The jarl’s men swore the binding on their own blood: “for us, and for all who come after us.” The rest is smudged.',
+        sv: 'Alla fyra. Låt mig läsa… Jarlens män svor bindningen på sitt eget blod: ”för oss, och för alla som kommer efter oss.” Resten är utsmetat.',
+      },
+      do: [
+        { k: 'take', item: 'rune_leaf', n: 4 },
+        { k: 'set', flag: 'q_pages_done', value: true },
+      ],
+      next: 'pages2',
+    },
+    pages2: {
+      text: {
+        en: 'Halvar stood among them, I would stake my life on it. Say nothing to him yet. Take this vessel; the runes are louder in the young.',
+        sv: 'Halvar stod bland dem, det sätter jag mitt liv på. Säg ingenting till honom än. Ta det här kärlet; runorna ljuder högre i de unga.',
+      },
+      do: [
+        { k: 'give', item: 'seidr_upgrade' },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+    },
+    pages_done: {
+      text: {
+        en: '“For all who come after us.” I have read those leaves a hundred times now, and that line does not get any warmer.',
+        sv: '”För alla som kommer efter oss.” Jag har läst de bladen hundra gånger nu, och den raden blir inte varmare.',
       },
     },
   },

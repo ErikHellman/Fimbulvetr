@@ -171,6 +171,10 @@ export const FLAGS = {
   ev_herd_on: { t: 'bool' },
   q_herd_penned: { t: 'bool' },
   q_herd_done: { t: 'bool' },
+  /** The eye on Askdalr's ridge, shot open: the chest with a leaf of Gyða's record appears (`q_pages`). */
+  w_ask_leaf_eye: { t: 'bool' },
+  /** All four leaves handed back to Gyða. */
+  q_pages_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

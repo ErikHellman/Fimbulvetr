@@ -24,6 +24,14 @@ export const myrDeep: ScreenDef = {
       art: 'logs',
       closed: { k: 'not', c: { k: 'flag', id: 'st_road_open' } },
     },
+    // A leaf of Gyða's record (q_pages), in the drifts west of the road by the old mound.
+    {
+      k: 'chest',
+      id: 'myr_c_leaf',
+      at: { x: 11, y: 7 },
+      gives: { item: 'rune_leaf' },
+      when: { k: 'flag', id: 'st_blood_told' },
+    },
     { k: 'enemy', id: 'vargr', at: { x: 10, y: 15 } },
     { k: 'enemy', id: 'draugr', at: { x: 29, y: 8 }, when: { k: 'phase', is: 'night' } },
   ],

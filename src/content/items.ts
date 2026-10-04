@@ -35,6 +35,7 @@ export const ITEM_NAMES = {
   trade_fleece: { en: 'Raw fleece', sv: 'Råull' },
   trade_yarn: { en: 'Spun yarn', sv: 'Spunnet garn' },
   trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
+  rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {
@@ -54,10 +55,15 @@ const MAX: Partial<Record<ItemId, number>> = {
   small_key: 9,
   horn: 4,
   fen_moss: 9,
+  rune_leaf: 4,
 };
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
 const FOUND: Partial<Record<ItemId, L10n>> = {
+  rune_leaf: {
+    en: 'You found a torn leaf of Gyða’s rune-record! Bring it to her in the hof.',
+    sv: 'Du hittade ett rivet blad ur Gyðas runkrönika! Ge det till henne i hovet.',
+  },
   bow: {
     en: 'You found the bow, and a quiver of thirty arrows! Shoot with its item key, the way you face. Arrows strike from afar, and open the eyes carved in stone.',
     sv: 'Du hittade pilbågen, och ett koger med trettio pilar! Skjut med dess föremålsknapp, åt det håll du vänder dig. Pilar träffar på avstånd och öppnar ögonen som är huggna i sten.',

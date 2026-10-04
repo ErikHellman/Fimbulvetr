@@ -523,4 +523,31 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_pages: {
+    id: 'q_pages',
+    name: { en: 'The lost leaves', sv: 'De förlorade bladen' },
+    stages: [
+      {
+        when: flag('st_blood_told'),
+        text: {
+          en: 'Four leaves of Gyða’s rune-record are lost in the lowlands: on Askdalr’s ridge, in Myrkviðr’s drifts, in Mýrland behind stone, in a Haugar cairn.',
+          sv: 'Fyra blad ur Gyðas runkrönika är borta i låglandet: på Askdalrs ås, i Myrkviðrs drivor, i Mýrland bakom sten, i ett röse i Haugar.',
+        },
+      },
+      {
+        when: { k: 'item', id: 'rune_leaf', gte: 4 },
+        text: {
+          en: 'All four leaves found. Bring them to Gyða.',
+          sv: 'Alla fyra bladen hittade. Ge dem till Gyða.',
+        },
+      },
+      {
+        when: flag('q_pages_done'),
+        text: {
+          en: 'The jarl’s men swore the binding on their blood, “for us, and for all who come after us”. Gyða gave Ask a seiðr vessel.',
+          sv: 'Jarlens män svor bindningen på sitt blod, ”för oss, och för alla som kommer efter oss”. Gyða gav Ask ett seiðrkärl.',
+        },
+      },
+    ],
+  },
 };
