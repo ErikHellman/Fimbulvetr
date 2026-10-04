@@ -72,6 +72,9 @@ export const TERRAIN_IDS = [
   'crypt_wall',
   'pit',
   'ghost',
+  'blackwater',
+  'snag',
+  'mire',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -204,4 +207,10 @@ export const TERRAIN = {
   pit: { solid: true, low: true },
   /** Hidden floor over the pits: sound underfoot, but drawn as the pit it spans; only light shows it. */
   ghost: { solid: false },
+  /** Niflmýrr's still black pools: no footing, and so cold and dead that no winter skins them with ice. */
+  blackwater: { solid: true, low: true },
+  /** A dead tree in the fog marsh, grey and barkless. */
+  snag: { solid: true, decor: { art: ['decor_snag'], w: 1, h: 1 } },
+  /** Niflmýrr's ground: grey-green sedge over sodden peat. */
+  mire: { solid: false },
 } as const satisfies Record<TerrainId, TerrainDef>;

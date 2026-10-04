@@ -721,6 +721,19 @@ function gather(w: World, node: Node): boolean {
           changed = true;
           return;
         }
+        case 'gate': {
+          // Ice that fire melts (the rime): Eldr, once known, melts it from beside it.
+          if (t.melts === undefined || state.flags[t.melts] === true) return;
+          if (!state.inv.galdr.includes('eldr') || !evalCond(t.closed, ctx)) return;
+          let near = false;
+          for (let dy = 0; dy < t.h && !near; dy++)
+            for (let dx = 0; dx < t.w && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
+          state.flags[t.melts] = true;
+          changed = true;
+          return;
+        }
         case 'crack': {
           // Bombs, once owned, are never used up: every crack beside the reach can be blown open.
           if (state.world.opened.includes(t.id) || !owns(state.inv.items, 'bombs')) return;

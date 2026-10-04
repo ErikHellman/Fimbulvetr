@@ -45,6 +45,7 @@ export const WORLD_LAYOUT: WorldLayout = {
     hau_king: [7, 4],
     hau_tarn: [8, 4],
     hau_gully: [6, 5],
+    nif_gorge: [7, 1],
     ask_gate: [4, 9],
     ask_ridge: [5, 9],
     ask_pasture: [3, 10],

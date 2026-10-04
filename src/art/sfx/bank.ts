@@ -638,4 +638,14 @@ export const SFX_BANK = {
     release: 1.2,
     volume: 0.3,
   },
+  /** Rime giving way to fire: a hiss of steam over a cracking groan. */
+  sfx_melt: {
+    wave: 'noise',
+    freq: 2200,
+    freqEnd: 400,
+    attack: 0.02,
+    sustain: 0.4,
+    release: 0.6,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

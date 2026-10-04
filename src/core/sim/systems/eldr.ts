@@ -9,7 +9,7 @@ import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { damageActor } from './combat';
 import { ignite } from './fire';
-import { lightBrazier, stampCollision } from './fixtures';
+import { lightBrazier, meltGate, stampCollision } from './fixtures';
 import { burnProp } from './props';
 import { raining } from './weather';
 
@@ -87,13 +87,18 @@ export function meltAround(rt: SimRt, tx: number, ty: number): boolean {
 
 /**
  * An Eldr bolt in flight: straight on (the wind pushing it aside) until its range runs out or it meets a
- * wall. Whatever it touches first takes the fire and ends it: a foe (burnt, half as hard in the rain), a
+ * wall. Whatever it touches first takes the fire and ends it: a melting gate (its flag set), a foe (burnt, half as hard in the rain), a
  * cold brazier (lit), brambles (burnt away), burnable cover (set alight) or drifts and ice (melted).
  */
 export function stepEldr(rt: SimRt, e: Entity, wind: Vec): void {
   const t = rt.db.tuning.eldr;
   const step = { x: mem(e, 'dx') * t.speed + wind.x, y: mem(e, 'dy') * t.speed + wind.y };
   const next = { x: e.pos.x + step.x, y: e.pos.y + step.y - 5 };
+  // A melting gate is stamped solid, so it is met before the wall it would otherwise be.
+  if (meltGate(rt, at(e.body, { x: e.pos.x + step.x, y: e.pos.y + step.y }))) {
+    burst(rt, e);
+    return;
+  }
   if (wallAt(rt, next) || mem(e, 'flown') + t.speed > t.range) {
     burst(rt, e);
     return;

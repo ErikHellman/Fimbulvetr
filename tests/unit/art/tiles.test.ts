@@ -50,7 +50,7 @@ describe('tileset', () => {
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 
-  it('animates the waters in four frames (rapids fast, springs and sap slower), everything else in one', () => {
+  it('animates the waters in four frames (rapids fast, springs, sap and black pools slower), everything else in one', () => {
     for (const id of TERRAIN_IDS) {
       const e = ts.entries[id];
       if (id === 'water' || id === 'ford' || id === 'shoal')
@@ -58,13 +58,14 @@ describe('tileset', () => {
       else if (id === 'rapids') expect(e, id).toMatchObject({ frames: 4, frameMs: 90 });
       else if (id === 'spring') expect(e, id).toMatchObject({ frames: 4, frameMs: 240 });
       else if (id === 'sap') expect(e, id).toMatchObject({ frames: 4, frameMs: 260 });
+      else if (id === 'blackwater') expect(e, id).toMatchObject({ frames: 4, frameMs: 400 });
       else expect(e.frames, id).toBe(1);
     }
   });
 
   it('lists one tile animation per variant of each animated water and the sap, frame-major', () => {
     const anims = tileAnimations(ts);
-    expect(anims).toHaveLength(6 * 47);
+    expect(anims).toHaveLength(7 * 47);
     const s = ts.entries.water.start;
     expect(anims.find((a) => a.tile === s + 46)).toEqual({
       tile: s + 46,

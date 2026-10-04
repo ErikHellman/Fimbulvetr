@@ -15,7 +15,7 @@ export const hauPass: ScreenDef = {
       art: 'slab',
       closed: { k: 'not', c: { k: 'flag', id: 'st_pass_open' } },
     },
-    /** The gorge's end: the Rime King's breath, frozen into a wall of ice once the door opens (M6 melts it). */
+    /** The gorge's end: the Rime King's breath, frozen into a wall of ice once the door opens. Eldr melts it. */
     {
       k: 'gate',
       at: { x: 18, y: 1 },
@@ -23,6 +23,7 @@ export const hauPass: ScreenDef = {
       h: 1,
       art: 'rime',
       closed: { k: 'not', c: { k: 'flag', id: 'st_rime_open' } },
+      melts: 'st_rime_open',
     },
     /** Walking up to the door with all three stones lit opens the pass: the end of Act I. */
     {
@@ -51,7 +52,7 @@ export const hauPass: ScreenDef = {
     { x: 27, y: 18 },
   ],
   map: [
-    '########################################',
+    '##################jjjj##################',
     '##################jjjj##################',
     '##################jjjj##################',
     '##################jjjj##################',

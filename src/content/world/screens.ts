@@ -112,6 +112,7 @@ export const SCREEN_IDS = [
   'd3_r18',
   'd3_r19',
   'd3_r20',
+  'nif_gorge',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

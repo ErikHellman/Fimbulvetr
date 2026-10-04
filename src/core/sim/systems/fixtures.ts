@@ -435,6 +435,21 @@ function douseBraziers(rt: SimRt): void {
 }
 
 /** Lights the cold brazier under `box` (from the lantern). Returns whether one was lit; never in the rain. */
+/**
+ * Melts the closed melting gate under `box` (the rime across the gorge): its flag is set, the screen shakes,
+ * and the whole gate opens with the next fixture refresh. Returns whether one melted.
+ */
+export function meltGate(rt: SimRt, box: Box): boolean {
+  const e = fixtureAt(rt, 'gate', box, (f) => mem(f, 'on') === 1);
+  if (e === null) return false;
+  const thing = thingOf(rt, e);
+  if (thing?.k !== 'gate' || thing.melts === undefined) return false;
+  rt.state.flags[thing.melts] = true;
+  rt.emit({ t: 'sfx', id: 'sfx_melt' });
+  rt.emit({ t: 'shake', amount: 3 });
+  return true;
+}
+
 export function lightBrazier(rt: SimRt, box: Box): boolean {
   if (raining(rt)) return false;
   const e = fixtureAt(rt, 'brazier', box, (f) => mem(f, 'lit') !== 1);

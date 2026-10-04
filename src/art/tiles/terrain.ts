@@ -448,7 +448,50 @@ const KONUNGSHAUGR = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Niflmýrr's grey sedge over sodden peat. */
+function mire(p: Painter): void {
+  p.fill('#4e5a4c');
+  p.speckle('#3c463b', 0.2);
+  p.speckle('#6c7a64', 0.08);
+  p.speckle('#8e9a84', 0.02);
+}
+
+/** Niflmýrr (M6a): the sedge mire, black pools that never freeze, and the ground under a dead tree. */
+const NIFLMYRR = {
+  mire: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      mire(p);
+    },
+  },
+  blackwater: {
+    autotile: true,
+    variants: 0,
+    frames: 4,
+    frameMs: 400,
+    group: 'water',
+    paint: (p, v) => {
+      mire(p);
+      region(p, v.mask, 3, '#1c2224', '#3a4642', '#283032', 0.12);
+      // A slow glint sliding across the still surface.
+      const gx = (nextInt(p.rng, 2, 9) + v.frame * 2) % 16;
+      const gy = nextInt(p.rng, 5, 11);
+      if (insideBlob(v.mask, gx, gy, 4)) p.rect(gx, gy, 2, 1, '#5a6a68');
+    },
+  },
+  snag: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      mire(p);
+      p.speckle('#3c463b', 0.22);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...NIFLMYRR,
   ...DEEP_WOOD,
   ...KONUNGSHAUGR,
   ...HAUGAR,

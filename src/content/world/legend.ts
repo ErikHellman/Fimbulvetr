@@ -76,6 +76,10 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '8': 'crypt_wall',
   '0': 'pit',
   '9': 'ghost',
+  /** Niflmýrr (M6a): black pools that never freeze, dead trees and the sedge mire. */
+  '5': 'blackwater',
+  '6': 'snag',
+  '*': 'mire',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

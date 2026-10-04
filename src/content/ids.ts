@@ -162,6 +162,7 @@ export const SFX = [
   'sfx_ward',
   'sfx_seal',
   'sfx_breath',
+  'sfx_melt',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

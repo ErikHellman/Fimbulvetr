@@ -221,6 +221,8 @@ export type Thing =
       readonly h: number;
       readonly art: GateArt;
       readonly closed: Cond;
+      /** Ice that fire melts: an Eldr bolt reaching a closed tile sets this flag (the rime across the gorge). */
+      readonly melts?: FlagId;
     }
   /**
    * Scenery drawn over the map, tile by tile, when `shown` holds as the screen is entered (raid ruins

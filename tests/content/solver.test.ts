@@ -326,4 +326,23 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
     );
     expect(r.stranded).toEqual([]);
   });
+
+  it('melts the rime into Niflmýrr only with Eldr', () => {
+    const into = (s: GameState) => s.flags.st_rime_open === true;
+    const atThePass = (eldr: boolean): GameState => {
+      const s = underTheFimbulvetr();
+      s.hero.screen = 'hau_pass';
+      s.hero.x = 20 * TILE + TILE / 2;
+      s.hero.y = 8 * TILE + TILE - 1;
+      if (!eldr) s.inv.galdr = s.inv.galdr.filter((g) => g !== 'eldr');
+      return s;
+    };
+    const pass = { season: 'winter', within: ['hau_pass', 'nif_gorge'] } as const;
+    const warm = solve(DB, atThePass(true), into, pass);
+    expect(warm.finishable).toBe(true);
+    expect(warm.screens).toContain('nif_gorge');
+    const cold = solve(DB, atThePass(false), into, pass);
+    expect(cold.finishable).toBe(false);
+    expect(cold.screens).not.toContain('nif_gorge');
+  });
 });

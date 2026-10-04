@@ -112,6 +112,7 @@ import { testA } from './testlands/test_a';
 import { testB } from './testlands/test_b';
 import { testC } from './testlands/test_c';
 import { testInt } from './testlands/test_int';
+import { nifGorge } from './niflmyrr/nif_gorge';
 
 export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   test_a: testA,
@@ -226,4 +227,5 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d3_r18: d3R18,
   d3_r19: d3R19,
   d3_r20: d3R20,
+  nif_gorge: nifGorge,
 };
