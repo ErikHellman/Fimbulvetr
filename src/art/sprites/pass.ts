@@ -144,6 +144,21 @@ function boards(): Raster {
   return outline(r, INK, 1);
 }
 
+const WATTLE = hex('#9a7a4e');
+const WATTLE_SHADE = hex('#6a5034');
+
+/** A wattle hurdle (16×16): two stakes with withies woven between them, a shepherd's movable fence. */
+function hurdle(): Raster {
+  const r = createRaster(16, 16);
+  rect(r, 2, 4, 2, 11, WATTLE_SHADE);
+  rect(r, 12, 4, 2, 11, WATTLE_SHADE);
+  for (let y = 6; y <= 12; y += 3) {
+    line(r, 1, y, 14, y, WATTLE);
+    line(r, 1, y + 1, 14, y + 1, WATTLE_SHADE);
+  }
+  return outline(r, INK, 1);
+}
+
 export function passFrames(): SpriteFrame[] {
   const frames: SpriteFrame[] = [];
   for (const side of ['s', 'n', 'w'] as const) {
@@ -176,6 +191,7 @@ export function passFrames(): SpriteFrame[] {
     ['scorch', scorch()],
     ['rubble', rubble()],
     ['boards', boards()],
+    ['hurdle', hurdle()],
   ] as const) {
     frames.push({ name: `fix_${art}_idle_s_0`, raster, ox: 8, oy: 14 });
   }
@@ -196,6 +212,7 @@ export const PASS_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef
   fix_scorch: { idle: one(1, 1) },
   fix_rubble: { idle: one(1, 1) },
   fix_boards: { idle: one(1, 1) },
+  fix_hurdle: { idle: one(1, 1) },
   enemy_styrr: {
     idle: all(1, 1),
     walk: all(4, 5),

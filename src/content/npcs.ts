@@ -209,8 +209,13 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   ]),
   /** With her sheep on the heath by day; home before dark. */
   hildr: npc('hildr', [
-    /** With the fold raised (farm stage 2) she winters her flock in Askdalr's pasture. */
-    { when: atLeast('q_farm', 2), screen: 'ask_pasture', at: { x: 20, y: 9 }, facing: 's' },
+    /** With the fold raised (farm stage 2) and her flock gathered (`q_herd`) she winters in Askdalr's pasture. */
+    {
+      when: all(atLeast('q_farm', 2), flag('q_herd_done')),
+      screen: 'ask_pasture',
+      at: { x: 20, y: 9 },
+      facing: 's',
+    },
     { when: { k: 'not', c: night }, screen: 'hau_heath', at: { x: 17, y: 5 }, facing: 's' },
   ]),
   /** By his tent at the barrow field by day; at night he hides inside it. */

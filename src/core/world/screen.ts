@@ -242,8 +242,11 @@ export type Thing =
       readonly do: readonly Effect[];
     };
 
-/** Scenery that comes and goes with the story: what the raid left (scorched roofs, a burned fold, boarded doors). */
-export type SceneryArt = 'scorch' | 'rubble' | 'boards';
+/**
+ * Scenery that comes and goes with the story: what the raid left (scorched roofs, a burned fold, boarded
+ * doors), and Hildr's wattle hurdles on the heath.
+ */
+export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle';
 
 /** A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass. */
 export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime';

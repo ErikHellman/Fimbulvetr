@@ -226,6 +226,7 @@ export const QUESTS = [
   'q_fimbulvetr',
   'q_farm',
   'q_trade',
+  'q_herd',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -273,6 +274,9 @@ export const SCRIPTS = [
   'pass_open',
   'home_winter',
   'find_bell',
+  'herd_start',
+  'herd_won',
+  'herd_lost',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

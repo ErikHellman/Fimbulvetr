@@ -166,6 +166,11 @@ export const FLAGS = {
   st_farm_asked: { t: 'bool' },
   /** Trades made in the trading chain: 1 the bell for a fleece, 2 yarn, 3 Gamli's hook (4–7 later). */
   q_trade: { t: 'int', max: 7 },
+  /** Hildr's herding (`q_herd`): asked to start, the sixth sheep in the hurdles, and won. */
+  q_herd_asked: { t: 'bool' },
+  ev_herd_on: { t: 'bool' },
+  q_herd_penned: { t: 'bool' },
+  q_herd_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

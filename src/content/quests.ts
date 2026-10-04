@@ -503,4 +503,24 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_herd: {
+    id: 'q_herd',
+    name: { en: 'The scattered flock', sv: 'Den skingrade hjorden' },
+    stages: [
+      {
+        when: flag('q_herd_asked'),
+        text: {
+          en: 'The cold scattered Hildr’s flock across the heath. Pen six in her hurdles before the sand runs out.',
+          sv: 'Kölden skingrade Hildrs hjord över heden. Driv in sex innanför hennes gärdsgård innan sanden runnit ut.',
+        },
+      },
+      {
+        when: flag('q_herd_done'),
+        text: {
+          en: 'Hildr’s flock is gathered in the hurdles. She gave Ask her mother’s keepsake.',
+          sv: 'Hildrs hjord är samlad innanför gärdsgården. Hon gav Ask sin mors minnessak.',
+        },
+      },
+    ],
+  },
 };

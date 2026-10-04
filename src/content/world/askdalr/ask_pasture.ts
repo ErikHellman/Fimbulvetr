@@ -4,7 +4,7 @@ import { afterRaid, all, any, atLeast, not } from '../../dialogue/util';
 /** Grazing until the raid scatters the flock; back once the fold is raised again (farm stage 2). */
 const GRAZING = any(not(afterRaid), atLeast('q_farm', 2));
 /** Hildr's own sheep, down from the heath with her. */
-const HILDRS = atLeast('q_farm', 2);
+const HILDRS = all(atLeast('q_farm', 2), { k: 'flag', id: 'q_herd_done' });
 
 export const askPasture: ScreenDef = {
   id: 'ask_pasture',

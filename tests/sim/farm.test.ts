@@ -50,9 +50,9 @@ describe('rebuilding the farm, stages 1–2', () => {
     expect(npcOn(h, 'halvar')).toBe(true);
   });
 
-  it('raises the fold and byre for 250 silver; Hildr brings her flock down to the pasture', () => {
+  it('raises the fold and byre for 250 silver; Hildr, her flock gathered, brings it down to the pasture', () => {
     const h = home(250);
-    Object.assign(h.sim.state.flags, { st_farm_asked: true, q_farm: 1 });
+    Object.assign(h.sim.state.flags, { st_farm_asked: true, q_farm: 1, q_herd_done: true });
     warp(h, 'ask_pasture', 20, 18);
     expect(sheep(h)).toBe(0);
     expect(npcOn(h, 'hildr')).toBe(false);

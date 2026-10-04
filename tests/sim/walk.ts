@@ -308,3 +308,65 @@ export function duel(h: Harness, foe: Sim['actors'][number], budget = 2400): Har
   }
   return h;
 }
+
+/**
+ * Herds the tagged sheep not yet penned into a pen around `goal` (px): picks the free sheep nearest the
+ * goal, circles round behind it and walks it in. Stops when `done` holds or the budget runs out.
+ */
+export function herdInto(
+  h: Harness,
+  goal: { x: number; y: number },
+  done: () => boolean,
+  budget = 6000,
+): Harness {
+  type V = { x: number; y: number };
+  const unit = (v: V): V => {
+    const l = Math.sqrt(v.x * v.x + v.y * v.y);
+    return l === 0 ? { x: 0, y: 0 } : { x: v.x / l, y: v.y / l };
+  };
+  const hold = (d: V): Action[] => {
+    const keys: Action[] = [];
+    if (d.x < -0.38) keys.push('left');
+    if (d.x > 0.38) keys.push('right');
+    if (d.y < -0.38) keys.push('up');
+    if (d.y > 0.38) keys.push('down');
+    return keys;
+  };
+  for (let tick = 0; tick < budget && !done() && h.sim.mode === 'play'; tick++) {
+    const hero = h.sim.hero.pos;
+    const d2 = (p: V): number => (p.x - goal.x) ** 2 + (p.y - goal.y) ** 2;
+    const sheep = h.sim.actors
+      .filter((a) => a.kind === 'critter' && a.mem['tag'] !== undefined && (a.mem['penned'] ?? 0) === 0)
+      .sort((a, b) => d2(a.pos) - d2(b.pos))[0];
+    if (sheep === undefined) break;
+    const s = sheep.pos;
+    const dir = unit({ x: goal.x - s.x, y: goal.y - s.y });
+    const rel = { x: hero.x - s.x, y: hero.y - s.y };
+    const along = rel.x * dir.x + rel.y * dir.y;
+    const across = rel.x * -dir.y + rel.y * dir.x;
+    let move: V;
+    if (along < -10 && Math.abs(across) < 12) move = dir;
+    else {
+      // Behind the sheep, but never off the screen's edge.
+      const staging = {
+        x: Math.min((SCREEN_COLS - 1.5) * TILE, Math.max(1.5 * TILE, s.x - dir.x * 48)),
+        y: Math.min((SCREEN_ROWS - 1) * TILE, Math.max(2 * TILE, s.y - dir.y * 48)),
+      };
+      const toStaging = { x: staging.x - hero.x, y: staging.y - hero.y };
+      const dist = Math.sqrt(rel.x * rel.x + rel.y * rel.y);
+      if (dist < 46 && along > -30) {
+        // Too close and not behind: step away sideways before circling round.
+        const side = across >= 0 ? 1 : -1;
+        move = unit({ x: -dir.y * side + rel.x / dist, y: dir.x * side + rel.y / dist });
+      } else move = unit(toStaging);
+      if (Math.abs(toStaging.x) < 3 && Math.abs(toStaging.y) < 3) move = dir;
+    }
+    // Never walk out over an edge mid-herd.
+    if (hero.y < 2 * TILE && move.y < 0) move = { x: move.x, y: 0.5 };
+    if (hero.y > (SCREEN_ROWS - 1) * TILE && move.y > 0) move = { x: move.x, y: -0.5 };
+    if (hero.x < 1.5 * TILE && move.x < 0) move = { x: 0.5, y: move.y };
+    if (hero.x > (SCREEN_COLS - 1.5) * TILE && move.x > 0) move = { x: -0.5, y: move.y };
+    h.step(frameOf(hold(move)));
+  }
+  return h;
+}

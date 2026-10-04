@@ -1,11 +1,14 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { flag, not } from './util';
+import { all, atLeast, flag, not } from './util';
 
 /** Hildr, the shepherd on the heath: the barrow-wights, Styrr's habits, her sheep. */
 export const HILDR: DialogueDef = {
   entry: [
     { when: not(flag('n_hildr_met')), node: 'meet' },
     { when: { k: 'item', id: 'trade_bell' }, node: 'bell' },
+    { when: all(flag('q_herd_done'), atLeast('q_farm', 2)), node: 'pasture' },
+    { when: flag('q_herd_done'), node: 'herded' },
+    { when: all(flag('st_pass_open'), flag('q_herd_asked')), node: 'herd' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { when: flag('st_barrow_open'), node: 'opened' },
@@ -81,6 +84,33 @@ export const HILDR: DialogueDef = {
       text: {
         en: 'The cold scattered my flock across the heath in one night. A farm with a whole fold could winter them. I have a hut and a dog.',
         sv: 'Kölden skingrade min hjord över heden på en enda natt. En gård med en hel fålla kunde ta dem genom vintern. Jag har en koja och en hund.',
+      },
+      do: [{ k: 'set', flag: 'q_herd_asked', value: true }],
+      next: 'herd',
+    },
+    herd: {
+      text: {
+        en: 'And the dog is too old to run. Could you gather them? Six into my hurdles, south of the road, before the sand runs out. Walk at a sheep and it runs the other way.',
+        sv: 'Och hunden är för gammal för att springa. Kan du samla ihop dem? Sex innanför gärdsgården, söder om vägen, innan sanden runnit ut. Gå mot ett får så springer det åt andra hållet.',
+      },
+      choices: [
+        {
+          text: { en: 'Gather the flock.', sv: 'Samla hjorden.' },
+          do: [{ k: 'set', flag: 'ev_herd_on', value: true }],
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    herded: {
+      text: {
+        en: 'They are safe in the hurdles, but hurdles are no fold. If Halvar’s farm ever has one again, I would winter them there.',
+        sv: 'De är trygga innanför gärdsgården, men en gärdsgård är ingen fålla. Om Halvars gård får en igen, skulle jag ha dem där över vintern.',
+      },
+    },
+    pasture: {
+      text: {
+        en: 'A real fold, and hay in the byre. The flock has not been this fat since summer. Tell Halvar he snores through the wall.',
+        sv: 'En riktig fålla, och hö i fähuset. Hjorden har inte varit så fet sedan i somras. Säg till Halvar att han snarkar genom väggen.',
       },
     },
   },

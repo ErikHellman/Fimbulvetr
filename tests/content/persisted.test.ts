@@ -92,6 +92,8 @@ const PERSISTED = [
   'd3_k_r18',
   'hau_c_quiver',
   'hp_hau_watch',
+  // M5b (pieces handed over by quests; pen keys in world.vars: hau_hurdles)
+  'hp_hau_heath',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */
