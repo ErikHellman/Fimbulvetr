@@ -28,6 +28,18 @@ const FOG_LOOK: Look = {
 };
 const FOG_EYES = '#9fe8ff';
 
+/** The marbendill (M7a): a merman grey as a drowned man, lake-weed for hair, a scaled tail for legs. */
+const MARBENDILL_LOOK: Look = {
+  skin: '#7f948c',
+  hair: '#2f5a3a',
+  hairStyle: 'long',
+  beard: '#2f5a3a',
+  top: '#5f7a70',
+  legs: 'skirt',
+  bottom: '#46685e',
+};
+const MARBENDILL_EYES = '#d8f0e0';
+
 /** A faint swirl of mist on the ground: all that shows of something lying in wait. */
 function swirl(phase: number): Raster {
   const r = createRaster(32, 32);
@@ -101,6 +113,21 @@ export function niflmyrrFrames(): SpriteFrame[] {
     f('swing', 0, drawPerson(FOG_LOOK, side, 0, { eyes: FOG_EYES, arms: 'forward' }));
     f('swing', 1, drawPerson(FOG_LOOK, side, 2, { eyes: FOG_EYES, arms: 'forward' }));
     f('hurt', 0, drawPerson(FOG_LOOK, side, 2, { eyes: FOG_EYES }));
+
+    const b = (anim: string, i: number, r: Raster): void => {
+      add('enemy_marbendill', anim, side, i, r);
+    };
+    [20, 14, 8, 3].forEach((sink, i) => {
+      b('rise', i, sunk(MARBENDILL_LOOK, side, sink, MARBENDILL_EYES));
+    });
+    b('idle', 0, drawPerson(MARBENDILL_LOOK, side, 0, { eyes: MARBENDILL_EYES, sink: 2 }));
+    for (let i = 0; i < 4; i++)
+      b('walk', i, drawPerson(MARBENDILL_LOOK, side, i, { eyes: MARBENDILL_EYES, sink: 2 }));
+    b('tell', 0, drawPerson(MARBENDILL_LOOK, side, 0, { eyes: MARBENDILL_EYES, arms: 'forward', sink: 4 }));
+    b('tell', 1, drawPerson(MARBENDILL_LOOK, side, 1, { eyes: MARBENDILL_EYES, arms: 'forward', sink: 5 }));
+    b('grab', 0, drawPerson(MARBENDILL_LOOK, side, 1, { eyes: MARBENDILL_EYES, arms: 'forward' }));
+    b('grab', 1, drawPerson(MARBENDILL_LOOK, side, 3, { eyes: MARBENDILL_EYES, arms: 'up' }));
+    b('hurt', 0, drawPerson(MARBENDILL_LOOK, side, 2, { eyes: MARBENDILL_EYES, sink: 2 }));
   }
   return out;
 }
@@ -117,6 +144,14 @@ export const NIFLMYRR_ANIMS: Readonly<Record<string, Readonly<Record<string, Ani
     leap: a(1, 1),
     ride: a(2, 6),
     down: a(1, 1),
+    hurt: a(1, 1),
+  },
+  enemy_marbendill: {
+    rise: a(4, 8, false),
+    idle: a(1, 1),
+    walk: a(4, 6),
+    tell: a(2, 8),
+    grab: a(2, 10, false),
     hurt: a(1, 1),
   },
   enemy_fog_draugr: {

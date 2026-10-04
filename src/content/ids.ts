@@ -103,6 +103,7 @@ export const ENEMIES = [
   'garmr',
   'nastrond',
   'tower_shield',
+  'marbendill',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -262,6 +263,7 @@ export const QUESTS = [
   'q_burbot',
   'q_act2',
   'q_ljos',
+  'q_sealskin',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 

@@ -7,6 +7,7 @@ import { dungeonOf } from '../state/dungeons';
 import type { FlagValue } from '../state/flags';
 import type { SimRt } from '../sim/rt';
 import { wakeTheDead } from '../sim/systems/wake';
+import { clearDawnFlags } from '../sim/systems/clock';
 
 /** Silver caps by purse size. */
 export const PURSE_CAP = [100, 300, 999] as const;
@@ -112,6 +113,7 @@ export function applyEffect(e: Effect, rt: SimRt): void {
       break;
     case 'sleep':
       for (const ev of sleepUntil(s.clock, rt.db.clock, e.until)) rt.emit({ t: 'clock', e: ev });
+      clearDawnFlags(rt);
       break;
     case 'sfx':
       rt.emit({ t: 'sfx', id: e.id });

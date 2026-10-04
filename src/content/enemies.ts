@@ -634,6 +634,40 @@ export const ENEMY_DEFS = {
     light: true,
     drops: { heart: 3, silver: 3, none: 3 },
   },
+  /**
+   * A marbendill (Niflmýrr's strand at night, Sævatn): climbs out of the water, crouches with its hands out
+   * (400 ms) and springs to grab, hauling Ask in. Struck, it scrambles away with its back open.
+   */
+  marbendill: {
+    id: 'marbendill',
+    art: 'enemy_marbendill',
+    hp: 8,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -7, y: -24, w: 14, h: 24 },
+    behaviour: 'marbendill',
+    knockResist: 0.2,
+    immortal: false,
+    solid: false,
+    attacks: {
+      grab: {
+        from: 0,
+        to: 8,
+        boxes: {
+          e: { x: 0, y: -22, w: 20, h: 22 },
+          w: { x: -20, y: -22, w: 20, h: 22 },
+          s: { x: -10, y: -10, w: 20, h: 20 },
+          n: { x: -10, y: -30, w: 20, h: 22 },
+        },
+        amount: 2,
+        // A grab hauls Ask in towards the water rather than throwing them back.
+        knock: -3,
+        tags: 0,
+      },
+    },
+    stunnable: 90,
+    light: true,
+    drops: { heart: 3, silver: 2, none: 2 },
+  },
   /** Hel's black hounds: stalk like vargr, and lunge in pairs (see helhound.ts). Light enough to drag. */
   helhound: {
     id: 'helhound',

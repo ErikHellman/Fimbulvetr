@@ -770,6 +770,33 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_sealskin: {
+    id: 'q_sealskin',
+    name: { en: 'The seal-skin', sv: 'Sälskinnet' },
+    stages: [
+      {
+        when: flag('q_sealskin_asked'),
+        text: {
+          en: 'A marbendill climbs Niflmýrr’s strand every night and tears Hrafn’s nets. Drive it off three nights, after dark.',
+          sv: 'En marbendill klättrar upp på Niflmýrrs strand varje natt och river Hrafns nät. Driv bort den tre nätter, efter mörkrets inbrott.',
+        },
+      },
+      {
+        when: atLeast('q_seal_nights', 3),
+        text: {
+          en: 'Three nights, and the nets still whole. Go and tell Hrafn in his hut.',
+          sv: 'Tre nätter, och näten är fortfarande hela. Gå och berätta det för Hrafn i hans hydda.',
+        },
+      },
+      {
+        when: flag('q_sealskin_done'),
+        text: {
+          en: 'Hrafn gave Ask his late wife’s seal-skin. In it the lake carries Ask, and a roll dives under.',
+          sv: 'Hrafn gav Ask sin döda hustrus sälskinn. I det bär sjön Ask, och en rullning dyker under.',
+        },
+      },
+    ],
+  },
   q_axes: {
     id: 'q_axes',
     name: { en: 'The axe range', sv: 'Yxbanan' },

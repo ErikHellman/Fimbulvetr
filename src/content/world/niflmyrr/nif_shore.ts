@@ -1,4 +1,5 @@
 import type { ScreenDef } from '@core/world/screen';
+import { all, flag, not } from '../../dialogue/util';
 
 export const nifShore: ScreenDef = {
   id: 'nif_shore',
@@ -7,6 +8,23 @@ export const nifShore: ScreenDef = {
     "Where the Gjöll runs into Sævatn: a pale strand, a seal-hunter's turf hut, and the lake going out grey into the fog towards Holmr. The far shore is for later; for now the strand is as far as anyone walks.",
   things: [
     { k: 'door', at: { x: 19, y: 9 }, dir: 'n', to: 'nif_int_hut', arrive: { x: 19, y: 14 }, facing: 'n' },
+    /** Hrafn's marbendill (M7a): one a night on the strand while Ask guards his nets, three nights in all. */
+    {
+      k: 'enemy',
+      id: 'marbendill',
+      at: { x: 8, y: 12 },
+      when: all(
+        flag('q_sealskin_asked'),
+        not(flag('q_sealskin_done')),
+        not(flag('ev_seal_tonight')),
+        { k: 'flag', id: 'q_seal_nights', lt: 3 },
+        { k: 'phase', is: 'night' },
+      ),
+      onDeath: [
+        { k: 'add', flag: 'q_seal_nights', n: 1 },
+        { k: 'set', flag: 'ev_seal_tonight', value: true },
+      ],
+    },
   ],
   /** Where Niflmýrr's spawn table may put foes (see content/spawns.ts). */
   spawns: [

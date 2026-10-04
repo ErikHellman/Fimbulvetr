@@ -255,6 +255,14 @@ export const FLAGS = {
   ev_ulf_herd: { t: 'bool' },
   ev_ulf_round: { t: 'bool' },
   q_ulf_penned: { t: 'bool' },
+  /**
+   * Hrafn's seal-skin (M7a): asked to guard his nets, the nights the marbendill was driven off (three win
+   * the skin), tonight's fight done (clears at dawn), and the skin given.
+   */
+  q_sealskin_asked: { t: 'bool' },
+  q_seal_nights: { t: 'int', max: 3 },
+  ev_seal_tonight: { t: 'bool', dawn: true },
+  q_sealskin_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;
