@@ -12,6 +12,7 @@ import { D2_SCRIPTS } from './d2';
 import { HAUGAR_SCRIPTS } from './haugar';
 import { PASS_SCRIPTS } from './pass';
 import { LOWLAND_SCRIPTS } from './lowlands';
+import { NIFLMYRR_SCRIPTS } from './niflmyrr';
 
 /** Cutscenes and interaction scripts by id. */
 export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
@@ -27,4 +28,5 @@ export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ...HAUGAR_SCRIPTS,
   ...PASS_SCRIPTS,
   ...LOWLAND_SCRIPTS,
+  ...NIFLMYRR_SCRIPTS,
 };

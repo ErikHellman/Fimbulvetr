@@ -243,6 +243,7 @@ export const QUESTS = [
   'q_axes',
   'q_amber',
   'q_burbot',
+  'q_act2',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -302,6 +303,7 @@ export const SCRIPTS = [
   'amber_peat',
   'amber_mud',
   'ice_hole',
+  'nif_arrive',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

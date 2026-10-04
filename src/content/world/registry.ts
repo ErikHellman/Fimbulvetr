@@ -113,6 +113,11 @@ import { testB } from './testlands/test_b';
 import { testC } from './testlands/test_c';
 import { testInt } from './testlands/test_int';
 import { nifGorge } from './niflmyrr/nif_gorge';
+import { nifCauseway } from './niflmyrr/nif_causeway';
+import { nifDeadwood } from './niflmyrr/nif_deadwood';
+import { nifCamp } from './niflmyrr/nif_camp';
+import { nifShore } from './niflmyrr/nif_shore';
+import { nifIntHut } from './niflmyrr/nif_int_hut';
 
 export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   test_a: testA,
@@ -228,4 +233,9 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d3_r19: d3R19,
   d3_r20: d3R20,
   nif_gorge: nifGorge,
+  nif_causeway: nifCauseway,
+  nif_deadwood: nifDeadwood,
+  nif_camp: nifCamp,
+  nif_shore: nifShore,
+  nif_int_hut: nifIntHut,
 };

@@ -756,4 +756,24 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_act2: {
+    id: 'q_act2',
+    name: { en: 'The road north', sv: 'Vägen norrut' },
+    stages: [
+      {
+        when: flag('st_rime_open'),
+        text: {
+          en: 'Eldr melted the rime across the gorge. The road goes on north, into the fog.',
+          sv: 'Eldr smälte rimfrosten i klyftan. Vägen fortsätter norrut, in i dimman.',
+        },
+      },
+      {
+        when: flag('st_niflmyrr_reached'),
+        text: {
+          en: 'Niflmýrr: a marsh of fog and the restless dead. Somewhere in it are the captives, and Embla.',
+          sv: 'Niflmýrr: ett kärr av dimma och rastlösa döda. Någonstans där finns de tillfångatagna, och Embla.',
+        },
+      },
+    ],
+  },
 };

@@ -5,7 +5,18 @@ export const nifGorge: ScreenDef = {
   region: 'niflmyrr',
   purpose:
     "The gorge's far end, where the rime gave way: the stone road climbs out of the cliffs into Niflmýrr's first fog. Niflmýrr's warp stone stands on the old flags, and the marsh opens west.",
-  things: [{ k: 'warp', region: 'niflmyrr', at: { x: 20, y: 10 }, arrive: { x: 20, y: 11 } }],
+  things: [
+    { k: 'warp', region: 'niflmyrr', at: { x: 20, y: 10 }, arrive: { x: 20, y: 11 } },
+    /** Out of the gorge: Ask has reached Niflmýrr. */
+    {
+      k: 'trigger',
+      at: { x: 17, y: 13 },
+      w: 8,
+      h: 2,
+      script: 'nif_arrive',
+      when: { k: 'not', c: { k: 'flag', id: 'st_niflmyrr_reached' } },
+    },
+  ],
   /** Where Niflmýrr's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 5, y: 7 },

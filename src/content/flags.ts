@@ -217,6 +217,8 @@ export const FLAGS = {
   q_burbot_asked: { t: 'bool' },
   q_burbot_caught: { t: 'bool' },
   q_burbot_done: { t: 'bool' },
+  /** Out of the gorge and into Niflmýrr's fog (M6a). */
+  st_niflmyrr_reached: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;
