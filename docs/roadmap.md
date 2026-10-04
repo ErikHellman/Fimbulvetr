@@ -108,5 +108,12 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: Konungshaugr's 20 rooms, `q_runestone_3` to the third stone, Haugar's bow secrets (the great cairn's quiver, the watchtower's piece), arrows for sale
     - [x] Solver proofs, route, e2e, v1-m4b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M5 Act I finale (demo)
+- [ ] M5 Act I finale (demo) — brief: `docs/briefs/m5.md`
+  - [ ] M5a The pass — plan: `docs/superpowers/plans/2026-10-04-m5.md`
+    - [x] Duels and Styrr's last duel; Bragð; Hlíf from Sölvi
+    - [x] The pass opens: the seals, the breath, the season snap, the rime gorge, the credits
+    - [x] Askdalr after the raid: ruins keyed on the farm, `q_fimbulvetr` and the homecoming, every Fimbulvetr line, Bárðr's frozen lake
+    - [x] Solver proof in winter, route, e2e, v1-m5a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M5b The lowlands, after: rings, seiðr upgrades and trials; the farm, stages 1–2; the trading chain; ten side quests; the demo
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

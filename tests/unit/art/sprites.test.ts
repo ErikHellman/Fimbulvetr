@@ -267,6 +267,15 @@ describe('content art', () => {
     for (const d of Object.values(PROP_DEFS)) expect(ANIMS[d.art]?.['idle'], d.art).toBeDefined();
   });
 
+  it('has a menu icon for every galdr the content teaches', async () => {
+    const { DB } = await import('@content/index');
+    const taught = new Set<string>();
+    const text = JSON.stringify([DB.scripts, DB.dialogue]);
+    for (const m of text.matchAll(/"k":"learn","galdr":"(\w+)"/g)) taught.add(m[1] ?? '');
+    expect(taught.size).toBeGreaterThanOrEqual(4);
+    for (const g of taught) expect(ANIMS[`galdr_${g}`]?.['idle'], g).toBeDefined();
+  });
+
   it('has an idle animation for every decor art the terrain names', async () => {
     const { TERRAIN } = await import('@content/terrain');
     const arts = Object.values(TERRAIN).flatMap((d) => ('decor' in d ? [...d.decor.art] : []));

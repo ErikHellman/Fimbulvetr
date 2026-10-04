@@ -531,6 +531,53 @@ export const DEV_PRESETS = {
     warps: ['haugar'],
   },
   /**
+   * The end of M5a: the pass open in the Fimbulvetr winter, Styrr's duel won and Bragð learned, with silver
+   * enough for Sölvi's Hlíf. Askdalr's homecoming is still to come.
+   */
+  fimbul: {
+    screen: 'hau_pass',
+    tile: [20, 8],
+    facing: 's',
+    weapon: 'seax',
+    shield: true,
+    minute: 10 * 60,
+    season: 'winter',
+    policy: 'cycling',
+    silver: 150,
+    items: { lantern: 1, boomerang: 1, horn: 2, mead_red: 2, purse: 1, bombs: 10, bow: 1, arrows: 30 },
+    slots: ['bow', 'bombs'],
+    galdr: ['eldr', 'farvegr', 'bragd'],
+    seidr: 10,
+    flags: {
+      ...MYL_FLAGS,
+      st_d2_entered: true,
+      st_d2_boss_dead: true,
+      st_stone2_lit: true,
+      st_haugar_reached: true,
+      n_styrr_met: true,
+      q_rs3_watch: true,
+      q_watch_kills: 3,
+      st_barrow_open: true,
+      t_dash: true,
+      t_parry: true,
+      st_d3_entered: true,
+      st_d3_warden: true,
+      st_d3_boss_dead: true,
+      st_stone3_lit: true,
+      q_duel_asked: true,
+      q_duel_won: true,
+      st_bragd_learned: true,
+      st_pass_open: true,
+    },
+    vars: { ask_pen: 31 },
+    maxHp: 28,
+    hp: 28,
+    pieces: ['hp_d1_r09', 'hp_myl_peat', 'hp_hau_barrows', 'hp_hau_tarn'],
+    opened: ['d1_hc', 'd2_hc', 'd3_hc', 'd2_c_bombs', 'd3_c_bow', 'hau_k_gully', 'hau_k_barrows'],
+    dungeons: { d1: { bossDead: true }, d2: { bossDead: true }, d3: { bossDead: true } },
+    warps: ['haugar'],
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

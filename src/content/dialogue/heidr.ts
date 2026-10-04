@@ -5,6 +5,7 @@ import { all, flag, not } from './util';
 export const HEIDR: DialogueDef = {
   entry: [
     { when: not(flag('n_heidr_met')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: all(flag('st_myrland_reached'), not(flag('q_rs2_mill'))), node: 'serpent' },
     { when: flag('q_volva_done'), node: 'after' },
     { when: all(flag('q_volva_asked'), { k: 'item', id: 'fen_moss', gte: 3 }), node: 'moss' },
@@ -74,6 +75,12 @@ export const HEIDR: DialogueDef = {
       text: {
         en: 'The smoke shows me lights on an island in a frozen lake, and one burning brighter than the rest.',
         sv: 'Röken visar mig ljus på en ö i en frusen sjö, och ett som brinner starkare än de andra.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'The smoke shows me nothing now but white. Whatever woke in the mountain is looking back through it.',
+        sv: 'Röken visar mig ingenting nu utom vitt. Det som vaknade i berget ser tillbaka genom den.',
       },
     },
   },

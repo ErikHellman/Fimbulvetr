@@ -41,6 +41,7 @@ import type { SaveSummary } from '@shell/platform/saveStore';
 import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { FireView } from '@shell/view/fireView';
 import { GhostView } from '@shell/view/ghostView';
+import { WardView } from '@shell/view/wardView';
 import { FishView } from '@shell/view/fishView';
 import { ScreenView } from '@shell/view/screenView';
 
@@ -69,6 +70,7 @@ export class PlayScene extends Phaser.Scene {
   private fx!: FxView;
   private flames!: FireView;
   private ghostFloor!: GhostView;
+  private ward!: WardView;
   private fishing!: FishView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
@@ -133,6 +135,7 @@ export class PlayScene extends Phaser.Scene {
     this.fx = new FxView(this, data.assets.frames, ANIMS);
     this.flames = new FireView(this, data.assets.frames, ANIMS);
     this.ghostFloor = new GhostView(this, data.assets.frames);
+    this.ward = new WardView(this);
     this.fishing = new FishView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
@@ -388,6 +391,11 @@ export class PlayScene extends Phaser.Scene {
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     this.ghostFloor.draw(this.sim.ghosts(), this.sim.originOf(this.sim.screen.id));
     {
+      const hero = this.sim.hero;
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.ward.draw(this.sim.ward(), add(origin, lerp(hero.prev, hero.pos, alpha)), this.sim.tick);
+    }
+    {
       const ui = this.sim.storyUi();
       const origin = this.sim.originOf(this.sim.screen.id);
       this.fishing.draw(
@@ -499,6 +507,7 @@ export class PlayScene extends Phaser.Scene {
       fog: this.fog.shown.dark,
       flames: this.flames.shown,
       ghosts: this.ghostFloor.shown,
+      ward: this.ward.shown,
       lights: this.darkness.shown.lights,
     };
     const out = { ...sum };

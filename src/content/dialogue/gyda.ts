@@ -31,6 +31,8 @@ const FARM_DAYS: DialogueDef = daily(
 /** Gyða, the goði, keeps the rune-records in the hof. The morning after the raid she tells the legend. */
 export const GYDA: DialogueDef = {
   entry: [
+    { when: flag('st_blood_told'), node: 'leaves' },
+    { when: flag('st_home_winter'), node: 'blood' },
     { when: flag('st_uppvik_reached'), node: 'uppvik' },
     { when: flag('st_stone1_lit'), node: 'stone1' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'first_halvar' },
@@ -111,6 +113,26 @@ export const GYDA: DialogueDef = {
       text: {
         en: 'Rótarhellir lies where Yggdrasil’s roots break the forest floor, north and east of the old road.',
         sv: 'Rótarhellir ligger där Yggdrasils rötter bryter igenom skogsbotten, norr och öster om den gamla vägen.',
+      },
+    },
+    blood: {
+      text: {
+        en: 'That was no winter, Ask. That was a breath, held for a thousand years and let go.',
+        sv: 'Det där var ingen vinter, Ask. Det var en andedräkt, hållen i tusen år och utsläppt.',
+      },
+      next: 'blood2',
+    },
+    blood2: {
+      text: {
+        en: 'The old binding on the Rime King was sworn on blood, not on stone. Whose blood, my rune-record would say, but its last leaves were torn out when the raiders went through the hof.',
+        sv: 'Den gamla bindningen av Rimkungen svors på blod, inte på sten. Vems blod skulle min runkrönika kunna säga, men dess sista blad revs ut när plundrarna drog genom hovet.',
+      },
+      do: [{ k: 'set', flag: 'st_blood_told', value: true }],
+    },
+    leaves: {
+      text: {
+        en: 'The lost leaves of my rune-record are out there somewhere, in the snow. If you come across them, bring them to me.',
+        sv: 'De förlorade bladen ur min runkrönika finns någonstans där ute, i snön. Om du hittar dem, ge dem till mig.',
       },
     },
   },

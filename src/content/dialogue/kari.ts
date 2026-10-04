@@ -6,6 +6,7 @@ export const KARI: DialogueDef = {
   entry: [
     { when: not(flag('n_kari_met')), node: 'meet' },
     { when: all(flag('q_fish_gamli'), not(flag('q_fisher_done'))), node: 'gamli' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('q_fisher_done'), node: 'after' },
     { when: evening, node: 'night' },
     { when: atLeast('q_fish_caught', 5), node: 'knack' },
@@ -72,6 +73,12 @@ export const KARI: DialogueDef = {
       text: {
         en: 'Every time the water swirls I think it is Gamli again. It never is. Fish away; the rod is yours as long as you like.',
         sv: 'Varje gång vattnet virvlar tror jag att det är Gamle igen. Det är det aldrig. Fiska på; spöet är ditt så länge du vill.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'The lake shut like a lid in one night. Thirty winters on this shore, and I have never heard ice sing like that.',
+        sv: 'Sjön slöt sig som ett lock på en natt. Trettio vintrar vid den här stranden, och aldrig har jag hört isen sjunga så.',
       },
     },
   },

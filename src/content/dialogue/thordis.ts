@@ -5,6 +5,7 @@ import { evening, flag, not } from './util';
 export const THORDIS: DialogueDef = {
   entry: [
     { when: not(flag('w_horn_thordis')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: evening, node: 'night' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { node: 'day' },
@@ -58,6 +59,12 @@ export const THORDIS: DialogueDef = {
       text: {
         en: 'Rain drives them all in here, and they drip on my floor. At least the mead sells.',
         sv: 'Regnet driver in dem allihop, och de droppar på mitt golv. Mjödet säljer i alla fall.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'Half the valley sleeps on my benches, and the other half wants to. I have never sold so much mead in a winter, nor wanted to less.',
+        sv: 'Halva dalen sover på mina bänkar, och andra halvan vill göra det. Aldrig har jag sålt så mycket mjöd på en vinter, och aldrig har jag velat det mindre.',
       },
     },
   },

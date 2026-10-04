@@ -84,6 +84,7 @@ export const ENEMIES = [
   'bogdraugr',
   'haugvordr',
   'haugkonungr',
+  'styrr_duel',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -148,6 +149,10 @@ export const SFX = [
   'sfx_wake',
   'sfx_gem',
   'sfx_axe',
+  'sfx_bragd',
+  'sfx_ward',
+  'sfx_seal',
+  'sfx_breath',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -215,6 +220,7 @@ export const QUESTS = [
   'q_fisher',
   'q_runestone_3',
   'q_huscarl',
+  'q_fimbulvetr',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -257,6 +263,10 @@ export const SCRIPTS = [
   'd3_enter',
   'stone3_light',
   'shop_geirmundr',
+  'duel_lost',
+  'duel_won',
+  'pass_open',
+  'home_winter',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

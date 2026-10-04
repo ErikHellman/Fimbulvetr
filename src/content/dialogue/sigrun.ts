@@ -1,10 +1,11 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { afterRaid, raidNight } from './util';
+import { afterRaid, flag, raidNight } from './util';
 
 /** Sigrún the trader, across her counter. The shop opens after she has spoken. */
 export const SIGRUN: DialogueDef = {
   entry: [
     { when: raidNight, node: 'raid' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: afterRaid, node: 'after' },
     { when: { k: 'item', id: 'lantern' }, node: 'regular' },
     { node: 'hello' },
@@ -37,6 +38,12 @@ export const SIGRUN: DialogueDef = {
     },
     raid: {
       text: { en: 'The shop is shut! Run!', sv: 'Boden är stängd! Spring!' },
+    },
+    fimbul: {
+      text: {
+        en: 'Nobody comes up the road in this. I sell what I have, and when it is gone, it is gone.',
+        sv: 'Ingen kommer uppför vägen i det här. Jag säljer det jag har, och när det är slut är det slut.',
+      },
     },
   },
 };

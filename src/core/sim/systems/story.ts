@@ -95,7 +95,17 @@ export type StoryUi =
     }
   /** Farvegr's picker: the woken stones by region, then one more row for "stay". */
   | { readonly k: 'warps'; readonly rows: readonly RegionId[]; readonly cursor: number }
+  /** The Rime King's breath rolls over the screen, north to south: `t` ticks of `of`. */
+  | { readonly k: 'breath'; readonly t: number; readonly of: number }
+  /** The credits are rolling: `t` ticks of `of`. */
+  | { readonly k: 'credits'; readonly t: number; readonly of: number }
   | null;
+
+/** How long the breath of the Rime King holds the stage, in ticks. */
+export const BREATH_TICKS = 150;
+/** How long the credits roll, in ticks, and how long before confirm can skip them. */
+export const CREDITS_TICKS = 2400;
+export const CREDITS_SKIP = 60;
 
 const ADVANCE = ['confirm', 'interact', 'sword'] as const;
 const advancePressed = (input: InputFrame): boolean => ADVANCE.some((a) => wasPressed(input, a));
@@ -225,11 +235,16 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
     case 'farvegr':
       run.warps = { cursor: 0 };
       return true;
+    case 'breath':
+      rt.emit({ t: 'sfx', id: 'sfx_breath' });
+      rt.emit({ t: 'shake', amount: 4 });
+      return true;
     case 'say':
     case 'card':
     case 'move':
     case 'wait':
     case 'fade':
+    case 'credits':
       return true;
   }
 }
@@ -272,6 +287,11 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
       return stepFish(rt, run, step, input);
     case 'farvegr':
       return stepFarvegr(rt, run, input);
+    case 'breath':
+      return run.t + 1 < BREATH_TICKS;
+    case 'credits':
+      if (run.t >= CREDITS_SKIP && advancePressed(input)) return false;
+      return run.t + 1 < CREDITS_TICKS;
     case 'do':
     case 'face':
     case 'warp':
@@ -426,6 +446,8 @@ export function storyUi(rt: SimRt): StoryUi {
       result: f.result,
     };
   }
+  if (step.k === 'credits') return { k: 'credits', t: run.t, of: CREDITS_TICKS };
+  if (step.k === 'breath') return { k: 'breath', t: run.t, of: BREATH_TICKS };
   if (step.k === 'farvegr' && run.warps !== undefined)
     return { k: 'warps', rows: [...rt.state.world.warps], cursor: run.warps.cursor };
   // Once answered, the picker is gone even before the step ends on the next tick.

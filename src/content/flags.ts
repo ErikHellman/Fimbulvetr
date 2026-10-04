@@ -140,6 +140,24 @@ export const FLAGS = {
   t_dash: { t: 'bool' },
   /** Styrr taught the parry: a blow met by a freshly raised shield is turned, and its dealer stunned. */
   t_parry: { t: 'bool' },
+  /** Styrr has challenged Ask to the last duel (once both techniques are known). */
+  q_duel_asked: { t: 'bool' },
+  /** The duel is on: Styrr waits in his yard. Cleared by a win, a loss or leaving the yard. */
+  ev_duel_on: { t: 'bool' },
+  /** Ask won Styrr's last duel. */
+  q_duel_won: { t: 'bool' },
+  /** Styrr's last lesson: Bragð, the sword beam. */
+  st_bragd_learned: { t: 'bool' },
+  /** The rime across the gorge beyond the pass has melted (M6 opens the road north). */
+  st_rime_open: { t: 'bool' },
+  /** Sölvi taught Hlíf, the ward-song, once the pass was open. */
+  st_hlif_learned: { t: 'bool' },
+  /** The farm rebuilt so far: 1 the longhouse's roof, 2 the fold and byre (3–5 need ore, later). */
+  q_farm: { t: 'int', max: 5 },
+  /** Ask came home to Askdalr after the pass opened, into the Fimbulvetr. */
+  st_home_winter: { t: 'bool' },
+  /** Gyða told Ask the Rime King's binding was sworn on blood, and of her rune-record's lost leaves. */
+  st_blood_told: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -5,6 +5,7 @@ import { flag, not } from './util';
 export const HILDR: DialogueDef = {
   entry: [
     { when: not(flag('n_hildr_met')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { when: flag('st_barrow_open'), node: 'opened' },
     { when: not(flag('n_styrr_met')), node: 'styrr' },
@@ -48,6 +49,12 @@ export const HILDR: DialogueDef = {
       text: {
         en: 'The dead lie quiet since you came up out of the hill. I sleep with the door open now. Well, a little open.',
         sv: 'De döda ligger stilla sedan du kom upp ur kullen. Jag sover med dörren öppen nu. Nåja, lite öppen.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'The cold scattered my flock across the heath in one night. A farm with a whole fold could winter them. I have a hut and a dog.',
+        sv: 'Kölden skingrade min hjord över heden på en enda natt. En gård med en hel fålla kunde ta dem genom vintern. Jag har en koja och en hund.',
       },
     },
   },

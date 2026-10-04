@@ -5,6 +5,7 @@ import { flag, not } from './util';
 export const GEIRMUNDR: DialogueDef = {
   entry: [
     { when: not(flag('n_geirmundr_met')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { when: flag('st_barrow_open'), node: 'opened' },
     { node: 'day' },
@@ -47,6 +48,12 @@ export const GEIRMUNDR: DialogueDef = {
       text: {
         en: 'You came out. With nothing in your pockets? Then you are wiser than me, and luckier.',
         sv: 'Du kom ut. Utan något i fickorna? Då är du klokare än jag, och har mer tur.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'Frozen ground. You cannot dig frozen ground. Do you know what that does to a man in my trade?',
+        sv: 'Frusen mark. Man kan inte gräva i frusen mark. Vet du vad det gör med en man i min bransch?',
       },
     },
   },

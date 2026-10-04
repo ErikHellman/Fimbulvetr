@@ -1,5 +1,5 @@
 import type { ScreenDef, Thing } from '@core/world/screen';
-import { raidNight } from '../../dialogue/util';
+import { afterRaid, all, flag, not, raidNight } from '../../dialogue/util';
 
 /** The raid night: walls of fire close the yard except the road north to the gate. */
 const RAID: Thing[] = [
@@ -53,6 +53,37 @@ const LOGS: Thing[] = [
   })),
 ];
 
+/**
+ * What the raid left, until the farm is rebuilt: the longhouse's scorched turf (stage 1 mends it) and the
+ * burned fold (stage 2).
+ */
+const RUINS: Thing[] = [
+  ...[
+    [4, 3, 3, 1],
+    [13, 2, 2, 2],
+    [8, 5, 2, 1],
+  ].map(([x = 0, y = 0, w = 1, h = 1]): Thing => ({
+    k: 'scenery',
+    at: { x, y },
+    w,
+    h,
+    art: 'scorch',
+    shown: all(afterRaid, { k: 'flag', id: 'q_farm', lt: 1 }),
+  })),
+  ...[
+    [27, 4, 2, 1],
+    [29, 5, 2, 2],
+    [27, 6, 1, 1],
+  ].map(([x = 0, y = 0, w = 1, h = 1]): Thing => ({
+    k: 'scenery',
+    at: { x, y },
+    w,
+    h,
+    art: 'rubble',
+    shown: all(afterRaid, { k: 'flag', id: 'q_farm', lt: 2 }),
+  })),
+];
+
 export const askFarmyard: ScreenDef = {
   id: 'ask_farmyard',
   region: 'askdalr',
@@ -96,6 +127,16 @@ export const askFarmyard: ScreenDef = {
     },
     ...LOGS,
     ...RAID,
+    ...RUINS,
+    /** Home after the pass opened, into the Fimbulvetr. */
+    {
+      k: 'trigger',
+      at: { x: 0, y: 0 },
+      w: 40,
+      h: 22,
+      when: all(flag('st_pass_open'), not(flag('st_home_winter'))),
+      script: 'home_winter',
+    },
   ],
   map: [
     'TTTTTTTTTTTTTTTTTT,,,,TTTTTTTTTTTTTTTTTT',

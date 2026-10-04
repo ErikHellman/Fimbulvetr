@@ -163,6 +163,7 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'wheel':
       case 'warp':
       case 'seal':
+      case 'scenery':
         spawnFixtures(rt, thing, index, out);
         break;
       case 'door':

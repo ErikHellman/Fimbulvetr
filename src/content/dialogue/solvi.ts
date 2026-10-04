@@ -1,10 +1,14 @@
 import type { DialogueDef } from '@core/story/dialogue';
 import { all, flag, not } from './util';
 
+const HLIF = 120;
+
 /** Sölvi the rune-carver, among his standing stones. He teaches Ask Eldr, for a stave from Skeggi's kiln. */
 export const SOLVI: DialogueDef = {
   entry: [
     { when: not(flag('n_solvi_met')), node: 'meet' },
+    { when: all(flag('st_pass_open'), not(flag('st_hlif_learned'))), node: 'hlif' },
+    { when: flag('st_hlif_learned'), node: 'warded' },
     { when: all(flag('st_eldr_learned'), not(flag('q_rs2_mill'))), node: 'stone2' },
     { when: all(flag('st_stone2_lit'), not(flag('st_barrow_open'))), node: 'stone3' },
     { when: flag('st_eldr_learned'), node: 'after' },
@@ -13,6 +17,52 @@ export const SOLVI: DialogueDef = {
     { node: 'ask' },
   ],
   nodes: {
+    hlif: {
+      text: {
+        en: 'You felt it too: the cold came down like a lid. The runes went quiet all at once. All but one. Hlíf, the shelter-song. It wants to be sung now.',
+        sv: 'Du kände det också: kölden föll som ett lock. Runorna tystnade på en gång. Alla utom en. Hlíf, skyddssången. Den vill sjungas nu.',
+      },
+      choices: [
+        {
+          text: {
+            en: `Teach me Hlíf (${String(HLIF)} silver).`,
+            sv: `Lär mig Hlíf (${String(HLIF)} silver).`,
+          },
+          when: { k: 'silver', gte: HLIF },
+          do: [
+            { k: 'silver', n: -HLIF },
+            { k: 'learn', galdr: 'hlif' },
+            { k: 'set', flag: 'st_hlif_learned', value: true },
+            { k: 'sfx', id: 'sfx_ward' },
+          ],
+          next: 'hlif2',
+        },
+        {
+          text: { en: `Hlíf (${String(HLIF)} silver)…`, sv: `Hlíf (${String(HLIF)} silver)…` },
+          when: { k: 'not', c: { k: 'silver', gte: HLIF } },
+          next: 'hlif_poor',
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    hlif2: {
+      text: {
+        en: 'Sing it, and the runes stand round you like a ring of shields: three blows they take, whatever strikes them, and then they are spent. (Ready it in the pause menu.)',
+        sv: 'Sjung den, så står runorna runt dig som en ring av sköldar: tre slag tar de, vad som än slår, och sedan är de förbrukade. (Gör den redo i pausmenyn.)',
+      },
+    },
+    hlif_poor: {
+      text: {
+        en: 'The runes are free. The stone they are cut in is not, and neither is my supper.',
+        sv: 'Runorna är gratis. Stenen de ristas i är det inte, och inte heller min kvällsmat.',
+      },
+    },
+    warded: {
+      text: {
+        en: 'Keep Hlíf close this winter. Three blows are not many, but they are three more than the cold will give you.',
+        sv: 'Håll Hlíf nära den här vintern. Tre slag är inte många, men de är tre fler än kölden ger dig.',
+      },
+    },
     stone3: {
       text: {
         en: 'The third stone? The verse says: under the king who would not lie down. That is Konungshaugr in Haugar. Its door opens for a watcher, not a thief.',

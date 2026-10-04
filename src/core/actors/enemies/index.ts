@@ -18,6 +18,7 @@ import { HAUGBUI_MACHINE } from './haugbui';
 import { BOGDRAUGR_MACHINE } from './archer';
 import { HAUGVORDR_MACHINE } from './warden';
 import { KING_MACHINE } from './king';
+import { HUSCARL_MACHINE } from './huscarl';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -39,6 +40,7 @@ const MACHINES = {
   bogdraugr: BOGDRAUGR_MACHINE,
   haugvordr: HAUGVORDR_MACHINE,
   haugkonungr: KING_MACHINE,
+  huscarl: HUSCARL_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -67,6 +69,7 @@ const START: Readonly<Record<BehaviourId, string>> = {
   bogdraugr: 'rise',
   haugvordr: 'stand',
   haugkonungr: 'throne',
+  huscarl: 'stand',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

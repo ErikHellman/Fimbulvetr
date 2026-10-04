@@ -5,6 +5,7 @@ import { evening, flag, not } from './util';
 export const RAGNA: DialogueDef = {
   entry: [
     { when: not(flag('n_ragna_met')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'fimbul' },
     { when: evening, node: 'hall' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'hall' },
     { when: flag('n_bardr_met'), node: 'ferry' },
@@ -48,6 +49,12 @@ export const RAGNA: DialogueDef = {
       text: {
         en: 'Sailors drink to a fair wind. I drink to any wind at all. The air here has gone still and cold, lad.',
         sv: 'Sjöfolk dricker för god vind. Jag dricker för vilken vind som helst. Luften här har blivit stilla och kall, pojk.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'The bay froze in one breath, with three ships still in it. No sail leaves Uppvík before spring, if spring comes.',
+        sv: 'Viken frös på ett andetag, med tre skepp kvar i sig. Inget segel lämnar Uppvík före våren, om våren kommer.',
       },
     },
   },

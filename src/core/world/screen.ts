@@ -220,6 +220,18 @@ export type Thing =
       readonly art: GateArt;
       readonly closed: Cond;
     }
+  /**
+   * Scenery drawn over the map, tile by tile, when `shown` holds as the screen is entered (raid ruins
+   * until the farm is rebuilt). It never blocks the way.
+   */
+  | {
+      readonly k: 'scenery';
+      readonly at: TilePos;
+      readonly w: number;
+      readonly h: number;
+      readonly art: SceneryArt;
+      readonly shown: Cond;
+    }
   /** Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up. */
   | {
       readonly k: 'drop';
@@ -230,8 +242,11 @@ export type Thing =
       readonly do: readonly Effect[];
     };
 
-/** A gate's look: `slab` is a barrow's stone door. */
-export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab';
+/** Scenery that comes and goes with the story: what the raid left (scorched roofs, a burned fold, boarded doors). */
+export type SceneryArt = 'scorch' | 'rubble' | 'boards';
+
+/** A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass. */
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime';
 
 export interface ScreenDef {
   readonly id: ScreenId;

@@ -27,6 +27,7 @@ import { wareName } from '@shell/ui/wareText';
 import { gearLines } from '@shell/ui/gearText';
 import { fishPanel, type FishUi } from '@shell/ui/fishText';
 import { warpLines } from '@shell/ui/warpText';
+import { creditsRoll } from '@shell/ui/creditsText';
 import { GAME_H, GAME_W } from '@shell/scale';
 
 /** What PlayScene shares with the UI scene through the registry. */
@@ -123,6 +124,8 @@ export class UiScene extends Phaser.Scene {
   private choices!: Phaser.GameObjects.BitmapText;
   private card!: Phaser.GameObjects.Rectangle;
   private cardText!: Phaser.GameObjects.BitmapText;
+  /** The Rime King's breath: a white wave rolling down the screen as the pass opens. */
+  private breath!: Phaser.GameObjects.Graphics;
   private shop!: Phaser.GameObjects.BitmapText;
   private lastShown = '';
   private lastBlip = 0;
@@ -184,6 +187,7 @@ export class UiScene extends Phaser.Scene {
     this.galdrIcon = this.add.image(gx + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
     this.galdrLabel = this.text(gx + 8, 29, '', DIM);
     this.seidrBar = this.add.graphics();
+    this.breath = this.add.graphics();
     this.box = this.add.graphics();
     this.name = this.text(BOX.x + 12, BOX.y - 14, '', GOLD);
     this.body = this.text(BOX.x + 12, BOX.y + 10, '', PAPER);
@@ -541,6 +545,7 @@ export class UiScene extends Phaser.Scene {
     this.shop.setText('');
     this.card.setVisible(false);
     this.cardText.setText('');
+    this.breath.clear();
     if (ui === null) {
       this.lastShown = '';
       return;
@@ -557,6 +562,21 @@ export class UiScene extends Phaser.Scene {
     if (ui.k === 'fish') {
       this.lastShown = '';
       this.drawFish(ui, lang);
+      return;
+    }
+    if (ui.k === 'breath') {
+      this.lastShown = '';
+      this.drawBreath(ui.t / ui.of);
+      return;
+    }
+    if (ui.k === 'credits') {
+      this.lastShown = '';
+      const roll = creditsRoll(lang, ui.t, ui.of, GAME_H, LINE_HEIGHT);
+      const full = roll.lines.join('\n');
+      const widest = Math.max(...roll.lines.map((l) => textWidth(l)));
+      this.card.setVisible(true);
+      this.cardText.setText(centred(full, full.length));
+      this.cardText.setPosition(Math.round((GAME_W - widest) / 2), roll.y);
       return;
     }
     if (ui.k === 'warps') {
@@ -603,6 +623,17 @@ export class UiScene extends Phaser.Scene {
       this.panel(x, y, w, h);
       this.choices.setPosition(x + 8, y + 6).setText(lines.join('\n'));
     }
+  }
+
+  /**
+   * The breath at `p` (0…1) of its course: a white front sweeps down the screen, leaving a pale haze that
+   * thins as it passes.
+   */
+  private drawBreath(p: number): void {
+    const front = Math.round(Math.min(1, p * 1.6) * GAME_H);
+    const haze = 0.75 * (1 - p);
+    this.breath.fillStyle(0xf4fbff, haze).fillRect(0, 0, GAME_W, front);
+    if (p < 0.625) this.breath.fillStyle(0xffffff, 0.9).fillRect(0, Math.max(0, front - 18), GAME_W, 18);
   }
 
   private drawShop(ui: Extract<StoryUi, { k: 'shop' }>, lang: Lang): void {

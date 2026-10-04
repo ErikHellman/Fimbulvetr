@@ -1,11 +1,11 @@
 import type { DialogueDef } from '@core/story/dialogue';
 import { flag, not } from './util';
 
-/** Bárðr the ferryman rows nobody toward the mountains until the pass is open. */
+/** Bárðr the ferryman rows nobody toward the mountains; once the pass opens, the lake is ice. */
 export const BARDR: DialogueDef = {
   entry: [
     { when: not(flag('n_bardr_met')), node: 'meet' },
-    { when: flag('st_pass_open'), node: 'rows' },
+    { when: flag('st_pass_open'), node: 'frozen' },
     { when: { k: 'season', is: 'winter' }, node: 'winter' },
     { node: 'day' },
   ],
@@ -43,10 +43,10 @@ export const BARDR: DialogueDef = {
         sv: 'Ser du hur rännan ångar? De varma källorna håller den öppen, det enda vattnet på sjön som inte fryser. Båten ligger i den som ett ägg i ett bo.',
       },
     },
-    rows: {
+    frozen: {
       text: {
-        en: 'The pass is open, you say? Then the cold has somewhere else to go. Soon, lad. Soon I row.',
-        sv: 'Passet är öppet, säger du? Då har kylan någon annanstans att ta vägen. Snart, pojk. Snart ror jag.',
+        en: 'The lake froze in one night. I will not row on that, and I will not walk it yet.',
+        sv: 'Sjön frös på en natt. Jag ror inte på den där, och jag går inte på den än.',
       },
     },
   },

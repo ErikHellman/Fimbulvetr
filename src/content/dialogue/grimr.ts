@@ -26,7 +26,12 @@ const BEFORE: DialogueDef = daily(
 
 /** Grímr keeps the north gate. After the raid he opens it once Gyða has spoken. */
 export const GRIMR: DialogueDef = {
-  entry: [{ when: flag('st_legend_told'), node: 'open' }, { when: afterRaid, node: 'shut' }, ...BEFORE.entry],
+  entry: [
+    { when: flag('st_pass_open'), node: 'fimbul' },
+    { when: flag('st_legend_told'), node: 'open' },
+    { when: afterRaid, node: 'shut' },
+    ...BEFORE.entry,
+  ],
   nodes: {
     ...BEFORE.nodes,
     shut: {
@@ -39,6 +44,12 @@ export const GRIMR: DialogueDef = {
       text: {
         en: 'The gate is open. Keep to the road through Myrkviðr, and bring them back, Ask.',
         sv: 'Porten är öppen. Håll dig till vägen genom Myrkviðr, och för hem dem, Ask.',
+      },
+    },
+    fimbul: {
+      text: {
+        en: 'The gate freezes shut every night, and every morning I chip it free. Gyða says that is what the gods made watchmen for.',
+        sv: 'Porten fryser igen varje natt, och varje morgon hackar jag loss den. Gyða säger att det är därför gudarna skapade väktare.',
       },
     },
   },

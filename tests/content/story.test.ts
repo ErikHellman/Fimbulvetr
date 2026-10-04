@@ -41,9 +41,11 @@ const CONTENT = {
   fish: DB.fish,
 };
 
-/** Flags read now and set by a later milestone's content (the pass opens at the end of Act I, M5). */
-/** Declared ahead of the milestone that sets them: the pass (M5) and the third stone (M4b). */
-const SET_LATER = new Set(['st_pass_open']);
+/**
+ * Flags read now and set by a later milestone's content: the rime beyond the pass melts in M6, and the farm
+ * is rebuilt in M5b.
+ */
+const SET_LATER = new Set(['st_rime_open', 'q_farm']);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {

@@ -5,6 +5,7 @@ import { flag, not } from './util';
 export const HALLSTEINN: DialogueDef = {
   entry: [
     { when: not(flag('n_hallsteinn_met')), node: 'meet' },
+    { when: flag('st_pass_open'), node: 'open' },
     { when: flag('st_stone3_lit'), node: 'three' },
     { when: flag('st_stone2_lit'), node: 'two' },
     { node: 'seals' },
@@ -28,6 +29,12 @@ export const HALLSTEINN: DialogueDef = {
       text: {
         en: 'Two seals burning. I have watched this door forty winters and never seen one. The third stone is under Konungshaugr, they say.',
         sv: 'Två sigill som brinner. Jag har vaktat denna dörr i fyrtio vintrar och aldrig sett ett enda. Den tredje stenen ligger under Konungshaugr, sägs det.',
+      },
+    },
+    open: {
+      text: {
+        en: 'The door was the easy part. That ice up the gorge is the King’s own breath, and it will not melt for a summer. Go home, lad. Look to your people. I will watch it.',
+        sv: 'Dörren var det lätta. Isen uppe i klyftan är Konungens egen andedräkt, och den smälter inte för en sommar. Gå hem, grabben. Se till ditt folk. Jag vaktar den.',
       },
     },
     three: {

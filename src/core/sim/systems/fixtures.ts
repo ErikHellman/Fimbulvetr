@@ -40,6 +40,7 @@ const KINDS: Readonly<
   bridge: { solid: 'never', walk: 'on', anims: ['down', 'up'] },
   gate: { solid: 'on', anims: ['closed', 'open'] },
   fire: { solid: 'never', anims: ['burn', 'out'] },
+  scenery: { solid: 'never' },
   chest: { solid: 'on' },
   crack: { solid: 'on', anims: ['closed', 'open'] },
   lock: { solid: 'on', anims: ['closed', 'open'] },
@@ -105,6 +106,22 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       out.push(e);
       return;
     }
+    case 'scenery':
+      // Spawned only while shown: it changes with the story between visits, never in front of Ask.
+      if (!evalCond(thing.shown, condCtx(rt))) return;
+      for (let y = 0; y < thing.h; y++)
+        for (let x = 0; x < thing.w; x++) {
+          const e = fixture(
+            rt.newId(),
+            'scenery',
+            `fix_${thing.art}`,
+            { x: thing.at.x + x, y: thing.at.y + y },
+            index,
+          );
+          setAnim(e, 'idle');
+          out.push(e);
+        }
+      return;
     case 'gate':
     case 'fire':
     case 'lock':

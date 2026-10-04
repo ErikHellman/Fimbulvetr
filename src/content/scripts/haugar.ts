@@ -162,7 +162,6 @@ const stone3Light: ScriptDef = {
     },
     { k: 'warp', screen: 'hau_king', at: { x: 20, y: 12 }, facing: 's' },
     { k: 'fade', out: false },
-    { k: 'card', text: { en: 'To be continued.', sv: 'Fortsättning följer.' } },
   ],
 };
 
