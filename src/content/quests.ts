@@ -709,6 +709,33 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_burbot: {
+    id: 'q_burbot',
+    name: { en: 'A fish under the ice', sv: 'En fisk under isen' },
+    stages: [
+      {
+        when: flag('q_burbot_asked'),
+        text: {
+          en: 'Eyvindr wants a burbot from the hole in the ice off Uppvík’s jetty. Winter only, after dark.',
+          sv: 'Eyvindr vill ha en lake ur vaken i isen vid Uppvíks brygga. Bara på vintern, efter mörkrets inbrott.',
+        },
+      },
+      {
+        when: flag('q_burbot_caught'),
+        text: {
+          en: 'A burbot landed through the ice. Tell Eyvindr on the jetty.',
+          sv: 'En lake uppdragen genom isen. Berätta för Eyvindr på bryggan.',
+        },
+      },
+      {
+        when: flag('q_burbot_done'),
+        text: {
+          en: 'Eyvindr’s bay still lives. He gave Ask a piece of heart.',
+          sv: 'Eyvindrs vik lever ännu. Han gav Ask en bit hjärta.',
+        },
+      },
+    ],
+  },
   q_axes: {
     id: 'q_axes',
     name: { en: 'The axe range', sv: 'Yxbanan' },

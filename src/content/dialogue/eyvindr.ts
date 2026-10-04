@@ -1,16 +1,59 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { evening, flag, not } from './util';
+import { all, evening, flag, not } from './util';
 
 /** Eyvindr fishes off the jetty by day and tells stories in the mead hall by night. */
 export const EYVINDR: DialogueDef = {
   entry: [
     { when: not(flag('n_eyvindr_met')), node: 'meet' },
+    { when: flag('q_burbot_done'), node: 'burbot_after' },
+    { when: all(flag('q_burbot_asked'), flag('q_burbot_caught')), node: 'burbot' },
+    { when: flag('q_burbot_asked'), node: 'burbot_wait' },
+    { when: all(flag('st_pass_open'), not(evening)), node: 'burbot_ask' },
     { when: evening, node: 'night' },
     { when: flag('n_kari_met'), node: 'kari' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { node: 'day' },
   ],
   nodes: {
+    burbot_ask: {
+      text: {
+        en: 'Frozen to the bottom, they say. Not my bay. Under the ice the burbot are spawning, the only fish that loves the cold.',
+        sv: 'Bottenfrusen, säger de. Inte min vik. Under isen leker lakerna, den enda fisken som älskar kylan.',
+      },
+      next: 'burbot_ask2',
+    },
+    burbot_ask2: {
+      text: {
+        en: 'I cut a hole off the jetty’s end, but my hands are too cold to feel a bite. They take the bait after dark. Land me one?',
+        sv: 'Jag högg upp en vak vid bryggans ände, men mina händer är för kalla för att känna ett napp. De tar betet efter mörkrets inbrott. Drar du upp en åt mig?',
+      },
+      do: [
+        { k: 'set', flag: 'q_burbot_asked', value: true },
+        { k: 'set', flag: 'q_burbot_caught', value: false },
+      ],
+    },
+    burbot_wait: {
+      text: {
+        en: 'The hole off the jetty’s end, in winter, after dark. Strike when the float goes under, and do not haul against a running fish.',
+        sv: 'Vaken vid bryggans ände, på vintern, efter mörkrets inbrott. Hugg när flötet går under, och dra inte emot en fisk som rusar.',
+      },
+    },
+    burbot: {
+      text: {
+        en: 'A burbot, out of my frozen bay! Then the bay still lives, whatever the mountain says. Here, I found this in a net once. It is yours.',
+        sv: 'En lake, ur min frusna vik! Då lever viken ännu, vad berget än säger. Här, den här hittade jag i ett nät en gång. Den är din.',
+      },
+      do: [
+        { k: 'set', flag: 'q_burbot_done', value: true },
+        { k: 'piece', id: 'hp_upp_bay' },
+      ],
+    },
+    burbot_after: {
+      text: {
+        en: 'I fish the hole myself now, in two pairs of mittens. Nothing yet. But something.',
+        sv: 'Jag fiskar i vaken själv nu, i två par vantar. Ingenting än. Men något.',
+      },
+    },
     kari: {
       text: {
         en: 'You met old Kári down in Mýrland? He says his pike weighs as much as a calf. Liar. It weighs as much as two.',

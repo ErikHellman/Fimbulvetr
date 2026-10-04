@@ -74,6 +74,8 @@ export const FISH_DEFS = {
     pull: 9,
     run: 6,
     surge: 10,
+    /** Eyvindr's burbot (`q_burbot`); his ask clears it, so only one landed after counts. */
+    onLand: [{ k: 'set', flag: 'q_burbot_caught', value: true }],
   },
   salmon: {
     id: 'salmon',

@@ -272,6 +272,43 @@ const amberMud = amberSite(
   },
 );
 
+/** Eyvindr's hole in the bay ice off the jetty's end: fish it in winter, once he has asked (`q_burbot`). */
+const iceHole: ScriptDef = {
+  steps: [
+    {
+      k: 'if',
+      when: { k: 'flag', id: 'q_burbot_asked' },
+      then: [
+        {
+          k: 'if',
+          when: { k: 'season', is: 'winter' },
+          then: [{ k: 'fish', float: { x: 30, y: 9 } }],
+          else: [
+            {
+              k: 'say',
+              who: null,
+              text: {
+                en: 'Open water laps at the jetty. Eyvindr’s hole in the ice will come back with the winter.',
+                sv: 'Öppet vatten skvalpar mot bryggan. Eyvindrs vak i isen kommer tillbaka med vintern.',
+              },
+            },
+          ],
+        },
+      ],
+      else: [
+        {
+          k: 'say',
+          who: null,
+          text: {
+            en: 'Grey water off the jetty’s end, or grey ice. Eyvindr watches it like a dog watches a door.',
+            sv: 'Grått vatten vid bryggans ände, eller grå is. Eyvindr vaktar det som en hund vaktar en dörr.',
+          },
+        },
+      ],
+    },
+  ],
+};
+
 const TARGETS = ['q_axe_t1', 'q_axe_t2', 'q_axe_t3', 'q_axe_t4', 'q_axe_t5'] as const;
 
 /** Ketill's range: the targets reset, the axes back on the rack, and the sand turned. */
@@ -344,11 +381,13 @@ export const LOWLAND_SCRIPTS: Readonly<
     | 'axes_lost'
     | 'amber_reeds'
     | 'amber_peat'
-    | 'amber_mud',
+    | 'amber_mud'
+    | 'ice_hole',
     ScriptDef
   >
 > = {
   amber_reeds: amberReeds,
+  ice_hole: iceHole,
   amber_peat: amberPeat,
   amber_mud: amberMud,
   axes_start: axesStart,

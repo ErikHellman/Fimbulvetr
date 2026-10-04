@@ -213,6 +213,10 @@ export const FLAGS = {
   q_amber_peat: { t: 'bool' },
   q_amber_mud: { t: 'bool' },
   q_amber_done: { t: 'bool' },
+  /** Eyvindr's burbot (`q_burbot`): asked, one landed since, and his thanks. */
+  q_burbot_asked: { t: 'bool' },
+  q_burbot_caught: { t: 'bool' },
+  q_burbot_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

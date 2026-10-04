@@ -61,6 +61,8 @@ export const uppSmiths: ScreenDef = {
       script: 'axes_start',
       when: { k: 'flag', id: 'ev_axes_on' },
     },
+    /** Off the jetty's end: Eyvindr's ice hole, for his burbot (`q_burbot`). */
+    { k: 'use', at: { x: 30, y: 10 }, script: 'ice_hole' },
     /** Ketill's anvil: his shop by day, unless rain drives him indoors. */
     {
       k: 'use',
