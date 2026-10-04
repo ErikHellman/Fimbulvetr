@@ -8,6 +8,7 @@ import { coverAt } from '@core/world/cover';
 import { Harness, frameOf } from './harness';
 import { crossTo, face, talkTo, walkTo } from './walk';
 import { tileFeet } from '@core/world/screen';
+import { freezeAround } from '@core/sim/systems/is';
 
 /** At the cairns pool's north shore in summer, an Ís stave readied in slot K (two carried). */
 function byThePool(): Harness {
@@ -62,6 +63,21 @@ describe('an Ís rune-stave', () => {
     h.idle(10);
     crossTo(h, 'w', 'nif_cairns');
     expect(iceAt(h, 17, 6)).toBe(false);
+  });
+
+  it('never ices the screen’s outer ring, so nobody walks out over a seam onto open water', () => {
+    const map = Array.from({ length: 22 }, (_, y) => (y < 3 ? '~'.repeat(40) : '.'.repeat(40)));
+    const db: ContentDb = {
+      ...DB,
+      screens: { ...DB.screens, test_a: { ...DB.screens.test_a, map, things: [] } },
+    };
+    const h = new Harness({ db, tile: [5, 10] });
+    expect(freezeAround(h.sim, 5, 1)).toBe(true);
+    expect([iceAt(h, 4, 1), iceAt(h, 5, 2), iceAt(h, 6, 1)]).toEqual([true, true, true]);
+    expect([iceAt(h, 4, 0), iceAt(h, 5, 0), iceAt(h, 6, 0)]).toEqual([false, false, false]);
+    freezeAround(h.sim, 0, 1);
+    expect(iceAt(h, 0, 1)).toBe(false);
+    expect(iceAt(h, 1, 1)).toBe(true);
   });
 
   it('never freezes running or black water', () => {

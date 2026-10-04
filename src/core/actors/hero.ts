@@ -26,6 +26,8 @@ export type HeroMode =
   | 'shoot'
   | 'cast'
   | 'chain'
+  | 'swim'
+  | 'dive'
   | 'dying';
 
 export interface HeroCtx {
@@ -38,6 +40,8 @@ export interface HeroCtx {
   readonly dash: boolean;
   /** Ticks after a roll before the next (the arm-ring of stamina shortens it). */
   readonly rollCooldown: number;
+  /** Ask's feet are on open deep water, with the seal-skin to swim it. */
+  readonly wet: boolean;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -65,6 +69,10 @@ function swing(e: Entity, c: HeroCtx, anim: string, sound: 'sfx_swing' | 'sfx_sp
 
 const move: HeroDef = {
   tick(e, c) {
+    if (c.wet) {
+      c.emit({ t: 'sfx', id: 'sfx_splash' });
+      return 'swim';
+    }
     if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'roll';
     if (wasPressed(c.input, 'sword') && c.armed) return 'attack';
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
@@ -197,6 +205,36 @@ const roll: HeroDef = {
   },
 };
 
+/** Swimming with the seal-skin: slower than walking, and no hand free for the sword, shield or items. */
+const swim: HeroDef = {
+  enter(e) {
+    setAnim(e, 'swim');
+  },
+  tick(e, c) {
+    if (!c.wet) return 'move';
+    if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'dive';
+    steer(e, c, c.tuning.hero.swimSpeed, true);
+    setAnim(e, 'swim');
+    return undefined;
+  },
+};
+
+/** Under the water for `diveTicks`: blows pass over, surges do not carry, and the bottom can be searched. */
+const dive: HeroDef = {
+  enter(e, c) {
+    setAnim(e, 'dive');
+    c.emit({ t: 'sfx', id: 'sfx_dive' });
+  },
+  tick(e, c) {
+    steer(e, c, c.tuning.hero.swimSpeed, true);
+    if (e.fsm.t < c.tuning.hero.diveTicks - 1) return undefined;
+    return c.wet ? 'swim' : 'move';
+  },
+  exit(e, c) {
+    e.mem['rollCd'] = c.rollCooldown;
+  },
+};
+
 /** The dash thrust: the roll becomes a lunge along Ask's facing, the blade held out in front. */
 const thrust: HeroDef = {
   enter(e, c) {
@@ -225,7 +263,7 @@ const shield: HeroDef = {
     setAnim(e, 'shield');
   },
   tick(e, c) {
-    if (!isHeld(c.input, 'shield')) return 'move';
+    if (!isHeld(c.input, 'shield') || c.wet) return 'move';
     if (wasPressed(c.input, 'sword')) return 'attack';
     if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'roll';
     steer(e, c, c.tuning.hero.shieldSpeed, false);
@@ -362,6 +400,8 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   shoot,
   cast,
   chain,
+  swim,
+  dive,
   dying,
 };
 

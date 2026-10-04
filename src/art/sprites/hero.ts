@@ -4,7 +4,7 @@ import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
 import { outline } from '../outline';
 import { C } from '../palette';
-import { createRaster, flipX, hex, type Raster } from '../raster';
+import { createRaster, flipX, hex, setPixel, type Raster } from '../raster';
 import type { SpriteFrame } from './types';
 
 const P = {
@@ -263,6 +263,37 @@ function drawRoll(i: number): Raster {
   return outline(r, P.ink, 2);
 }
 
+/** The water's edge on a swimmer: everything below `WATERLINE` is under, and a ripple ring circles Ask. */
+const WATERLINE = 21;
+
+function waterline(r: Raster, i: number): Raster {
+  for (let y = WATERLINE; y < r.h; y++) for (let x = 0; x < r.w; x++) setPixel(r, x, y, [0, 0, 0, 0]);
+  const ring = hex(C.waterLight);
+  const rx = 9 + (i % 2);
+  for (let x = -rx; x <= rx; x++) {
+    const dy = Math.round(2.5 * Math.sqrt(Math.max(0, 1 - (x * x) / (rx * rx))));
+    setPixel(r, 16 + x, WATERLINE + dy, ring);
+    if (Math.abs(x) > rx - 3) setPixel(r, 16 + x, WATERLINE - dy, ring);
+  }
+  return r;
+}
+
+/** Diving: rings spreading where Ask went under, and bubbles rising. */
+function drawDive(i: number): Raster {
+  const r = createRaster(SMALL, SMALL);
+  const ring = hex(C.waterLight);
+  const shade = hex(C.waterShade);
+  const rx = 5 + i * 2;
+  for (let x = -rx; x <= rx; x++) {
+    const dy = Math.round(rx * 0.5 * Math.sqrt(Math.max(0, 1 - (x * x) / (rx * rx))));
+    setPixel(r, 16 + x, 24 + dy, ring);
+    setPixel(r, 16 + x, 24 - dy, i === 0 ? ring : shade);
+  }
+  setPixel(r, 15, 20 - i * 2, ring);
+  setPixel(r, 18, 18 - i * 2, ring);
+  return r;
+}
+
 /** Ask lying on his side, knocked out: head west, boots east. */
 function drawFallen(): Raster {
   const r = createRaster(SMALL, SMALL);
@@ -414,6 +445,17 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
           LARGE,
         ),
       );
+    // Swimming: head and shoulders over a ripple ring, the arms stroking.
+    for (let i = 0; i < 4; i++)
+      add(
+        'swim',
+        side,
+        i,
+        waterline(
+          drawPose({ side, phase: 0, shield: 'none', arms: i % 2 === 0 ? 'forward' : 'down' }, SMALL),
+          i,
+        ),
+      );
     for (const anim of ['attack1', 'attack2', 'attack3'] as const) {
       ATTACK_ARCS[side][anim].forEach((dir, i) => {
         add(anim, side, i, drawPose({ side, phase: 0, shield: RESTING_KIT[side], sword: dir, blade }, LARGE));
@@ -443,6 +485,7 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
     out.push(frame(`${art}_dying_s_${i}`, mirror ? flipX(r) : r));
   });
   out.push(frame(`${art}_dying_s_5`, drawFallen()));
+  for (let i = 0; i < 2; i++) out.push(frame(`${art}_dive_s_${i}`, drawDive(i)));
   return out;
 }
 
@@ -470,6 +513,8 @@ export const HERO_ANIMS = {
   cast: { frames: 3, fps: 10, loop: false, dirs: ALL },
   bow: { frames: 2, fps: 8, loop: false, dirs: ALL },
   fish: { frames: 2, fps: 2, loop: true, dirs: ALL },
+  swim: { frames: 4, fps: 6, loop: true, dirs: ALL },
+  dive: { frames: 2, fps: 4, loop: true, dirs: ['s'] },
   /** Spins through the four facings and falls; held on the last frame. */
   dying: { frames: 6, fps: 8, loop: false, dirs: ['s'] },
 } satisfies Record<string, AnimDef>;

@@ -15,12 +15,18 @@ export { PIECES_PER_HEART } from '../../story/effects';
 /** Dropped hearts and silver vanish after this many ticks (10 s); the view blinks them near the end. */
 export const DROP_TICKS = 600;
 
-export function createPiece(id: number, pos: Vec, thingIndex: number, def = 'heart_piece'): Entity {
+export function createPiece(
+  id: number,
+  pos: Vec,
+  thingIndex: number,
+  def = 'heart_piece',
+  art = `pickup_${def}`,
+): Entity {
   const e = createEntity({
     id,
     kind: 'pickup',
     def,
-    art: `pickup_${def}`,
+    art,
     pos,
     facing: 's',
     body: { x: -6, y: -10, w: 12, h: 10 },
@@ -104,6 +110,7 @@ export function collectPickups(rt: SimRt): void {
     const hidden = mem(e, 'wait') === 1 || hiddenByCover(rt, e) ? 1 : 0;
     if (mem(e, 'hidden') !== hidden) e.mem['hidden'] = hidden;
     if (hidden === 1) continue;
+    if (mem(e, 'sunk') === 1 && rt.hero.fsm.s !== 'dive') continue;
     if (!overlaps(heroBox, at(e.body, e.pos))) {
       if (mem(e, 'ttl') > 0) {
         e.mem['ttl'] = mem(e, 'ttl') - 1;

@@ -76,13 +76,22 @@ export const TERRAIN_IDS = [
   'snag',
   'mire',
   'drowned_path',
+  /** Sævatn (M7a): currents a swimmer is carried by, and surges only a diver crosses. */
+  'current_n',
+  'current_e',
+  'current_s',
+  'current_w',
+  'surge_n',
+  'surge_e',
+  'surge_s',
+  'surge_w',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
 export const TERRAIN = {
   grass: { solid: false },
   path: { solid: false },
-  water: { solid: true, low: true },
+  water: { solid: true, low: true, swim: true },
   rock: { solid: true },
   tree: { solid: true, decor: { art: ['decor_tree', 'decor_pine'], w: 1, h: 1 } },
   /** A low bank you can hop down (south) but not climb. */
@@ -165,7 +174,7 @@ export const TERRAIN = {
   /** White water over stones: too fast to wade, and it never freezes (the boomerang flies over it). */
   rapids: { solid: true, low: true },
   /** Warm spring water, steaming: no footing, and no winter ever freezes it. */
-  spring: { solid: true, low: true },
+  spring: { solid: true, low: true, swim: true },
   /** A gravel shoal across a river: wadeable, slow, and under the spring flood (see COVER_DEFS.flood). */
   shoal: { solid: false, slow: 0.7 },
   /** Cut peat banks: dark, soft ground. */
@@ -216,4 +225,14 @@ export const TERRAIN = {
   mire: { solid: false },
   /** A drowned causeway just under the black water: sound underfoot, but only light shows it. */
   drowned_path: { solid: false, hidden: true },
+  /** Lake water running one way: it carries a swimmer along and never freezes. */
+  current_n: { solid: true, low: true, swim: true, current: 'n' },
+  current_e: { solid: true, low: true, swim: true, current: 'e' },
+  current_s: { solid: true, low: true, swim: true, current: 's' },
+  current_w: { solid: true, low: true, swim: true, current: 'w' },
+  /** A surge: faster than anyone swims; only a diver passes under it. */
+  surge_n: { solid: true, low: true, swim: true, current: 'n', strong: true },
+  surge_e: { solid: true, low: true, swim: true, current: 'e', strong: true },
+  surge_s: { solid: true, low: true, swim: true, current: 's', strong: true },
+  surge_w: { solid: true, low: true, swim: true, current: 'w', strong: true },
 } as const satisfies Record<TerrainId, TerrainDef>;

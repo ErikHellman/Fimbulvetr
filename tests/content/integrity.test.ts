@@ -196,6 +196,39 @@ describe('world layout', () => {
       }
     },
   );
+
+  // With the seal-skin: a swimmer crossing a seam must come out in water or on ground, never in a wall.
+  it('lets a swimmer out of every seam it can swim into', () => {
+    const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
+    const open = (id: ScreenId): ((x: number, y: number) => boolean) => {
+      const grid = parseTextMap(SCREENS[id].map, LEGEND);
+      return (x, y) => {
+        const t = cellAt(grid, x, y);
+        return t !== undefined && (!TERRAIN[t].solid || DB.terrain[t].swim === true);
+      };
+    };
+    const swim = (id: ScreenId): ((x: number, y: number) => boolean) => {
+      const grid = parseTextMap(SCREENS[id].map, LEGEND);
+      return (x, y) => {
+        const t = cellAt(grid, x, y);
+        return t !== undefined && DB.terrain[t].swim === true;
+      };
+    };
+    for (const id of SCREEN_IDS) {
+      for (const [dir, other] of [
+        ['e', neighbourOf(index, id, 'e')],
+        ['s', neighbourOf(index, id, 's')],
+      ] as const) {
+        if (other === null) continue;
+        const n = dir === 'e' ? SCREEN_ROWS : SCREEN_COLS;
+        for (let k = 0; k < n; k++) {
+          const [hx, hy, tx, ty] = dir === 'e' ? [SCREEN_COLS - 1, k, 0, k] : [k, SCREEN_ROWS - 1, k, 0];
+          if (swim(id)(hx, hy)) expect(open(other)(tx, ty), `${id} → ${other} at ${String(k)}`).toBe(true);
+          if (swim(other)(tx, ty)) expect(open(id)(hx, hy), `${other} → ${id} at ${String(k)}`).toBe(true);
+        }
+      }
+    }
+  });
 });
 
 describe('the sleeping dead', () => {

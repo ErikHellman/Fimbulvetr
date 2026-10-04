@@ -5,7 +5,7 @@ import { at } from '../../math/box';
 import type { Vec } from '../../math/vec';
 import { ledgeHop } from '../../world/collision';
 import type { SimRt } from '../rt';
-import { heroSolidAt } from './movement';
+import { heroSolidAt, wet } from './movement';
 
 export function heroCtx(rt: SimRt, input: InputFrame): HeroCtx {
   return {
@@ -18,6 +18,7 @@ export function heroCtx(rt: SimRt, input: InputFrame): HeroCtx {
       rt.state.inv.ring === 'ring_stamina'
         ? Math.ceil(rt.db.tuning.hero.rollCooldown * rt.db.tuning.rings.staminaRoll)
         : rt.db.tuning.hero.rollCooldown,
+    wet: wet(rt),
     ledgeHop: (dir) => ledgeHop(rt.screen.collision, at(rt.hero.body, rt.hero.pos), dir, heroSolidAt(rt)),
     emit: (ev) => {
       rt.emit(ev);

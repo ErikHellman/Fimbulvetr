@@ -4,6 +4,7 @@ import type { ContentDb } from '@core/sim/db';
 import type { Thing } from '@core/world/screen';
 import { mem } from '@core/actors/entity';
 import { RAFT } from '@core/sim/systems/raft';
+import { LOW, SOLID } from '@core/world/collision';
 import { Harness } from './harness';
 import { heroTile, walkTo } from './walk';
 
@@ -30,7 +31,7 @@ describe('a raft', () => {
       [10, 10],
       [11, 10],
     ] as const)
-      expect(g.flags[y * g.cols + x], `${String(x)},${String(y)}`).toBe(0);
+      expect((g.flags[y * g.cols + x] ?? 0) & (SOLID | LOW), `${String(x)},${String(y)}`).toBe(0);
   });
 
   it('rests at its stop as footing, then sets off and rests at the far stop', () => {

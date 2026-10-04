@@ -144,7 +144,11 @@ function hook(rt: SimRt, e: Entity, box: Box): void {
     return;
   }
   const pickup = rt.actors.find(
-    (a) => a.kind === 'pickup' && mem(a, 'hidden') !== 1 && overlaps(box, at(a.body, a.pos)),
+    (a) =>
+      a.kind === 'pickup' &&
+      mem(a, 'hidden') !== 1 &&
+      mem(a, 'sunk') !== 1 &&
+      overlaps(box, at(a.body, a.pos)),
   );
   if (pickup !== undefined) {
     e.mem['fetch'] = pickup.id;

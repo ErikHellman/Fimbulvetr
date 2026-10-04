@@ -141,8 +141,13 @@ function spawnThings(rt: SimRt): Entity[] {
         break;
       }
       case 'piece':
-        if (!rt.state.world.pieces.includes(thing.id))
-          out.push(createPiece(rt.newId(), tileFeet(thing.at), index));
+        if (!rt.state.world.pieces.includes(thing.id)) {
+          // On the bottom under a ripple: only a diver brings it up (see `collectPickups`).
+          const art = thing.sunk === true ? 'fix_ripple' : undefined;
+          const e = createPiece(rt.newId(), tileFeet(thing.at), index, 'heart_piece', art);
+          if (thing.sunk === true) e.mem['sunk'] = 1;
+          out.push(e);
+        }
         break;
       case 'heart':
         if (!rt.state.world.opened.includes(thing.id))

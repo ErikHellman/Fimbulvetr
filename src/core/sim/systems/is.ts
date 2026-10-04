@@ -62,7 +62,8 @@ function stillWater(rt: SimRt, i: number): boolean {
 
 /**
  * Lays Ís ice (`is_ice`, walkable) on the still water in the 3×3 tiles around a tile. Running water,
- * black water and fords never freeze. The ice is not saved: it thaws when Ask leaves the screen.
+ * black water and fords never freeze, nor does the screen's outer ring. The ice is not saved: it thaws when
+ * Ask leaves the screen.
  * Returns whether any water froze.
  */
 export function freezeAround(rt: SimRt, tx: number, ty: number): boolean {
@@ -71,7 +72,8 @@ export function freezeAround(rt: SimRt, tx: number, ty: number): boolean {
   let froze = false;
   for (let y = ty - 1; y <= ty + 1; y++)
     for (let x = tx - 1; x <= tx + 1; x++) {
-      if (x < 0 || y < 0 || x >= g.cols || y >= g.rows) continue;
+      // Never the outer ring: ice there would let Ask walk out over a seam onto the next screen's open water.
+      if (x < 1 || y < 1 || x >= g.cols - 1 || y >= g.rows - 1) continue;
       const i = y * g.cols + x;
       if (!stillWater(rt, i)) continue;
       g.kind[i] = kind;

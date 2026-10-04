@@ -43,6 +43,12 @@ export interface HeroTuning {
   readonly parryTicks: number;
   /** Ticks a parried foe stands stunned (a boss half as long). */
   readonly parryStun: number;
+  /** Swimming pace (px a tick) with the seal-skin, and how long a dive lasts (ticks). */
+  readonly swimSpeed: number;
+  readonly diveTicks: number;
+  /** How hard a current pushes a swimmer (px a tick), and a surge (more than anyone swims). */
+  readonly current: number;
+  readonly strongCurrent: number;
   readonly body: Box;
   readonly hurt: Box;
 }

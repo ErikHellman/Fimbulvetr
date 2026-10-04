@@ -137,6 +137,8 @@ export type Thing =
       readonly when?: Cond;
       readonly learn?: GaldrId;
       readonly text?: L10n;
+      /** On the bottom of deep water under a ripple: a dive over it takes it, never interact. */
+      readonly sunk?: true;
     }
   /** A heart container, taken once ever (saved in `world.opened`); hidden until `when` and `appear` hold. */
   | {
@@ -220,7 +222,7 @@ export type Thing =
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
-  | { readonly k: 'piece'; readonly id: string; readonly at: TilePos }
+  | { readonly k: 'piece'; readonly id: string; readonly at: TilePos; readonly sunk?: true }
   /**
    * A herb that grows in one season: walking over it picks `item`, and it stays gone until that season
    * comes round again (`world.vars[id]` holds the season epoch it was picked in, plus one).

@@ -25,6 +25,12 @@ export interface TerrainDef {
   readonly hidden?: boolean;
   /** Its footing follows the screen's water level (see world/water.ts); the terrain itself is as at level 0. */
   readonly rise?: TerrainRise;
+  /** Deep water a swimmer crosses (with the seal-skin): `buildCollision` marks it `DEEP`. */
+  readonly swim?: boolean;
+  /** A current that pushes a swimmer this way. */
+  readonly current?: Dir4;
+  /** A surge: it pushes harder than anyone swims, and passes over a diver. */
+  readonly strong?: boolean;
 }
 
 /** How a terrain answers the water level: flooded from level `floods` up, or afloat from `floats` up. */

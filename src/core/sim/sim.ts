@@ -36,6 +36,7 @@ import type { Command } from './commands';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
 import type { Entry, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
+import { takeSunkChest } from './systems/chests';
 import { tickWorldClock } from './systems/clock';
 import { killEnemy, resolveAttacks, resolveSword } from './systems/combat';
 import { coverFor, cutCover, refreshCover } from './systems/cover';
@@ -410,6 +411,7 @@ export class Sim implements SimRt {
     pushBlocks(this, input);
     stepProjectiles(this);
     collectPickups(this);
+    takeSunkChest(this);
     settleCritters(this);
     stepProps(this, input);
     stepBombs(this);

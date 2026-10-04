@@ -6,7 +6,7 @@ import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { dungeonOf } from '../../state/dungeons';
 import { evalCond } from '../../story/cond';
-import { LOW, SOLID } from '../../world/collision';
+import { DEEP, LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import { tileFeet, type Thing, type TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
@@ -82,7 +82,14 @@ function fixture(id: number, def: string, art: string, tile: TilePos, index: num
 export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entity[]): void {
   switch (thing.k) {
     case 'chest': {
-      const e = fixture(rt.newId(), 'chest', 'fix_chest', thing.at, index);
+      const e = fixture(
+        rt.newId(),
+        'chest',
+        thing.sunk === true ? 'fix_ripple' : 'fix_chest',
+        thing.at,
+        index,
+      );
+      if (thing.sunk === true) e.mem['sunk'] = 1;
       setAnim(e, rt.state.world.opened.includes(thing.id) ? 'open' : 'closed');
       out.push(e);
       return;
@@ -177,7 +184,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
     case 'fire':
       return evalCond(thing.when, condCtx(rt));
     case 'chest':
-      return mem(e, 'wait') !== 1;
+      // A sunk chest lies on the bottom under a ripple: a swimmer passes over it.
+      return mem(e, 'wait') !== 1 && mem(e, 'sunk') !== 1;
     case 'lock':
       return !(doorsOf(rt)?.includes(thing.id) ?? false);
     case 'crack':
@@ -293,16 +301,17 @@ export function stampCollision(rt: SimRt): void {
   }
   // A raft resting at its stop: footing over the water.
   for (const i of raftTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
+  // Walls and solid fixtures stand on the water as on land: nobody swims through them (`DEEP` off).
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
-    collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
+    collision.flags[i] = ((collision.flags[i] ?? 0) | SOLID) & ~DEEP;
   }
   for (const e of rt.actors) {
     if (e.kind !== 'fixture') continue;
     const solid = KINDS[e.def]?.solid;
     if (solid === 'never' || (solid === 'on' && mem(e, 'on') !== 1)) continue;
     const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
-    collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
+    collision.flags[i] = ((collision.flags[i] ?? 0) | SOLID) & ~DEEP;
   }
 }
 

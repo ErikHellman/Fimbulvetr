@@ -27,9 +27,11 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  *
  * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
  * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored. Once Ís can be
- * sung (the galdr or a stave), still water is walkable in any season. Hidden floor (the ghost floor, the
- * drowned path) is floor, as it is to the sim: light only shows it. Once the grapple chain is held, a post
- * in a straight line from a reached tile pulls Ask to the tile before it.
+ * sung (the galdr or a stave), still water off a screen's outer ring is walkable in any season. Hidden
+ * floor (the ghost floor, the drowned path) is floor, as it is to the sim: light only shows it. Once the
+ * grapple chain is held, a post in a straight line from a reached tile pulls Ask to the tile before it.
+ * With the seal-skin, deep water (currents and surges too: a dive passes under a surge) is swum, and a
+ * sunk chest or piece is dived for once its own tile is reached.
  */
 
 export interface SolveOptions {
@@ -297,7 +299,20 @@ function bridgeTiles(w: World, state: GameState): Set<number> {
       if (w.db.screens[id].water !== undefined) continue;
       const g = w.grids[w.idx.get(id) ?? 0];
       g?.cells.forEach((cell, i) => {
-        if (cell === 'water') out.add(w.tile(id, i % SCREEN_COLS, Math.floor(i / SCREEN_COLS)));
+        const x = i % SCREEN_COLS;
+        const y = Math.floor(i / SCREEN_COLS);
+        // Ís never ices a screen's outer ring (see `freezeAround`).
+        if (cell === 'water' && x > 0 && y > 0 && x < SCREEN_COLS - 1 && y < SCREEN_ROWS - 1)
+          out.add(w.tile(id, x, y));
+      });
+    }
+  // With the seal-skin, deep water is swum (a surge is crossed by diving under it).
+  if (has(state, 'sealskin'))
+    for (const id of w.ids) {
+      const g = w.grids[w.idx.get(id) ?? 0];
+      g?.cells.forEach((cell, i) => {
+        if (w.db.terrain[cell].swim === true)
+          out.add(w.tile(id, i % SCREEN_COLS, Math.floor(i / SCREEN_COLS)));
       });
     }
   const ctx = ctxOf(w, state);
@@ -345,6 +360,7 @@ function solidThing(
     case 'gate':
       return evalCond(t.closed, ctx);
     case 'chest':
+      return t.sunk !== true;
     case 'switch':
     case 'wheel':
     case 'warp':
@@ -741,7 +757,13 @@ function gather(w: World, node: Node): boolean {
         case 'chest': {
           if (state.world.opened.includes(t.id) || !evalCond(t.when, ctx)) return;
           if (t.appear !== undefined && !signal(w, state, id, t.appear, reach)) return;
-          if (!besideReach(w, reach, id, t.at.x, t.at.y)) return;
+          // A sunk chest is dived for: Ask swims onto its tile.
+          if (
+            t.sunk === true
+              ? !reach.has(w.tile(id, t.at.x, t.at.y))
+              : !besideReach(w, reach, id, t.at.x, t.at.y)
+          )
+            return;
           state.world.opened.push(t.id);
           if ('item' in t.gives) give(w, state, id, t.gives.item, t.gives.n ?? 1);
           if (t.learn !== undefined && !state.inv.galdr.includes(t.learn)) state.inv.galdr.push(t.learn);
@@ -757,7 +779,11 @@ function gather(w: World, node: Node): boolean {
             (!evalCond(t.when, ctx) || (t.appear !== undefined && !signal(w, state, id, t.appear, reach)))
           )
             return;
-          if (!reach.has(w.tile(id, t.at.x, t.at.y)) && !throwable(w, state, reach, id, t.at.x, t.at.y))
+          const onIt = reach.has(w.tile(id, t.at.x, t.at.y));
+          if (
+            !onIt &&
+            ((t.k === 'piece' && t.sunk === true) || !throwable(w, state, reach, id, t.at.x, t.at.y))
+          )
             return;
           got.push(t.id);
           changed = true;

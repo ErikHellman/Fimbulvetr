@@ -1,5 +1,6 @@
 import type { TerrainId } from '@content/terrain';
 import { nextFloat, nextInt } from '@core/math/rng';
+import type { Dir4 } from '@core/math/dir';
 import { C } from '../palette';
 import type { Painter } from '../painter';
 import { insideBlob, onBlobEdge } from './blob';
@@ -496,7 +497,53 @@ const NIFLMYRR = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Streaks of foam sliding the way a current runs, `step` px a frame (a surge's are longer and quicker). */
+function streaks(p: Painter, frame: number, dir: Dir4, colour: string, len: number, step: number): void {
+  const across = dir === 'e' || dir === 'w';
+  const sign = dir === 'e' || dir === 's' ? 1 : -1;
+  for (let k = 0; k < 2; k++) {
+    const lane = k * 8 + 2 + nextInt(p.rng, 0, 3);
+    const head = (((nextInt(p.rng, 0, 15) + sign * frame * step) % 16) + 16) % 16;
+    for (let i = 0; i < len; i++) {
+      const a = (((head - sign * i) % 16) + 16) % 16;
+      p.px(across ? a : lane, across ? lane : a, colour);
+    }
+  }
+}
+
+/**
+ * Running lake water, drawn whole (it always lies inside open water, which runs into it with no bank):
+ * a current slides pale streaks along; a surge is darker, with longer, quicker foam.
+ */
+function current(dir: Dir4, strong: boolean): TerrainArt {
+  return {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: strong ? 80 : 160,
+    group: 'water',
+    paint: (p, v) => {
+      p.fill(strong ? C.waterShade : C.water);
+      p.speckle(C.waterLight, 0.05);
+      streaks(p, v.frame, dir, strong ? C.foam : C.waterLight, strong ? 5 : 3, strong ? 4 : 2);
+    },
+  };
+}
+
+/** Sævatn's running water: currents a swimmer rides, and surges only a diver crosses. */
+const SAEVATN = {
+  current_n: current('n', false),
+  current_e: current('e', false),
+  current_s: current('s', false),
+  current_w: current('w', false),
+  surge_n: current('n', true),
+  surge_e: current('e', true),
+  surge_s: current('s', true),
+  surge_w: current('w', true),
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...SAEVATN,
   ...NIFLMYRR,
   ...DEEP_WOOD,
   ...KONUNGSHAUGR,

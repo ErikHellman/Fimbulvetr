@@ -315,7 +315,11 @@ function strike(rt: SimRt, e: Entity, back: boolean): void {
   }
   if (mem(e, 'fetch') === 0) {
     const pickup = rt.actors.find(
-      (a) => a.kind === 'pickup' && mem(a, 'hidden') !== 1 && overlaps(box, at(a.body, a.pos)),
+      (a) =>
+        a.kind === 'pickup' &&
+        mem(a, 'hidden') !== 1 &&
+        mem(a, 'sunk') !== 1 &&
+        overlaps(box, at(a.body, a.pos)),
     );
     if (pickup !== undefined) {
       e.mem['fetch'] = pickup.id;

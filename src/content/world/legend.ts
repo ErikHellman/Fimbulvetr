@@ -81,6 +81,15 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '6': 'snag',
   '*': 'mire',
   '-': 'drowned_path',
+  /** Sævatn (M7a): currents (north, east, south, west) and surges. */
+  '/': 'current_n',
+  '>': 'current_e',
+  '|': 'current_s',
+  '<': 'current_w',
+  '[': 'surge_n',
+  '}': 'surge_e',
+  ']': 'surge_s',
+  '{': 'surge_w',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

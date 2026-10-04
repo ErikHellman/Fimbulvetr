@@ -678,4 +678,14 @@ export const SFX_BANK = {
     release: 0.08,
     volume: 0.22,
   },
+  /** A dive: a low gulp sinking under. */
+  sfx_dive: {
+    wave: 'sine',
+    freq: 420,
+    freqEnd: 140,
+    attack: 0.01,
+    sustain: 0.1,
+    release: 0.2,
+    volume: 0.28,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

@@ -225,6 +225,8 @@ type HitSource = { readonly pos: Vec; readonly faction: Faction } | Entity;
 export function hurtHero(rt: SimRt, source: HitSource, amount: number, knock: number, tags: number): boolean {
   const { hero, db } = rt;
   if (rt.god === true) return false;
+  // Under the water every blow passes over.
+  if (hero.fsm.s === 'dive') return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
   if (warded(rt, amount)) return true;
