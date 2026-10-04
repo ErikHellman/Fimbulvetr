@@ -441,6 +441,27 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     bottom: '#4a3a2a',
     apron: '#6a4a2a',
   },
+  /** Vala the healer: grey-braided, in a moss-green dress with a pale apron of herbs. */
+  vala: {
+    skin: SKIN,
+    hair: '#b8b2a8',
+    hairStyle: 'braid',
+    top: '#4a6a48',
+    legs: 'skirt',
+    bottom: '#3a5238',
+    apron: '#d8d0b0',
+  },
+  /** Hreggviðr the ore-trader: broad, bald and red-bearded, soot on his leather apron. */
+  hreggvidr: {
+    skin: TAN,
+    hair: '#a0482a',
+    hairStyle: 'bald',
+    beard: '#a0482a',
+    top: '#5a4a3a',
+    legs: 'pants',
+    bottom: '#2e2a26',
+    apron: '#3a2e26',
+  },
   /** Hrafn the seal-hunter: wind-burnt, black-haired, in sealskin and oiled leather. */
   hrafn: {
     skin: TAN,

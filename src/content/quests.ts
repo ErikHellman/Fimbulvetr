@@ -505,6 +505,13 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         },
       },
       {
+        when: atLeast('q_trade', 5),
+        text: {
+          en: 'Embla gave her sail-needle for the comb: for a dwarf who mends bellows and swears at them.',
+          sv: 'Embla gav sin segelnål för kammen: till en dvärg som lagar blåsbälgar och svär åt dem.',
+        },
+      },
+      {
         when: atLeast('q_trade', 7),
         text: { en: 'Every trade is made.', sv: 'Alla byten är gjorda.' },
       },
@@ -793,6 +800,47 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         text: {
           en: 'Hrafn gave Ask his late wife’s seal-skin. In it the lake carries Ask, and a roll dives under.',
           sv: 'Hrafn gav Ask sin döda hustrus sälskinn. I det bär sjön Ask, och en rullning dyker under.',
+        },
+      },
+    ],
+  },
+  q_holmr: {
+    id: 'q_holmr',
+    name: { en: 'The island', sv: 'Ön' },
+    stages: [
+      {
+        when: flag('q_sealskin_done'),
+        text: {
+          en: 'The seal-skin is Ask’s. Somebody keeps a fire on Holmr, past the warm water in the middle of Sævatn.',
+          sv: 'Sälskinnet är Asks. Någon håller en eld brinnande på Holmr, bortom det varma vattnet mitt i Sævatn.',
+        },
+      },
+      {
+        when: flag('st_embla_found'),
+        text: {
+          en: 'Embla is alive, at the Refuge on Holmr. She says the thane under the lake keeps the drowned hof whose spire stands in the drowned village.',
+          sv: 'Embla lever, på Tillflykten på Holmr. Hon säger att hövdingen under sjön håller det drunknade hovet vars spira står i den drunknade byn.',
+        },
+      },
+      {
+        when: flag('st_d5_entered'),
+        text: {
+          en: 'Ask has dived into Sökkva Hof, the drowned hof.',
+          sv: 'Ask har dykt ner i Sökkva Hov, det drunknade hovet.',
+        },
+      },
+      {
+        when: { k: 'galdr', id: 'vindr' },
+        text: {
+          en: 'Ask has learned Vindr in the drowned hof. Its thane, Nykr, waits deeper down.',
+          sv: 'Ask har lärt sig Vindr i det drunknade hovet. Dess hövding, Nykr, väntar längre ner.',
+        },
+      },
+      {
+        when: flag('st_thane_nykr'),
+        text: {
+          en: 'Nykr is dead. Two thanes down. Embla says the third keeps a forge under the mountain.',
+          sv: 'Nykr är död. Två hövdingar fällda. Embla säger att den tredje håller en smedja under berget.',
         },
       },
     ],

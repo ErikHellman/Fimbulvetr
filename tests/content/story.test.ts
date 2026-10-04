@@ -41,8 +41,11 @@ const CONTENT = {
   fish: DB.fish,
 };
 
-/** Flags read now and set by a later milestone's content: the rime beyond the pass melts in M6. */
-const SET_LATER = new Set(['st_rime_open']);
+/**
+ * Flags read now and set by a later milestone's content: the rime beyond the pass melts in M6; Sökkva Hof
+ * is entered and Nykr killed in M7b (`q_holmr` names both).
+ */
+const SET_LATER = new Set(['st_rime_open', 'st_d5_entered', 'st_thane_nykr']);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {

@@ -681,8 +681,10 @@ export class UiScene extends Phaser.Scene {
   }
 
   private drawShop(ui: Extract<StoryUi, { k: 'shop' }>, lang: Lang): void {
+    // Prices in silver are bare numbers; a trader paid in goods names them ("3 Black ore").
+    const paid = ui.currency === undefined ? '' : ` ${t(ITEM_NAMES[ui.currency], lang)}`;
     const rows = ui.rows.map(
-      (r, i) => `${i === ui.cursor ? '>' : ' '} ${wareName(r.ware, lang)} — ${String(r.price)}`,
+      (r, i) => `${i === ui.cursor ? '>' : ' '} ${wareName(r.ware, lang)} — ${String(r.price)}${paid}`,
     );
     rows.push(`${ui.cursor === ui.rows.length ? '>' : ' '} ${t(UI.shop_leave, lang)}`);
     const note = ui.last === null ? '' : t(UI[`shop_${ui.last}`], lang);

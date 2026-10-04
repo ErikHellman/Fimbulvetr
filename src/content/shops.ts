@@ -62,4 +62,23 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'cheese', price: 8 },
     ],
   },
+  /** Vala the healer's brews at the Refuge (M7a). */
+  vala: {
+    id: 'vala',
+    name: { en: 'Vala’s brews', sv: 'Valas brygder' },
+    stock: [
+      { item: 'mead_green', price: 25 },
+      { item: 'mead_red', price: 20 },
+    ],
+  },
+  /** Hreggviðr the ore-trader at the Refuge: he takes black ore, not silver (M7a). */
+  hreggvidr: {
+    id: 'hreggvidr',
+    name: { en: 'Hreggviðr’s trade', sv: 'Hreggviðrs byteshandel' },
+    currency: 'ore',
+    stock: [
+      { item: 'mead_blue', price: 3 },
+      { item: 'quiver', price: 8 },
+    ],
+  },
 };

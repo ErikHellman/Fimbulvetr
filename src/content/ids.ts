@@ -42,13 +42,22 @@ export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
 /** Things carried for someone: a quest's token or a brew's ingredients. */
 export const QUEST_ITEMS = ['charred_stave', 'fen_moss', 'wisp_ember'] as const;
 /** The trading chain's goods (`q_trade`): each is traded on for the next. */
-export const TRADE_ITEMS = ['trade_bell', 'trade_fleece', 'trade_yarn', 'trade_hook', 'trade_comb'] as const;
+export const TRADE_ITEMS = [
+  'trade_bell',
+  'trade_fleece',
+  'trade_yarn',
+  'trade_hook',
+  'trade_comb',
+  'trade_needle',
+] as const;
 /** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
 export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
 /** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
 export const FETCH_ITEMS = ['honey', 'amber'] as const;
 /** Rune-staves: each sings its galdr once, from an item slot, for no seiðr. */
 export const STAVES = ['stave_is'] as const;
+/** Counted goods that pay where silver does not: ore, for Hreggviðr at the Refuge (M7a). */
+export const MATERIALS = ['ore'] as const;
 export const ITEMS = [
   ...SUB_ITEMS,
   ...CONSUMABLES,
@@ -60,6 +69,7 @@ export const ITEMS = [
   ...LORE_ITEMS,
   ...FETCH_ITEMS,
   ...STAVES,
+  ...MATERIALS,
 ] as const;
 export type ItemId = (typeof ITEMS)[number];
 
@@ -232,6 +242,9 @@ export const NPCS = [
   'thrall',
   'bragi',
   'hrafn',
+  // Sævatn
+  'vala',
+  'hreggvidr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -265,10 +278,21 @@ export const QUESTS = [
   'q_act2',
   'q_ljos',
   'q_sealskin',
+  'q_holmr',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'geirmundr', 'tofa'] as const;
+export const SHOPS = [
+  'sigrun',
+  'dev_shop',
+  'hrafnkell',
+  'ketill',
+  'heidr',
+  'geirmundr',
+  'tofa',
+  'vala',
+  'hreggvidr',
+] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
@@ -337,6 +361,10 @@ export const SCRIPTS = [
   'd4_cell_tofa',
   'ferry_out',
   'ferry_back',
+  'embla_found',
+  'shop_vala',
+  'shop_hreggvidr',
+  'war_table',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

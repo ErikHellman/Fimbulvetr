@@ -265,6 +265,13 @@ export const FLAGS = {
   q_sealskin_done: { t: 'bool' },
   /** Ask has paid Bárðr and the boat is about to set off (cleared as it does, or at dawn at the latest). */
   ev_ferry: { t: 'bool', dawn: true },
+  /** Embla met at the Refuge on Holmr (M7a). */
+  st_embla_found: { t: 'bool' },
+  /** Vala has healed Ask today (free once a day). */
+  ev_vala_day: { t: 'bool', dawn: true },
+  /** Sökkva Hof (D5) entered, and its thane Nykr dead (set in M7b; named now for `q_holmr`). */
+  st_d5_entered: { t: 'bool' },
+  st_thane_nykr: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

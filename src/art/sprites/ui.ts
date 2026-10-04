@@ -167,6 +167,19 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     's.s.s.s.',
     '........',
   ],
+  /** A curved bone sail-needle with a thread through its eye. */
+  trade_needle: [
+    '......s.',
+    '.....sSs',
+    '....s.s.',
+    '...s....',
+    '..s.....',
+    '.sw.....',
+    'sw......',
+    'w.......',
+  ],
+  /** A lump of black ore, glints of metal in it. */
+  ore: ['........', '..LLL...', '.LeLlL..', 'LeLLLeL.', 'LLlLeLL.', '.LeLLL..', '..LLL...', '........'],
   /** A round iron bomb, its fuse spitting sparks. */
   bombs: ['.....y.y', '......Y.', '....ww..', '..iiii..', '.iliiii.', '.iiiiii.', '.iiiiiL.', '..iiLL..'],
   /** A short hunting bow, strung. */

@@ -36,6 +36,7 @@ export const ITEM_NAMES = {
   trade_yarn: { en: 'Spun yarn', sv: 'Spunnet garn' },
   trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
   trade_comb: { en: 'Walrus-ivory comb', sv: 'Kam av valrossben' },
+  trade_needle: { en: 'Sail-needle', sv: 'Segelnål' },
   rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
   mail_clasp: { en: 'Ring-mail clasp', sv: 'Brynjespänne' },
   grave_ring: { en: 'Grave-ring', sv: 'Gravring' },
@@ -43,6 +44,7 @@ export const ITEM_NAMES = {
   amber: { en: 'Amber', sv: 'Bärnsten' },
   stave_is: { en: 'Ís rune-stave', sv: 'Ís-runstav' },
   wisp_ember: { en: 'Wisp ember', sv: 'Irrbloss-glöd' },
+  ore: { en: 'Black ore', sv: 'Svart malm' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {
@@ -66,10 +68,15 @@ const MAX: Partial<Record<ItemId, number>> = {
   amber: 3,
   stave_is: 3,
   wisp_ember: 3,
+  ore: 99,
 };
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
 const FOUND: Partial<Record<ItemId, L10n>> = {
+  ore: {
+    en: 'You found black ore! Hreggviðr at the Refuge trades for it.',
+    sv: 'Du hittade svart malm! Hreggviðr på Tillflykten byter mot den.',
+  },
   stave_is: {
     en: 'You got an Ís rune-stave! Ready it in an item slot: it sings Ís once, for no seiðr, then it is spent. Frost freezes foes and lays ice on still water.',
     sv: 'Du fick en Ís-runstav! Lägg den i en föremålsplats: den sjunger Ís en gång, utan seiðr, och sedan är den förbrukad. Frosten fryser fiender och lägger is på stilla vatten.',

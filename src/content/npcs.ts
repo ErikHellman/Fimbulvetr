@@ -62,6 +62,8 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   thrall: { en: 'A bled thrall', sv: 'En tappad träl' },
   bragi: { en: 'Bragi', sv: 'Bragi' },
   hrafn: { en: 'Hrafn', sv: 'Hrafn' },
+  vala: { en: 'Vala', sv: 'Vala' },
+  hreggvidr: { en: 'Hreggviðr', sv: 'Hreggviðr' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -119,6 +121,16 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
         { x: 16, y: 11 },
       ],
     },
+    /** At the Refuge on Holmr once the pass is open (M7a): waiting on the shore until Ask first lands, then
+     *  by the war table by day and at the hearth in the evening. */
+    {
+      when: all(flag('st_pass_open'), not(flag('st_embla_found'))),
+      screen: 'sae_holmr',
+      at: { x: 18, y: 18 },
+      facing: 's',
+    },
+    { when: all(flag('st_pass_open'), evening), screen: 'ref_int_hall', at: { x: 16, y: 9 }, facing: 's' },
+    { when: flag('st_pass_open'), screen: 'ref_int_hall', at: { x: 21, y: 11 }, facing: 's' },
   ]),
   gyda: npc('gyda', [{ screen: 'ask_int_hof', at: { x: 20, y: 11 }, facing: 's' }]),
   sigrun: npc('sigrun', [{ screen: 'ask_int_trader', at: { x: 19, y: 10 }, facing: 's' }]),
@@ -250,4 +262,7 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   hrafn: npc('hrafn', [{ screen: 'nif_int_hut', at: { x: 17, y: 11 }, facing: 's' }]),
   /** The wandering skald: by his fire in the drained camp from evening to dawn. */
   bragi: npc('bragi', [{ when: evening, screen: 'nif_camp', at: { x: 35, y: 12 }, facing: 's' }]),
+  /** The Refuge's healer and ore-trader, each behind a table in the longhouse on Holmr (M7a). */
+  vala: npc('vala', [{ screen: 'ref_int_hall', at: { x: 12, y: 12 }, facing: 'e' }]),
+  hreggvidr: npc('hreggvidr', [{ screen: 'ref_int_hall', at: { x: 27, y: 12 }, facing: 'w' }]),
 };

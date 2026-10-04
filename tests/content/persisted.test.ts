@@ -136,6 +136,10 @@ const PERSISTED = [
   'sae_c_drowned',
   'sae_c_wreck',
   'sae_c_narrows',
+  'sae_k_ore1',
+  'sae_c_ore1',
+  'sae_k_ore2',
+  'sae_c_ore2',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

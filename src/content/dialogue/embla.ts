@@ -1,9 +1,16 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { day, eve, evening, eveningDue, raid } from './util';
+import { all, day, eve, evening, eveningDue, flag, not, raid } from './util';
 
-/** Embla: small talk by day, and one evening scene on each of the three farm days. */
+/**
+ * Embla: small talk by day, and one evening scene on each of the three farm days. At the Refuge on Holmr
+ * (M7a): the meeting on the shore, the comb for her sail-needle (trading step 5), and lines by time of day.
+ */
 export const EMBLA: DialogueDef = {
   entry: [
+    { when: all(raid, not(flag('st_embla_found'))), node: 'found' },
+    { when: all(flag('st_embla_found'), { k: 'item', id: 'trade_comb' }), node: 'comb' },
+    { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
+    { when: flag('st_embla_found'), node: 'r_day' },
     { when: raid, node: 'raid' },
     { when: eveningDue(1), node: 'e1' },
     { when: eveningDue(2), node: 'e2' },
@@ -14,6 +21,51 @@ export const EMBLA: DialogueDef = {
     { when: day(3), node: 'd3' },
   ],
   nodes: {
+    found: {
+      text: {
+        en: 'Ask! No, do not say it. I know what the cold took from Askdalr, and I know why. I heard it in the old songs long before the trolls came.',
+        sv: 'Ask! Nej, säg det inte. Jag vet vad kylan tog från Askdalr, och jag vet varför. Jag hörde det i de gamla sångerna långt innan trollen kom.',
+      },
+      next: 'found2',
+    },
+    found2: {
+      text: {
+        en: 'The binding was sworn on our blood, the whole village’s. When they came I ran, because I knew what they wanted us for. I am sorry I could not take you with me.',
+        sv: 'Bindningen svors på vårt blod, hela byns. När de kom sprang jag, för jag visste vad de ville ha oss till. Förlåt att jag inte kunde ta dig med mig.',
+      },
+      next: 'found3',
+    },
+    found3: {
+      text: {
+        en: 'But I have not been idle. Others got away too, and they are here. Four thanes keep the Rime King’s oath, and every one that falls loosens it. Come inside; I will show you the table.',
+        sv: 'Men jag har inte suttit sysslolös. Fler kom undan, och de är här. Fyra hövdingar håller Rimkungens ed, och varje som faller lossar den. Kom in, så visar jag dig bordet.',
+      },
+      do: [{ k: 'set', flag: 'st_embla_found', value: true }],
+    },
+    comb: {
+      text: {
+        en: 'Is that a comb? Walrus ivory. Nobody has given me anything that was not for running in a long time. Here, take my sail-needle. For a dwarf who mends bellows and swears at them.',
+        sv: 'Är det en kam? Valrossben. Ingen har gett mig något som inte var till för att fly på länge. Här, ta min segelnål. Till en dvärg som lagar blåsbälgar och svär åt dem.',
+      },
+      do: [
+        { k: 'take', item: 'trade_comb' },
+        { k: 'give', item: 'trade_needle' },
+        { k: 'set', flag: 'q_trade', value: 5 },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+    },
+    r_day: {
+      text: {
+        en: 'The table does not lie; it only waits. Look how many are still in the Rime King’s halls, and how many thanes still hold his oath.',
+        sv: 'Bordet ljuger inte, det bara väntar. Se hur många som fortfarande sitter i Rimkungens salar, och hur många hövdingar som fortfarande håller hans ed.',
+      },
+    },
+    r_eve: {
+      text: {
+        en: 'Sit by the fire a while. Out here even the smoke smells of home, if you close your eyes.',
+        sv: 'Sitt vid elden en stund. Här ute luktar till och med röken hemma, om du blundar.',
+      },
+    },
     e1: {
       text: {
         en: 'There you are. Father had you chasing sheep all day?',

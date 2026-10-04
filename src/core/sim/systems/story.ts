@@ -66,6 +66,8 @@ export type StoryUi =
       readonly name: L10n;
       /** `item` repeats the ware's item id when it is one. */
       readonly rows: readonly { readonly item?: ItemId; readonly ware: Ware; readonly price: number }[];
+      /** What the prices are paid in, when not silver (Hreggviðr's ore). */
+      readonly currency?: ItemId;
       /** Rows, then one more for "leave". */
       readonly cursor: number;
       readonly last: BuyResult | null;
@@ -472,9 +474,10 @@ export function storyUi(rt: SimRt): StoryUi {
       name: shop.name,
       rows: visibleStock(shop, condCtx(rt)).map((s) => {
         const ware = wareOf(s);
-        const price = priceOf(rt, s.price);
+        const price = priceOf(rt, s.price, shop.currency);
         return 'item' in ware ? { item: ware.item, ware, price } : { ware, price };
       }),
+      ...(shop.currency === undefined ? {} : { currency: shop.currency }),
       cursor: run.shop.cursor,
       last: run.shop.last,
     };
