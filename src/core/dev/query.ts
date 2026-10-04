@@ -218,6 +218,9 @@ export function applyPreset(state: GameState, p: DevPreset): void {
   if (p.minute !== undefined) setMinute(state.clock, p.minute);
   if (p.silver !== undefined) state.hero.silver = p.silver;
   Object.assign(state.inv.items, p.items ?? {});
+  // Purses carried widen the cap as picking them up would (100, 300, 999).
+  const purses = state.inv.items.purse ?? 0;
+  state.hero.purse = purses >= 2 ? 2 : purses === 1 ? 1 : 0;
   Object.assign(state.world.vars, p.vars ?? {});
   if (p.season !== undefined) setSeason(state.clock, p.season);
   if (p.policy !== undefined) setPolicy(state.clock, p.policy);

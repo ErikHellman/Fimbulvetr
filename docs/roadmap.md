@@ -115,5 +115,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Askdalr after the raid: ruins keyed on the farm, `q_fimbulvetr` and the homecoming, every Fimbulvetr line, Bárðr's frozen lake
     - [x] Solver proof in winter, route, e2e, v1-m5a fixture, docs
     - [ ] User playtest and Swedish proofread
-  - [ ] M5b The lowlands, after: rings, seiðr upgrades and trials; the farm, stages 1–2; the trading chain; ten side quests; the demo
+  - [ ] M5b The lowlands, after — same plan, Part 2
+    - [x] Arm-rings, seiðr upgrades and timed trials
+    - [x] The farm, stages 1–2; the trading chain, steps 1–3
+    - [x] Ten side quests: the flock, the leaves, troll stones, the clasp, the grave-ring, the crates, wild honey, the axe range, amber, the burbot
+    - [x] The demo: title tag and version, New Game to credits route, winter solver proof, e2e, v1-m5b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

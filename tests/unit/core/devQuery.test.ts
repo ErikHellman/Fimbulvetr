@@ -87,6 +87,16 @@ describe('presets', () => {
     expect(bad.warnings).toHaveLength(2);
   });
 
+  it('sizes the purse to the purses a preset carries, as picking them up would', () => {
+    const state = newGame(1, NEW_GAME);
+    applyPreset(state, DEV_PRESETS.farm);
+    expect(state.hero.purse).toBe(2);
+    expect(state.hero.silver).toBe(400);
+    const fimbul = newGame(1, NEW_GAME);
+    applyPreset(fimbul, DEV_PRESETS.fimbul);
+    expect(fimbul.hero.purse).toBe(1);
+  });
+
   it('applies the kit, flags and place of a preset', () => {
     const state = newGame(1, NEW_GAME);
     applyPreset(state, {
