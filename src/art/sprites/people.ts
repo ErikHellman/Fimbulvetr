@@ -430,6 +430,17 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     legs: 'pants',
     bottom: '#45423a',
   },
+  /** Bragi, the wandering skald: weathered, grey-bearded, a blue cloak and a harp-bag on his back. */
+  bragi: {
+    skin: TAN,
+    hair: '#9a9a90',
+    hairStyle: 'long',
+    beard: '#9a9a90',
+    top: '#2e4a6a',
+    legs: 'pants',
+    bottom: '#4a3a2a',
+    apron: '#6a4a2a',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

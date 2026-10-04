@@ -221,6 +221,12 @@ export const FLAGS = {
   st_niflmyrr_reached: { t: 'bool' },
   /** The bled thrall at the drained camp told why the captives were taken (the twist, M6a). */
   st_twist_heard: { t: 'bool' },
+  /** Bragi the skald, met by his fire at the drained camp (M6a). */
+  n_bragi_met: { t: 'bool' },
+  /** The skald's verses bought: each marks a secret on the map (see content/verses.ts). */
+  w_verse_deadwood: { t: 'bool' },
+  w_verse_cairns: { t: 'bool' },
+  w_verse_gjoll: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

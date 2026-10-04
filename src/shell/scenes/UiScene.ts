@@ -12,7 +12,8 @@ import { CONTINUE_DELAY } from '@core/sim/systems/death';
 import { condCtx } from '@core/sim/systems/story';
 import { questLog } from '@core/story/quests';
 import { peekDungeon } from '@core/state/dungeons';
-import { dungeonMap, overworldMap } from '@core/world/mapModel';
+import { dungeonMap, overworldMap, verseMarks } from '@core/world/mapModel';
+import { VERSES } from '@content/verses';
 import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
@@ -338,7 +339,10 @@ export class UiScene extends Phaser.Scene {
     });
   }
 
-  /** The overworld as coloured cells: visited screens by region, the hero's cell framed in gold. */
+  /**
+   * The overworld as coloured cells: visited screens by region, the hero's cell framed in gold, and a
+   * seiðr-blue diamond on each screen a verse held points at (unvisited ones drawn dim).
+   */
   private menuMap(top: number, lang: Lang): void {
     const { sim } = this.link;
     const dungeon = sim.db.screens[sim.screen.id].dungeon;
@@ -346,7 +350,8 @@ export class UiScene extends Phaser.Scene {
       this.menuDungeonMap(dungeon, top, lang);
       return;
     }
-    const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id);
+    const marks = verseMarks(VERSES, sim.state);
+    const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id, marks);
     const cw = 22;
     const ch = 13;
     const cols = m.x1 - m.x0 + 3;
@@ -354,12 +359,20 @@ export class UiScene extends Phaser.Scene {
     const ox = Math.round(MENU.x + (MENU.w - cols * cw) / 2);
     const oy = top + 18;
     for (const c of m.cells) {
-      if (!c.visited && !c.here) continue;
+      if (!c.visited && !c.here && !c.marked) continue;
       const cx = ox + (c.gx - m.x0 + 1) * cw;
       const cy = oy + (c.gy - m.y0 + 1) * ch;
       if (cx < MENU.x || cy + ch > MENU.y + MENU.h - 24) continue;
-      this.menuBox.fillStyle(REGION_COLOURS[c.region], 1).fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      const seen = c.visited || c.here;
+      this.menuBox.fillStyle(seen ? REGION_COLOURS[c.region] : DIM, seen ? 1 : 0.5);
+      this.menuBox.fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
       if (c.here) this.menuBox.lineStyle(2, GOLD, 1).strokeRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      if (c.marked) {
+        const mx = cx + cw / 2;
+        const my = cy + ch / 2;
+        this.menuBox.fillStyle(SEIDR, 1).fillTriangle(mx, my - 4, mx + 3, my, mx - 3, my);
+        this.menuBox.fillTriangle(mx, my + 4, mx + 3, my, mx - 3, my);
+      }
     }
     this.menuBox.lineStyle(1, DIM, 1).strokeRect(ox + 0.5, oy + 0.5, cols * cw - 1, rows * ch - 1);
     const here = m.cells.find((c) => c.here);

@@ -1,4 +1,6 @@
+import type { FlagId } from '@content/flags';
 import type { DungeonId, EnemyId, RegionId } from '@content/ids';
+import type { L10n } from '../i18n/t';
 import type { ScreenId } from '@content/world/screens';
 import type { EnemyDef } from '../actors/enemies/defs';
 import { peekDungeon } from '../state/dungeons';
@@ -14,11 +16,13 @@ export interface MapCell {
   readonly visited: boolean;
   /** The hero is on this screen (or inside a house entered from it). */
   readonly here: boolean;
+  /** A verse held points at a secret here, not yet found (drawn even if unvisited). */
+  readonly marked: boolean;
 }
 
 export interface MapModel {
   readonly cells: readonly MapCell[];
-  /** The grid rectangle worth drawing: every visited cell plus the hero's (inclusive). */
+  /** The grid rectangle worth drawing: every visited or marked cell plus the hero's (inclusive). */
   readonly x0: number;
   readonly y0: number;
   readonly x1: number;
@@ -48,12 +52,32 @@ export function gridScreenOf(
   return null;
 }
 
-/** The overworld as the pause menu shows it: every grid screen, which were visited, and where the hero is. */
+/** A skald's verse: held under `flag`, it marks `screen` on the map until heart piece `piece` is found. */
+export interface VerseDef {
+  readonly flag: FlagId;
+  readonly screen: ScreenId;
+  readonly piece: string;
+  /** The verse as sung, and kept in mind. */
+  readonly text: L10n;
+}
+
+/** The screens the verses held still point at: the verse bought, its piece not yet taken. */
+export function verseMarks(verses: readonly VerseDef[], state: GameState): ScreenId[] {
+  return verses
+    .filter((v) => state.flags[v.flag] === true && !state.world.pieces.includes(v.piece))
+    .map((v) => v.screen);
+}
+
+/**
+ * The overworld as the pause menu shows it: every grid screen, which were visited, where the hero is, and
+ * the screens `marks` points at (the skald's verses).
+ */
 export function overworldMap(
   layout: WorldLayout,
   screens: Readonly<Record<ScreenId, ScreenDef>>,
   visited: readonly ScreenId[],
   current: ScreenId,
+  marks: readonly ScreenId[] = [],
 ): MapModel {
   const here = gridScreenOf(layout, screens, current);
   const cells: MapCell[] = [];
@@ -66,10 +90,11 @@ export function overworldMap(
       region: screens[id].region,
       visited: visited.includes(id),
       here: id === here,
+      marked: marks.includes(id),
     });
   }
   cells.sort((a, b) => a.gy - b.gy || a.gx - b.gx);
-  const shown = cells.filter((c) => c.visited || c.here);
+  const shown = cells.filter((c) => c.visited || c.here || c.marked);
   const xs = shown.map((c) => c.gx);
   const ys = shown.map((c) => c.gy);
   return {

@@ -32,3 +32,13 @@ describe('overworld map', () => {
     expect(m.cells.find((c) => c.here)?.id).toBe('ask_farmyard');
   });
 });
+
+describe('verse markers', () => {
+  it('marks a screen on the map, unvisited or not, and frames it', () => {
+    const m = overworldMap(DB.layout, DB.screens, ['ask_farmyard'], 'ask_farmyard', ['ask_village']);
+    expect(m.cells.filter((c) => c.marked).map((c) => c.id)).toEqual(['ask_village']);
+    expect(m).toMatchObject({ x0: 4, y0: 10, x1: 5, y1: 10 });
+    const none = overworldMap(DB.layout, DB.screens, ['ask_farmyard'], 'ask_farmyard');
+    expect(none.cells.some((c) => c.marked)).toBe(false);
+  });
+});

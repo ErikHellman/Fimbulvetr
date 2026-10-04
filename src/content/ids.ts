@@ -217,6 +217,7 @@ export const NPCS = [
   'hallsteinn',
   // Niflmýrr
   'thrall',
+  'bragi',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
