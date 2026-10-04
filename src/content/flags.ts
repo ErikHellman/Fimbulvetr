@@ -235,6 +235,26 @@ export const FLAGS = {
   w_verse_deadwood: { t: 'bool' },
   w_verse_cairns: { t: 'bool' },
   w_verse_gjoll: { t: 'bool' },
+  /** Into Helgrind (D4, M6b); Garmr dead (its shutters open); Náströnd dead; Kolbeinn's word after. */
+  st_d4_entered: { t: 'bool' },
+  st_d4_garmr: { t: 'bool' },
+  st_d4_boss_dead: { t: 'bool' },
+  st_d4_kolbeinn: { t: 'bool' },
+  /** Helgrind's latch: the boomerang lowers the bridge to the bone-pit's silver. */
+  w_d4_r12: { t: 'bool' },
+  /** The Rime King's four thanes (each has its own flag) and the eight captives freed: Act II's war count. */
+  q_thanes: { t: 'int', max: 4 },
+  q_captives: { t: 'int', max: 8 },
+  st_thane_nastrond: { t: 'bool' },
+  st_freed_ulf: { t: 'bool' },
+  st_freed_tofa: { t: 'bool' },
+  /**
+   * Ulf's herding round at home (replayable): asked for (his trigger starts it), under way (his own pen
+   * counts), and his five penned before the sand runs out.
+   */
+  ev_ulf_herd: { t: 'bool' },
+  ev_ulf_round: { t: 'bool' },
+  q_ulf_penned: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

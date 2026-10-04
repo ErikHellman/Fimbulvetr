@@ -226,6 +226,28 @@ function shieldDown(): Raster {
   return outline(r, INK, 1);
 }
 
+/**
+ * One tile of a captive's cell bars (18×34, like a slab gate): iron bars in a stone sill and lintel;
+ * `open`, the bars are gone (pulled up into the lintel) and only the sill and lintel are left.
+ */
+function bars(open: boolean): Raster {
+  const r = createRaster(18, 34);
+  const base = 31;
+  rect(r, 1, base - 3, 16, 3, STONE);
+  rect(r, 1, base - 3, 16, 1, STONE_LIGHT);
+  rect(r, 1, 3, 16, 3, STONE);
+  rect(r, 1, 5, 16, 1, STONE_DARK);
+  if (!open) {
+    for (const x of [3, 8, 13]) {
+      rect(r, x, 6, 2, base - 9, IRON);
+      rect(r, x, 6, 1, base - 9, IRON_LIGHT);
+    }
+    rect(r, 2, 15, 14, 2, IRON_DARK);
+    rect(r, 2, 15, 14, 1, IRON);
+  }
+  return outline(r, INK, 1);
+}
+
 export function helgrindFrames(): SpriteFrame[] {
   const east = hookEast();
   const south = turn(east);
@@ -289,6 +311,8 @@ export function helgrindFrames(): SpriteFrame[] {
     ...hooks.map(([d, raster]) => ({ name: `fx_grapple_fly_${d}_0`, raster, ox: 7, oy: 7 })),
     { name: 'fx_chain_idle_s_0', raster: link(), ox: 3, oy: 3 },
     { name: 'fix_raft_idle_s_0', raster: raft(), ox: 17, oy: 31 },
+    { name: 'fix_bars_closed_s_0', raster: bars(false), ox: 9, oy: 31 },
+    { name: 'fix_bars_open_s_0', raster: bars(true), ox: 9, oy: 31 },
   ];
 }
 
@@ -301,6 +325,7 @@ export const HELGRIND_ANIMS: Readonly<Record<string, Readonly<Record<string, Ani
   fx_grapple: { fly: { frames: 1, fps: 1, loop: true, dirs: ALL } },
   fx_chain: { idle: one(1, 1) },
   fix_raft: { idle: one(1, 1) },
+  fix_bars: { closed: one(1, 1), open: one(1, 1) },
   enemy_helhound: { idle: all(1, 1), hurt: all(1, 1), walk: all(4, 10), tell: all(2, 10), lunge: all(2, 10) },
   enemy_garmr: {
     sleep: all(1, 1),

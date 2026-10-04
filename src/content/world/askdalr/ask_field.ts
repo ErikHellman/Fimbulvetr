@@ -24,9 +24,24 @@ const RAVENS: Thing[] = [
 export const askField: ScreenDef = {
   id: 'ask_field',
   region: 'askdalr',
-  purpose: 'The barley field where the ravens come down on day 3; stones along the path are there to throw.',
+  purpose:
+    'The barley field where the ravens come down on day 3; stones along the path are there to throw. Once Tófa is home from Helgrind she sells over the fence at 8–10, 16.',
   things: [
     ...RAVENS,
+    /** Tófa's stall over the fence, by day once she is home from Helgrind: flatbread and cheese. */
+    {
+      k: 'use',
+      at: { x: 8, y: 16 },
+      w: 3,
+      script: 'shop_tofa',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'st_freed_tofa' },
+          { k: 'not', c: { k: 'phase', is: 'night' } },
+        ],
+      },
+    },
     { k: 'prop', id: 'stone', at: { x: 8, y: 17 } },
     { k: 'prop', id: 'stone', at: { x: 14, y: 17 } },
     { k: 'prop', id: 'pot', at: { x: 18, y: 17 } },

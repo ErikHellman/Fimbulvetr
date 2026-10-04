@@ -6,14 +6,17 @@ import { runFsm } from '../../actors/fsm';
 import { TILE } from '../../world/dims';
 import type { Thing } from '../../world/screen';
 import type { SimRt } from '../rt';
-import { applyAll } from './story';
+import { evalCond } from '../../story/cond';
+import { applyAll, condCtx } from './story';
 
 type PenThing = Extract<Thing, { k: 'pen' }>;
 
 export const critterDef = (rt: SimRt, e: Entity): CritterDef => rt.db.critters[e.def as CritterId];
 
+/** The screen's first pen whose `when` holds. */
 export function penOf(rt: SimRt): PenThing | null {
-  for (const t of rt.db.screens[rt.screen.id].things) if (t.k === 'pen') return t;
+  const ctx = condCtx(rt);
+  for (const t of rt.db.screens[rt.screen.id].things) if (t.k === 'pen' && evalCond(t.when, ctx)) return t;
   return null;
 }
 

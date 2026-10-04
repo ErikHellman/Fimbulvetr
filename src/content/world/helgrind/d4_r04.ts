@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d4R04: ScreenDef = {
+  id: 'd4_r04',
+  region: 'niflmyrr',
+  dungeon: 'd4',
+  purpose:
+    'The Gjöll runs through the hall. A raft plies across from the west bank to the east, where the compass lies and a hel-hound waits.',
+  things: [
+    { k: 'raft', at: { x: 10, y: 10 }, path: [{ x: 28, y: 10 }] },
+    { k: 'chest', id: 'd4_c_compass', at: { x: 34, y: 10 }, gives: { item: 'compass' } },
+    { k: 'enemy', id: 'helhound', at: { x: 33, y: 15 } },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 4 } },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 17 } },
+    { k: 'prop', id: 'pot', at: { x: 35, y: 4 } },
+  ],
+  map: [
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '7777777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '7777777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8877777777vvvvvvvvvvvvvvvvvvvv7777777788',
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+  ],
+};

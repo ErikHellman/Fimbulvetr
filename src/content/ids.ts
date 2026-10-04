@@ -264,7 +264,7 @@ export const QUESTS = [
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'geirmundr'] as const;
+export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'geirmundr', 'tofa'] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
@@ -321,6 +321,16 @@ export const SCRIPTS = [
   'amber_mud',
   'ice_hole',
   'nif_arrive',
+  'd4_enter',
+  'd4_pedestal',
+  'd4_kolbeinn',
+  'd4_gate_out',
+  'shop_tofa',
+  'ulf_herd_start',
+  'ulf_herd_won',
+  'ulf_herd_lost',
+  'd4_cell_ulf',
+  'd4_cell_tofa',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

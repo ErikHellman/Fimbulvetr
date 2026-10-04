@@ -1,8 +1,11 @@
 import type { ScreenDef } from '@core/world/screen';
-import { afterRaid, all, any, atLeast, not } from '../../dialogue/util';
+import { afterRaid, all, any, atLeast, flag, not } from '../../dialogue/util';
 
-/** Grazing until the raid scatters the flock; back once the fold is raised again (farm stage 2). */
-const GRAZING = any(not(afterRaid), atLeast('q_farm', 2));
+/**
+ * Grazing until the raid scatters the flock; back once the fold is raised again (farm stage 2), or once Ulf
+ * is home from Helgrind to whistle them in.
+ */
+const GRAZING = any(not(afterRaid), atLeast('q_farm', 2), flag('st_freed_ulf'));
 /** Hildr's own sheep, down from the heath with her. */
 const HILDRS = all(atLeast('q_farm', 2), { k: 'flag', id: 'q_herd_done' });
 
@@ -28,7 +31,19 @@ export const askPasture: ScreenDef = {
       script: 'find_bell',
       when: all(afterRaid, not({ k: 'item', id: 'trade_bell' }), { k: 'flag', id: 'q_trade', lt: 1 }),
     },
+    /** Ulf's herding round (first, so it counts while the round is on): the same fold, his own tally. */
+    {
+      k: 'pen',
+      at: { x: 1, y: 1 },
+      w: 11,
+      h: 20,
+      v: 'ulf_pen',
+      flag: 'q_ulf_penned',
+      count: 5,
+      when: flag('ev_ulf_round'),
+    },
     { k: 'pen', at: { x: 1, y: 1 }, w: 11, h: 20, v: 'ask_pen', flag: 'q_sheep_d1', count: 5 },
+    { k: 'trigger', at: { x: 0, y: 0 }, w: 40, h: 22, script: 'ulf_herd_start', when: flag('ev_ulf_herd') },
     { k: 'critter', id: 'sheep', at: { x: 22, y: 8 }, tag: 0, when: GRAZING },
     { k: 'critter', id: 'sheep', at: { x: 25, y: 11 }, tag: 1, when: GRAZING },
     { k: 'critter', id: 'sheep', at: { x: 28, y: 7 }, tag: 2, when: GRAZING },

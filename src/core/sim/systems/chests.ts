@@ -20,10 +20,10 @@ export function openChest(rt: SimRt, probe: Box): boolean {
     const gift = thing.gives;
     if ('item' in gift) giveItem(rt, gift.item, gift.n ?? 1);
     else applyEffect({ k: 'silver', n: gift.silver }, rt);
+    if (thing.learn !== undefined) applyEffect({ k: 'learn', galdr: thing.learn }, rt);
     rt.emit({ t: 'sfx', id: 'sfx_itemget' });
-    startStory(rt, [
-      { k: 'say', who: null, text: 'item' in gift ? rt.db.items[gift.item].found : gift.text },
-    ]);
+    const text = thing.text ?? ('item' in gift ? rt.db.items[gift.item].found : gift.text);
+    startStory(rt, [{ k: 'say', who: null, text }]);
     return true;
   }
   return false;

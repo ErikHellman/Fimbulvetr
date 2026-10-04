@@ -1,5 +1,14 @@
 import type { FlagId } from '@content/flags';
-import type { CritterId, DungeonId, EnemyId, ItemId, PropId, RegionId, ScriptId } from '@content/ids';
+import type {
+  CritterId,
+  DungeonId,
+  EnemyId,
+  GaldrId,
+  ItemId,
+  PropId,
+  RegionId,
+  ScriptId,
+} from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import { DIR_VEC, type Dir4 } from '../math/dir';
 import type { L10n } from '../i18n/t';
@@ -101,7 +110,8 @@ export type Thing =
     }
   /**
    * A pen: a tagged critter whose feet enter it stays inside, its tag bit is set in `world.vars[v]`, and
-   * `flag` is set once `count` are in.
+   * `flag` is set once `count` are in. A screen's first pen whose `when` holds is the one that counts (Ulf's
+   * herding round pens the day-one flock afresh under its own var).
    */
   | {
       readonly k: 'pen';
@@ -111,10 +121,12 @@ export type Thing =
       readonly v: string;
       readonly flag: FlagId;
       readonly count: number;
+      readonly when?: Cond;
     }
   /**
    * A chest, opened once ever with interact (`id` is saved in `world.opened`). It is hidden, and not solid,
-   * until `when` holds and the room gives the `appear` signal.
+   * until `when` holds and the room gives the `appear` signal. With `learn` it also teaches a galdr (Ís
+   * for good, past Garmr), and `text` replaces the gift's found line.
    */
   | {
       readonly k: 'chest';
@@ -123,6 +135,8 @@ export type Thing =
       readonly gives: ChestGift;
       readonly appear?: RoomSignal;
       readonly when?: Cond;
+      readonly learn?: GaldrId;
+      readonly text?: L10n;
     }
   /** A heart container, taken once ever (saved in `world.opened`); hidden until `when` and `appear` hold. */
   | {
@@ -263,8 +277,11 @@ export type Thing =
  */
 export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive';
 
-/** A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass. */
-export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime';
+/**
+ * A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass, `bars` a
+ * captive's cell in Helgrind.
+ */
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime' | 'bars';
 
 export interface ScreenDef {
   readonly id: ScreenId;

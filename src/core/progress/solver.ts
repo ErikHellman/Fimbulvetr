@@ -21,7 +21,8 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * floods again, and so on until nothing changes. Small keys are the only real choice, so it branches on
  * which reachable lock a key opens and explores every order. Root blocks and vines never block (pushing and
  * cutting are always possible), nor do props Ask can lift; brambles block until Eldr is known. A `use`
- * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask. Enemies
+ * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask; one whose
+ * script sets flags, teaches a galdr or gives what Ask lacks does so once it is reached. Enemies
  * other than bosses are assumed beaten with the sword.
  *
  * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
@@ -743,6 +744,7 @@ function gather(w: World, node: Node): boolean {
           if (!besideReach(w, reach, id, t.at.x, t.at.y)) return;
           state.world.opened.push(t.id);
           if ('item' in t.gives) give(w, state, id, t.gives.item, t.gives.n ?? 1);
+          if (t.learn !== undefined && !state.inv.galdr.includes(t.learn)) state.inv.galdr.push(t.learn);
           changed = true;
           return;
         }
@@ -840,11 +842,19 @@ function gather(w: World, node: Node): boolean {
         case 'use': {
           if (!evalCond(t.when, ctx) || !besideReach(w, reach, id, t.at.x, t.at.y)) return;
           node.scripts.add(t.script);
+          // What the script does for good: flags set, galdr taught, and things given that Ask lacks (so a
+          // stave rack that refills an empty hand counts once, not over and over).
           for (const step of w.db.scripts[t.script]?.steps ?? [])
             if (step.k === 'do')
               for (const eff of step.effects)
                 if (eff.k === 'set' && state.flags[eff.flag] !== eff.value) {
                   state.flags[eff.flag] = eff.value;
+                  changed = true;
+                } else if (eff.k === 'learn' && !state.inv.galdr.includes(eff.galdr)) {
+                  state.inv.galdr.push(eff.galdr);
+                  changed = true;
+                } else if (eff.k === 'give' && !has(state, eff.item)) {
+                  give(w, state, id, eff.item, eff.n ?? 1);
                   changed = true;
                 }
           return;

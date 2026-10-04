@@ -103,6 +103,19 @@ const FIMBUL = {
   warps: ['haugar'],
 } as const satisfies DevPreset;
 
+/** And what M5b and M6a set on the way to Helgrind's gate. */
+const AFTER_RIME = {
+  ...FIMBUL.flags,
+  st_home_winter: true,
+  st_blood_told: true,
+  st_hlif_learned: true,
+  st_rime_open: true,
+  st_niflmyrr_reached: true,
+  st_twist_heard: true,
+  q_ljos_asked: true,
+  q_ljos_done: true,
+} as const;
+
 export const DEV_PRESETS = {
   /** The M0 test kit: seax and shield in the test lands. */
   m0: { screen: 'test_a', tile: [10, 11], weapon: 'seax', shield: true },
@@ -592,6 +605,63 @@ export const DEV_PRESETS = {
     silver: 400,
     items: { ...FIMBUL.items, purse: 2 },
     flags: { ...FIMBUL.flags, st_home_winter: true, st_blood_told: true },
+  },
+  /**
+   * Before Helgrind's gate, as M6a leaves Ask: the rime melted, Niflmýrr reached and the twist heard, Hlíf
+   * and Ljós known, two Ís staves (one readied in slot K) and eight hearts.
+   */
+  d4: {
+    ...FIMBUL,
+    screen: 'nif_gate',
+    tile: [20, 7],
+    facing: 'n',
+    minute: 23 * 60,
+    silver: 70,
+    items: { ...FIMBUL.items, stave_is: 2 },
+    slots: ['stave_is', 'bombs'],
+    galdr: ['eldr', 'farvegr', 'bragd', 'hlif', 'ljos'],
+    flags: { ...AFTER_RIME },
+    maxHp: 32,
+    hp: 32,
+  },
+  /**
+   * Before Náströnd's great door in Helgrind's hub, with everything D4 gives: the grapple in slot K, Ís
+   * learned, the great key, Garmr dead and every lock open.
+   */
+  d4boss: {
+    ...FIMBUL,
+    screen: 'd4_r13',
+    tile: [19, 3],
+    facing: 'n',
+    minute: 23 * 60,
+    silver: 70,
+    items: { ...FIMBUL.items, stave_is: 2, grapple: 1 },
+    slots: ['grapple', 'bombs'],
+    galdr: ['eldr', 'farvegr', 'bragd', 'hlif', 'ljos', 'is'],
+    flags: { ...AFTER_RIME, st_d4_entered: true, st_d4_garmr: true },
+    maxHp: 32,
+    hp: 32,
+    opened: [
+      ...FIMBUL.opened,
+      'd4_c_key1',
+      'd4_c_key2',
+      'd4_c_key3',
+      'd4_c_map',
+      'd4_c_compass',
+      'd4_c_grapple',
+      'd4_c_is',
+      'd4_c_bigkey',
+    ],
+    dungeons: {
+      ...FIMBUL.dungeons,
+      d4: {
+        keys: 0,
+        bigKey: true,
+        map: true,
+        compass: true,
+        doors: ['d4_lock_a', 'd4_lock_b', 'd4_lock_c', 'd4_sh_r07n', 'd4_sh_r07e'],
+      },
+    },
   },
   /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns

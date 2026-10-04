@@ -170,6 +170,7 @@ describe('enemies', () => {
       fix_biglock: ['closed', 'open'],
       fix_crack_wall: ['closed', 'open'],
       fix_crack_rock: ['closed', 'open'],
+      fix_bars: ['closed', 'open'],
     };
     for (const [art, anims] of Object.entries(used))
       for (const anim of anims) expect(ANIMS[art]?.[anim], `${art} ${anim}`).toBeDefined();

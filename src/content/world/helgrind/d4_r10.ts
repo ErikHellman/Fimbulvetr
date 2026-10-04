@@ -1,0 +1,42 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d4R10: ScreenDef = {
+  id: 'd4_r10',
+  region: 'niflmyrr',
+  dungeon: 'd4',
+  purpose:
+    'Rapids under a north strip that holds the third key and the way north to the river hall. Post (25, 3) pulls Ask over; post (12, 10) brings Ask back.',
+  things: [
+    { k: 'post', at: { x: 25, y: 3 } },
+    { k: 'post', at: { x: 12, y: 10 } },
+    { k: 'chest', id: 'd4_c_key3', at: { x: 31, y: 3 }, gives: { item: 'small_key' } },
+    { k: 'enemy', id: 'helhound', at: { x: 10, y: 14 } },
+    { k: 'enemy', id: 'helhound', at: { x: 28, y: 15 } },
+    { k: 'prop', id: 'pot', at: { x: 35, y: 18 } },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 18 } },
+  ],
+  map: [
+    '8888888888888888888778888888888888888888',
+    '8888888888888888888778888888888888888888',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '88vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv88',
+    '88vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv88',
+    '88vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv88',
+    '88vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv88',
+    '8877777777777777777777777777777777777788',
+    '7777777777777777777777777777777777777788',
+    '7777777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+  ],
+};

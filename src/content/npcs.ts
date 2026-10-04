@@ -71,6 +71,11 @@ const up: Cond = all({ k: 'not', c: { k: 'phase', is: 'night' } }, not(raid));
 const wet: Cond = { k: 'weather', is: ['rain', 'storm'] };
 const night: Cond = { k: 'phase', is: 'night' };
 
+/** A captive freed from Helgrind is home by day; one still held sits in a cell there. */
+const freed = (who: 'ulf' | 'tofa'): Cond =>
+  all(flag(`st_freed_${who}`), { k: 'not', c: { k: 'phase', is: 'night' } });
+const held = (who: 'ulf' | 'tofa'): Cond => all(afterRaid, not(flag(`st_freed_${who}`)));
+
 const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
   id,
   name: NPC_NAMES[id],
@@ -123,8 +128,18 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   ]),
   asa: npc('asa', [{ when: up, screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' }]),
   bjarni: npc('bjarni', [{ when: up, screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' }]),
-  ulf: npc('ulf', [{ when: up, screen: 'ask_pasture', at: { x: 15, y: 4 }, facing: 's' }]),
-  tofa: npc('tofa', [{ when: up, screen: 'ask_field', at: { x: 11, y: 19 }, facing: 'e' }]),
+  /** Taken in the raid to a cell in Helgrind; home to the pasture by day once Náströnd falls. */
+  ulf: npc('ulf', [
+    { when: freed('ulf'), screen: 'ask_pasture', at: { x: 15, y: 4 }, facing: 's' },
+    { when: held('ulf'), screen: 'd4_r18', at: { x: 11, y: 10 }, facing: 'e' },
+    { when: up, screen: 'ask_pasture', at: { x: 15, y: 4 }, facing: 's' },
+  ]),
+  /** Taken in the raid to a cell in Helgrind; home to her stall at the field fence by day after. */
+  tofa: npc('tofa', [
+    { when: freed('tofa'), screen: 'ask_field', at: { x: 9, y: 15 }, facing: 's' },
+    { when: held('tofa'), screen: 'd4_r19', at: { x: 19, y: 5 }, facing: 's' },
+    { when: up, screen: 'ask_field', at: { x: 11, y: 19 }, facing: 'e' },
+  ]),
   oddr: npc('oddr', [{ when: up, screen: 'ask_field', at: { x: 26, y: 19 }, facing: 'w' }]),
   hallbera: npc('hallbera', [{ when: up, screen: 'ask_village', at: { x: 31, y: 7 }, facing: 's' }]),
   thorkell: npc('thorkell', [{ when: up, screen: 'ask_village', at: { x: 30, y: 14 }, facing: 's' }]),

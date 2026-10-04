@@ -815,6 +815,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'De tillfångatagna tappas på blod för att lösa eden som håller Rimkungen. Embla kom undan, västerut över sjön. Helgrinds port står norr om Gjöll.',
         },
       },
+      {
+        when: flag('st_d4_entered'),
+        text: {
+          en: 'Inside Helgrind. Somewhere past the Gjöll’s rapids its thane keeps two of the captives.',
+          sv: 'Inne i Helgrind. Någonstans bortom Gjölls forsar håller dess hövding två av de tillfångatagna.',
+        },
+      },
+      {
+        when: flag('st_thane_nastrond'),
+        text: {
+          en: 'One thane down, three to go. Embla is somewhere ahead.',
+          sv: 'En hövding fälld, tre kvar. Embla är någonstans längre fram.',
+        },
+      },
     ],
   },
 };

@@ -86,6 +86,28 @@ import { d2R13 } from './sokkva/d2_r13';
 import { d2R14 } from './sokkva/d2_r14';
 import { d2R15 } from './sokkva/d2_r15';
 import { d2R16 } from './sokkva/d2_r16';
+import { d4R01 } from './helgrind/d4_r01';
+import { d4R02 } from './helgrind/d4_r02';
+import { d4R03 } from './helgrind/d4_r03';
+import { d4R04 } from './helgrind/d4_r04';
+import { d4R05 } from './helgrind/d4_r05';
+import { d4R06 } from './helgrind/d4_r06';
+import { d4R07 } from './helgrind/d4_r07';
+import { d4R08 } from './helgrind/d4_r08';
+import { d4R09 } from './helgrind/d4_r09';
+import { d4R10 } from './helgrind/d4_r10';
+import { d4R11 } from './helgrind/d4_r11';
+import { d4R12 } from './helgrind/d4_r12';
+import { d4R13 } from './helgrind/d4_r13';
+import { d4R14 } from './helgrind/d4_r14';
+import { d4R15 } from './helgrind/d4_r15';
+import { d4R16 } from './helgrind/d4_r16';
+import { d4R17 } from './helgrind/d4_r17';
+import { d4R18 } from './helgrind/d4_r18';
+import { d4R19 } from './helgrind/d4_r19';
+import { d4R20 } from './helgrind/d4_r20';
+import { d4R21 } from './helgrind/d4_r21';
+import { d4R22 } from './helgrind/d4_r22';
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
 import { d3R03 } from './konungshaugr/d3_r03';
@@ -250,4 +272,26 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   nif_cairns: nifCairns,
   nif_strand: nifStrand,
   nif_int_cave: nifIntCave,
+  d4_r01: d4R01,
+  d4_r02: d4R02,
+  d4_r03: d4R03,
+  d4_r04: d4R04,
+  d4_r05: d4R05,
+  d4_r06: d4R06,
+  d4_r07: d4R07,
+  d4_r08: d4R08,
+  d4_r09: d4R09,
+  d4_r10: d4R10,
+  d4_r11: d4R11,
+  d4_r12: d4R12,
+  d4_r13: d4R13,
+  d4_r14: d4R14,
+  d4_r15: d4R15,
+  d4_r16: d4R16,
+  d4_r17: d4R17,
+  d4_r18: d4R18,
+  d4_r19: d4R19,
+  d4_r20: d4R20,
+  d4_r21: d4R21,
+  d4_r22: d4R22,
 };

@@ -316,7 +316,9 @@ function underTheFimbulvetr(): GameState {
 
 describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
   it('reaches every lowland screen and every M5b side-quest spot in winter, and nothing strands Ask', () => {
-    const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter' });
+    // Helgrind has proofs of its own (solver_d4): leaving it out keeps this solve from branching on its keys.
+    const within = SCREEN_IDS.filter((id) => DB.screens[id].dungeon !== 'd4');
+    const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter', within });
     const lowland = SCREEN_IDS.filter(
       (id) => DB.screens[id].dungeon === undefined && !id.startsWith('test_'),
     );

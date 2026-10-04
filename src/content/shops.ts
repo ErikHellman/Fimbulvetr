@@ -53,4 +53,13 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { armor: 'byrnie', price: 100 },
     ],
   },
+  /** Tófa's stall at the field fence, once she is home from Helgrind. */
+  tofa: {
+    id: 'tofa',
+    name: { en: 'Tófa’s stall', sv: 'Tófas stånd' },
+    stock: [
+      { item: 'flatbread', price: 5 },
+      { item: 'cheese', price: 8 },
+    ],
+  },
 };
