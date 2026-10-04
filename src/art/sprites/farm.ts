@@ -79,6 +79,20 @@ const PROP_PAL: GridPalette = {
   a: C.water,
 };
 
+/** A trader's crate, iron-hooped planks. */
+const CRATE = [
+  'bbbbbbbbbbbb',
+  'bBhhhhhhhhBb',
+  'bBbbbbbbbbBb',
+  'bBbBbbbbBbBb',
+  'bBbbBbbBbbBb',
+  'bBbbbBBbbbBb',
+  'bBbbBbbBbbBb',
+  'bBbBbbbbBbBb',
+  'bBhhhhhhhhBb',
+  'BBBBBBBBBBBB',
+];
+
 const POT = [
   '....cccccc....',
   '...CCCCCCCC...',
@@ -283,6 +297,7 @@ export function farmFrames(): SpriteFrame[] {
   out.push(propFrame('prop_stone_idle_s_0', STONE));
   out.push(propFrame('prop_rock_idle_s_0', ROCK));
   out.push(propFrame('prop_pail_idle_s_0', PAIL));
+  out.push(propFrame('prop_crate_idle_s_0', CRATE));
   out.push(propFrame('prop_log_small_idle_s_0', LOG_SMALL));
   out.push(propFrame('prop_log_big_idle_s_0', LOG_BIG));
   out.push(...heartFrames(), ...dropFrames(), shadowFrame(), fenMoss());
@@ -307,6 +322,7 @@ export const FARM_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef
   prop_stone: ONE_S,
   prop_rock: ONE_S,
   prop_pail: ONE_S,
+  prop_crate: ONE_S,
   prop_log_small: ONE_S,
   prop_log_big: ONE_S,
   pickup_heart_piece: { idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] } },

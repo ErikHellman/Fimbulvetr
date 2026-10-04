@@ -21,6 +21,23 @@ export const askVillage: ScreenDef = {
   purpose:
     "Askdalr village: the square, Sigrún's trading house (door) and the neighbours' houses. Most people are here by day.",
   things: [
+    // Sigrún's crates (`q_crates`), set down in front of her door, each counted once.
+    ...(['crate_a', 'crate_b', 'crate_c'] as const).map((id): Thing => ({
+      k: 'drop',
+      at: { x: 5, y: 6 },
+      w: 7,
+      h: 2,
+      accepts: id,
+      do: [
+        {
+          k: 'set',
+          flag: id === 'crate_a' ? 'q_crate_a' : id === 'crate_b' ? 'q_crate_b' : 'q_crate_c',
+          value: true,
+        },
+        { k: 'add', flag: 'q_crates_home', n: 1 },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+    })),
     /** The region's warp stone (Farvegr). */
     { k: 'warp', region: 'askdalr', at: { x: 24, y: 14 }, arrive: { x: 24, y: 15 } },
     { k: 'door', at: { x: 8, y: 5 }, dir: 'n', to: 'ask_int_trader', arrive: { x: 19, y: 17 }, facing: 'n' },

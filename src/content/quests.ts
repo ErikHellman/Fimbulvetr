@@ -628,4 +628,31 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_crates: {
+    id: 'q_crates',
+    name: { en: 'Sigrún’s crates', sv: 'Sigrúns lårar' },
+    stages: [
+      {
+        when: flag('q_crates_asked'),
+        text: {
+          en: 'The storm scattered three of Sigrún’s crates: in the farmyard, by the hof, by the brook. Carry them to her door.',
+          sv: 'Stormen skingrade tre av Sigrúns lårar: på gårdsplanen, vid hovet, vid bäcken. Bär dem till hennes dörr.',
+        },
+      },
+      {
+        when: atLeast('q_crates_home', 3),
+        text: {
+          en: 'All three crates are home. Tell Sigrún.',
+          sv: 'Alla tre lårarna är hemma. Säg till Sigrún.',
+        },
+      },
+      {
+        when: flag('q_crates_done'),
+        text: {
+          en: 'Sigrún has her crates back, and sells Embla’s cheese again. She gave Ask a piece of heart.',
+          sv: 'Sigrún har fått tillbaka sina lårar och säljer Emblas ost igen. Hon gav Ask en bit hjärta.',
+        },
+      },
+    ],
+  },
 };

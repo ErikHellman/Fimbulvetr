@@ -90,6 +90,19 @@ export const askFarmyard: ScreenDef = {
   purpose:
     "Halvar's farm: the longhouse, the well and trough for the water chore (day 1) and the chopping block for the firewood chore (day 2). Every road in Askdalr meets here.",
   things: [
+    /** One of Sigrún's crates, blown into the farmyard's corner (`q_crates`): lift it and carry it to her door in the village. */
+    {
+      k: 'prop',
+      id: 'crate_a',
+      at: { x: 37, y: 17 },
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'q_crates_asked' },
+          { k: 'not', c: { k: 'flag', id: 'q_crate_a' } },
+        ],
+      },
+    },
     {
       k: 'door',
       at: { x: 9, y: 7 },

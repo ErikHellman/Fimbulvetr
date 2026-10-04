@@ -1,5 +1,8 @@
 import type { ScreenId } from '@content/world/screens';
-import { setAnim } from '../../actors/entity';
+import { mem, setAnim } from '../../actors/entity';
+import { changeState } from '../../actors/fsm';
+import { HERO_MACHINE } from '../../actors/hero';
+import { EMPTY_FRAME } from '../../input/actions';
 import { at, type Box } from '../../math/box';
 import type { Dir4 } from '../../math/dir';
 import type { Vec } from '../../math/vec';
@@ -7,7 +10,7 @@ import { SCREEN_H, SCREEN_W, TILE } from '../../world/dims';
 import { tileFeet, type DoorThing } from '../../world/screen';
 import type { SimRt, Transition } from '../rt';
 import { forfeitDuels } from './combat';
-import { placeHero } from './hero';
+import { heroCtx, placeHero } from './hero';
 import { spawnActors } from './spawn';
 
 export const TRANSITION_TICKS = 30;
@@ -39,12 +42,32 @@ export function markVisited(rt: SimRt, id: ScreenId): void {
   if (!rt.state.world.visited.includes(id)) rt.state.world.visited.push(id);
 }
 
-/** Makes `id` the live screen with fresh actors and the hero at `heroAt`, and records it as the entry. */
-export function enterScreen(rt: SimRt, id: ScreenId, heroAt: Vec, facing: Dir4 = rt.hero.facing): void {
+/**
+ * Makes `id` the live screen with fresh actors and the hero at `heroAt`, and records it as the entry. With
+ * `walked` (over an edge or through a door) what Ask carries overhead comes along (Sigrún's crates), no
+ * longer belonging to any thing; any other way (a warp, a fall, a script) loses it.
+ */
+export function enterScreen(
+  rt: SimRt,
+  id: ScreenId,
+  heroAt: Vec,
+  facing: Dir4 = rt.hero.facing,
+  walked = false,
+): void {
   forfeitDuels(rt);
+  const carrying = rt.hero.mem['carrying'];
+  const carried = walked
+    ? rt.actors.find((a) => a.kind === 'prop' && a.id === carrying && mem(a, 'carried') === 1)
+    : undefined;
   rt.screen = rt.load(id);
   rt.actors = spawnActors(rt, heroAt);
+  if (carried !== undefined) {
+    carried.mem['thing'] = -1;
+    carried.pos = { ...heroAt };
+    rt.actors.push(carried);
+  }
   placeHero(rt, heroAt);
+  if (carried !== undefined) changeState(HERO_MACHINE, rt.hero, 'carry', heroCtx(rt, EMPTY_FRAME));
   rt.hero.facing = facing;
   rt.entry = { x: heroAt.x, y: heroAt.y, facing };
 }
@@ -63,7 +86,7 @@ export function checkEdges(rt: SimRt): void {
   const from = rt.screen.id;
   const heroFrom = { ...rt.hero.pos };
   const heroTo = entryPoint(dir, heroFrom, rt.db.tuning.hero.body);
-  enterScreen(rt, to, heroTo);
+  enterScreen(rt, to, heroTo, rt.hero.facing, true);
   setAnim(rt.hero, 'walk');
   rt.transition = {
     kind: 'slide',
@@ -128,7 +151,7 @@ export function stepTransition(rt: SimRt): void {
   tr.t += 1;
   if (tr.kind === 'slide') rt.hero.animT += 1;
   if (tr.kind === 'fade' && tr.t === tr.dur / 2) {
-    enterScreen(rt, tr.to, tr.heroTo, tr.facing);
+    enterScreen(rt, tr.to, tr.heroTo, tr.facing, true);
     setAnim(rt.hero, 'idle');
   }
   if (tr.t < tr.dur) return;

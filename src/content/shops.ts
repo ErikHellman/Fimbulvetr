@@ -10,6 +10,8 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
     stock: [
       { item: 'lantern', price: 25 },
       { item: 'flatbread', price: 5 },
+      /** Embla's cheese, back on the shelf once the crates are home (`q_crates`). */
+      { item: 'cheese', price: 8, when: { k: 'flag', id: 'q_crates_done' } },
     ],
   },
   /** Mead, a second horn to carry it in (Þórdís gives the first), and bombs once Ask carries them. */

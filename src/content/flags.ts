@@ -187,6 +187,13 @@ export const FLAGS = {
   q_ring_given: { t: 'bool' },
   q_ring_laid: { t: 'bool' },
   q_barrow_ring_done: { t: 'bool' },
+  /** Sigrún's crates (`q_crates`): asked, each crate set down at her door, how many, and her thanks. */
+  q_crates_asked: { t: 'bool' },
+  q_crate_a: { t: 'bool' },
+  q_crate_b: { t: 'bool' },
+  q_crate_c: { t: 'bool' },
+  q_crates_home: { t: 'int', max: 3 },
+  q_crates_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

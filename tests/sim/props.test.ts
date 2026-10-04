@@ -73,7 +73,7 @@ describe('throwing', () => {
     expect(h.count('hit')).toBe(1);
   });
 
-  it('is lost when the hero leaves the screen', () => {
+  it('is lost when the hero is warped off the screen', () => {
     const h = new Harness({ db: propDb(), tile: [12, 13], facing: 's' });
     h.press(['interact']).idle(20);
     h.sim.command({ t: 'warp', screen: 'test_b', x: 100, y: 100 });

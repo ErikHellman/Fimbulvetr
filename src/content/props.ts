@@ -163,4 +163,32 @@ export const PROP_DEFS = {
     blast: true,
     loot: ['arrows'],
   },
+  /** Sigrún's three crates (`q_crates`), one id each so each is delivered once; they do not break. */
+  crate_a: {
+    id: 'crate_a',
+    art: 'prop_crate',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: false,
+    throwDamage: 2,
+  },
+  crate_b: {
+    id: 'crate_b',
+    art: 'prop_crate',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: false,
+    throwDamage: 2,
+  },
+  crate_c: {
+    id: 'crate_c',
+    art: 'prop_crate',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: false,
+    throwDamage: 2,
+  },
 } as const satisfies Record<PropId, PropDef>;

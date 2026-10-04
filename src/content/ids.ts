@@ -234,6 +234,7 @@ export const QUESTS = [
   'q_trolls',
   'q_steinn',
   'q_barrow_ring',
+  'q_crates',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -308,6 +309,9 @@ export const PROPS = [
   'bomb_pot',
   'arrow_pot',
   'grave_gold',
+  'crate_a',
+  'crate_b',
+  'crate_c',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 
