@@ -191,4 +191,14 @@ export const PROP_DEFS = {
     fragile: false,
     throwDamage: 2,
   },
+  /** A throwing axe from Ketill's rack (`q_axes`): it flies like a pail and lies where it lands, to throw again. */
+  axe: {
+    id: 'axe',
+    art: 'prop_axe',
+    body: SMALL,
+    hurt: SMALL_HURT,
+    liftable: true,
+    fragile: false,
+    throwDamage: 2,
+  },
 } as const satisfies Record<PropId, PropDef>;

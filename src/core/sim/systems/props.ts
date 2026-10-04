@@ -16,7 +16,8 @@ import { critterDef } from './critters';
 import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
 import { spillDrop } from './pickups';
-import { applyAll, probeBox } from './story';
+import { evalCond } from '../../story/cond';
+import { applyAll, condCtx, probeBox } from './story';
 import { wakeTheDead } from './wake';
 
 export const propDef = (rt: SimRt, e: Entity): PropDef => rt.db.props[e.def as PropId];
@@ -192,7 +193,7 @@ function settle(rt: SimRt, e: Entity): void {
   const tx = Math.floor(e.pos.x / TILE);
   const ty = Math.floor((e.pos.y - 1) / TILE);
   for (const thing of rt.db.screens[rt.screen.id].things) {
-    if (thing.k !== 'drop' || thing.accepts !== e.def) continue;
+    if (thing.k !== 'drop' || thing.accepts !== e.def || !evalCond(thing.when, condCtx(rt))) continue;
     if (tx < thing.at.x || tx >= thing.at.x + thing.w || ty < thing.at.y || ty >= thing.at.y + thing.h)
       continue;
     remove(rt, e);

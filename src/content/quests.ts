@@ -682,4 +682,24 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_axes: {
+    id: 'q_axes',
+    name: { en: 'The axe range', sv: 'Yxbanan' },
+    stages: [
+      {
+        when: flag('q_axes_asked'),
+        text: {
+          en: 'Ketill’s range by Uppvík’s lower houses: hit five straw men with thrown axes in forty-five seconds.',
+          sv: 'Ketills bana vid Uppvíks nedre hus: träffa fem halmgubbar med kastade yxor på fyrtiofem sekunder.',
+        },
+      },
+      {
+        when: flag('q_axes_done'),
+        text: {
+          en: 'Five for five at Ketill’s range. He gave Ask a piece of heart.',
+          sv: 'Fem av fem på Ketills bana. Han gav Ask en bit hjärta.',
+        },
+      },
+    ],
+  },
 };

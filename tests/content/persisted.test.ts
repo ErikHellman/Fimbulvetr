@@ -99,6 +99,7 @@ const PERSISTED = [
   'myl_c_leaf',
   'hau_c_leaf',
   'hp_ask_village',
+  'hp_upp_range',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

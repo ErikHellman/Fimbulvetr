@@ -1,5 +1,8 @@
 import type { ScriptDef } from '@core/story/script';
 
+/** Forty-five seconds of sand at Ketill's axe range. */
+export const AXES_TICKS = 2700;
+
 /** A minute of sand for Hildr's herding. */
 export const HERD_TICKS = 3600;
 
@@ -193,9 +196,82 @@ const hive: ScriptDef = {
   ],
 };
 
+const TARGETS = ['q_axe_t1', 'q_axe_t2', 'q_axe_t3', 'q_axe_t4', 'q_axe_t5'] as const;
+
+/** Ketill's range: the targets reset, the axes back on the rack, and the sand turned. */
+const axesStart: ScriptDef = {
+  steps: [
+    { k: 'fade', out: true },
+    {
+      k: 'do',
+      effects: [
+        { k: 'set', flag: 'ev_axes_on', value: false },
+        { k: 'set', flag: 'q_axes_hit', value: 0 },
+        ...TARGETS.map((flag) => ({ k: 'set' as const, flag, value: false })),
+      ],
+    },
+    { k: 'warp', screen: 'upp_smiths', at: { x: 13, y: 19 }, facing: 'e' },
+    { k: 'fade', out: false },
+    {
+      k: 'trial',
+      ticks: AXES_TICKS,
+      done: { k: 'flag', id: 'q_axes_hit', gte: 5 },
+      win: 'axes_won',
+      fail: 'axes_lost',
+    },
+  ],
+};
+
+const axesWon: ScriptDef = {
+  steps: [
+    {
+      k: 'say',
+      who: 'ketill',
+      text: {
+        en: 'Five for five, and sand to spare! My old apprentice never managed three. Here, this was meant for a better prize than him.',
+        sv: 'Fem av fem, och sand över! Min gamla lärling klarade aldrig tre. Här, det här var tänkt som pris åt någon bättre än han.',
+      },
+    },
+    {
+      k: 'do',
+      effects: [
+        { k: 'set', flag: 'q_axes_done', value: true },
+        { k: 'piece', id: 'hp_upp_range' },
+      ],
+    },
+  ],
+};
+
+const axesLost: ScriptDef = {
+  steps: [
+    {
+      k: 'say',
+      who: 'ketill',
+      text: {
+        en: 'Sand’s out. Not bad for a farmhand, not good for an axe-thrower. Again, whenever you like.',
+        sv: 'Sanden är slut. Inte illa för en dräng, inte bra för en yxkastare. Igen, när du vill.',
+      },
+    },
+  ],
+};
+
 export const LOWLAND_SCRIPTS: Readonly<
-  Record<'find_bell' | 'herd_start' | 'herd_won' | 'herd_lost' | 'ring_laid' | 'hive', ScriptDef>
+  Record<
+    | 'find_bell'
+    | 'herd_start'
+    | 'herd_won'
+    | 'herd_lost'
+    | 'ring_laid'
+    | 'hive'
+    | 'axes_start'
+    | 'axes_won'
+    | 'axes_lost',
+    ScriptDef
+  >
 > = {
+  axes_start: axesStart,
+  axes_won: axesWon,
+  axes_lost: axesLost,
   hive,
   ring_laid: ringLaid,
   find_bell: findBell,

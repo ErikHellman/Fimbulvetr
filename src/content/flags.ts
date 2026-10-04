@@ -197,6 +197,16 @@ export const FLAGS = {
   /** Þórdís's wild honey (`q_honey`): asked, and the honey brought. */
   q_honey_asked: { t: 'bool' },
   q_honey_done: { t: 'bool' },
+  /** Ketill's axe range (`q_axes`): asked, a try begun, each of the five targets hit, how many, and won. */
+  q_axes_asked: { t: 'bool' },
+  ev_axes_on: { t: 'bool' },
+  q_axe_t1: { t: 'bool' },
+  q_axe_t2: { t: 'bool' },
+  q_axe_t3: { t: 'bool' },
+  q_axe_t4: { t: 'bool' },
+  q_axe_t5: { t: 'bool' },
+  q_axes_hit: { t: 'int', max: 5 },
+  q_axes_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

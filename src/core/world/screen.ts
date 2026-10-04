@@ -234,7 +234,10 @@ export type Thing =
       readonly art: SceneryArt;
       readonly shown: Cond;
     }
-  /** Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up. */
+  /**
+   * Setting down (or throwing) an `accepts` prop inside the rectangle applies `do` and uses it up, while
+   * `when` holds (a target already hit takes no more).
+   */
   | {
       readonly k: 'drop';
       readonly at: TilePos;
@@ -242,6 +245,7 @@ export type Thing =
       readonly h: number;
       readonly accepts: PropId;
       readonly do: readonly Effect[];
+      readonly when?: Cond;
     };
 
 /**

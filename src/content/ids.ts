@@ -239,6 +239,7 @@ export const QUESTS = [
   'q_barrow_ring',
   'q_crates',
   'q_honey',
+  'q_axes',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -291,6 +292,9 @@ export const SCRIPTS = [
   'herd_lost',
   'ring_laid',
   'hive',
+  'axes_start',
+  'axes_won',
+  'axes_lost',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
@@ -317,6 +321,7 @@ export const PROPS = [
   'crate_a',
   'crate_b',
   'crate_c',
+  'axe',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 

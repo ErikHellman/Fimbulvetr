@@ -115,7 +115,7 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **Screens** (`src/content/world/<region>/<id>.ts`) are 40×22 text maps plus `things`:
   - enemy (optional `when`, e.g. night-only draugr, and `onDeath` effects), door, sign, `use` (interact runs a script), trigger (entering runs a script)
   - `fire` (burning tiles: hurt through the shield, not solid, glow in the dark) and `gate` (tiles that are solid while `closed` holds: a palisade, a wall of fire, piled logs)
-  - prop (lift/throw/split; `wall` props fill their tile, `pushable` ones slide), drop zone, critter, pen, heart piece
+  - prop (lift/throw/split; `wall` props fill their tile, `pushable` ones slide), drop zone (with an optional `when`), critter, pen, heart piece
   - `chest` (`gives` an item or silver; `appear` on a room signal), `heart` (a heart container), `lock` (`big` for the boss door), `shutter` (`opens` on a signal, saved by `id`), `switch` (`set` latches a flag), `brazier` (`lit` from the start or by the lantern), `bridge`, `crack` (a blast opens it for good), `wheel` (sets the water level)
   - Signs and uses may cover a `w`×`h` block (a sign on a 2×2 well).
 - **Dungeon rooms** carry `dungeon` (no clock, no weather) and may be `dark`. Locks and shutters between two rooms sit on the edge tiles and are mirrored in both rooms under one id, so a slide never lands Ask inside a shut one. `tests/content/persisted.test.ts` holds every chest, lock, saved shutter, piece and heart id: append only.
