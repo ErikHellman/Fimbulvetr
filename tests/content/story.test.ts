@@ -41,11 +41,8 @@ const CONTENT = {
   fish: DB.fish,
 };
 
-/**
- * Flags read now and set by a later milestone's content: the rime beyond the pass melts in M6, and the farm
- * is rebuilt in M5b.
- */
-const SET_LATER = new Set(['st_rime_open', 'q_farm']);
+/** Flags read now and set by a later milestone's content: the rime beyond the pass melts in M6. */
+const SET_LATER = new Set(['st_rime_open']);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {

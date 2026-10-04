@@ -162,6 +162,8 @@ export const FLAGS = {
   w_ring_stamina: { t: 'bool' },
   /** Thrift takes a quarter off shop prices, rounded up. */
   w_ring_thrift: { t: 'bool' },
+  /** Halvar asked Ask to rebuild the farm (`q_farm`). */
+  st_farm_asked: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

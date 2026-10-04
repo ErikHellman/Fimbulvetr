@@ -5,6 +5,7 @@ import {
   afterRaid,
   all,
   any,
+  atLeast,
   daytime,
   evening,
   eveningDue,
@@ -78,6 +79,13 @@ const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
 export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   halvar: npc('halvar', [
     { when: raidNight, screen: 'ask_gate', at: { x: 18, y: 8 }, facing: 'n' },
+    /** Up again once the longhouse has its roof (farm stage 1): he works the yard by day. */
+    {
+      when: all(afterRaid, atLeast('q_farm', 1), not(evening)),
+      screen: 'ask_farmyard',
+      at: { x: 14, y: 10 },
+      facing: 's',
+    },
     /** Wounded at the gate: he keeps to his bed after the raid. */
     { when: afterRaid, screen: 'ask_int_longhouse', at: { x: 27, y: 8 }, facing: 's' },
     { when: evening, screen: 'ask_int_longhouse', at: { x: 27, y: 9 }, facing: 's' },
@@ -201,6 +209,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   ]),
   /** With her sheep on the heath by day; home before dark. */
   hildr: npc('hildr', [
+    /** With the fold raised (farm stage 2) she winters her flock in Askdalr's pasture. */
+    { when: atLeast('q_farm', 2), screen: 'ask_pasture', at: { x: 20, y: 9 }, facing: 's' },
     { when: { k: 'not', c: night }, screen: 'hau_heath', at: { x: 17, y: 5 }, facing: 's' },
   ]),
   /** By his tent at the barrow field by day; at night he hides inside it. */

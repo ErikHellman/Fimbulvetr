@@ -221,6 +221,7 @@ export const QUESTS = [
   'q_runestone_3',
   'q_huscarl',
   'q_fimbulvetr',
+  'q_farm',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 

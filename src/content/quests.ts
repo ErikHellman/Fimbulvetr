@@ -438,4 +438,31 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_farm: {
+    id: 'q_farm',
+    name: { en: 'The farm', sv: 'Gården' },
+    stages: [
+      {
+        when: flag('st_farm_asked'),
+        text: {
+          en: 'Halvar wants the farm rebuilt, the longhouse roof first: turf and timber for 150 silver.',
+          sv: 'Halvar vill bygga upp gården igen, först långhusets tak: torv och timmer för 150 silver.',
+        },
+      },
+      {
+        when: atLeast('q_farm', 1),
+        text: {
+          en: 'The longhouse has its roof again. The fold and byre next, for 250 silver: a bigger purse will be needed.',
+          sv: 'Långhuset har tak igen. Fållan och fähuset härnäst, för 250 silver: det behövs en större pung.',
+        },
+      },
+      {
+        when: atLeast('q_farm', 2),
+        text: {
+          en: 'The longhouse and the fold stand again, and Hildr winters her flock in the pasture. The rest must wait for ore.',
+          sv: 'Långhuset och fållan står igen, och Hildr har sin hjord i hagen över vintern. Resten får vänta på malm.',
+        },
+      },
+    ],
+  },
 };

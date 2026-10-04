@@ -1,7 +1,10 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { afterRaid, all, choresDone, day, evening, flag, not, paid, raidNight } from './util';
+import { afterRaid, all, atLeast, choresDone, day, evening, flag, not, paid, raidNight } from './util';
 
 const PAY = 10;
+/** What each stage of the rebuilding costs: the longhouse's roof, then the fold and byre. */
+export const FARM_COST = [150, 250] as const;
+const [ROOF, FOLD] = FARM_COST;
 
 /** Halvar hands out the day's chores and pays for them. */
 export const HALVAR: DialogueDef = {
@@ -9,6 +12,9 @@ export const HALVAR: DialogueDef = {
     { when: raidNight, node: 'raid' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
+    { when: atLeast('q_farm', 2), node: 'farm_done' },
+    { when: atLeast('q_farm', 1), node: 'fold' },
+    { when: flag('st_farm_asked'), node: 'roof' },
     { when: flag('st_home_winter'), node: 'winter' },
     { when: all(afterRaid, flag('n_styrr_met'), not(flag('st_stone3_lit'))), node: 'styrr' },
     { when: afterRaid, node: 'after' },
@@ -204,6 +210,93 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'Go to Gyða. If anyone knows why the mountain breathed, she does. I will mend in this bed until the roof does.',
         sv: 'Gå till Gyða. Om någon vet varför berget andades så är det hon. Jag får läka i den här sängen tills taket gör det.',
+      },
+      next: 'farm',
+    },
+    farm: {
+      text: {
+        en: 'And the roof will not mend itself. Turf and timber can be bought, if there is silver. We build it back, Ask, a piece at a time.',
+        sv: 'Och taket lagar inte sig självt. Torv och timmer går att köpa, om det finns silver. Vi bygger upp det igen, Ask, en bit i taget.',
+      },
+      do: [{ k: 'set', flag: 'st_farm_asked', value: true }],
+      next: 'roof',
+    },
+    roof: {
+      text: {
+        en: 'The roof first. Snow lies on my blanket every morning.',
+        sv: 'Taket först. Det ligger snö på min filt varje morgon.',
+      },
+      choices: [
+        {
+          text: {
+            en: `Turf the roof (${String(ROOF)} silver).`,
+            sv: `Torva taket (${String(ROOF)} silver).`,
+          },
+          when: { k: 'silver', gte: ROOF },
+          do: [
+            { k: 'silver', n: -ROOF },
+            { k: 'set', flag: 'q_farm', value: 1 },
+            { k: 'sfx', id: 'sfx_buy' },
+          ],
+          next: 'roof_done',
+        },
+        {
+          text: { en: `The roof (${String(ROOF)} silver)…`, sv: `Taket (${String(ROOF)} silver)…` },
+          when: { k: 'not', c: { k: 'silver', gte: ROOF } },
+          next: 'poor',
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    roof_done: {
+      text: {
+        en: 'Green turf on a winter roof. It will look like a fool’s work until spring. Help me up, lad. I have lain here long enough.',
+        sv: 'Grön torv på ett vintertak. Det ser ut som ett dårverk fram till våren. Hjälp mig upp, pojk. Jag har legat här länge nog.',
+      },
+    },
+    fold: {
+      text: {
+        en: 'Hildr’s flock is scattered over the heath. Raise the fold and the byre again, and she could winter them here.',
+        sv: 'Hildrs hjord är skingrad över heden. Res fållan och fähuset igen, så kunde hon ha dem här över vintern.',
+      },
+      choices: [
+        {
+          text: {
+            en: `Raise the fold and byre (${String(FOLD)} silver).`,
+            sv: `Res fållan och fähuset (${String(FOLD)} silver).`,
+          },
+          when: { k: 'silver', gte: FOLD },
+          do: [
+            { k: 'silver', n: -FOLD },
+            { k: 'set', flag: 'q_farm', value: 2 },
+            { k: 'sfx', id: 'sfx_buy' },
+          ],
+          next: 'fold_done',
+        },
+        {
+          text: { en: `The fold (${String(FOLD)} silver)…`, sv: `Fållan (${String(FOLD)} silver)…` },
+          when: { k: 'not', c: { k: 'silver', gte: FOLD } },
+          next: 'poor',
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    fold_done: {
+      text: {
+        en: 'A fold with sheep in it again. I will send word to Hildr on the heath. She will come; the cold leaves her no choice.',
+        sv: 'En fålla med får i igen. Jag skickar bud till Hildr på heden. Hon kommer; kölden lämnar henne inget val.',
+      },
+    },
+    poor: {
+      text: {
+        en: 'Timber costs silver, even now. Come back with a fuller purse. I am not going anywhere.',
+        sv: 'Timmer kostar silver, även nu. Kom tillbaka med en fullare pung. Jag ska ingenstans.',
+      },
+    },
+    farm_done: {
+      text: {
+        en: 'A roof, a fold, sheep. The smithy and the rest want iron, and there is no ore this side of the rime.',
+        sv: 'Ett tak, en fålla, får. Smedjan och resten vill ha järn, och det finns ingen malm på den här sidan rimfrosten.',
       },
     },
   },
