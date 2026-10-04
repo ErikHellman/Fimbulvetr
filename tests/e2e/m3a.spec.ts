@@ -24,11 +24,11 @@ test('the boomerang strikes the weir’s latch and the drawbridge carries Ask in
   await tap(page, 'KeyK');
   await expect.poll(async () => (await flags(page)).w_myl_bridge).toBe(true);
   // Down to the bridge head and west over the rapids until Mýrland greets Ask.
-  // Step by frames and let go on the bridge's rows (6–7): holding on past them walks off its end.
-  await page.keyboard.down('KeyS');
-  for (let i = 0; i < 400 && (await tileY(page)) < 6; i++) await frames(page);
-  await page.keyboard.up('KeyS');
-  expect(await tileY(page)).toBeLessThanOrEqual(7);
+  // Tap down until Ask's feet stand on the bridge's lower row (7), so all of Ask is between its rails:
+  // feet just over into row 6 leave Ask's head in the rapids' row 5, which snags the bank on a slow
+  // machine. Taps, not a held key, so a slow frame never carries Ask off the bridge's end (row 8).
+  for (let i = 0; i < 200 && (await tileY(page)) < 7; i++) await tap(page, 'KeyS');
+  expect(await tileY(page)).toBe(7);
   await page.keyboard.down('KeyA');
   await expect.poll(async () => mode(page), { timeout: 15_000 }).toBe('story');
   await page.keyboard.up('KeyA');
