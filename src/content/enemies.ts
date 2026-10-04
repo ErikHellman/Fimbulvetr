@@ -668,6 +668,39 @@ export const ENEMY_DEFS = {
     light: true,
     drops: { heart: 3, silver: 2, none: 2 },
   },
+  /**
+   * A nykr foal, a small water horse of Sævatn: circles under the surface out of reach, rears (400 ms) and
+   * lunges, up onto the bank if Ask stands there, where it flounders open to the blade (see nykr_foal.ts).
+   */
+  nykr_foal: {
+    id: 'nykr_foal',
+    art: 'enemy_nykr_foal',
+    hp: 3,
+    body: { x: -7, y: -8, w: 14, h: 8 },
+    hurt: { x: -10, y: -18, w: 20, h: 18 },
+    behaviour: 'nykr_foal',
+    knockResist: 0.5,
+    immortal: false,
+    solid: false,
+    swims: true,
+    attacks: {
+      lunge: {
+        from: 0,
+        to: 14,
+        boxes: {
+          e: { x: 0, y: -16, w: 18, h: 16 },
+          w: { x: -18, y: -16, w: 18, h: 16 },
+          s: { x: -9, y: -10, w: 18, h: 18 },
+          n: { x: -9, y: -24, w: 18, h: 18 },
+        },
+        amount: 2,
+        knock: 3,
+        tags: 0,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 2, silver: 3, none: 2 },
+  },
   /** Hel's black hounds: stalk like vargr, and lunge in pairs (see helhound.ts). Light enough to drag. */
   helhound: {
     id: 'helhound',

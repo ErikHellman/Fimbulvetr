@@ -7,7 +7,7 @@ import type { ActorCtx } from '../../actors/enemies/defs';
 import { runFsm } from '../../actors/fsm';
 import { gridSolidAt } from '../../world/collision';
 import type { SimRt } from '../rt';
-import { enemyDef } from './movement';
+import { enemyDef, openWater } from './movement';
 
 /** What enemy (and critter) behaviours see this tick. */
 export function actorCtx(rt: SimRt): ActorCtx {
@@ -19,6 +19,7 @@ export function actorCtx(rt: SimRt): ActorCtx {
     heroFsm: rt.hero.fsm.s,
     heroFacing: rt.hero.facing,
     solidAt: gridSolidAt(rt.screen.collision, () => true),
+    waterAt: (tx, ty) => openWater(rt, tx, ty),
     others: rt.actors,
     emit: (ev) => {
       rt.emit(ev);

@@ -24,6 +24,7 @@ import { FOG_DRAUGR_MACHINE } from './fog';
 import { HELHOUND_MACHINE } from './helhound';
 import { GARMR_MACHINE } from './garmr';
 import { MARBENDILL_MACHINE } from './marbendill';
+import { NYKR_FOAL_MACHINE } from './nykr_foal';
 import { NASTROND_MACHINE, TOWER_SHIELD_MACHINE } from './nastrond';
 
 const MACHINES = {
@@ -54,6 +55,7 @@ const MACHINES = {
   nastrond: NASTROND_MACHINE,
   tower_shield: TOWER_SHIELD_MACHINE,
   marbendill: MARBENDILL_MACHINE,
+  nykr_foal: NYKR_FOAL_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -90,6 +92,7 @@ const START: Readonly<Record<BehaviourId, string>> = {
   nastrond: 'throne',
   tower_shield: 'lie',
   marbendill: 'rise',
+  nykr_foal: 'circle',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

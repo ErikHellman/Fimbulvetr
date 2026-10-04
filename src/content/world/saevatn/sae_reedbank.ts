@@ -5,7 +5,15 @@ export const saeReedbank: ScreenDef = {
   region: 'saevatn',
   purpose:
     "The east reed-bank, a strip of sand and grass under Myrkviðr's cliffs, reached only over the water or the ice.",
-  things: [],
+  things: [
+    /** A nykr foal circles here, out of the ice's way (it is under it in winter). */
+    {
+      k: 'enemy',
+      id: 'nykr_foal',
+      at: { x: 17, y: 10 },
+      when: { k: 'not', c: { k: 'season', is: 'winter' } },
+    },
+  ],
   /** Where Sævatn's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 27, y: 9 },

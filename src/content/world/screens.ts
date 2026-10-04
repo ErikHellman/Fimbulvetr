@@ -153,6 +153,13 @@ export const SCREEN_IDS = [
   'sae_drowned',
   'sae_holmr_ford',
   'sae_wreck',
+  'sae_holmr',
+  'sae_narrows',
+  'sae_well',
+  'sae_north',
+  'sae_seal_rocks',
+  'sae_fjordmouth',
+  'ref_int_hall',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

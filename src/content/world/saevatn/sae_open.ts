@@ -6,6 +6,13 @@ export const saeOpen: ScreenDef = {
   purpose:
     'The open lake between the landing and Holmr: grey water to every side and two bare islets. In winter it is one white floor.',
   things: [
+    /** A nykr foal circles here, out of the ice's way (it is under it in winter). */
+    {
+      k: 'enemy',
+      id: 'nykr_foal',
+      at: { x: 14, y: 12 },
+      when: { k: 'not', c: { k: 'season', is: 'winter' } },
+    },
     {
       k: 'chest',
       id: 'sae_c_open',

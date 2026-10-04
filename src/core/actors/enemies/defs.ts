@@ -127,6 +127,8 @@ export interface ActorCtx {
   readonly heroFacing: Dir4;
   /** Wall lookup for the current screen (off-screen tiles are solid). */
   readonly solidAt: SolidAt;
+  /** Whether a tile is open deep water (no ice, raft or wall on it): where swimmers go. */
+  waterAt(tx: number, ty: number): boolean;
   /** Everything else live on the screen (pack members, bulbs, props). Read only. */
   readonly others: readonly Readonly<Entity>[];
   emit(event: SimEvent): void;

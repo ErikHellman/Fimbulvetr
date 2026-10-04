@@ -319,8 +319,9 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
     // Helgrind has proofs of its own (solver_d4): leaving it out keeps this solve from branching on its keys.
     const within = SCREEN_IDS.filter((id) => DB.screens[id].dungeon !== 'd4');
     const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter', within });
+    // Holmr's hall lies past the warm ring: the seal-skin (Hrafn's nights) has its own proofs (M7a).
     const lowland = SCREEN_IDS.filter(
-      (id) => DB.screens[id].dungeon === undefined && !id.startsWith('test_'),
+      (id) => DB.screens[id].dungeon === undefined && !id.startsWith('test_') && id !== 'ref_int_hall',
     );
     for (const id of lowland) expect(r.screens, id).toContain(id);
     expect(r.scripts).toEqual(

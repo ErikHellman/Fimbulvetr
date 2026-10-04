@@ -39,9 +39,12 @@ export function moveAll(rt: SimRt): void {
   const { cols, rows } = rt.screen.collision;
   const sky: SolidAt = (tx, ty) => tx < 0 || ty < 0 || tx >= cols || ty >= rows;
   const hero = [at(rt.hero.body, rt.hero.pos)];
+  // Swimmers (a nykr foal) cross open deep water as well as ground.
+  const swims: SolidAt = (tx, ty) => walls(tx, ty) && !openWater(rt, tx, ty);
   for (const e of rt.actors) {
-    const flies = e.kind === 'enemy' && enemyDef(rt, e).flies === true;
-    moveEntity(rt, e, flies ? sky : walls, e.kind === 'npc' ? hero : [], flies);
+    const def = e.kind === 'enemy' ? enemyDef(rt, e) : undefined;
+    const flies = def?.flies === true;
+    moveEntity(rt, e, flies ? sky : def?.swims === true ? swims : walls, e.kind === 'npc' ? hero : [], flies);
   }
 }
 
@@ -80,7 +83,7 @@ export function heroSolidAt(rt: SimRt): SolidAt {
 const swimmer = (rt: SimRt): boolean => (rt.state.inv.items.sealskin ?? 0) > 0;
 
 /** Whether a tile is deep water nothing stands on (see `heroSolidAt`). */
-function openWater(rt: SimRt, tx: number, ty: number): boolean {
+export function openWater(rt: SimRt, tx: number, ty: number): boolean {
   const g = rt.screen.collision;
   if (tx < 0 || ty < 0 || tx >= g.cols || ty >= g.rows) return false;
   const f = g.flags[ty * g.cols + tx] ?? 0;

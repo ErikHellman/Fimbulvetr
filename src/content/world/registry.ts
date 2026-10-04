@@ -115,6 +115,13 @@ import { saeReedbank } from './saevatn/sae_reedbank';
 import { saeDrowned } from './saevatn/sae_drowned';
 import { saeHolmrFord } from './saevatn/sae_holmr_ford';
 import { saeWreck } from './saevatn/sae_wreck';
+import { saeHolmr } from './saevatn/sae_holmr';
+import { saeNarrows } from './saevatn/sae_narrows';
+import { saeWell } from './saevatn/sae_well';
+import { saeNorth } from './saevatn/sae_north';
+import { saeSealRocks } from './saevatn/sae_seal_rocks';
+import { saeFjordmouth } from './saevatn/sae_fjordmouth';
+import { refIntHall } from './saevatn/ref_int_hall';
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
 import { d3R03 } from './konungshaugr/d3_r03';
@@ -308,4 +315,11 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   sae_drowned: saeDrowned,
   sae_holmr_ford: saeHolmrFord,
   sae_wreck: saeWreck,
+  sae_holmr: saeHolmr,
+  sae_narrows: saeNarrows,
+  sae_well: saeWell,
+  sae_north: saeNorth,
+  sae_seal_rocks: saeSealRocks,
+  sae_fjordmouth: saeFjordmouth,
+  ref_int_hall: refIntHall,
 };
