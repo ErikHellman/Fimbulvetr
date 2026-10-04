@@ -375,4 +375,20 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
     });
     expect(r.finishable).toBe(true);
   });
+
+  it('walks all of Niflmýrr from the pass once the rime is melted, in every season, stranding nothing', () => {
+    const nif = SCREEN_IDS.filter((id) => id.startsWith('nif_'));
+    expect(nif).toHaveLength(12);
+    for (const season of ['winter', 'summer'] as const) {
+      const s = underTheFimbulvetr();
+      s.flags.st_rime_open = true;
+      s.hero.screen = 'hau_pass';
+      s.hero.x = 20 * TILE + TILE / 2;
+      s.hero.y = 8 * TILE + TILE - 1;
+      const r = solve(DB, s, nothing, { season, within: ['hau_pass', ...nif] });
+      for (const id of nif) expect(r.screens, `${season} ${id}`).toContain(id);
+      expect(r.opened, season).toEqual(expect.arrayContaining(['nif_k_jars', 'nif_c_cave']));
+      expect(r.stranded, season).toEqual([]);
+    }
+  });
 });

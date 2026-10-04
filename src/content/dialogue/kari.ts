@@ -7,6 +7,7 @@ export const KARI: DialogueDef = {
     { when: not(flag('n_kari_met')), node: 'meet' },
     { when: all(flag('q_fish_gamli'), not(flag('q_fisher_done'))), node: 'gamli' },
     { when: { k: 'item', id: 'trade_yarn' }, node: 'yarn' },
+    { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('q_fisher_done'), node: 'after' },
     { when: evening, node: 'night' },
@@ -37,6 +38,12 @@ export const KARI: DialogueDef = {
       text: {
         en: 'Take this: the bone hook Gamli carried in his jaw for twenty winters. There is a seal-hunter past the pass who would kill for it.',
         sv: 'Ta den här: benkroken som Gamle bar i käften i tjugo vintrar. Det finns en sälfångare bortom passet som skulle döda för den.',
+      },
+    },
+    rime: {
+      text: {
+        en: 'The rime is gone from the gorge? Then you will find Hrafn on the lake shore past it, hunting seal. Tell him Kári still owes him a net.',
+        sv: 'Rimfrosten är borta från ravinen? Då hittar du Hrafn vid sjöstranden bortom den, på säljakt. Säg att Kári fortfarande är skyldig honom ett nät.',
       },
     },
     meet: {

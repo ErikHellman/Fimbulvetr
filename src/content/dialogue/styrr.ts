@@ -16,6 +16,7 @@ export const STYRR: DialogueDef = {
   entry: [
     { when: not(flag('n_styrr_met')), node: 'meet' },
     { when: all(flag('t_parry'), not(flag('q_duel_asked'))), node: 'challenge' },
+    { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('q_duel_won'), node: 'won' },
     { when: all(flag('st_barrow_open'), not(flag('st_stone3_lit'))), node: 'opened' },
@@ -23,6 +24,12 @@ export const STYRR: DialogueDef = {
     { node: 'menu' },
   ],
   nodes: {
+    rime: {
+      text: {
+        en: 'Fog on the far side of the rime, you say? Then mind your back in it. The dead in a marsh do not stand up to face you. They wait until you turn.',
+        sv: 'Dimma på andra sidan rimfrosten, säger du? Akta då ryggen där. De döda i ett kärr reser sig inte för att möta dig. De väntar tills du vänder dig om.',
+      },
+    },
     meet: {
       text: {
         en: 'Through the rockfall, were you? With a bomb, I would wager. Nobody climbs it. Styrr. I carried a shield for the old jarl, long ago.',

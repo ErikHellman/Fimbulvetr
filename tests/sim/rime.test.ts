@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { DB } from '@content/index';
 import { DEV_PRESETS } from '@content/dev/presets';
+import type { FlagId } from '@content/flags';
+import type { NpcId } from '@content/ids';
+import { evalCond } from '@core/story/cond';
 import { Harness, frameOf } from './harness';
 import { heroTile, walkTo } from './walk';
 
@@ -40,5 +44,20 @@ describe('the rime wall', () => {
     h.press(['galdr']).idle(60);
     const again = new Harness({ state: h.sim.snapshot() });
     expect(again.sim.state.flags.st_rime_open).toBe(true);
+  });
+});
+
+describe('after the rime', () => {
+  it('gives Gyða, Sölvi, Styrr, Hallsteinn and Kári a new line', () => {
+    const opening = (melted: boolean, npc: NpcId): string | undefined => {
+      const h = new Harness({ preset: DEV_PRESETS.fimbul });
+      const flags = h.sim.state.flags;
+      for (const f of Object.keys(DB.flags) as FlagId[]) if (f.startsWith('n_')) flags[f] = true;
+      Object.assign(flags, { st_hlif_learned: true, q_duel_won: true, st_rime_open: melted });
+      const def = DB.dialogue[npc];
+      return def?.entry.find((e) => evalCond(e.when, { state: h.sim.state, quests: DB.quests }))?.node;
+    };
+    for (const npc of ['gyda', 'solvi', 'styrr', 'hallsteinn', 'kari'] as const)
+      expect(opening(true, npc), npc).not.toBe(opening(false, npc));
   });
 });

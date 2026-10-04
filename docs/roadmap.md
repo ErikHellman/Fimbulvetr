@@ -121,4 +121,13 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Ten side quests: the flock, the leaves, troll stones, the clasp, the grave-ring, the crates, wild honey, the axe range, amber, the burbot
     - [x] The demo: title tag and version, New Game to credits route, winter solver proof, e2e, v1-m5b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M6 Niflmýrr + D4 · [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
+- [ ] M6 Niflmýrr + D4 — brief: `docs/briefs/m6.md`, plan: `docs/superpowers/plans/2026-10-04-m6.md`
+  - [ ] M6a Niflmýrr — Part 1
+    - [x] Eldr melts the rime; the always-foggy region and its own sky
+    - [x] Ten screens, the hut and the cave; mara and fog-draugr; the twist at the drained camp
+    - [x] Bragi and the map verses; Hrafn and trading step 4
+    - [x] Rune-staves and Ís; Ljós and Heiðr's embers; the drowned path
+    - [x] New lines after the rime, solver proofs, route, e2e, v1-m6a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M6b Helgrind (D4) — Part 2
+- [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

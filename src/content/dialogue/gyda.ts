@@ -34,6 +34,7 @@ export const GYDA: DialogueDef = {
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_blood_told'), node: 'leaves' },
     { when: flag('st_home_winter'), node: 'blood' },
     { when: flag('st_uppvik_reached'), node: 'uppvik' },
@@ -179,6 +180,12 @@ export const GYDA: DialogueDef = {
         { k: 'give', item: 'seidr_upgrade' },
         { k: 'sfx', id: 'sfx_itemget' },
       ],
+    },
+    rime: {
+      text: {
+        en: 'They say the rime ran off the gorge like spring water. The record has no rune for a winter that melts for one child with a song. I will have to cut a new one.',
+        sv: 'Det sägs att rimfrosten rann av ravinen som vårvatten. Krönikan har ingen runa för en vinter som smälter för ett barn med en sång. Jag får rista en ny.',
+      },
     },
     pages_done: {
       text: {

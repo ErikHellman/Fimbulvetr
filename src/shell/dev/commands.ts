@@ -12,7 +12,7 @@ import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { DevBridge } from './bridge';
 
 export const HELP =
-  'warp <screen> [x y] · time <HH:MM|day|night> · season <name> · flag <id> <value> · give <item> [n] · hp <n> · god [on|off] · weather <kind|off> · kill · lang <en|sv> · volume <0..1> · save · export · import';
+  'warp <screen> [x y] · time <HH:MM|day|night> · season <name> · flag <id> <value> · give <item> [n] · slot <1|2> <item|none> · hp <n> · god [on|off] · weather <kind|off> · kill · lang <en|sv> · volume <0..1> · save · export · import';
 
 const isItem = (s: string): s is ItemId => (ITEMS as readonly string[]).includes(s);
 const isWeather = (s: string): s is WeatherKind => (WEATHER_KINDS as readonly string[]).includes(s);
@@ -62,6 +62,13 @@ export function runCommand(b: DevBridge, line: string, print: (text: string) => 
       if (!Number.isInteger(n) || n < 1) return 'usage: give <item> [n]';
       b.sim.command({ t: 'give', item, n });
       return `gave ${String(n)} ${item}`;
+    }
+    case 'slot': {
+      const [which = '', item = ''] = args;
+      if (which !== '1' && which !== '2') return 'usage: slot <1|2> <item|none>';
+      if (item !== 'none' && !isItem(item)) return `unknown item '${item}'`;
+      b.sim.command({ t: 'equip', slot: which === '1' ? 0 : 1, item: item === 'none' ? null : item });
+      return `slot ${which}: ${item}`;
     }
     case 'hp': {
       const n = Number(args[0]);
