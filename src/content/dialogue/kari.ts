@@ -7,6 +7,7 @@ export const KARI: DialogueDef = {
     { when: not(flag('n_kari_met')), node: 'meet' },
     { when: all(flag('q_fish_gamli'), not(flag('q_fisher_done'))), node: 'gamli' },
     { when: { k: 'item', id: 'trade_yarn' }, node: 'yarn' },
+    { when: flag('q_sealskin_done'), node: 'skin' },
     { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('q_fisher_done'), node: 'after' },
@@ -15,6 +16,12 @@ export const KARI: DialogueDef = {
     { node: 'day' },
   ],
   nodes: {
+    skin: {
+      text: {
+        en: "You swim the lake in a seal's skin now? My father would have called you mad. Then he would have asked where the burbot lie.",
+        sv: 'Du simmar i sjön i ett sälskinn nu? Min far skulle ha kallat dig galen. Sedan skulle han ha frågat var lakarna ligger.',
+      },
+    },
     yarn: {
       text: {
         en: 'Yarn? Good yarn, too. My nets are more hole than net since the ice came. What do you want for it?',

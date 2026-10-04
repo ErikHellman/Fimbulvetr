@@ -135,4 +135,12 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Helgrind's 22 rooms, Kolbeinn's word, Ulf and Tófa freed and home
     - [x] Solver proofs, route, e2e, v1-m6b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M7 Sævatn + Refuge + D5 · [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
+- [ ] M7 Sævatn + Refuge + D5 — brief: `docs/briefs/m7.md`, plan: `docs/superpowers/plans/2026-10-04-m7.md`
+  - [ ] M7a Sævatn and the Refuge — Part 1
+    - [x] Swimming, diving, currents and sunk things; the seal-skin from Hrafn's three nights
+    - [x] Bárðr's ferry and the 13 lake screens; the warm ring round Holmr; nykr foals and marbendill
+    - [x] The Refuge: Embla found, Vala, Hreggviðr and ore, the war table, the shrine and warp stone; trading step 5
+    - [x] Embla's first letter, new lowland lines, solver proofs, route, e2e, v1-m7a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M7b Sökkva Hof (D5) — Part 2
+- [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

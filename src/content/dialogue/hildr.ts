@@ -9,6 +9,7 @@ export const HILDR: DialogueDef = {
     { when: all(flag('q_herd_done'), atLeast('q_farm', 2)), node: 'pasture' },
     { when: flag('q_herd_done'), node: 'herded' },
     { when: all(flag('st_pass_open'), flag('q_herd_asked')), node: 'herd' },
+    { when: flag('q_sealskin_done'), node: 'skin' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { when: flag('st_barrow_open'), node: 'opened' },
@@ -16,6 +17,12 @@ export const HILDR: DialogueDef = {
     { node: 'day' },
   ],
   nodes: {
+    skin: {
+      text: {
+        en: 'You smell of the deep water, child. The lake has let you in. Do not forget that it can change its mind.',
+        sv: 'Du luktar djupt vatten, barn. Sjön har släppt in dig. Glöm inte att den kan ändra sig.',
+      },
+    },
     meet: {
       text: {
         en: 'Careful, you will scatter them. Hildr. These are my sheep, and that is my heather, and none of it is for sale.',

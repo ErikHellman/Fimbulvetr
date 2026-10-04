@@ -15,6 +15,7 @@ export const HALVAR: DialogueDef = {
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
     { when: atLeast('q_farm', 2), node: 'farm_done' },
     { when: atLeast('q_farm', 1), node: 'fold' },
+    { when: flag('st_embla_found'), node: 'embla' },
     { when: flag('st_farm_asked'), node: 'roof' },
     { when: flag('st_home_winter'), node: 'winter' },
     { when: all(afterRaid, flag('n_styrr_met'), not(flag('st_stone3_lit'))), node: 'styrr' },
@@ -32,6 +33,12 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    embla: {
+      text: {
+        en: 'So she is alive, out on an island in the lake. Tell her the farm still stands, and that her bed is made up whenever she wants it.',
+        sv: 'Så hon lever, ute på en ö i sjön. Säg att gården står kvar, och att hennes säng är bäddad när hon än vill ha den.',
+      },
+    },
     intro: {
       text: {
         en: 'Up with the sun, good. The sheep broke out of the pen again, and the trough is bone dry.',

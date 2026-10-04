@@ -9,12 +9,19 @@ export const EYVINDR: DialogueDef = {
     { when: all(flag('q_burbot_asked'), flag('q_burbot_caught')), node: 'burbot' },
     { when: flag('q_burbot_asked'), node: 'burbot_wait' },
     { when: all(flag('st_pass_open'), not(evening)), node: 'burbot_ask' },
+    { when: all(flag('q_sealskin_done'), evening), node: 'skin' },
     { when: evening, node: 'night' },
     { when: flag('n_kari_met'), node: 'kari' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { node: 'day' },
   ],
   nodes: {
+    skin: {
+      text: {
+        en: "They say you swim among the burbot now, in a skin from the deep. Then leave Gamli's grandchildren be. Some of them I mean to catch myself.",
+        sv: 'Det sägs att du simmar bland lakarna nu, i ett skinn från djupet. Låt då Gamlis barnbarn vara. Några av dem tänker jag fånga själv.',
+      },
+    },
     burbot_ask: {
       text: {
         en: 'Frozen to the bottom, they say. Not my bay. Under the ice the burbot are spawning, the only fish that loves the cold.',

@@ -804,6 +804,26 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_letters: {
+    id: 'q_letters',
+    name: { en: 'Embla’s letters', sv: 'Emblas brev' },
+    stages: [
+      {
+        when: atLeast('q_letters', 1),
+        text: {
+          en: 'Embla’s first letter: she left something in the split pine west of the birch ring in Myrkviðr’s glade.',
+          sv: 'Emblas första brev: hon lämnade något i den kluvna tallen väster om björkringen i Myrkviðrs glänta.',
+        },
+      },
+      {
+        when: flag('st_letter1_found'),
+        text: {
+          en: 'In the split pine lay a carved box with a seiðr vessel. Embla will write again.',
+          sv: 'I den kluvna tallen låg en snidad ask med ett seiðkärl. Embla kommer att skriva igen.',
+        },
+      },
+    ],
+  },
   q_holmr: {
     id: 'q_holmr',
     name: { en: 'The island', sv: 'Ön' },

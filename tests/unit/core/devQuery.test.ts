@@ -147,6 +147,14 @@ describe('presets', () => {
     expect(state.dungeons.d2.keys).toBe(0);
   });
 
+  it('puts Ask on Holmr’s ford with the seal-skin, after Helgrind, for Sævatn (sae)', () => {
+    const state = newGame(1, NEW_GAME);
+    applyPreset(state, DEV_PRESETS.sae);
+    expect(state.hero.screen).toBe('sae_holmr_ford');
+    expect(state.inv.items.sealskin).toBe(1);
+    expect(state.flags).toMatchObject({ q_sealskin_done: true, st_thane_nastrond: true });
+  });
+
   it('every dev preset starts on a known screen', () => {
     for (const p of Object.values(DEV_PRESETS)) expect(SCREEN_IDS).toContain(p.screen);
   });

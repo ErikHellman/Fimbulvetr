@@ -139,6 +139,42 @@ const warTable: ScriptDef = {
   ],
 };
 
+/** The split pine in Myrkviðr's glade, where Embla's first letter leads: a carved box with a seiðr vessel. */
+const letter1Box: ScriptDef = {
+  steps: [
+    {
+      k: 'if',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'q_letters', gte: 1 },
+          { k: 'not', c: { k: 'flag', id: 'st_letter1_found' } },
+        ],
+      },
+      then: [
+        say(
+          'In the split of the old pine, where two children once hid, there is a little box carved with ash leaves. Inside lies a seiðr vessel.',
+          'I klyftan i den gamla tallen, där två barn en gång gömde sig, står en liten ask snidad med asklöv. I den ligger ett seiðkärl.',
+        ),
+        {
+          k: 'do',
+          effects: [
+            { k: 'give', item: 'seidr_upgrade' },
+            { k: 'set', flag: 'st_letter1_found', value: true },
+            { k: 'sfx', id: 'sfx_itemget' },
+          ],
+        },
+      ],
+      else: [
+        say(
+          'An old split pine. Children have carved marks in the bark, long ago.',
+          'En gammal kluven tall. Barn har ristat märken i barken, för länge sedan.',
+        ),
+      ],
+    },
+  ],
+};
+
 /** Sævatn (M7): Bárðr's ferry and the Refuge. */
 export const SAEVATN_SCRIPTS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ferry_out: ferryOut,
@@ -147,4 +183,5 @@ export const SAEVATN_SCRIPTS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   shop_vala: shopVala,
   shop_hreggvidr: shopHreggvidr,
   war_table: warTable,
+  letter1_box: letter1Box,
 };

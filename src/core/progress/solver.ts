@@ -760,7 +760,7 @@ function gather(w: World, node: Node): boolean {
           // A sunk chest is dived for: Ask swims onto its tile.
           if (
             t.sunk === true
-              ? !reach.has(w.tile(id, t.at.x, t.at.y))
+              ? !divable(w, state, reach, id, t.at.x, t.at.y)
               : !besideReach(w, reach, id, t.at.x, t.at.y)
           )
             return;
@@ -779,10 +779,11 @@ function gather(w: World, node: Node): boolean {
             (!evalCond(t.when, ctx) || (t.appear !== undefined && !signal(w, state, id, t.appear, reach)))
           )
             return;
-          const onIt = reach.has(w.tile(id, t.at.x, t.at.y));
-          if (
-            !onIt &&
-            ((t.k === 'piece' && t.sunk === true) || !throwable(w, state, reach, id, t.at.x, t.at.y))
+          if (t.k === 'piece' && t.sunk === true) {
+            if (!divable(w, state, reach, id, t.at.x, t.at.y)) return;
+          } else if (
+            !reach.has(w.tile(id, t.at.x, t.at.y)) &&
+            !throwable(w, state, reach, id, t.at.x, t.at.y)
           )
             return;
           got.push(t.id);
@@ -866,7 +867,13 @@ function gather(w: World, node: Node): boolean {
           return;
         }
         case 'use': {
-          if (!evalCond(t.when, ctx) || !besideReach(w, reach, id, t.at.x, t.at.y)) return;
+          if (!evalCond(t.when, ctx)) return;
+          // A wide use (a table, a boat) is used from beside any of its tiles.
+          let near = false;
+          for (let dy = 0; dy < (t.h ?? 1) && !near; dy++)
+            for (let dx = 0; dx < (t.w ?? 1) && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
           node.scripts.add(t.script);
           // What the script does for good: flags set, galdr taught, and things given that Ask lacks (so a
           // stave rack that refills an empty hand counts once, not over and over).
@@ -891,6 +898,22 @@ function gather(w: World, node: Node): boolean {
     });
   }
   return changed;
+}
+
+/**
+ * A sunk thing's tile is reached as open water by a seal-skin owner: the season's ice over it is ground to
+ * walk on, and no one dives through it.
+ */
+function divable(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+): boolean {
+  if (!has(state, 'sealskin') || !reach.has(w.tile(id, x, y))) return false;
+  return w.passage[w.idx.get(id) ?? 0]?.get(y * SCREEN_COLS + x) !== true;
 }
 
 function give(w: World, state: GameState, id: ScreenId, item: ItemId, n: number): void {

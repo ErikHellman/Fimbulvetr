@@ -272,6 +272,9 @@ export const FLAGS = {
   /** Sökkva Hof (D5) entered, and its thane Nykr dead (set in M7b; named now for `q_holmr`). */
   st_d5_entered: { t: 'bool' },
   st_thane_nykr: { t: 'bool' },
+  /** Embla's letters (one in M7, M8 and M9), and the first one's vessel found in Myrkviðr's glade. */
+  q_letters: { t: 'int', max: 3 },
+  st_letter1_found: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

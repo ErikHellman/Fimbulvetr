@@ -34,6 +34,7 @@ export const GYDA: DialogueDef = {
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_embla_found'), node: 'embla' },
     { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_blood_told'), node: 'leaves' },
     { when: flag('st_home_winter'), node: 'blood' },
@@ -45,6 +46,12 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    embla: {
+      text: {
+        en: 'I lit a candle for Embla every night since the raid. Last night I lit two, one for her and one for the lake that hid her.',
+        sv: 'Jag har tänt ett ljus för Embla varje kväll sedan räden. I går tände jag två, ett för henne och ett för sjön som gömde henne.',
+      },
+    },
     uppvik: {
       text: {
         en: 'You have seen Uppvík! Is Gunnhildr still keeping the hof there? Tell her Gyða of Askdalr owes her a cheese.',

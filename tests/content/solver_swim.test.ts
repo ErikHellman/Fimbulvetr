@@ -56,4 +56,12 @@ describe('the solver and swimming', () => {
     expect(r.pieces).toEqual(expect.arrayContaining(['hp_test_far', 'hp_test_sunk', 'hp_test_shore']));
     expect(r.opened).toContain('c_test_sunk');
   });
+
+  it('cannot dive through winter ice, seal-skin or not', () => {
+    for (const skin of [false, true]) {
+      const r = solve(lake([sunkPiece, sunkChest]), start(skin), none, { ...within, season: 'winter' });
+      expect(r.pieces, String(skin)).not.toContain('hp_test_sunk');
+      expect(r.opened, String(skin)).not.toContain('c_test_sunk');
+    }
+  });
 });

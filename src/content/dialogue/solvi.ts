@@ -9,6 +9,7 @@ export const SOLVI: DialogueDef = {
   entry: [
     { when: not(flag('n_solvi_met')), node: 'meet' },
     { when: all(flag('st_pass_open'), not(flag('st_hlif_learned'))), node: 'hlif' },
+    { when: flag('st_embla_found'), node: 'embla' },
     { when: all(flag('st_rime_open'), flag('st_hlif_learned')), node: 'staves' },
     { when: flag('st_hlif_learned'), node: 'warded' },
     { when: all(flag('st_eldr_learned'), not(flag('q_rs2_mill'))), node: 'stone2' },
@@ -19,6 +20,12 @@ export const SOLVI: DialogueDef = {
     { node: 'ask' },
   ],
   nodes: {
+    embla: {
+      text: {
+        en: "Halvar's daughter has raised a hall full of the fled and the angry, and she plans a war on the ice. Good. A war needs someone who remembers the old staves.",
+        sv: 'Halvars dotter har samlat en hall full av flyktingar och arga, och hon planerar ett krig mot isen. Bra. Ett krig behöver någon som minns de gamla stavarna.',
+      },
+    },
     hlif: {
       text: {
         en: 'You felt it too: the cold came down like a lid. The runes went quiet all at once. All but one. Hlíf, the shelter-song. It wants to be sung now.',

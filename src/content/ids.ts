@@ -279,6 +279,7 @@ export const QUESTS = [
   'q_ljos',
   'q_sealskin',
   'q_holmr',
+  'q_letters',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -365,6 +366,7 @@ export const SCRIPTS = [
   'shop_vala',
   'shop_hreggvidr',
   'war_table',
+  'letter1_box',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

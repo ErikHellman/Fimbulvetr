@@ -664,6 +664,39 @@ export const DEV_PRESETS = {
     },
   },
   /**
+   * On Holmr's ford in Sævatn, as M6b leaves Ask and Hrafn's nights won: the seal-skin, the grapple in slot
+   * K, Ís learned, Náströnd dead and the captives freed, nine hearts. Embla is not yet found.
+   */
+  sae: {
+    ...FIMBUL,
+    screen: 'sae_holmr_ford',
+    tile: [21, 3],
+    facing: 'n',
+    minute: 12 * 60,
+    silver: 70,
+    items: { ...FIMBUL.items, stave_is: 2, grapple: 1, sealskin: 1, trade_comb: 1 },
+    slots: ['grapple', 'bombs'],
+    galdr: ['eldr', 'farvegr', 'bragd', 'hlif', 'ljos', 'is'],
+    flags: {
+      ...AFTER_RIME,
+      st_d4_entered: true,
+      st_d4_garmr: true,
+      st_d4_boss_dead: true,
+      st_thane_nastrond: true,
+      st_freed_ulf: true,
+      st_freed_tofa: true,
+      q_thanes: 1,
+      q_captives: 2,
+      q_trade: 4,
+      n_hrafn_met: true,
+      q_sealskin_asked: true,
+      q_seal_nights: 3,
+      q_sealskin_done: true,
+    },
+    maxHp: 36,
+    hp: 36,
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

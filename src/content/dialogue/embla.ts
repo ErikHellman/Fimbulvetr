@@ -9,6 +9,7 @@ export const EMBLA: DialogueDef = {
   entry: [
     { when: all(raid, not(flag('st_embla_found'))), node: 'found' },
     { when: all(flag('st_embla_found'), { k: 'item', id: 'trade_comb' }), node: 'comb' },
+    { when: all(flag('st_embla_found'), { k: 'flag', id: 'q_letters', lt: 1 }), node: 'letter1' },
     { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
     { when: flag('st_embla_found'), node: 'r_day' },
     { when: raid, node: 'raid' },
@@ -53,6 +54,13 @@ export const EMBLA: DialogueDef = {
         { k: 'set', flag: 'q_trade', value: 5 },
         { k: 'sfx', id: 'sfx_itemget' },
       ],
+    },
+    letter1: {
+      text: {
+        en: 'Here. I wrote this the night I ran, when I thought I would never see you again. Read it later. It tells you where we hid as children: the split pine west of the birch ring in Myrkviðr’s glade. I left something there for whoever came after me.',
+        sv: 'Här. Jag skrev det här natten jag sprang, när jag trodde att jag aldrig skulle se dig igen. Läs det sedan. Det berättar var vi gömde oss som barn: den kluvna tallen väster om björkringen i Myrkviðrs glänta. Jag lämnade något där åt den som kom efter mig.',
+      },
+      do: [{ k: 'set', flag: 'q_letters', value: 1 }],
     },
     r_day: {
       text: {

@@ -8,6 +8,7 @@ export const RAGNA: DialogueDef = {
     { when: flag('q_amber_done'), node: 'amber_after' },
     { when: all(flag('q_amber_asked'), { k: 'item', id: 'amber', gte: 3 }), node: 'amber' },
     { when: flag('q_amber_asked'), node: 'amber_wait' },
+    { when: flag('st_embla_found'), node: 'embla' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: evening, node: 'hall' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'hall' },
@@ -15,6 +16,12 @@ export const RAGNA: DialogueDef = {
     { node: 'day' },
   ],
   nodes: {
+    embla: {
+      text: {
+        en: "Word came down with the ferryman: Halvar's girl lives, and leads the Refuge on Holmr. Tell her Uppvík's door is open to her, whatever the jarl says.",
+        sv: 'Det kom bud med färjkarlen: Halvars flicka lever, och leder Tillflykten på Holmr. Säg att Uppvíks dörr står öppen för henne, vad jarlen än säger.',
+      },
+    },
     ferry: {
       text: {
         en: 'You met Bárðr at the lake? He would not row me north either. Nobody rows toward the mountains this year.',
