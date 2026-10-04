@@ -146,6 +146,13 @@ export const SCREEN_IDS = [
   'd4_r20',
   'd4_r21',
   'd4_r22',
+  'sae_landing',
+  'sae_open',
+  'sae_skerries',
+  'sae_reedbank',
+  'sae_drowned',
+  'sae_holmr_ford',
+  'sae_wreck',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

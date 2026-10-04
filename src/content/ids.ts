@@ -271,7 +271,7 @@ export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'gei
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
-export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat', 'thingstone'] as const;
+export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat', 'thingstone', 'bardr_ferry'] as const;
 export type DialogueId = (typeof DIALOGUES)[number];
 
 /** Cutscenes and interaction scripts. */
@@ -334,6 +334,8 @@ export const SCRIPTS = [
   'ulf_herd_lost',
   'd4_cell_ulf',
   'd4_cell_tofa',
+  'ferry_out',
+  'ferry_back',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

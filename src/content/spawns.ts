@@ -132,5 +132,14 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
         { id: 'myrljos', weight: 1, time: 'night' },
       ],
     },
+  } /** Sævatn: the marbendill climb out onto its banks at night; in winter ravens cross the ice instead. */,
+  saevatn: {
+    count: { summer: 1, autumn: 1, winter: 1, spring: 1 },
+    entries: {
+      summer: [{ id: 'marbendill', weight: 1, time: 'night' }],
+      autumn: [{ id: 'marbendill', weight: 1, time: 'night' }],
+      winter: [{ id: 'rime_raven', weight: 1, time: 'night' }],
+      spring: [{ id: 'marbendill', weight: 1, time: 'night' }],
+    },
   },
 };

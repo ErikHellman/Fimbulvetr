@@ -34,7 +34,7 @@ import { THORKELL } from './thorkell';
 import { TOFA } from './tofa';
 import { ULF } from './ulf';
 import { KARI } from './kari';
-import { BARDR } from './bardr';
+import { BARDR, BARDR_FERRY } from './bardr';
 import { THURIDR } from './thuridr';
 import { LJOTR } from './ljotr';
 import { AUDR } from './audr';
@@ -93,4 +93,5 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   bragi: BRAGI,
   hrafn: HRAFN,
   thingstone: THINGSTONE,
+  bardr_ferry: BARDR_FERRY,
 };

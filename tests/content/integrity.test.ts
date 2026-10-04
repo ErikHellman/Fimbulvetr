@@ -40,6 +40,12 @@ describe('screens', () => {
     for (const thing of SCREENS[id].things) {
       if (!standing.has(thing.k)) continue;
       const where = `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`;
+      // A sunk piece lies on the bottom of deep water, for a diver.
+      if (thing.k === 'piece' && thing.sunk === true) {
+        const t = cellAt(grid, thing.at.x, thing.at.y);
+        expect(t !== undefined && DB.terrain[t].swim === true, where).toBe(true);
+        continue;
+      }
       if (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) {
         const t = cellAt(grid, thing.at.x, thing.at.y);
         expect(t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t], where).toBe(true);

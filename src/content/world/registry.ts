@@ -108,6 +108,13 @@ import { d4R19 } from './helgrind/d4_r19';
 import { d4R20 } from './helgrind/d4_r20';
 import { d4R21 } from './helgrind/d4_r21';
 import { d4R22 } from './helgrind/d4_r22';
+import { saeLanding } from './saevatn/sae_landing';
+import { saeOpen } from './saevatn/sae_open';
+import { saeSkerries } from './saevatn/sae_skerries';
+import { saeReedbank } from './saevatn/sae_reedbank';
+import { saeDrowned } from './saevatn/sae_drowned';
+import { saeHolmrFord } from './saevatn/sae_holmr_ford';
+import { saeWreck } from './saevatn/sae_wreck';
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
 import { d3R03 } from './konungshaugr/d3_r03';
@@ -294,4 +301,11 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d4_r20: d4R20,
   d4_r21: d4R21,
   d4_r22: d4R22,
+  sae_landing: saeLanding,
+  sae_open: saeOpen,
+  sae_skerries: saeSkerries,
+  sae_reedbank: saeReedbank,
+  sae_drowned: saeDrowned,
+  sae_holmr_ford: saeHolmrFord,
+  sae_wreck: saeWreck,
 };

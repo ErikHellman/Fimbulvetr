@@ -129,6 +129,12 @@ const PERSISTED = [
   'd4_sh_r07n',
   'd4_sh_r07e',
   'd4_sh_r22',
+  // M7a — Sævatn
+  'sae_c_landing',
+  'sae_c_open',
+  'hp_sae_skerries',
+  'sae_c_drowned',
+  'sae_c_wreck',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

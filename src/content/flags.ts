@@ -263,6 +263,8 @@ export const FLAGS = {
   q_seal_nights: { t: 'int', max: 3 },
   ev_seal_tonight: { t: 'bool', dawn: true },
   q_sealskin_done: { t: 'bool' },
+  /** Ask has paid Bárðr and the boat is about to set off (cleared as it does, or at dawn at the latest). */
+  ev_ferry: { t: 'bool', dawn: true },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

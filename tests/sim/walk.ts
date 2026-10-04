@@ -4,7 +4,7 @@ import type { Action } from '@core/input/actions';
 import type { Dir4 } from '@core/math/dir';
 import type { Sim } from '@core/sim/sim';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
-import { SOLID } from '@core/world/collision';
+import { DEEP, LOW, SOLID } from '@core/world/collision';
 import { tileFeet } from '@core/world/screen';
 import { Harness, frameOf } from './harness';
 
@@ -17,9 +17,13 @@ export const heroTile = (sim: Sim): readonly [number, number] => [
   Math.floor((sim.hero.pos.y - 1) / TILE),
 ];
 
-/** Tiles that block walking: solid terrain, anything solid standing on the tile, and burning tiles. */
+/**
+ * Tiles that block walking: solid terrain, anything solid standing on the tile, and burning tiles. With the
+ * seal-skin, open deep water is no block: the walker swims it.
+ */
 function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   const g = sim.screen.collision;
+  const swims = (sim.state.inv.items.sealskin ?? 0) > 0;
   const occupied = new Set<string>();
   for (const a of sim.actors)
     if (a.kind === 'fixture' && a.def === 'fire' && a.mem['on'] === 1)
@@ -34,7 +38,9 @@ function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   }
   return (tx, ty) => {
     if (tx < 0 || ty < 0 || tx >= SCREEN_COLS || ty >= SCREEN_ROWS) return true;
-    if (((g.flags[ty * g.cols + tx] ?? 0) & SOLID) !== 0) return true;
+    const f = g.flags[ty * g.cols + tx] ?? 0;
+    const water = swims && (f & DEEP) !== 0 && (f & LOW) !== 0;
+    if ((f & SOLID) !== 0 && !water) return true;
     return occupied.has(`${String(tx)},${String(ty)}`);
   };
 }
