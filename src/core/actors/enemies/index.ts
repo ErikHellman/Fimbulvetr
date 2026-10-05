@@ -32,6 +32,9 @@ import { BELGR_MACHINE } from './belgr';
 import { IVALDI_MACHINE } from './ivaldi';
 import { FROSTVAETTR_MACHINE } from './frost';
 import { SVELLR_MACHINE } from './svellr';
+import { JOTUNVORDR_MACHINE } from './jotunvordr';
+import { KOLBEINN_MACHINE } from './kolbeinn';
+import { HAND_MACHINE, HRIMNIR_MACHINE, PILLAR_MACHINE } from './hrimnir';
 import { HRIMGERDR_MACHINE, ICICLE_MACHINE } from './hrimgerdr';
 
 const MACHINES = {
@@ -72,6 +75,11 @@ const MACHINES = {
   svellr: SVELLR_MACHINE,
   hrimgerdr: HRIMGERDR_MACHINE,
   icicle: ICICLE_MACHINE,
+  jotunvordr: JOTUNVORDR_MACHINE,
+  kolbeinn: KOLBEINN_MACHINE,
+  hrimnir: HRIMNIR_MACHINE,
+  hrimnir_hand: HAND_MACHINE,
+  rime_pillar: PILLAR_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -118,6 +126,11 @@ const START: Readonly<Record<BehaviourId, string>> = {
   svellr: 'idle',
   hrimgerdr: 'idle',
   icicle: 'shadow',
+  jotunvordr: 'idle',
+  kolbeinn: 'stand',
+  hrimnir: 'idle',
+  hrimnir_hand: 'shadow',
+  rime_pillar: 'shadow',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

@@ -106,6 +106,9 @@ export const TERRAIN_IDS = [
   'tower_wall',
   /** Hrímturn (M9b): a wall of clear ice that light shines through. */
   'clear_ice',
+  /** Útgarðr (M10a): the giants' floor of great grey flags, and walls of blocks a giant could lift. */
+  'giant_floor',
+  'giant_wall',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -285,4 +288,7 @@ export const TERRAIN = {
   tower_wall: { solid: true },
   /** Clear ice: a wall to walkers and shots, but a beam of light shines through it. */
   clear_ice: { solid: true, clear: true },
+  /** Útgarðr: flags the size of a farmhouse door, and walls of rime-bound blocks. */
+  giant_floor: { solid: false },
+  giant_wall: { solid: true },
 } as const satisfies Record<TerrainId, TerrainDef>;

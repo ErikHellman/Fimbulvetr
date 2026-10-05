@@ -34,6 +34,7 @@ export const GYDA: DialogueDef = {
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_halvar_confessed'), node: 'halvar' },
     { when: flag('st_thane_hrimgerdr'), node: 'thanes4' },
     { when: flag('st_hrf_reached'), node: 'hrf' },
     { when: flag('st_thane_ivaldi'), node: 'ivaldi' },
@@ -50,6 +51,12 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    halvar: {
+      text: {
+        en: 'Halvar’s name is in the record, child, among the forty who went up with the old goði. I always wondered why he would never read it. I will cut a line under it now: HE WENT BACK.',
+        sv: 'Halvars namn står i krönikan, barn, bland de fyrtio som gick upp med den gamle goden. Jag har alltid undrat varför han aldrig ville läsa den. Nu ristar jag en rad under det: HAN GICK TILLBAKA.',
+      },
+    },
     thanes4: {
       text: {
         en: 'Four thanes, four oaths broken. The record has nothing after that but the King’s name, and under it, cut deep: HE WAKES. Whatever Kolbeinn wants at Útgarðr, child, he wants it awake.',

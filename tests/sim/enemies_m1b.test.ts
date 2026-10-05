@@ -30,7 +30,8 @@ describe('telegraphs', () => {
     // timed in lindormr.test.ts. Hrönn bites only when it surfaces at a grate in its turn (its 24-tick tell is
     // timed in hronn.test.ts), and Nykr's wave and charge follow its rear and coil (nykr.test.ts). Belgr's swell
     // and Ívaldi's raised hammer are boss tells, longer by design (forge_bosses.test.ts), as are Svellr's scrape
-    // and the shadow of Hrímgerðr's icicles (rime_bosses.test.ts).
+    // and the shadow of Hrímgerðr's icicles (rime_bosses.test.ts). Jötunvörðr's raised knee and Kolbeinn's
+    // drawn-back staff are timed in utgard_foes.test.ts.
     const setPieces: readonly EnemyId[] = [
       'lindormr',
       'hronn',
@@ -39,6 +40,11 @@ describe('telegraphs', () => {
       'ivaldi',
       'svellr',
       'icicle',
+      'jotunvordr',
+      'kolbeinn_boss',
+      'hrimnir',
+      'hrimnir_hand',
+      'rime_pillar',
     ];
     const attackers = ENEMIES.filter((id) => DB.enemies[id].attacks !== undefined && !setPieces.includes(id));
     expect(attackers).toEqual(expect.arrayContaining(['vargr', 'draugr', 'troll']));

@@ -129,6 +129,11 @@ export const ENEMIES = [
   'svellr',
   'hrimgerdr',
   'icicle',
+  'jotunvordr',
+  'kolbeinn_boss',
+  'hrimnir',
+  'hrimnir_hand',
+  'rime_pillar',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -445,6 +450,10 @@ export const SCRIPTS = [
   'd7_cell_asa',
   'd7_cell_bjarni',
   'd7_basin',
+  'd8_enter',
+  'd8_basin',
+  'd8_kolbeinn',
+  'd8_kolbeinn_yield',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

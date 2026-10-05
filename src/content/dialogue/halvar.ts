@@ -10,6 +10,8 @@ const [ROOF, FOLD] = FARM_COST;
 export const HALVAR: DialogueDef = {
   entry: [
     { when: raidNight, node: 'raid' },
+    { when: all(flag('st_thane_hrimgerdr'), not(flag('st_utgard_open'))), node: 'confess' },
+    { when: all(flag('st_utgard_open'), not(flag('st_hrimnir_dead'))), node: 'gate' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
@@ -37,6 +39,50 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    confess: {
+      text: {
+        en: 'Lad. Sit a moment. No, stand, it is too cold to sit. I came up because there is a thing I should have told you at the gate, the morning after the raid, and I told you about a seax instead.',
+        sv: 'Pojk. Sätt dig en stund. Nej, stå, det är för kallt att sitta. Jag kom upp för att det finns en sak jag borde ha sagt dig vid grinden, morgonen efter räden, och i stället berättade jag om en sax.',
+      },
+      next: 'confess2',
+    },
+    confess2: {
+      text: {
+        en: 'I was a huscarl once, of the old jarl. Thirty winters back we came up this mountain, forty of us and a goði, and we found him here. Hrímnir. Asleep, and so big I took him for the mountain.',
+        sv: 'Jag var huskarl en gång, hos den gamle jarlen. För trettio vintrar sedan kom vi upp på det här berget, fyrtio man och en gode, och vi fann honom här. Hrímnir. Sovande, och så stor att jag tog honom för berget.',
+      },
+      next: 'confess3',
+    },
+    confess3: {
+      text: {
+        en: 'We could have killed him. The goði said so. But killing a jötunn costs blood, and we had wives and fields. So we bound him instead, on our own blood, and on the blood of every child we would ever have.',
+        sv: 'Vi kunde ha dödat honom. Goden sa det. Men att döda en jätte kostar blod, och vi hade hustrur och åkrar. Så vi band honom i stället, med vårt eget blod, och med blodet från varje barn vi någonsin skulle få.',
+      },
+      next: 'confess4',
+    },
+    confess4: {
+      text: {
+        en: 'Embla’s blood. Ása’s, Bjarni’s, all of theirs. We chose the easy thing, and you have been paying for it all year. I am sorry, lad. That is all an old man has.',
+        sv: 'Emblas blod. Ásas, Bjarnis, allas. Vi valde det lätta, och du har fått betala för det hela året. Förlåt mig, pojk. Det är allt en gammal man har.',
+      },
+      next: 'words',
+    },
+    words: {
+      text: {
+        en: 'But I still know the words we shut this gate with. Stand back. ... There. Finish what we would not. And come back down, all of you.',
+        sv: 'Men jag kan fortfarande orden vi stängde den här porten med. Stig undan. ... Så. Gör färdigt det vi inte ville. Och kom ner igen, allihop.',
+      },
+      do: [
+        { k: 'set', flag: 'st_halvar_confessed', value: true },
+        { k: 'set', flag: 'st_utgard_open', value: true },
+      ],
+    },
+    gate: {
+      text: {
+        en: 'I will keep the gate, lad. Nothing comes out of it behind you. Go on.',
+        sv: 'Jag håller porten, pojk. Inget kommer ut ur den bakom dig. Gå nu.',
+      },
+    },
     rime: {
       text: {
         en: 'Ása at her loom and Bjarni at his jetty, and every one of them home. I count heads at supper now, lad, like a fool counting sheep. They are all there.',

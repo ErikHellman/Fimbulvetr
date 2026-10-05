@@ -109,6 +109,9 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '▫': 'tower_floor',
   '▪': 'tower_wall',
   '▧': 'clear_ice',
+  /** Útgarðr (M10a): the giants' floor and walls. */
+  '□': 'giant_floor',
+  '▣': 'giant_wall',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

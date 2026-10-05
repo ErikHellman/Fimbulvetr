@@ -18,6 +18,11 @@ export const EMBLA: DialogueDef = {
       when: all(flag('st_embla_found'), flag('st_hrf_reached'), { k: 'flag', id: 'q_letters', eq: 2 }),
       node: 'letter3',
     },
+    { when: all(flag('st_embla_found'), flag('st_halvar_confessed')), node: 'r_halvar' },
+    {
+      when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr'), not(flag('st_halvar_confessed'))),
+      node: 'r_north',
+    },
     { when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr')), node: 'r_rime' },
     { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
     { when: flag('st_embla_found'), node: 'r_day' },
@@ -31,6 +36,18 @@ export const EMBLA: DialogueDef = {
     { when: day(3), node: 'd3' },
   ],
   nodes: {
+    r_north: {
+      text: {
+        en: 'A boat came over from the shore at dawn with my father in it, of all people. He asked where Útgarðr was, and went up the mountain without his breakfast. Go after him, Ask.',
+        sv: 'En båt kom över från stranden i gryningen med min far i, av alla människor. Han frågade var Útgarðr låg, och gick upp på berget utan att äta frukost. Gå efter honom, Ask.',
+      },
+    },
+    r_halvar: {
+      text: {
+        en: 'So he told you. He was there, at the binding, and he never said a word, all those years. I am angry with him, and I will be angry later. When I go up there, it will be to finish it.',
+        sv: 'Så han berättade. Han var där, vid bindningen, och han sa aldrig ett ord, i alla år. Jag är arg på honom, och jag tänker vara arg sen. När jag går upp dit blir det för att göra slut på det.',
+      },
+    },
     r_rime: {
       text: {
         en: 'All four. I felt the oath go slack, like a rope cut in the dark. Ask, the King was bound with our blood, and it is our blood that loosed him. Kolbeinn knew that from the start.',

@@ -70,6 +70,7 @@ import { stepTrial } from './systems/trial';
 import { heatMax, stepCold, stepHeat } from './systems/heat';
 import { stepBeams, type BeamSeg } from './systems/beams';
 import { rimeFloor } from './systems/glaze';
+import { ringOf, stepBinding, type Ring } from './systems/binding';
 import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
@@ -294,6 +295,11 @@ export class Sim implements SimRt {
     return rimeFloor(this);
   }
 
+  /** The ring of binding in Hrímnir's hall (M10b), in screen px, for the view; null when none burns. */
+  ring(): Ring | null {
+    return ringOf(this);
+  }
+
   /** The killing frost on Ask (M9), for the HUD's frost bar; null when Ask is warm. */
   cold(): { readonly now: number; readonly max: number } | null {
     return this.coldTicks === undefined ? null : { now: this.coldTicks, max: this.db.tuning.hero.cold };
@@ -480,6 +486,7 @@ export class Sim implements SimRt {
     stepFire(this);
     stepHeat(this);
     stepCold(this);
+    stepBinding(this);
     stepCrust(this);
     checkDeath(this);
     if (this.mode === 'over') return;
