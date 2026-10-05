@@ -8,6 +8,7 @@ import { atLeast, flag } from './util';
  */
 export const DVALINN: DialogueDef = {
   entry: [
+    { when: flag('st_hrf_reached'), node: 'hrf' },
     { when: flag('st_thane_ivaldi'), node: 'free' },
     { when: atLeast('q_foreman', 5), node: 'after' },
     { when: atLeast('q_foreman', 4), node: 'road' },
@@ -17,6 +18,12 @@ export const DVALINN: DialogueDef = {
     { node: 'ask' },
   ],
   nodes: {
+    hrf: {
+      text: {
+        en: 'Sindri’s ember-mail held on the high road? Of course it held. Tell the old beacon-keeper up there that Dvalinn still owes him a barrel, if he is alive.',
+        sv: 'Höll Sindris glödbrynja på höga vägen? Klart den höll. Säg till den gamle vårdkasväktaren däruppe att Dvalinn fortfarande är skyldig honom en tunna, om han lever.',
+      },
+    },
     free: {
       text: {
         en: 'The forge has gone quiet. Forty years I have listened to that hammer under my feet, long-legs, and now I cannot sleep for the silence. Thank you.',

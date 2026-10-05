@@ -40,6 +40,7 @@ import { HREGGVIDR } from './hreggvidr';
 import { DVALINN } from './dvalinn';
 import { HEKLA } from './hekla';
 import { NALI, NYR } from './miners';
+import { ORMR } from './ormr';
 import { SINDRI } from './sindri';
 import { THURIDR } from './thuridr';
 import { LJOTR } from './ljotr';
@@ -106,6 +107,7 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   sindri: SINDRI,
   nyr: NYR,
   nali: NALI,
+  ormr: ORMR,
   thingstone: THINGSTONE,
   bardr_ferry: BARDR_FERRY,
   urdr: URDR,

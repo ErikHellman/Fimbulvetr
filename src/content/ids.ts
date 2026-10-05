@@ -124,6 +124,8 @@ export const ENEMIES = [
   'glod',
   'belgr',
   'ivaldi',
+  'isvargr',
+  'frostvaettr',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -272,6 +274,8 @@ export const NPCS = [
   'sindri',
   'nyr',
   'nali',
+  // Hrímfjöll
+  'ormr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -310,6 +314,7 @@ export const QUESTS = [
   'q_loom',
   'q_foreman',
   'q_forge',
+  'q_rime',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -427,6 +432,10 @@ export const SCRIPTS = [
   'd6_cell_rannveig',
   'shop_rannveig',
   'd6_cistern',
+  'hrf_arrive',
+  'hrf_turned_back',
+  'hrf_letter3',
+  'hrf_sealed',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

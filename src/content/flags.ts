@@ -313,6 +313,25 @@ export const FLAGS = {
   st_thane_ivaldi: { t: 'bool' },
   st_freed_thorkell: { t: 'bool' },
   st_freed_rannveig: { t: 'bool' },
+  /** Hrímfjöll reached over the frost line (M9a). */
+  st_hrf_reached: { t: 'bool' },
+  /** Ormr's beacon lit again with Sindri's lens (M9a, trading step 7): he gave the beacon arm-ring. */
+  st_beacon_lit: { t: 'bool' },
+  /** The beacon arm-ring owned (M9a): it marks the heart pieces still out on the map. */
+  w_ring_beacon: { t: 'bool' },
+  /** Embla's third letter followed to the cairn at the top of the world (M9a): the last seiðr vessel. */
+  st_letter3_found: { t: 'bool' },
+  /** Hrímturn (D7) entered, and Svellr its mini-boss broken over the ice mirror (M9b). */
+  st_d7_entered: { t: 'bool' },
+  st_d7_svellr: { t: 'bool' },
+  /** Thane Hrímgerðr dead (M9b): Ása and Bjarni freed, and Kolbeinn's word heard in her hall. */
+  st_d7_boss_dead: { t: 'bool' },
+  st_d7_kolbeinn: { t: 'bool' },
+  st_thane_hrimgerdr: { t: 'bool' },
+  st_freed_asa: { t: 'bool' },
+  st_freed_bjarni: { t: 'bool' },
+  /** Útgarðr's gate in the ice open (M10). */
+  st_utgard_open: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

@@ -18,6 +18,7 @@ import { D5_SCRIPTS } from './d5';
 import { D6_SCRIPTS } from './d6';
 import { SAEVATN_SCRIPTS } from './saevatn';
 import { DVERGAGROF_SCRIPTS } from './dvergagrof';
+import { HRIMFJOLL_SCRIPTS } from './hrimfjoll';
 
 /** Cutscenes and interaction scripts by id. */
 export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
@@ -39,4 +40,5 @@ export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ...D5_SCRIPTS,
   ...D6_SCRIPTS,
   ...DVERGAGROF_SCRIPTS,
+  ...HRIMFJOLL_SCRIPTS,
 };

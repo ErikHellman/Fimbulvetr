@@ -20,6 +20,7 @@ import { HELGRIND_ANIMS, helgrindFrames } from './helgrind';
 import { SAEVATN_ANIMS, saevatnFrames } from './saevatn';
 import { HOF_ANIMS, hofFrames } from './hof';
 import { FORGE_ANIMS, forgeFrames } from './forge';
+import { RIME_ANIMS, rimeFrames } from './rime';
 
 export type { SpriteFrame } from './types';
 
@@ -45,6 +46,7 @@ export const ANIMS: AnimTable = {
   ...SAEVATN_ANIMS,
   ...HOF_ANIMS,
   ...FORGE_ANIMS,
+  ...RIME_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -68,6 +70,7 @@ export function buildSprites(): SpriteFrame[] {
     ...saevatnFrames(),
     ...hofFrames(),
     ...forgeFrames(),
+    ...rimeFrames(),
     missingFrame(),
   ];
 }

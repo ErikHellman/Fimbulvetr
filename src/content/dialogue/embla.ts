@@ -14,6 +14,10 @@ export const EMBLA: DialogueDef = {
       when: all(flag('st_embla_found'), flag('st_dvg_reached'), { k: 'flag', id: 'q_letters', eq: 1 }),
       node: 'letter2',
     },
+    {
+      when: all(flag('st_embla_found'), flag('st_hrf_reached'), { k: 'flag', id: 'q_letters', eq: 2 }),
+      node: 'letter3',
+    },
     { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
     { when: flag('st_embla_found'), node: 'r_day' },
     { when: raid, node: 'raid' },
@@ -72,6 +76,13 @@ export const EMBLA: DialogueDef = {
         sv: 'Har du tagit dig in i dvärglandet? Då gick du förbi vår tjärn. Här, mitt andra brev. Minns du det lilla röset på södra stranden, där vi gömde oss för Far den dagen vi tappade bort hans get? Titta under översta stenen.',
       },
       do: [{ k: 'set', flag: 'q_letters', value: 2 }],
+    },
+    letter3: {
+      text: {
+        en: 'You walked through the killing frost? Then you can go where I never could. My last letter: I climbed as far as the cairn past the frozen tarn once, before the cold drove me back. I left the last thing I had there.',
+        sv: 'Gick du genom den dödande frosten? Då kan du gå dit jag aldrig kunde. Mitt sista brev: jag klättrade en gång ända till röset bortom den frusna tjärnen, innan kylan drev mig tillbaka. Jag lämnade det sista jag hade där.',
+      },
+      do: [{ k: 'set', flag: 'q_letters', value: 3 }],
     },
     r_day: {
       text: {

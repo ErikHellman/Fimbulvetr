@@ -164,4 +164,26 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
       ],
     },
   },
+  /** Hrímfjöll (M9a): ice wolves by day and night, frost wisps after dark; always winter up here. */
+  hrimfjoll: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      autumn: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      winter: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      spring: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+    },
+  },
 };

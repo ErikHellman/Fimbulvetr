@@ -86,6 +86,16 @@ export const WORLD_LAYOUT: WorldLayout = {
     dvg_camp: [10, 4],
     dvg_vents: [11, 4],
     dvg_adit: [9, 5],
+    hrf_icefall: [9, 0],
+    hrf_crevasse: [10, 0],
+    hrf_saddle: [11, 0],
+    hrf_towerfoot: [12, 0],
+    hrf_utgard: [13, 0],
+    hrf_road: [9, 1],
+    hrf_glacier: [10, 1],
+    hrf_beacon: [11, 1],
+    hrf_tarn: [12, 1],
+    hrf_cairn: [13, 1],
   },
   dungeons: {
     /** Rótarhellir, under Yggdrasil's roots in Myrkviðr: entered from myr_roots into d1_r01. */

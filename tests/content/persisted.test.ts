@@ -209,6 +209,12 @@ const PERSISTED = [
   'd6_lock_c',
   'd6_sh_r16w',
   'hp_d6_r21',
+  // M9a Hrímfjöll.
+  'hrf_c_icefall',
+  'hrf_k_ore',
+  'hrf_c_ore',
+  'hp_hrf_glacier',
+  'hrf_c_tarn',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

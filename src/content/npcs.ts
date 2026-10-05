@@ -72,6 +72,7 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   sindri: { en: 'Sindri', sv: 'Sindri' },
   nyr: { en: 'Nýr', sv: 'Nýr' },
   nali: { en: 'Náli', sv: 'Náli' },
+  ormr: { en: 'Ormr', sv: 'Ormr' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -314,4 +315,6 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: atLeast('q_foreman', 4), screen: 'dvg_camp', at: { x: 13, y: 13 }, facing: 'n' },
     { screen: 'dvg_int_mine2', at: { x: 12, y: 8 }, facing: 'n' },
   ]),
+  /** Ormr the beacon-keeper (M9a), by his hearth under the beacon. */
+  ormr: npc('ormr', [{ screen: 'hrf_int_hut', at: { x: 18, y: 9 }, facing: 's' }]),
 };

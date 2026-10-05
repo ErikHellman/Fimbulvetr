@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { GaldrId, ItemId, NpcId, QuestId, WeaponId } from '@content/ids';
+import type { ArmorId, GaldrId, ItemId, NpcId, QuestId, WeaponId } from '@content/ids';
 import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
 import type { GameState } from '../state/gameState';
@@ -25,6 +25,8 @@ export type Cond =
   | { readonly k: 'season'; readonly is: Season }
   | { readonly k: 'phase'; readonly is: Phase | readonly Phase[] }
   | { readonly k: 'weapon'; readonly is: WeaponId }
+  /** The armour Ask wears, one of these (M9: warm armour on the high road). */
+  | { readonly k: 'armor'; readonly is: readonly ArmorId[] }
   /** A galdr Ask knows. */
   | { readonly k: 'galdr'; readonly id: GaldrId }
   /** The sky over the current region (indoors too: an NPC goes in because it rains outside). */
@@ -83,6 +85,8 @@ export function evalCond(c: Cond | undefined, ctx: CondCtx): boolean {
     }
     case 'weapon':
       return s.inv.weapon === c.is;
+    case 'armor':
+      return c.is.includes(s.inv.armor);
     case 'galdr':
       return s.inv.galdr.includes(c.id);
     case 'weather': {

@@ -30,6 +30,7 @@ import { NYKR_MACHINE } from './nykr';
 import { NASTROND_MACHINE, TOWER_SHIELD_MACHINE } from './nastrond';
 import { BELGR_MACHINE } from './belgr';
 import { IVALDI_MACHINE } from './ivaldi';
+import { FROSTVAETTR_MACHINE } from './frost';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -65,6 +66,7 @@ const MACHINES = {
   nykr: NYKR_MACHINE,
   belgr: BELGR_MACHINE,
   ivaldi: IVALDI_MACHINE,
+  frostvaettr: FROSTVAETTR_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -107,6 +109,7 @@ const START: Readonly<Record<BehaviourId, string>> = {
   nykr: 'rise',
   belgr: 'idle',
   ivaldi: 'throne',
+  frostvaettr: 'hover',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

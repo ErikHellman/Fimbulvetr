@@ -138,5 +138,8 @@ export interface ActorCtx {
   shoot(def: ShotId, pos: Vec, dir: Vec, owner?: number): void;
 }
 
-/** Things enemies throw or spit: a water-worm's spit, a draugr's arrow, the Haugbúi King's spectral axe. */
-export type ShotId = 'spit' | 'arrow' | 'axe';
+/**
+ * Things enemies throw or spit: a water-worm's spit, a draugr's arrow, the Haugbúi King's spectral axe, a
+ * rime bolt (M9: a frost wisp's or Hrímgerðr's, which the ice mirror turns).
+ */
+export type ShotId = 'spit' | 'arrow' | 'axe' | 'bolt';

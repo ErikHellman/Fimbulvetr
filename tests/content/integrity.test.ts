@@ -283,6 +283,7 @@ describe('warp stones', () => {
       'askdalr',
       'dvergagrof',
       'haugar',
+      'hrimfjoll',
       'myrkvidr',
       'myrland',
       'niflmyrr',

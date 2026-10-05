@@ -87,7 +87,7 @@ export function stepProjectiles(rt: SimRt): void {
     else if (e.def === 'bragd') stepBragd(rt, e);
     else if (e.def === 'vindr') stepVindr(rt, e);
     else if (e.def === 'arrow' && e.faction === 'hero') stepArrow(rt, e);
-    else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe') stepShot(rt, e);
+    else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe' || e.def === 'bolt') stepShot(rt, e);
   }
 }
 
@@ -170,6 +170,7 @@ export const SHOTS = {
   spit: { art: 'fx_spit', speed: 2.5, life: 120, amount: 2, knock: 3, z: 10, out: 0 },
   arrow: { art: 'fx_arrow', speed: 4, life: 90, amount: 2, knock: 2, z: 10, out: 0 },
   axe: { art: 'fx_axe', speed: 3, life: 240, amount: 4, knock: 4, z: 14, out: 120 },
+  bolt: { art: 'fx_bolt', speed: 3, life: 150, amount: 3, knock: 3, z: 10, out: 0 },
 } as const satisfies Record<
   ShotId,
   { art: string; speed: number; life: number; amount: number; knock: number; z: number; out: number }
@@ -201,7 +202,10 @@ export function shoot(rt: SimRt, def: ShotId, pos: Vec, dir: Vec, owner?: number
   e.mem['z'] = s.z;
   if (owner !== undefined) e.mem['owner'] = owner;
   rt.actors.push(e);
-  rt.emit({ t: 'sfx', id: def === 'axe' ? 'sfx_axe' : def === 'arrow' ? 'sfx_bow' : 'sfx_spit' });
+  rt.emit({
+    t: 'sfx',
+    id: def === 'axe' ? 'sfx_axe' : def === 'arrow' ? 'sfx_bow' : def === 'bolt' ? 'sfx_frost' : 'sfx_spit',
+  });
 }
 
 /**

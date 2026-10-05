@@ -857,6 +857,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Under rösets översta sten låg en bit av ett hjärta, insvept i näver.',
         },
       },
+      {
+        when: atLeast('q_letters', 3),
+        text: {
+          en: 'Embla’s third letter: the cairn at the top of the world, on Hrímfjöll’s last firn past the frozen tarn.',
+          sv: 'Emblas tredje brev: röset på världens tak, på Hrímfjölls sista firn bortom den frusna tjärnen.',
+        },
+      },
+      {
+        when: flag('st_letter3_found'),
+        text: {
+          en: 'Between the cairn’s stones lay the last seiðr vessel. Embla has no more letters to write: the rest she will say to Ask’s face.',
+          sv: 'Mellan rösets stenar låg det sista seiðkärlet. Embla har inga fler brev att skriva: resten säger hon till Ask ansikte mot ansikte.',
+        },
+      },
     ],
   },
   q_loom: {
@@ -964,6 +978,40 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         text: {
           en: 'Thane Ívaldi, the Anvil, is broken. Þorkell and Rannveig are free. Kolbeinn says one thane is left, in the ice.',
           sv: 'Hövding Ívaldi, Städet, är krossad. Þorkell och Rannveig är fria. Kolbeinn säger att en hövding är kvar, i isen.',
+        },
+      },
+    ],
+  },
+  q_rime: {
+    id: 'q_rime',
+    name: { en: 'The Rime Tower', sv: 'Rimtornet' },
+    stages: [
+      {
+        when: flag('st_hrf_reached'),
+        text: {
+          en: 'In the ember byrnie Ask has crossed the frost line onto Hrímfjöll. A tower of ice stands over the glacier: Hrímturn, where the last thane keeps her oath.',
+          sv: 'I glödbrynjan har Ask tagit sig över frostgränsen upp på Hrímfjöll. Ett torn av is reser sig över glaciären: Hrímturn, där den sista hövdingen håller sin ed.',
+        },
+      },
+      {
+        when: flag('st_d7_entered'),
+        text: {
+          en: 'Inside Hrímturn the floors are glass and the light comes in shafts through the ice.',
+          sv: 'Inne i Hrímturn är golven av glas och ljuset faller in i strålar genom isen.',
+        },
+      },
+      {
+        when: flag('st_d7_svellr'),
+        text: {
+          en: 'Svellr the glacier construct lies shattered, and the ice mirror is Ask’s. It turns any beam the way Ask faces.',
+          sv: 'Glaciärvarelsen Svellr ligger krossad, och isspegeln är Asks. Den vänder varje stråle åt det håll Ask står vänd.',
+        },
+      },
+      {
+        when: flag('st_thane_hrimgerdr'),
+        text: {
+          en: 'Four thanes down. Útgarðr’s gate stands open, and the Rime King is waking.',
+          sv: 'Fyra hövdingar nere. Útgarðrs port står öppen, och Rimkungen håller på att vakna.',
         },
       },
     ],

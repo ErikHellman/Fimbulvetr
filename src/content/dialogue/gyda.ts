@@ -34,6 +34,7 @@ export const GYDA: DialogueDef = {
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_hrf_reached'), node: 'hrf' },
     { when: flag('st_thane_ivaldi'), node: 'ivaldi' },
     { when: flag('st_dvg_reached'), node: 'dvg' },
     { when: flag('st_embla_found'), node: 'embla' },
@@ -48,6 +49,12 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    hrf: {
+      text: {
+        en: 'Hrímgerðr, the record calls the last one: a giantess of glass who turns the light itself into a blade. The runes beside her name are scratched out, as if the carver was afraid. Turn her light back on her, child.',
+        sv: 'Hrímgerðr kallar krönikan den sista: en jättekvinna av glas som gör själva ljuset till en klinga. Runorna bredvid hennes namn är bortskrapade, som om ristaren var rädd. Vänd hennes ljus mot henne, barn.',
+      },
+    },
     ivaldi: {
       text: {
         en: 'Three thanes fallen: Náströnd at Helgrind, Nykr under the lake, and now Ívaldi in his forge. The record says the fourth sits in the ice under Hrímfjöll, nearest the Rime King. Go warm, child.',

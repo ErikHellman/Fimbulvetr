@@ -189,6 +189,17 @@ import { d6R25 } from './forge/d6_r25';
 import { d6R26 } from './forge/d6_r26';
 import { d6R27 } from './forge/d6_r27';
 import { d6R28 } from './forge/d6_r28';
+import { hrfRoad } from './hrimfjoll/hrf_road';
+import { hrfIcefall } from './hrimfjoll/hrf_icefall';
+import { hrfGlacier } from './hrimfjoll/hrf_glacier';
+import { hrfCrevasse } from './hrimfjoll/hrf_crevasse';
+import { hrfBeacon } from './hrimfjoll/hrf_beacon';
+import { hrfSaddle } from './hrimfjoll/hrf_saddle';
+import { hrfTarn } from './hrimfjoll/hrf_tarn';
+import { hrfTowerfoot } from './hrimfjoll/hrf_towerfoot';
+import { hrfCairn } from './hrimfjoll/hrf_cairn';
+import { hrfUtgard } from './hrimfjoll/hrf_utgard';
+import { hrfIntHut } from './hrimfjoll/hrf_int_hut';
 
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
@@ -457,4 +468,15 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d6_r26: d6R26,
   d6_r27: d6R27,
   d6_r28: d6R28,
+  hrf_road: hrfRoad,
+  hrf_icefall: hrfIcefall,
+  hrf_glacier: hrfGlacier,
+  hrf_crevasse: hrfCrevasse,
+  hrf_beacon: hrfBeacon,
+  hrf_saddle: hrfSaddle,
+  hrf_tarn: hrfTarn,
+  hrf_towerfoot: hrfTowerfoot,
+  hrf_cairn: hrfCairn,
+  hrf_utgard: hrfUtgard,
+  hrf_int_hut: hrfIntHut,
 };

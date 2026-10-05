@@ -1084,4 +1084,50 @@ export const ENEMY_DEFS = {
     },
     drops: { heart: 0, silver: 0, none: 1 },
   },
+  /** An ice wolf of Hrímfjöll (M9): the wolf's stalk, crouch (400 ms) and lunge, harder and hardier; fire bites it twice as hard. */
+  isvargr: {
+    id: 'isvargr',
+    art: 'enemy_isvargr',
+    hp: 10,
+    body: { x: -7, y: -8, w: 14, h: 8 },
+    hurt: { x: -10, y: -16, w: 20, h: 16 },
+    behaviour: 'vargr',
+    knockResist: 0.2,
+    immortal: false,
+    solid: false,
+    weak: ['fire'],
+    touch: { amount: 2, knock: 2, tags: 0 },
+    attacks: {
+      lunge: {
+        from: 0,
+        to: 13,
+        boxes: around({ x: -9, y: -14, w: 18, h: 14 }),
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    stunnable: 120,
+    drops: { heart: 2, silver: 3, arrows: 1, none: 4 },
+  },
+  /**
+   * A frost wisp (M9): drifts to line up with Ask on a row or column, glows (400 ms) and looses a rime bolt
+   * straight along it. Fire puts it out at a touch; the ice mirror sends its bolt back (M9b).
+   */
+  frostvaettr: {
+    id: 'frostvaettr',
+    art: 'enemy_frostvaettr',
+    hp: 3,
+    body: { x: -4, y: -4, w: 8, h: 4 },
+    hurt: { x: -7, y: -20, w: 14, h: 14 },
+    behaviour: 'frostvaettr',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    glow: 32,
+    weak: ['fire'],
+    stunnable: 90,
+    drops: { heart: 1, silver: 1, seidr: 2, none: 3 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

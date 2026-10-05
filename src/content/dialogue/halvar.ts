@@ -13,6 +13,7 @@ export const HALVAR: DialogueDef = {
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    { when: all(atLeast('q_farm', 2), flag('st_hrf_reached')), node: 'hrf' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
     { when: all(atLeast('q_farm', 2), flag('st_dvg_reached')), node: 'dvg' },
     { when: atLeast('q_farm', 2), node: 'farm_done' },
@@ -39,6 +40,12 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'Þorkell is home, thinner, and talking about iron like a dwarf. Three of the four thanes, lad. Your mother would not have believed it. I hardly do.',
         sv: 'Þorkell är hemma, magrare, och pratar om järn som en dvärg. Tre av de fyra hövdingarna, pojk. Din mor skulle inte ha trott det. Jag gör det knappt själv.',
+      },
+    },
+    hrf: {
+      text: {
+        en: 'Hrímfjöll. My grandfather went up there once, after a lost ewe, and came down without two toes. Whatever is in that tower, lad, come down with all of yours.',
+        sv: 'Hrímfjöll. Min farfar gick upp dit en gång, efter en bortsprungen tacka, och kom ner utan två tår. Vad det än är i det där tornet, pojk, kom ner med alla dina.',
       },
     },
     dvg: {

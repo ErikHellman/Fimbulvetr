@@ -12,7 +12,7 @@ import { CONTINUE_DELAY } from '@core/sim/systems/death';
 import { condCtx } from '@core/sim/systems/story';
 import { questLog } from '@core/story/quests';
 import { peekDungeon } from '@core/state/dungeons';
-import { dungeonMap, overworldMap, verseMarks } from '@core/world/mapModel';
+import { dungeonMap, overworldMap, verseMarks, beaconMarks } from '@core/world/mapModel';
 import { VERSES } from '@content/verses';
 import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
 import type { Sim, StoryUi } from '@core/sim/sim';
@@ -358,7 +358,12 @@ export class UiScene extends Phaser.Scene {
       this.menuDungeonMap(dungeon, top, lang);
       return;
     }
-    const marks = verseMarks(VERSES, sim.state);
+    // The skald's verses; and with the beacon arm-ring worn (M9), every heart piece still lying out.
+    const verses = verseMarks(VERSES, sim.state);
+    const marks =
+      sim.state.inv.ring === 'ring_beacon'
+        ? [...verses, ...beaconMarks(sim.db.layout, sim.db.screens, sim.state)]
+        : verses;
     const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id, marks);
     const cw = 22;
     const ch = 13;

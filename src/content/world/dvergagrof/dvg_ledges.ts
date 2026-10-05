@@ -4,7 +4,7 @@ export const dvgLedges: ScreenDef = {
   id: 'dvg_ledges',
   region: 'dvergagrof',
   purpose:
-    'Cliff ledges under the frost line. The high road north to Hrímfjöll starts here, and the killing frost on it turns back anyone not wrapped in an ember byrnie (M9). Rime ravens nest on the ledges.',
+    'Cliff ledges under the frost line. The high road north to Hrímfjöll starts here (M9), and the killing frost on it turns back anyone not wrapped in an ember byrnie. Rime ravens nest on the ledges.',
   things: [
     {
       k: 'sign',
@@ -24,10 +24,10 @@ export const dvgLedges: ScreenDef = {
     { x: 18, y: 14 },
   ],
   map: [
-    '########################################',
-    '########################################',
-    '########################################',
-    '########################################',
+    '#########################·,·############',
+    '#########################·,·############',
+    '#########################·,·############',
+    '#########################·,·############',
     '#·················M······,·············#',
     '#························,·············#',
     '#·····K··················,··············',

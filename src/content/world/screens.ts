@@ -227,6 +227,17 @@ export const SCREEN_IDS = [
   'd6_r26',
   'd6_r27',
   'd6_r28',
+  'hrf_road',
+  'hrf_icefall',
+  'hrf_glacier',
+  'hrf_crevasse',
+  'hrf_beacon',
+  'hrf_saddle',
+  'hrf_tarn',
+  'hrf_towerfoot',
+  'hrf_cairn',
+  'hrf_utgard',
+  'hrf_int_hut',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

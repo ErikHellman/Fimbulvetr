@@ -46,7 +46,16 @@ const CONTENT = {
  * is entered and Nykr killed in M7b (`q_holmr` names both).
  */
 // Set by content still to come: Ívaldi's Forge (M8b).
-const SET_LATER = new Set(['st_rime_open', 'st_d5_entered', 'st_thane_nykr']);
+// Set in a later part: Hrímturn's beats (M9b) and Útgarðr's gate (M10).
+const SET_LATER = new Set([
+  'st_rime_open',
+  'st_d5_entered',
+  'st_thane_nykr',
+  'st_d7_entered',
+  'st_d7_svellr',
+  'st_thane_hrimgerdr',
+  'st_utgard_open',
+]);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {
