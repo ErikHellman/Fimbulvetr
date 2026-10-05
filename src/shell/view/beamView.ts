@@ -1,8 +1,11 @@
 import type * as Phaser from 'phaser';
 import type { Vec } from '@core/math/vec';
 import type { BeamSeg } from '@core/sim/systems/beams';
+import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
 
 const GLOW = 0xa8d8f0;
+/** Hrímgerðr's glazed floor: a pale sheen over the rows she has frozen. */
+const RIME = 0xd8f0ff;
 const CORE = 0xf4fcff;
 /** Beams are drawn this far above the tile middles (a shaft of light at chest height). */
 const LIFT = 6;
@@ -20,9 +23,18 @@ export class BeamView {
     this.gfx = scene.add.graphics().setDepth(-0.5);
   }
 
-  draw(segs: readonly BeamSeg[], origin: Vec, tick: number): void {
+  draw(segs: readonly BeamSeg[], origin: Vec, tick: number, rimeFloor: number | null = null): void {
     this.gfx.clear();
     this.shown = segs.length;
+    if (rimeFloor !== null)
+      this.gfx
+        .fillStyle(RIME, 0.3)
+        .fillRect(
+          origin.x,
+          origin.y + rimeFloor * TILE,
+          SCREEN_COLS * TILE,
+          (SCREEN_ROWS - rimeFloor) * TILE,
+        );
     const glow = 0.35 + (Math.floor(tick / 5) % 3) * 0.05;
     for (const s of segs) {
       const x = Math.round(origin.x + Math.min(s.x0, s.x1));

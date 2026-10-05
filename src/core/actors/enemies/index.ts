@@ -31,6 +31,8 @@ import { NASTROND_MACHINE, TOWER_SHIELD_MACHINE } from './nastrond';
 import { BELGR_MACHINE } from './belgr';
 import { IVALDI_MACHINE } from './ivaldi';
 import { FROSTVAETTR_MACHINE } from './frost';
+import { SVELLR_MACHINE } from './svellr';
+import { HRIMGERDR_MACHINE, ICICLE_MACHINE } from './hrimgerdr';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -67,6 +69,9 @@ const MACHINES = {
   belgr: BELGR_MACHINE,
   ivaldi: IVALDI_MACHINE,
   frostvaettr: FROSTVAETTR_MACHINE,
+  svellr: SVELLR_MACHINE,
+  hrimgerdr: HRIMGERDR_MACHINE,
+  icicle: ICICLE_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -110,6 +115,9 @@ const START: Readonly<Record<BehaviourId, string>> = {
   belgr: 'idle',
   ivaldi: 'throne',
   frostvaettr: 'hover',
+  svellr: 'idle',
+  hrimgerdr: 'idle',
+  icicle: 'shadow',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

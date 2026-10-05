@@ -12,7 +12,18 @@ export function onGlaze(rt: SimRt): boolean {
   const ty = Math.floor((rt.hero.pos.y - 1) / TILE);
   if (tx < 0 || ty < 0 || tx >= terrain.cols || ty >= terrain.rows) return false;
   const id = terrain.cells[ty * terrain.cols + tx];
-  return id !== undefined && rt.db.terrain[id].glaze === true;
+  if (id !== undefined && rt.db.terrain[id].glaze === true) return true;
+  const rime = rimeFloor(rt);
+  return rime !== null && ty >= rime;
+}
+
+/**
+ * The row from which a foe has glazed the floor (Hrímgerðr's second phase, `mem.rimeFloor`), or null: every
+ * floor tile from there down is glaze while she lives.
+ */
+export function rimeFloor(rt: SimRt): number | null {
+  for (const a of rt.actors) if (a.kind === 'enemy' && mem(a, 'rimeFloor') > 0) return mem(a, 'rimeFloor');
+  return null;
 }
 
 /** The way Ask is sliding, or null. Kept in `mem.slide` (0 none, then n, e, s, w). */

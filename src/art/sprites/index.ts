@@ -21,7 +21,7 @@ import { SAEVATN_ANIMS, saevatnFrames } from './saevatn';
 import { HOF_ANIMS, hofFrames } from './hof';
 import { FORGE_ANIMS, forgeFrames } from './forge';
 import { RIME_ANIMS, rimeFrames } from './rime';
-import { TOWER_ANIMS, towerFrames } from './tower';
+import { TOWER_ANIMS, towerFoeFrames, towerFrames } from './tower';
 
 export type { SpriteFrame } from './types';
 
@@ -74,6 +74,7 @@ export function buildSprites(): SpriteFrame[] {
     ...forgeFrames(),
     ...rimeFrames(),
     ...towerFrames(),
+    ...towerFoeFrames(),
     missingFrame(),
   ];
 }

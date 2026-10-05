@@ -126,6 +126,9 @@ export const ENEMIES = [
   'ivaldi',
   'isvargr',
   'frostvaettr',
+  'svellr',
+  'hrimgerdr',
+  'icicle',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -436,6 +439,11 @@ export const SCRIPTS = [
   'hrf_turned_back',
   'hrf_letter3',
   'hrf_sealed',
+  'd7_enter',
+  'd7_kolbeinn',
+  'd7_gate_out',
+  'd7_cell_asa',
+  'd7_cell_bjarni',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

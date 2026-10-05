@@ -29,8 +29,17 @@ describe('telegraphs', () => {
     // Lindormr charges only in its last phase, once flushed out of a mound: its tell (the 30-tick coil) is
     // timed in lindormr.test.ts. Hrönn bites only when it surfaces at a grate in its turn (its 24-tick tell is
     // timed in hronn.test.ts), and Nykr's wave and charge follow its rear and coil (nykr.test.ts). Belgr's swell
-    // and Ívaldi's raised hammer are boss tells, longer by design (forge_bosses.test.ts).
-    const setPieces: readonly EnemyId[] = ['lindormr', 'hronn', 'nykr', 'belgr', 'ivaldi'];
+    // and Ívaldi's raised hammer are boss tells, longer by design (forge_bosses.test.ts), as are Svellr's scrape
+    // and the shadow of Hrímgerðr's icicles (rime_bosses.test.ts).
+    const setPieces: readonly EnemyId[] = [
+      'lindormr',
+      'hronn',
+      'nykr',
+      'belgr',
+      'ivaldi',
+      'svellr',
+      'icicle',
+    ];
     const attackers = ENEMIES.filter((id) => DB.enemies[id].attacks !== undefined && !setPieces.includes(id));
     expect(attackers).toEqual(expect.arrayContaining(['vargr', 'draugr', 'troll']));
     for (const id of attackers) {

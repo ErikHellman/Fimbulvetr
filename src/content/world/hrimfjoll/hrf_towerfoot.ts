@@ -7,6 +7,9 @@ export const hrfTowerfoot: ScreenDef = {
     'The foot of Hrímturn, the Rime Tower that the giantess Hrímgerðr grew out of the glacier. Its door is sealed with rime until the other three thanes have fallen; then it opens into Dungeon 7 (M9b).',
   cold: true,
   things: [
+    /** Through Hrímturn's door, into the tower (M9b). */
+    { k: 'door', at: { x: 19, y: 6 }, dir: 'n', to: 'd7_r28', arrive: { x: 19, y: 18 }, facing: 'n' },
+    { k: 'door', at: { x: 20, y: 6 }, dir: 'n', to: 'd7_r28', arrive: { x: 20, y: 18 }, facing: 'n' },
     /** Hrímturn's door, sealed with rime until three thanes have fallen. */
     {
       k: 'gate',

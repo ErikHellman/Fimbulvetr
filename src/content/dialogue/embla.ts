@@ -18,6 +18,7 @@ export const EMBLA: DialogueDef = {
       when: all(flag('st_embla_found'), flag('st_hrf_reached'), { k: 'flag', id: 'q_letters', eq: 2 }),
       node: 'letter3',
     },
+    { when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr')), node: 'r_rime' },
     { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
     { when: flag('st_embla_found'), node: 'r_day' },
     { when: raid, node: 'raid' },
@@ -30,6 +31,12 @@ export const EMBLA: DialogueDef = {
     { when: day(3), node: 'd3' },
   ],
   nodes: {
+    r_rime: {
+      text: {
+        en: 'All four. I felt the oath go slack, like a rope cut in the dark. Ask, the King was bound with our blood, and it is our blood that loosed him. Kolbeinn knew that from the start.',
+        sv: 'Alla fyra. Jag kände eden slakna, som ett rep som skärs av i mörkret. Ask, Kungen bands med vårt blod, och det är vårt blod som lösgjort honom. Det visste Kolbeinn från början.',
+      },
+    },
     found: {
       text: {
         en: 'Ask! No, do not say it. I know what the cold took from Askdalr, and I know why. I heard it in the old songs long before the trolls came.',

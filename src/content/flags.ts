@@ -332,6 +332,13 @@ export const FLAGS = {
   st_freed_bjarni: { t: 'bool' },
   /** Útgarðr's gate in the ice open (M10). */
   st_utgard_open: { t: 'bool' },
+  /** Hrímturn's crystal eyes (M9b), each lit for good by a beam: they lift the bars they keep. */
+  st_d7_eye_r30: { t: 'bool' },
+  st_d7_eye_r23: { t: 'bool' },
+  st_d7_eye_r24: { t: 'bool' },
+  st_d7_eye_r15: { t: 'bool' },
+  st_d7_eye_r11: { t: 'bool' },
+  st_d7_eye_r17: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

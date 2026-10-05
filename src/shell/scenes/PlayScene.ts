@@ -402,7 +402,12 @@ export class PlayScene extends Phaser.Scene {
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     this.ghostFloor.draw(this.sim.ghosts(), this.sim.originOf(this.sim.screen.id));
     this.chain.draw(this.sim.grapple(), this.sim.originOf(this.sim.screen.id));
-    this.beamView.draw(this.sim.beams(), this.sim.originOf(this.sim.screen.id), this.sim.tick);
+    this.beamView.draw(
+      this.sim.beams(),
+      this.sim.originOf(this.sim.screen.id),
+      this.sim.tick,
+      this.sim.rimeFloor(),
+    );
     {
       const hero = this.sim.hero;
       const origin = this.sim.originOf(this.sim.screen.id);

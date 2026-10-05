@@ -69,6 +69,7 @@ import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
 import { heatMax, stepCold, stepHeat } from './systems/heat';
 import { stepBeams, type BeamSeg } from './systems/beams';
+import { rimeFloor } from './systems/glaze';
 import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
@@ -286,6 +287,11 @@ export class Sim implements SimRt {
   /** Whether a blizzard blows over the current screen (M9): the view draws its white veil. */
   blizzard(): boolean {
     return blizzard(this);
+  }
+
+  /** The row from which Hrímgerðr has glazed her hall's floor (M9b), for the view's rime; null if none. */
+  rimeFloor(): number | null {
+    return rimeFloor(this);
   }
 
   /** The killing frost on Ask (M9), for the HUD's frost bar; null when Ask is warm. */

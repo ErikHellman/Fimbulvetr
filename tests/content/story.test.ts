@@ -65,6 +65,8 @@ describe('story content', () => {
       if (o['k'] === 'flag' && typeof o['id'] === 'string') read.add(o['id']);
       if ((o['k'] === 'set' || o['k'] === 'add') && typeof o['flag'] === 'string') set.add(o['flag']);
       if (o['k'] === 'pen' && typeof o['flag'] === 'string') set.add(o['flag']);
+      // A crystal eye sets its flag when a beam lights it.
+      if (o['k'] === 'eye' && typeof o['flag'] === 'string') set.add(o['flag']);
       // A latch sets its flag when struck.
       if (o['k'] === 'switch' && typeof o['set'] === 'string') set.add(o['set']);
       // Gates that fire melts or wind tears set their flag when it happens.

@@ -13,6 +13,7 @@ export const HALVAR: DialogueDef = {
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    { when: all(atLeast('q_farm', 2), flag('st_thane_hrimgerdr')), node: 'rime' },
     { when: all(atLeast('q_farm', 2), flag('st_hrf_reached')), node: 'hrf' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
     { when: all(atLeast('q_farm', 2), flag('st_dvg_reached')), node: 'dvg' },
@@ -36,6 +37,12 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    rime: {
+      text: {
+        en: 'Ása at her loom and Bjarni at his jetty, and every one of them home. I count heads at supper now, lad, like a fool counting sheep. They are all there.',
+        sv: 'Ása vid sin vävstol och Bjarni på sin brygga, och varenda en av dem hemma. Jag räknar huvuden vid kvällsmaten nu, pojk, som en dåre som räknar får. Alla är där.',
+      },
+    },
     ivaldi: {
       text: {
         en: 'Þorkell is home, thinner, and talking about iron like a dwarf. Three of the four thanes, lad. Your mother would not have believed it. I hardly do.',

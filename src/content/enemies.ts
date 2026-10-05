@@ -1,6 +1,6 @@
 import type { AttackWindow, EnemyDef } from '@core/actors/enemies/defs';
 import type { Box } from '@core/math/box';
-import { ARROW, HAMMER, HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
+import { ARROW, HAMMER, HEAVY, PIERCE_SHIELD, REFLECT } from '@core/combat/hit';
 import type { EnemyId } from './ids';
 
 /** The same box for every facing (a body slam). */
@@ -1129,5 +1129,75 @@ export const ENEMY_DEFS = {
     weak: ['fire'],
     stunnable: 90,
     drops: { heart: 1, silver: 1, seidr: 2, none: 3 },
+  },
+  /**
+   * Svellr, the glacier construct (D7's mini-boss, M9b): it scrapes the floor squared up on Ask, charges
+   * straight across the hall and stuns itself on the wall, cracked open to the sword. It guards the mirror.
+   */
+  svellr: {
+    id: 'svellr',
+    art: 'enemy_svellr',
+    hp: 14,
+    body: { x: -14, y: -10, w: 28, h: 10 },
+    hurt: { x: -16, y: -36, w: 32, h: 36 },
+    behaviour: 'svellr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    boss: { name: { en: 'Svellr', sv: 'Svellr' }, mini: true },
+    touch: { amount: 2, knock: 4, tags: 0 },
+    attacks: {
+      charge: {
+        from: 0,
+        to: 150,
+        boxes: around({ x: -16, y: -24, w: 32, h: 24 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    drops: { heart: 1, silver: 0, none: 0 },
+  },
+  /**
+   * Thane Hrímgerðr, the Glass (D7's boss, M9b): she casts rime bolts along rows and columns; every blow
+   * turns off her, but her own bolt sent back by the ice mirror makes her kneel, open to the sword.
+   */
+  hrimgerdr: {
+    id: 'hrimgerdr',
+    art: 'enemy_hrimgerdr',
+    hp: 18,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -52, w: 28, h: 52 },
+    behaviour: 'hrimgerdr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    needs: ['mirror'],
+    boss: { name: { en: 'Hrímgerðr', sv: 'Hrímgerðr' } },
+    struckBy: REFLECT,
+    touch: { amount: 2, knock: 5, tags: 0 },
+    drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /** An icicle from Hrímgerðr's roof (M9b): its shadow grows where Ask stood, then it falls. */
+  icicle: {
+    id: 'icicle',
+    art: 'enemy_icicle',
+    hp: 1,
+    body: { x: -6, y: -6, w: 12, h: 6 },
+    hurt: { x: -7, y: -10, w: 14, h: 10 },
+    behaviour: 'icicle',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      fall: {
+        from: 6,
+        to: 9,
+        boxes: around({ x: -9, y: -12, w: 18, h: 12 }),
+        amount: 3,
+        knock: 3,
+        tags: PIERCE_SHIELD,
+      },
+    },
   },
 } as const satisfies Record<EnemyId, EnemyDef>;

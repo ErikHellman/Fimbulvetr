@@ -215,6 +215,28 @@ const PERSISTED = [
   'hrf_c_ore',
   'hp_hrf_glacier',
   'hrf_c_tarn',
+  // M9b Hrímturn.
+  'd7_c_bigkey',
+  'd7_c_cache',
+  'd7_c_compass',
+  'd7_c_key1',
+  'd7_c_key2',
+  'd7_c_key3',
+  'd7_c_map',
+  'd7_c_mirror',
+  'd7_c_r03',
+  'd7_c_r06',
+  'd7_c_r08',
+  'd7_c_r09',
+  'd7_c_r10',
+  'd7_c_r14',
+  'd7_hc',
+  'd7_k_r31e',
+  'd7_lock_a',
+  'd7_lock_b',
+  'd7_lock_big',
+  'd7_lock_c',
+  'hp_d7_beam',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

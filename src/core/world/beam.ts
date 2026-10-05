@@ -2,7 +2,7 @@ import { DIR_VEC, type Dir4 } from '../math/dir';
 import { SCREEN_COLS, SCREEN_ROWS } from './dims';
 
 /** How far a beam may run before it is let go (a loop of prisms never ends otherwise). */
-export const BEAM_TILES = 60;
+export const BEAM_TILES = 120;
 
 /** A prism's slant: `/` or `\`. */
 export type Slant = '/' | '\\';

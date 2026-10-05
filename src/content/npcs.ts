@@ -83,7 +83,7 @@ const wet: Cond = { k: 'weather', is: ['rain', 'storm'] };
 const night: Cond = { k: 'phase', is: 'night' };
 
 /** A captive freed from Helgrind is home by day; one still held sits in a cell there. */
-type Captive = 'ulf' | 'tofa' | 'oddr' | 'hallbera' | 'thorkell' | 'rannveig';
+type Captive = 'ulf' | 'tofa' | 'oddr' | 'hallbera' | 'thorkell' | 'rannveig' | 'asa' | 'bjarni';
 const freed = (who: Captive): Cond =>
   all(flag(`st_freed_${who}`), { k: 'not', c: { k: 'phase', is: 'night' } });
 const held = (who: Captive): Cond => all(afterRaid, not(flag(`st_freed_${who}`)));
@@ -148,8 +148,17 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: raidNight, screen: 'ask_gate', at: { x: 24, y: 9 }, facing: 'w' },
     { screen: 'ask_gate', at: { x: 20, y: 5 }, facing: 's' },
   ]),
-  asa: npc('asa', [{ when: up, screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' }]),
-  bjarni: npc('bjarni', [{ when: up, screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' }]),
+  /** Taken in the raid to cells in Hrímturn (M9b); home by day once Hrímgerðr falls. */
+  asa: npc('asa', [
+    { when: freed('asa'), screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' },
+    { when: held('asa'), screen: 'd7_r19', at: { x: 27, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' },
+  ]),
+  bjarni: npc('bjarni', [
+    { when: freed('bjarni'), screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' },
+    { when: held('bjarni'), screen: 'd7_r18', at: { x: 27, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' },
+  ]),
   /** Taken in the raid to a cell in Helgrind; home to the pasture by day once Náströnd falls. */
   ulf: npc('ulf', [
     { when: freed('ulf'), screen: 'ask_pasture', at: { x: 15, y: 4 }, facing: 's' },

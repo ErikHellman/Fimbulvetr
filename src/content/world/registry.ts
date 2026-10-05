@@ -197,6 +197,38 @@ import { hrfBeacon } from './hrimfjoll/hrf_beacon';
 import { hrfSaddle } from './hrimfjoll/hrf_saddle';
 import { hrfTarn } from './hrimfjoll/hrf_tarn';
 import { hrfTowerfoot } from './hrimfjoll/hrf_towerfoot';
+import { d7R01 } from './hrimturn/d7_r01';
+import { d7R02 } from './hrimturn/d7_r02';
+import { d7R03 } from './hrimturn/d7_r03';
+import { d7R04 } from './hrimturn/d7_r04';
+import { d7R05 } from './hrimturn/d7_r05';
+import { d7R06 } from './hrimturn/d7_r06';
+import { d7R07 } from './hrimturn/d7_r07';
+import { d7R08 } from './hrimturn/d7_r08';
+import { d7R09 } from './hrimturn/d7_r09';
+import { d7R10 } from './hrimturn/d7_r10';
+import { d7R11 } from './hrimturn/d7_r11';
+import { d7R12 } from './hrimturn/d7_r12';
+import { d7R13 } from './hrimturn/d7_r13';
+import { d7R14 } from './hrimturn/d7_r14';
+import { d7R15 } from './hrimturn/d7_r15';
+import { d7R16 } from './hrimturn/d7_r16';
+import { d7R17 } from './hrimturn/d7_r17';
+import { d7R18 } from './hrimturn/d7_r18';
+import { d7R19 } from './hrimturn/d7_r19';
+import { d7R20 } from './hrimturn/d7_r20';
+import { d7R21 } from './hrimturn/d7_r21';
+import { d7R22 } from './hrimturn/d7_r22';
+import { d7R23 } from './hrimturn/d7_r23';
+import { d7R24 } from './hrimturn/d7_r24';
+import { d7R25 } from './hrimturn/d7_r25';
+import { d7R26 } from './hrimturn/d7_r26';
+import { d7R27 } from './hrimturn/d7_r27';
+import { d7R28 } from './hrimturn/d7_r28';
+import { d7R29 } from './hrimturn/d7_r29';
+import { d7R30 } from './hrimturn/d7_r30';
+import { d7R31 } from './hrimturn/d7_r31';
+import { d7R32 } from './hrimturn/d7_r32';
 import { hrfCairn } from './hrimfjoll/hrf_cairn';
 import { hrfUtgard } from './hrimfjoll/hrf_utgard';
 import { hrfIntHut } from './hrimfjoll/hrf_int_hut';
@@ -479,4 +511,36 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   hrf_cairn: hrfCairn,
   hrf_utgard: hrfUtgard,
   hrf_int_hut: hrfIntHut,
+  d7_r01: d7R01,
+  d7_r02: d7R02,
+  d7_r03: d7R03,
+  d7_r04: d7R04,
+  d7_r05: d7R05,
+  d7_r06: d7R06,
+  d7_r07: d7R07,
+  d7_r08: d7R08,
+  d7_r09: d7R09,
+  d7_r10: d7R10,
+  d7_r11: d7R11,
+  d7_r12: d7R12,
+  d7_r13: d7R13,
+  d7_r14: d7R14,
+  d7_r15: d7R15,
+  d7_r16: d7R16,
+  d7_r17: d7R17,
+  d7_r18: d7R18,
+  d7_r19: d7R19,
+  d7_r20: d7R20,
+  d7_r21: d7R21,
+  d7_r22: d7R22,
+  d7_r23: d7R23,
+  d7_r24: d7R24,
+  d7_r25: d7R25,
+  d7_r26: d7R26,
+  d7_r27: d7R27,
+  d7_r28: d7R28,
+  d7_r29: d7R29,
+  d7_r30: d7R30,
+  d7_r31: d7R31,
+  d7_r32: d7R32,
 };

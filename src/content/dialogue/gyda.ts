@@ -34,6 +34,7 @@ export const GYDA: DialogueDef = {
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_thane_hrimgerdr'), node: 'thanes4' },
     { when: flag('st_hrf_reached'), node: 'hrf' },
     { when: flag('st_thane_ivaldi'), node: 'ivaldi' },
     { when: flag('st_dvg_reached'), node: 'dvg' },
@@ -49,6 +50,12 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    thanes4: {
+      text: {
+        en: 'Four thanes, four oaths broken. The record has nothing after that but the King’s name, and under it, cut deep: HE WAKES. Whatever Kolbeinn wants at Útgarðr, child, he wants it awake.',
+        sv: 'Fyra hövdingar, fyra brutna eder. Krönikan har inget efter det utom Kungens namn, och under det, djupt ristat: HAN VAKNAR. Vad Kolbeinn än vill vid Útgarðr, barn, så vill han ha det vaket.',
+      },
+    },
     hrf: {
       text: {
         en: 'Hrímgerðr, the record calls the last one: a giantess of glass who turns the light itself into a blade. The runes beside her name are scratched out, as if the carver was afraid. Turn her light back on her, child.',

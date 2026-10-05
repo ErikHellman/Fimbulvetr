@@ -8,6 +8,7 @@ import { atLeast, flag } from './util';
  */
 export const DVALINN: DialogueDef = {
   entry: [
+    { when: flag('st_thane_hrimgerdr'), node: 'rime' },
     { when: flag('st_hrf_reached'), node: 'hrf' },
     { when: flag('st_thane_ivaldi'), node: 'free' },
     { when: atLeast('q_foreman', 5), node: 'after' },
@@ -18,6 +19,12 @@ export const DVALINN: DialogueDef = {
     { node: 'ask' },
   ],
   nodes: {
+    rime: {
+      text: {
+        en: 'The meltwater is running in the vents again, long-legs, the first time since my beard was brown. Whatever you broke up there, the mountain is glad of it.',
+        sv: 'Smältvattnet rinner i schakten igen, långben, för första gången sedan mitt skägg var brunt. Vad du än krossade däruppe, så är berget glad för det.',
+      },
+    },
     hrf: {
       text: {
         en: 'Sindri’s ember-mail held on the high road? Of course it held. Tell the old beacon-keeper up there that Dvalinn still owes him a barrel, if he is alive.',
