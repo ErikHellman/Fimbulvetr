@@ -68,8 +68,14 @@ export type Step =
       readonly win: ScriptId;
       readonly fail: ScriptId;
     }
-  /** The credits roll: `CREDITS_TICKS`, or until confirm once `CREDITS_SKIP` ticks have passed. */
-  | { readonly k: 'credits' };
+  /**
+   * The credits roll: `CREDITS_TICKS`, or until confirm once `CREDITS_SKIP` ticks have passed. `roll` picks
+   * the demo's credits (the default, after the pass) or the game's last ones (M10b).
+   */
+  | { readonly k: 'credits'; readonly roll?: CreditsRoll };
+
+/** Which credits roll: the demo's, at the end of Act I, or the game's own at the very end. */
+export type CreditsRoll = 'demo' | 'end';
 
 export interface ScriptDef {
   readonly steps: readonly Step[];

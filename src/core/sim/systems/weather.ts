@@ -30,13 +30,23 @@ export function skyAt(rt: SimRt, region: RegionId, minute: number): WeatherKind 
   if (story !== undefined) return story.kind;
   if (!rt.rolled) return 'clear';
   const c = rt.state.clock;
-  return weatherAt(rt.state.seed, c.day, minute, region, seasonAt(c, region, rt.db.clock), rt.db.clock);
+  return weatherAt(
+    rt.state.seed,
+    c.day,
+    minute,
+    region,
+    seasonAt(c, region, rt.db.clock, rt.state.flags),
+    rt.db.clock,
+  );
 }
 
 /** A wet day on a screen: spring, and the morning's sky was not clear (mud stands all day). */
 export function wetDay(rt: SimRt, id: ScreenId): boolean {
   const region = rt.db.screens[id].region;
-  return seasonAt(rt.state.clock, region, rt.db.clock) === 'spring' && skyAt(rt, region, 0) !== 'clear';
+  return (
+    seasonAt(rt.state.clock, region, rt.db.clock, rt.state.flags) === 'spring' &&
+    skyAt(rt, region, 0) !== 'clear'
+  );
 }
 
 /** The wind on the current screen (still indoors and in dungeons). */

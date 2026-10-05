@@ -454,6 +454,11 @@ export const SCRIPTS = [
   'd8_basin',
   'd8_kolbeinn',
   'd8_kolbeinn_yield',
+  // The binding hall and the ending (M10b)
+  'd8_embla',
+  'd8_ending',
+  'end_home',
+  'end_shore',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

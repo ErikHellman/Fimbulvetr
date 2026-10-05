@@ -1,4 +1,5 @@
 import type { ScreenDef } from '@core/world/screen';
+import { all, flag, not } from '../../dialogue/util';
 import { room } from './templates';
 
 export const d8R12: ScreenDef = {
@@ -12,7 +13,18 @@ export const d8R12: ScreenDef = {
       k: 'enemy',
       id: 'hrimnir',
       at: { x: 20, y: 4 },
+      when: not(flag('st_hrimnir_dead')),
       onDeath: [{ k: 'set', flag: 'st_hrimnir_dead', value: true }],
+    },
+    /** Embla takes the binding in hand as Ask comes in; the ending runs as soon as the King is dead. */
+    { k: 'trigger', at: { x: 30, y: 2 }, w: 8, h: 18, script: 'd8_embla', when: not(flag('st_d8_embla')) },
+    {
+      k: 'trigger',
+      at: { x: 2, y: 2 },
+      w: 36,
+      h: 18,
+      script: 'd8_ending',
+      when: all(flag('st_hrimnir_dead'), not(flag('st_game_done'))),
     },
     {
       k: 'sign',

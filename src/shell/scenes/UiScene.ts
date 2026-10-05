@@ -666,7 +666,7 @@ export class UiScene extends Phaser.Scene {
     }
     if (ui.k === 'credits') {
       this.lastShown = '';
-      const roll = creditsRoll(lang, ui.t, ui.of, GAME_H, LINE_HEIGHT);
+      const roll = creditsRoll(lang, ui.t, ui.of, GAME_H, LINE_HEIGHT, ui.roll);
       const full = roll.lines.join('\n');
       const widest = Math.max(...roll.lines.map((l) => textWidth(l)));
       this.card.setVisible(true);

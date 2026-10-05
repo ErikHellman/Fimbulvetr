@@ -138,6 +138,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
         { x: 16, y: 11 },
       ],
     },
+    /** Home at the farm once it is all over (M10b). */
+    { when: flag('st_game_done'), screen: 'ask_farmyard', at: { x: 17, y: 10 }, facing: 's' },
     /** At the Refuge on Holmr once the pass is open (M7a): waiting on the shore until Ask first lands, then
      *  by the war table by day and at the hearth in the evening. */
     {

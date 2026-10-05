@@ -407,6 +407,7 @@ export class PlayScene extends Phaser.Scene {
       this.sim.originOf(this.sim.screen.id),
       this.sim.tick,
       this.sim.rimeFloor(),
+      this.sim.ring(),
     );
     {
       const hero = this.sim.hero;
@@ -456,7 +457,7 @@ export class PlayScene extends Phaser.Scene {
     this.weather.update(
       {
         kind: this.sim.weather(),
-        season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock),
+        season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock, this.sim.state.flags),
         wind: this.sim.wind(),
       },
       this.time.now,

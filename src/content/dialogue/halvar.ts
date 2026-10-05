@@ -15,6 +15,7 @@ export const HALVAR: DialogueDef = {
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    { when: flag('st_game_done'), node: 'spring' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_hrimgerdr')), node: 'rime' },
     { when: all(atLeast('q_farm', 2), flag('st_hrf_reached')), node: 'hrf' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
@@ -39,6 +40,12 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    spring: {
+      text: {
+        en: 'Spring, and nobody has to bleed to keep it. Go on, the chores can wait a day. I never thought I would hear myself say that.',
+        sv: 'Vår, och ingen behöver blöda för att hålla den. Gå nu, sysslorna kan vänta en dag. Jag trodde aldrig att jag skulle höra mig själv säga det.',
+      },
+    },
     confess: {
       text: {
         en: 'Lad. Sit a moment. No, stand, it is too cold to sit. I came up because there is a thing I should have told you at the gate, the morning after the raid, and I told you about a seax instead.',
