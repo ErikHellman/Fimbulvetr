@@ -431,15 +431,25 @@ export function strikeSwitch(rt: SimRt, box: Box, arrow = false): boolean {
   return true;
 }
 
-/** Opens every cracked wall or rock under `box` (a blast), for good. Returns whether one was opened. */
-export function openCracks(rt: SimRt, box: Box): boolean {
+/** What can break a crack open: a blast (bombs), the hammer's blow or Skjálfti's quake (M8b). */
+export type CrackBreaker = 'blast' | 'hammer' | 'quake';
+
+/** Walls and rocks open to a blast; a weak floor to the hammer or a quake; a stake to the hammer only. */
+export function breaks(by: CrackBreaker, art: 'wall' | 'rock' | 'floor' | 'stake'): boolean {
+  if (art === 'wall' || art === 'rock') return by === 'blast';
+  if (art === 'floor') return by !== 'blast';
+  return by === 'hammer';
+}
+
+/** Opens every crack under `box` that `by` breaks, for good. Returns whether one was opened. */
+export function openCracks(rt: SimRt, box: Box, by: CrackBreaker = 'blast'): boolean {
   const opened = rt.state.world.opened;
   let any = false;
   for (const e of rt.actors) {
     if (e.kind !== 'fixture' || e.def !== 'crack' || mem(e, 'on') !== 1) continue;
     if (!overlaps(box, at(e.hurt, e.pos))) continue;
     const thing = thingOf(rt, e);
-    if (thing?.k !== 'crack' || opened.includes(thing.id)) continue;
+    if (thing?.k !== 'crack' || opened.includes(thing.id) || !breaks(by, thing.art)) continue;
     opened.push(thing.id);
     any = true;
   }

@@ -169,6 +169,12 @@ export function freezeFoe(rt: SimRt, foe: Entity): boolean {
     return true;
   }
   if (def.boss !== undefined) {
+    // A white-hot boss (Ívaldi's last phase) is cooled for its behaviour to read; others shrug it off.
+    if (mem(foe, 'hot') === 1) {
+      foe.mem['iced'] = 1;
+      rt.emit({ t: 'sfx', id: 'sfx_sizzle' });
+      return true;
+    }
     rt.emit({ t: 'sfx', id: 'sfx_block' });
     return false;
   }

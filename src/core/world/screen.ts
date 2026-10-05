@@ -207,7 +207,11 @@ export type Thing =
       readonly at: TilePos;
       readonly w: number;
       readonly h: number;
-      readonly art: 'wall' | 'rock';
+      /**
+       * `wall` and `rock` open to a blast; `floor` (a weak floor over a way down) only to the hammer or
+       * Skjálfti, and `stake` (a dwarf stake across the way) only to the hammer (M8b).
+       */
+      readonly art: 'wall' | 'rock' | 'floor' | 'stake';
     }
   /**
    * A mill wheel: struck (sword, boomerang or blast) it sets the screen's water level to `level`, unless

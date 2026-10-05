@@ -26,6 +26,7 @@ export type HeroMode =
   | 'shoot'
   | 'cast'
   | 'chain'
+  | 'hammer'
   | 'swim'
   | 'dive'
   | 'dying';
@@ -356,6 +357,20 @@ const cast: HeroDef = {
   },
 };
 
+/** The dwarf hammer (M8b): raised overhead, then brought down; the blow itself is `stepHammer`'s. */
+const hammer: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'lift');
+  },
+  tick(e, c) {
+    still(e);
+    const h = c.tuning.hero;
+    if (e.fsm.t === h.hammerHit - 2) setAnim(e, 'throw');
+    return e.fsm.t >= h.hammerTicks - 1 ? 'move' : undefined;
+  },
+};
+
 /**
  * The grapple chain is out (or pulling Ask along it): Ask stands still with the arm out. The chain's own
  * step ends it, back to `move`, when the head is caught or Ask lands.
@@ -402,6 +417,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   shoot,
   cast,
   chain,
+  hammer,
   swim,
   dive,
   dying,

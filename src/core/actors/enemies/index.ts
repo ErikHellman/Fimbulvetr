@@ -28,6 +28,8 @@ import { NYKR_FOAL_MACHINE } from './nykr_foal';
 import { GRATE_MACHINE, HRONN_MACHINE } from './hronn';
 import { NYKR_MACHINE } from './nykr';
 import { NASTROND_MACHINE, TOWER_SHIELD_MACHINE } from './nastrond';
+import { BELGR_MACHINE } from './belgr';
+import { IVALDI_MACHINE } from './ivaldi';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -61,6 +63,8 @@ const MACHINES = {
   hronn: HRONN_MACHINE,
   hronn_grate: GRATE_MACHINE,
   nykr: NYKR_MACHINE,
+  belgr: BELGR_MACHINE,
+  ivaldi: IVALDI_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -101,6 +105,8 @@ const START: Readonly<Record<BehaviourId, string>> = {
   hronn: 'wake',
   hronn_grate: 'grate',
   nykr: 'rise',
+  belgr: 'idle',
+  ivaldi: 'throne',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

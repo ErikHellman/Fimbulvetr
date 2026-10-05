@@ -189,6 +189,19 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'sw......',
     'w.......',
   ],
+  /** The dwarf hammer: a squat iron head on a short haft. */
+  hammer: ['.LLLLLL.', 'LllllllL', 'LLLLLLLL', '...ww...', '...ww...', '...wW...', '...wW...', '...WW...'],
+  /** A Skjálfti rune-stave: a short ash stave with ember runes cut down it. */
+  stave_skjalfti: [
+    '......w.',
+    '.....wy.',
+    '....wW..',
+    '...yw...',
+    '..wW....',
+    '.yw.....',
+    'wW......',
+    'w.......',
+  ],
   /** A round lens of dwarf-glass in a brass rim, light caught in it. */
   trade_lens: [
     '..bbbb..',

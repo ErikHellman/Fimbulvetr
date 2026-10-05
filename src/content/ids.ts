@@ -56,7 +56,7 @@ export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
 /** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
 export const FETCH_ITEMS = ['honey', 'amber'] as const;
 /** Rune-staves: each sings its galdr once, from an item slot, for no seiðr. */
-export const STAVES = ['stave_is'] as const;
+export const STAVES = ['stave_is', 'stave_skjalfti'] as const;
 /** Counted goods that pay where silver does not: ore, for Hreggviðr at the Refuge (M7a). */
 export const MATERIALS = ['ore'] as const;
 export const ITEMS = [
@@ -122,6 +122,8 @@ export const ENEMIES = [
   'nykr',
   'jarnvordr',
   'glod',
+  'belgr',
+  'ivaldi',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 

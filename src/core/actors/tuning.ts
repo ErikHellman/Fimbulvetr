@@ -54,6 +54,10 @@ export interface HeroTuning {
   readonly heatBurn: number;
   /** A conveyor belt's push on anyone walking it, px a tick. */
   readonly belt: number;
+  /** The dwarf hammer (M8b): how long a blow takes, the tick it lands, and what it deals a foe. */
+  readonly hammerTicks: number;
+  readonly hammerHit: number;
+  readonly hammerDamage: number;
   readonly diveTicks: number;
   /** How hard a current pushes a swimmer (px a tick), and a surge (more than anyone swims). */
   readonly current: number;

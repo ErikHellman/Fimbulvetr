@@ -1,6 +1,6 @@
 import type { AttackWindow, EnemyDef } from '@core/actors/enemies/defs';
 import type { Box } from '@core/math/box';
-import { ARROW, HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
+import { ARROW, HAMMER, HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
 import type { EnemyId } from './ids';
 
 /** The same box for every facing (a body slam). */
@@ -1003,5 +1003,85 @@ export const ENEMY_DEFS = {
     },
     stunnable: 90,
     drops: { heart: 1, silver: 1, seidr: 2, none: 3 },
+  },
+  /**
+   * Belgr, the bellows construct (M8b, D6's mini-boss, guarding the hammer): its iron turns every blow; its
+   * bellows swell (667 ms) and it breathes a cone of fire, then draws air with its intake open. A bomb's
+   * blast in the intake staggers it, and the sword bites.
+   */
+  belgr: {
+    id: 'belgr',
+    art: 'enemy_belgr',
+    hp: 16,
+    body: { x: -14, y: -10, w: 28, h: 10 },
+    hurt: { x: -16, y: -40, w: 32, h: 40 },
+    behaviour: 'belgr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    needs: ['bombs'],
+    boss: { name: { en: 'Belgr', sv: 'Belgr' }, mini: true },
+    struckBy: HEAVY,
+    touch: { amount: 2, knock: 5, tags: 0 },
+    attacks: {
+      breathe: {
+        from: 4,
+        to: 32,
+        boxes: {
+          s: { x: -18, y: 0, w: 36, h: 44 },
+          n: { x: -18, y: -84, w: 36, h: 44 },
+          e: { x: 10, y: -30, w: 48, h: 34 },
+          w: { x: -58, y: -30, w: 48, h: 34 },
+        },
+        amount: 4,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    drops: { heart: 1, silver: 0, none: 0 },
+  },
+  /**
+   * Thane Ívaldi, the Anvil (M8b, D6's boss): plated armour that turns every blow but the dwarf hammer's
+   * on an opening (his hammer stuck in the floor; thrown off his anvil by Skjálfti; cooled by Ís when
+   * white-hot). See `IVALDI_MACHINE`.
+   */
+  ivaldi: {
+    id: 'ivaldi',
+    art: 'enemy_ivaldi',
+    hp: 24,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -44, w: 28, h: 44 },
+    behaviour: 'ivaldi',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    needs: ['hammer'],
+    boss: { name: { en: 'Ívaldi', sv: 'Ívaldi' } },
+    struckBy: HAMMER,
+    touch: { amount: 2, knock: 5, tags: 0 },
+    attacks: {
+      slam: {
+        from: 0,
+        to: 10,
+        boxes: {
+          s: { x: -10, y: -4, w: 20, h: 100 },
+          n: { x: -10, y: -112, w: 20, h: 100 },
+          e: { x: 6, y: -18, w: 100, h: 20 },
+          w: { x: -106, y: -18, w: 100, h: 20 },
+        },
+        amount: 4,
+        knock: 5,
+        tags: HEAVY,
+      },
+      quake: {
+        from: 0,
+        to: 8,
+        boxes: around({ x: -56, y: -52, w: 112, h: 88 }),
+        amount: 3,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    drops: { heart: 0, silver: 0, none: 1 },
   },
 } as const satisfies Record<EnemyId, EnemyDef>;

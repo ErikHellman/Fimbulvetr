@@ -52,6 +52,7 @@ import { eat, equip, useItems } from './systems/items';
 import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
 import { stepBombs } from './systems/bombs';
+import { stepHammer } from './systems/hammer';
 import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
 import { stepRiders } from './systems/mara';
@@ -437,6 +438,7 @@ export class Sim implements SimRt {
     settleCritters(this);
     stepProps(this, input);
     stepBombs(this);
+    stepHammer(this);
     resolveSword(this);
     swordProps(this);
     swordSwitches(this);

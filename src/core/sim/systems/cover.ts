@@ -128,6 +128,14 @@ export function blastCover(rt: SimRt, box: Box): void {
   );
 }
 
+/** The hammer's blow (M8b) breaks drifts and anything else only a blast tears up, nothing it would cut. */
+export function hammerCover(rt: SimRt, box: Box): void {
+  saveCut(
+    rt,
+    cutBox(rt.screen.cover, box, (k) => kindIs(rt, k, (id) => rt.db.cover[id].blasts === true)),
+  );
+}
+
 function saveCut(rt: SimRt, cut: readonly number[]): void {
   if (cut.length === 0) return;
   rt.state.world.cover[rt.screen.id] = {

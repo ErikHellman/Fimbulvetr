@@ -907,8 +907,15 @@ function gather(w: World, node: Node): boolean {
           return;
         }
         case 'crack': {
-          // Bombs, once owned, are never used up: every crack beside the reach can be blown open.
-          if (state.world.opened.includes(t.id) || !owns(state.inv.items, 'bombs')) return;
+          // Bombs, once owned, are never used up: every crack beside the reach can be blown open. A weak
+          // floor gives to the hammer or Skjálfti, a stake to the hammer (M8b).
+          if (state.world.opened.includes(t.id)) return;
+          const tool =
+            t.art === 'wall' || t.art === 'rock'
+              ? owns(state.inv.items, 'bombs')
+              : owns(state.inv.items, 'hammer') ||
+                (t.art === 'floor' && state.inv.galdr.includes('skjalfti'));
+          if (!tool) return;
           let near = false;
           for (let dy = 0; dy < t.h && !near; dy++)
             for (let dx = 0; dx < t.w && !near; dx++)
