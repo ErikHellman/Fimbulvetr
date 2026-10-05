@@ -390,6 +390,17 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '.y..y.y.',
     'y...y..y',
   ],
+  /** Vindr: three curling streaks of wind. */
+  galdr_vindr: [
+    '........',
+    'lllll.L.',
+    '.....ll.',
+    '.LLLLLL.',
+    '.......L',
+    'lllll.L.',
+    '.....l..',
+    '........',
+  ],
   /** Ís: a six-armed frost star. */
   galdr_is: ['...k....', '.k.k.k..', '..kkk...', 'kkk.kkk.', '..kkk...', '.k.k.k..', '...k....', '........'],
   galdr_eldr: [

@@ -70,6 +70,8 @@ const FETCH_TILES = 7;
 const GRAPPLE_TILES = 6;
 /** How far an arrow carries to an eye switch, in tiles (it flies 72 ticks at 5 px a tick). */
 const ARROW_TILES = 12;
+/** How far a Vindr gust carries to a wind fan or a sail, in tiles. */
+const GUST_TILES = 5;
 const DIRS8: readonly (readonly [number, number])[] = [
   [1, 0],
   [-1, 0],
@@ -453,12 +455,14 @@ const deckOf = (w: World, id: ScreenId, at: { x: number; y: number }): number[] 
   w.tile(id, at.x + 1, at.y + 1),
 ];
 
-/** A raft carries Ask from each stop's deck to the next stop's and back (its decks are footing). */
-function raftEdges(w: World): Map<number, number[]> {
+/** A raft carries Ask from each stop's deck to the next stop's and back (its decks are footing); a sailing one needs Vindr. */
+function raftEdges(w: World, state: GameState): Map<number, number[]> {
   const out = new Map<number, number[]>();
+  // A sailing raft only leaves a stop when a gust fills its sail (Ask aboard sings it).
+  const vindr = state.inv.galdr.includes('vindr');
   for (const id of w.ids)
     for (const t of w.db.screens[id].things) {
-      if (t.k !== 'raft') continue;
+      if (t.k !== 'raft' || (t.sail === true && !vindr)) continue;
       const stops = [t.at, ...t.path];
       for (let i = 1; i < stops.length; i++) {
         const a = stops[i - 1];
@@ -477,7 +481,7 @@ function raftEdges(w: World): Map<number, number[]> {
 /** Every move that is not a step: warps from a `use`, pulls along the grapple chain, and raft rides. */
 function jumpEdges(w: World, state: GameState): Map<number, number[]> {
   const out = warpEdges(w, state);
-  for (const more of [grappleEdges(w, state), raftEdges(w)])
+  for (const more of [grappleEdges(w, state), raftEdges(w, state)])
     for (const [from, to] of more) out.set(from, [...(out.get(from) ?? []), ...to]);
   return out;
 }
@@ -660,6 +664,32 @@ function shootable(
   y: number,
 ): boolean {
   if (!has(state, 'bow')) return false;
+  return inLine(w, state, reach, id, x, y, ARROW_TILES);
+}
+
+/** Whether a wind fan can be spun from the reach: Vindr known, a straight lane of up to five tiles. */
+function gustable(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+): boolean {
+  if (!state.inv.galdr.includes('vindr')) return false;
+  return inLine(w, state, reach, id, x, y, GUST_TILES);
+}
+
+/** Whether a reached tile lies up to `tiles` off (x, y) in a straight line over nothing that stops a shot. */
+function inLine(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+  tiles: number,
+): boolean {
   const blocked = blockedTiles(w, state, null);
   for (const [dx, dy] of [
     [1, 0],
@@ -667,7 +697,7 @@ function shootable(
     [0, 1],
     [0, -1],
   ] as const)
-    for (let k = 1; k <= ARROW_TILES; k++) {
+    for (let k = 1; k <= tiles; k++) {
       const fx = x - dx * k;
       const fy = y - dy * k;
       const tr = w.terrain(id, fx, fy);
@@ -677,7 +707,7 @@ function shootable(
   return false;
 }
 
-/** Whether a switch can be struck from the reach: an eye only by an arrow, a plain one any way. */
+/** Whether a switch can be struck from the reach: a fan only by a gust, an eye only by an arrow, a plain one any way. */
 function strikable(
   w: World,
   state: GameState,
@@ -686,6 +716,7 @@ function strikable(
   t: Extract<Thing, { k: 'switch' }>,
 ): boolean {
   const { x, y } = t.at;
+  if (t.fan === true) return gustable(w, state, reach, id, x, y);
   if (shootable(w, state, reach, id, x, y)) return true;
   if (t.eye === true) return false;
   return besideReach(w, reach, id, x, y) || throwable(w, state, reach, id, x, y);

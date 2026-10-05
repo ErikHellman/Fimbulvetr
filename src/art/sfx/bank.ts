@@ -688,4 +688,14 @@ export const SFX_BANK = {
     release: 0.2,
     volume: 0.28,
   },
+  /** Vindr: a short rushing gust that swells and falls away. */
+  sfx_gust: {
+    wave: 'noise',
+    freq: 700,
+    freqEnd: 1600,
+    attack: 0.04,
+    sustain: 0.12,
+    release: 0.25,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

@@ -179,7 +179,14 @@ export type Thing =
    * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good). An
    * `eye` (carved in stone) opens only to an arrow; anything else clinks off it.
    */
-  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId; readonly eye?: true }
+  | {
+      readonly k: 'switch';
+      readonly at: TilePos;
+      readonly set?: FlagId;
+      readonly eye?: true;
+      /** A wind fan (M7b): only a Vindr gust spins it; no blade, shot or blast does. */
+      readonly fan?: true;
+    }
   /** A drawbridge over water or a gap: its tiles are walkable while `down` holds. */
   | {
       readonly k: 'bridge';
@@ -218,7 +225,13 @@ export type Thing =
    * A raft, 2×2 tiles, resting at `at` (its top-left tile) and plying a straight line through each stop of
    * `path` and back again. Resting, it is footing; Ask aboard as it sets off rides along. Never saved.
    */
-  | { readonly k: 'raft'; readonly at: TilePos; readonly path: readonly TilePos[] }
+  | {
+      readonly k: 'raft';
+      readonly at: TilePos;
+      readonly path: readonly TilePos[];
+      /** A sail (M7b): the raft never leaves a stop until a Vindr gust fills it. */
+      readonly sail?: true;
+    }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */

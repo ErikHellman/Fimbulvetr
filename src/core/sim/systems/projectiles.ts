@@ -1,4 +1,5 @@
 import { stepBragd } from './bragd';
+import { stepVindr } from './vindr';
 import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import type { ShotId } from '../../actors/enemies/defs';
@@ -84,6 +85,7 @@ export function stepProjectiles(rt: SimRt): void {
     else if (e.def === 'is') stepIs(rt, e);
     else if (e.def === 'grapple') stepGrapple(rt, e);
     else if (e.def === 'bragd') stepBragd(rt, e);
+    else if (e.def === 'vindr') stepVindr(rt, e);
     else if (e.def === 'arrow' && e.faction === 'hero') stepArrow(rt, e);
     else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe') stepShot(rt, e);
   }

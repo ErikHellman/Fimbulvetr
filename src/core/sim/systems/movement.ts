@@ -48,6 +48,25 @@ export function moveAll(rt: SimRt): void {
   }
 }
 
+/**
+ * Shoves a foe (or any actor but Ask) `dx`, `dy` px at once, stopped by what stops it walking: walls for
+ * walkers, open water staying open for swimmers, the screen's edge for fliers.
+ */
+export function shove(rt: SimRt, e: Entity, dx: number, dy: number): void {
+  const def = e.kind === 'enemy' ? enemyDef(rt, e) : undefined;
+  const walls = gridSolidAt(rt.screen.collision, () => true);
+  const { cols, rows } = rt.screen.collision;
+  const solidAt: SolidAt =
+    def?.flies === true
+      ? (tx, ty) => tx < 0 || ty < 0 || tx >= cols || ty >= rows
+      : def?.swims === true
+        ? (tx, ty) => walls(tx, ty) && !openWater(rt, tx, ty)
+        : walls;
+  const box = at(e.body, e.pos);
+  const r = moveBox(box, dx, dy, solidAt, []);
+  e.pos = { x: e.pos.x + (r.x - box.x), y: e.pos.y + (r.y - box.y) };
+}
+
 function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[], flies = false): void {
   const f = flies
     ? 1

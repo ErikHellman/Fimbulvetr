@@ -1,5 +1,5 @@
 import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
-import { at } from '../../math/box';
+import { at, overlaps, type Box } from '../../math/box';
 import { TILE } from '../../world/dims';
 import type { Thing, TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
@@ -25,7 +25,7 @@ export function createRaft(rt: SimRt, thing: RaftThing, index: number): Entity {
     id: rt.newId(),
     kind: 'fixture',
     def: 'raft',
-    art: 'fix_raft',
+    art: thing.sail === true ? 'fix_sailraft' : 'fix_raft',
     pos: restAt(thing.at),
     facing: 's',
     body: DECK,
@@ -51,6 +51,24 @@ function stopsOf(rt: SimRt, e: Entity): readonly TilePos[] {
   return t?.k === 'raft' ? [t.at, ...t.path] : [];
 }
 
+/** Whether a raft carries a sail (it leaves a stop only when a gust fills it). */
+function sails(rt: SimRt, e: Entity): boolean {
+  const t = rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
+  return t?.k === 'raft' && t.sail === true;
+}
+
+/** A Vindr gust fills the sail of every resting sailing raft whose deck it touches. Returns whether one filled. */
+export function fillSail(rt: SimRt, box: Box): boolean {
+  let any = false;
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || e.def !== 'raft' || !sails(rt, e) || mem(e, 'moving') === 1) continue;
+    if (mem(e, 'filled') === 1 || !overlaps(box, at(e.body, e.pos))) continue;
+    e.mem['filled'] = 1;
+    any = true;
+  }
+  return any;
+}
+
 /** Whether Ask's feet are on the raft's deck. */
 function aboard(rt: SimRt, e: Entity): boolean {
   const deck = at(e.body, e.pos);
@@ -73,9 +91,11 @@ export function stepRafts(rt: SimRt): void {
   for (const e of rt.actors) {
     if (e.kind !== 'fixture' || e.def !== 'raft') continue;
     if (mem(e, 'moving') !== 1) {
-      const wait = mem(e, 'wait') - 1;
+      const wait = Math.max(0, mem(e, 'wait') - 1);
       e.mem['wait'] = wait;
       if (wait > 0) continue;
+      // A sailing raft waits at its stop for a gust in its sail.
+      if (sails(rt, e) && mem(e, 'filled') !== 1) continue;
       const stops = stopsOf(rt, e);
       if (stops.length < 2) continue;
       let next = mem(e, 'stop') + mem(e, 'step');
@@ -105,6 +125,7 @@ export function stepRafts(rt: SimRt): void {
     e.mem['ty'] = stop?.y ?? mem(e, 'ty');
     e.mem['moving'] = 0;
     e.mem['ride'] = 0;
+    if (sails(rt, e)) e.mem['filled'] = 0;
     e.mem['wait'] = RAFT.wait;
     restamp = true;
   }

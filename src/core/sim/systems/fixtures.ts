@@ -95,7 +95,8 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       return;
     }
     case 'switch': {
-      const e = fixture(rt.newId(), 'switch', thing.eye === true ? 'fix_eye' : 'fix_switch', thing.at, index);
+      const art = thing.fan === true ? 'fix_fan' : thing.eye === true ? 'fix_eye' : 'fix_switch';
+      const e = fixture(rt.newId(), 'switch', art, thing.at, index);
       if (thing.set !== undefined && rt.state.flags[thing.set] === true) e.mem['lit'] = 1;
       out.push(e);
       return;
@@ -379,6 +380,23 @@ const isEye = (rt: SimRt, f: Entity): boolean => {
   return t?.k === 'switch' && t.eye === true;
 };
 
+/** Whether a switch fixture is a wind fan (only a gust spins it). */
+const isFan = (rt: SimRt, f: Entity): boolean => {
+  const t = thingOf(rt, f);
+  return t?.k === 'switch' && t.fan === true;
+};
+
+/** Spins the still wind fan under `box` (a Vindr gust): it sets its flag. Returns whether one spun. */
+export function spinFan(rt: SimRt, box: Box): boolean {
+  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1 && isFan(rt, f));
+  if (e === null) return false;
+  e.mem['lit'] = 1;
+  const thing = thingOf(rt, e);
+  if (thing?.k === 'switch' && thing.set !== undefined) rt.state.flags[thing.set] = true;
+  rt.emit({ t: 'sfx', id: 'sfx_switch' });
+  return true;
+}
+
 /** An unlit eye under `box` (what a boomerang clinks off). */
 export function eyeAt(rt: SimRt, box: Box): boolean {
   return fixtureAt(rt, 'switch', box, (f) => isEye(rt, f) && mem(f, 'lit') !== 1) !== null;
@@ -389,7 +407,12 @@ export function eyeAt(rt: SimRt, box: Box): boolean {
  * arrow lights an eye. Returns whether one was lit.
  */
 export function strikeSwitch(rt: SimRt, box: Box, arrow = false): boolean {
-  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1 && (arrow || !isEye(rt, f)));
+  const e = fixtureAt(
+    rt,
+    'switch',
+    box,
+    (f) => mem(f, 'lit') !== 1 && !isFan(rt, f) && (arrow || !isEye(rt, f)),
+  );
   if (e === null) return false;
   e.mem['lit'] = 1;
   const thing = thingOf(rt, e);
