@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { GaldrId, ItemId, QuestId, WeaponId } from '@content/ids';
+import type { GaldrId, ItemId, NpcId, QuestId, WeaponId } from '@content/ids';
 import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
 import type { GameState } from '../state/gameState';
@@ -29,6 +29,8 @@ export type Cond =
   | { readonly k: 'galdr'; readonly id: GaldrId }
   /** The sky over the current region (indoors too: an NPC goes in because it rains outside). */
   | { readonly k: 'weather'; readonly is: WeatherKind | readonly WeatherKind[] }
+  /** Ask is walking `npc` along with her right now (M8: the escort reached its end). */
+  | { readonly k: 'escort'; readonly npc: NpcId }
   | { readonly k: 'all'; readonly of: readonly Cond[] }
   | { readonly k: 'any'; readonly of: readonly Cond[] }
   | { readonly k: 'not'; readonly c: Cond };
@@ -38,6 +40,8 @@ export interface CondCtx {
   readonly quests: Readonly<Partial<Record<QuestId, QuestDef>>>;
   /** The sky, read lazily (only `weather` conditions pay for it); missing means clear. */
   readonly weather?: () => WeatherKind;
+  /** Who Ask is escorting, if anyone; missing means no one. */
+  readonly escort?: NpcId;
 }
 
 export function phaseOf(minute: number): Phase {
@@ -85,6 +89,8 @@ export function evalCond(c: Cond | undefined, ctx: CondCtx): boolean {
       const w = ctx.weather?.() ?? 'clear';
       return typeof c.is === 'string' ? w === c.is : c.is.includes(w);
     }
+    case 'escort':
+      return ctx.escort === c.npc;
     case 'all':
       return c.of.every((x) => evalCond(x, ctx));
     case 'any':

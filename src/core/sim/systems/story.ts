@@ -116,6 +116,7 @@ export const condCtx = (rt: SimRt): CondCtx => ({
   state: rt.state,
   quests: rt.db.quests,
   weather: () => skyOf(rt),
+  ...(rt.escort === undefined ? {} : { escort: rt.escort.npc }),
 });
 
 function dialogueEnv(rt: SimRt, id: keyof SimRt['db']['dialogue']): DialogueEnv {

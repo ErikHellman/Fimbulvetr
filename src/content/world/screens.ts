@@ -196,6 +196,9 @@ export const SCREEN_IDS = [
   'dvg_peak',
   'dvg_adit',
   'dvg_int_forge',
+  'dvg_int_mine1',
+  'dvg_int_mine2',
+  'dvg_int_tunnel',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

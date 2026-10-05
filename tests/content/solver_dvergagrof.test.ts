@@ -62,7 +62,27 @@ describe('the progression solver on Dvergagröf (M8a)', () => {
       nothing,
       { season: 'summer', within },
     );
-    // The near lip is on the chasm's own screen; everything past the drop is out of reach.
-    for (const id of DVG.filter((d) => d !== 'dvg_chasm')) expect(r.screens).not.toContain(id);
+    // The near lip is on the chasm's own screen, and the cart road's Uppvík end is behind Ketill's forge
+    // (boarded halfway); everything past the drop is out of reach.
+    for (const id of DVG.filter((d) => d !== 'dvg_chasm' && d !== 'dvg_int_tunnel'))
+      expect(r.screens).not.toContain(id);
+  }, 120_000);
+
+  it('walks the cart road from Uppvík once Dvalinn has opened it, grapple or not', () => {
+    const r = solve(
+      DB,
+      atTheTarn((s) => {
+        delete s.inv.items.grapple;
+        s.flags.q_foreman = 5;
+      }),
+      nothing,
+      { season: 'summer', within },
+    );
+    expect(r.screens).toEqual(expect.arrayContaining(['dvg_int_tunnel', 'dvg_minehead', 'dvg_camp']));
+  }, 120_000);
+
+  it('reaches the old workings and the lamp-room once the cave-in is blown', () => {
+    const r = solve(DB, atTheTarn(), nothing, { season: 'winter', within });
+    expect(r.screens).toEqual(expect.arrayContaining(['dvg_int_mine1', 'dvg_int_mine2']));
   }, 120_000);
 });

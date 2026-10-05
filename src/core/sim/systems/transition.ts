@@ -12,6 +12,7 @@ import type { SimRt, Transition } from '../rt';
 import { forfeitDuels } from './combat';
 import { heroCtx, placeHero } from './hero';
 import { spawnActors } from './spawn';
+import { placeFollower } from './escort';
 
 export const TRANSITION_TICKS = 30;
 export const FADE_TICKS = 36;
@@ -69,6 +70,8 @@ export function enterScreen(
     rt.actors.push(carried);
   }
   placeHero(rt, heroAt);
+  // Whoever Ask is escorting comes along, onto every screen.
+  placeFollower(rt, heroAt);
   if (carried !== undefined) changeState(HERO_MACHINE, rt.hero, 'carry', heroCtx(rt, EMPTY_FRAME));
   rt.hero.facing = facing;
   rt.entry = { x: heroAt.x, y: heroAt.y, facing };

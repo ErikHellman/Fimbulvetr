@@ -79,6 +79,8 @@ const SEIDR = 0x7fd8e8;
 const RED = 0xe0433f;
 /** The heat bar in a hot room (M8). */
 const HEAT = 0xf08a2c;
+/** The escorted NPC's health (M8), under the heat bar. */
+const ESCORT = 0x6ab04c;
 const CAVE = 0x6e6258;
 const CAVE_SEEN = 0x9a8a78;
 /** Along the bottom edge, clear of the HUD and of whatever the room keeps at its top. */
@@ -578,10 +580,26 @@ export class UiScene extends Phaser.Scene {
       .strokeRect(5.5, y - 0.5, w + 3, 6);
   }
 
+  /** Whoever walks with Ask (M8's escort): her health as a green bar under the heat bar. */
+  private drawEscort(rows: number): void {
+    const escort = this.link.sim.escortHp();
+    if (escort === null) return;
+    const y = 6 + rows * 10 + 8;
+    const w = 40;
+    this.heatBar
+      .fillStyle(INK, 0.8)
+      .fillRect(6, y, w + 2, 5)
+      .fillStyle(ESCORT, 1)
+      .fillRect(7, y + 1, Math.round((w * escort.hp) / Math.max(1, escort.max)), 3)
+      .lineStyle(1, GOLD, 0.8)
+      .strokeRect(5.5, y - 0.5, w + 3, 6);
+  }
+
   /** Heat in a hot room (M8): an orange bar under the seiðr bar that fills while Ask stands in the heat. */
   private drawHeat(heartRows: number): void {
     const heat = this.link.sim.heat();
     this.heatBar.clear();
+    this.drawEscort(heartRows + (heat === null ? 0 : 1));
     if (heat === null) return;
     const y = 6 + heartRows * 10 + 8;
     const w = 40;

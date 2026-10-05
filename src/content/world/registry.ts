@@ -158,6 +158,9 @@ import { dvgSlag } from './dvergagrof/dvg_slag';
 import { dvgPeak } from './dvergagrof/dvg_peak';
 import { dvgAdit } from './dvergagrof/dvg_adit';
 import { dvgIntForge } from './dvergagrof/dvg_int_forge';
+import { dvgIntMine1 } from './dvergagrof/dvg_int_mine1';
+import { dvgIntMine2 } from './dvergagrof/dvg_int_mine2';
+import { dvgIntTunnel } from './dvergagrof/dvg_int_tunnel';
 
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
@@ -395,4 +398,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   dvg_peak: dvgPeak,
   dvg_adit: dvgAdit,
   dvg_int_forge: dvgIntForge,
+  dvg_int_mine1: dvgIntMine1,
+  dvg_int_mine2: dvgIntMine2,
+  dvg_int_tunnel: dvgIntTunnel,
 };

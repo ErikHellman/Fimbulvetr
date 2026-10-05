@@ -37,6 +37,7 @@ export const ITEM_NAMES = {
   trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
   trade_comb: { en: 'Walrus-ivory comb', sv: 'Kam av valrossben' },
   trade_needle: { en: 'Sail-needle', sv: 'Segelnål' },
+  trade_lens: { en: 'Dwarf-glass lens', sv: 'Lins av dvärgglas' },
   rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
   mail_clasp: { en: 'Ring-mail clasp', sv: 'Brynjespänne' },
   grave_ring: { en: 'Grave-ring', sv: 'Gravring' },

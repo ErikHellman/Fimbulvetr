@@ -87,4 +87,11 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'quiver', price: 8 },
     ],
   },
+  /** Sindri the smith at Dvergagröf's camp forges for ore (M8a); the dwarf blade joins once Belgr falls (M8b). */
+  sindri: {
+    id: 'sindri',
+    name: { en: 'Sindri’s forge', sv: 'Sindris smedja' },
+    currency: 'ore',
+    stock: [{ armor: 'ember_byrnie', price: 12 }],
+  },
 };

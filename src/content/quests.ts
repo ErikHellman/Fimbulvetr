@@ -512,6 +512,13 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         },
       },
       {
+        when: atLeast('q_trade', 6),
+        text: {
+          en: 'Sindri mended his bellows with the needle and gave a lens of dwarf-glass: for whoever watches the frost on the high road.',
+          sv: 'Sindri lagade sin blåsbälg med nålen och gav en lins av dvärgglas: åt den som vaktar frosten på höga vägen.',
+        },
+      },
+      {
         when: atLeast('q_trade', 7),
         text: { en: 'Every trade is made.', sv: 'Alla byten är gjorda.' },
       },
@@ -822,6 +829,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'I den kluvna tallen låg en snidad ask med ett seiðkärl. Embla kommer att skriva igen.',
         },
       },
+      {
+        when: atLeast('q_letters', 2),
+        text: {
+          en: 'Embla’s second letter: under the top stone of the cairn by Haugar’s tarn, where we hid from Halvar.',
+          sv: 'Emblas andra brev: under översta stenen på röset vid Haugars tjärn, där vi gömde oss för Halvar.',
+        },
+      },
+      {
+        when: flag('st_letter2_found'),
+        text: {
+          en: 'Under the cairn’s top stone lay a piece of a heart, wrapped in birch bark.',
+          sv: 'Under rösets översta sten låg en bit av ett hjärta, insvept i näver.',
+        },
+      },
     ],
   },
   q_loom: {
@@ -847,6 +868,67 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         text: {
           en: 'The Norns wove the threads into a seiðr vessel. At any hof, after a prayer, Ask may now ask the year to turn to another season.',
           sv: 'Nornorna vävde trådarna till ett seiðkärl. Vid vilket hov som helst kan Ask nu, efter en bön, be året vända sig till en annan årstid.',
+        },
+      },
+    ],
+  },
+  q_foreman: {
+    id: 'q_foreman',
+    name: { en: 'The foreman’s crew', sv: 'Förmannens lag' },
+    stages: [
+      {
+        when: atLeast('q_foreman', 1),
+        text: {
+          en: 'Dvalinn’s crew is trapped behind a cave-in at Dvergagröf’s mine mouth. Something that breaks rock would clear it.',
+          sv: 'Dvalinns lag sitter fast bakom ett ras vid Dvergagröfs gruvmynning. Något som spränger sten skulle rensa det.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 2),
+        text: {
+          en: 'The cave-in is cleared. Dvalinn should hear the way into the old workings is open.',
+          sv: 'Raset är bortsprängt. Dvalinn borde få höra att vägen in i de gamla gångarna är öppen.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 3),
+        text: {
+          en: 'Hekla waits at the mine mouth. Take her through the old workings to the lamp-room, and keep the foes off her.',
+          sv: 'Hekla väntar vid gruvmynningen. Led henne genom de gamla gångarna till lampsalen, och håll fienderna borta från henne.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 4),
+        text: {
+          en: 'The crew is out of the lamp-room. Dvalinn is waiting at the camp.',
+          sv: 'Laget är ute ur lampsalen. Dvalinn väntar i lägret.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 5),
+        text: {
+          en: 'Dvalinn opened the cart road from the mine mouth to Uppvík’s smiths.',
+          sv: 'Dvalinn öppnade kärrvägen från gruvmynningen till smederna i Uppvík.',
+        },
+      },
+    ],
+  },
+  q_forge: {
+    id: 'q_forge',
+    name: { en: 'The forge under the mountain', sv: 'Smedjan under berget' },
+    stages: [
+      {
+        when: flag('st_dvg_reached'),
+        text: {
+          en: 'Over the chasm east of Haugar’s tarn lies Dvergagröf, and deep in the mountain something beats iron.',
+          sv: 'Över klyftan öster om Haugars tjärn ligger Dvergagröf, och djupt inne i berget slår något på järn.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 1),
+        text: {
+          en: 'Dvalinn the foreman says Ívaldi’s forge has eaten all the dwarves’ powder. Its great door is east of the mine mouth.',
+          sv: 'Förmannen Dvalinn säger att Ívaldis smedja har ätit upp allt dvärgarnas krut. Dess stora port ligger öster om gruvmynningen.',
         },
       },
     ],

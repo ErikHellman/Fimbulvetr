@@ -10,6 +10,10 @@ export const EMBLA: DialogueDef = {
     { when: all(raid, not(flag('st_embla_found'))), node: 'found' },
     { when: all(flag('st_embla_found'), { k: 'item', id: 'trade_comb' }), node: 'comb' },
     { when: all(flag('st_embla_found'), { k: 'flag', id: 'q_letters', lt: 1 }), node: 'letter1' },
+    {
+      when: all(flag('st_embla_found'), flag('st_dvg_reached'), { k: 'flag', id: 'q_letters', eq: 1 }),
+      node: 'letter2',
+    },
     { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
     { when: flag('st_embla_found'), node: 'r_day' },
     { when: raid, node: 'raid' },
@@ -61,6 +65,13 @@ export const EMBLA: DialogueDef = {
         sv: 'Här. Jag skrev det här natten jag sprang, när jag trodde att jag aldrig skulle se dig igen. Läs det sedan. Det berättar var vi gömde oss som barn: den kluvna tallen väster om björkringen i Myrkviðrs glänta. Jag lämnade något där åt den som kom efter mig.',
       },
       do: [{ k: 'set', flag: 'q_letters', value: 1 }],
+    },
+    letter2: {
+      text: {
+        en: 'You crossed into the dwarf country? Then you passed our tarn. Here, my second letter. Do you remember the little cairn on the south shore, where we hid from Father the day we lost his goat? Look under the top stone.',
+        sv: 'Har du tagit dig in i dvärglandet? Då gick du förbi vår tjärn. Här, mitt andra brev. Minns du det lilla röset på södra stranden, där vi gömde oss för Far den dagen vi tappade bort hans get? Titta under översta stenen.',
+      },
+      do: [{ k: 'set', flag: 'q_letters', value: 2 }],
     },
     r_day: {
       text: {

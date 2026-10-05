@@ -35,7 +35,8 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
-import type { Entry, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
+import type { Entry, Escort, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
+import { stepEscort } from './systems/escort';
 import { takeSunkChest } from './systems/chests';
 import { tickWorldClock } from './systems/clock';
 import { killEnemy, resolveAttacks, resolveSword } from './systems/combat';
@@ -120,6 +121,7 @@ export class Sim implements SimRt {
   heatTicks?: number;
   burnTicks?: number;
   crust?: Map<number, number>;
+  escort?: Escort;
   tick = 0;
   readonly rolled: boolean;
   private events: SimEvent[] = [];
@@ -272,6 +274,11 @@ export class Sim implements SimRt {
     return this.heatTicks === undefined ? null : { now: this.heatTicks, max: heatMax(this) };
   }
 
+  /** The escorted NPC's health for the HUD (M8), or null while nobody walks with Ask. */
+  escortHp(): { readonly hp: number; readonly max: number } | null {
+    return this.escort === undefined ? null : { hp: this.escort.hp, max: this.escort.max };
+  }
+
   boss(): BossView | null {
     for (const e of this.actors) {
       if (e.kind !== 'enemy') continue;
@@ -349,6 +356,7 @@ export class Sim implements SimRt {
         heat: this.heatTicks,
         burn: this.burnTicks,
         crust: this.crust === undefined ? undefined : [...this.crust],
+        escort: this.escort,
         fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
@@ -419,6 +427,7 @@ export class Sim implements SimRt {
     runCritters(this, ctx);
     scheduleNpcs(this);
     stepNpcs(this);
+    stepEscort(this);
     moveAll(this);
     bumpLocks(this, input);
     pushBlocks(this, input);

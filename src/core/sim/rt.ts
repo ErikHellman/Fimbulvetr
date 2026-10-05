@@ -1,4 +1,4 @@
-import type { ScriptId } from '@content/ids';
+import type { NpcId, ScriptId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { Entity } from '../actors/entity';
 import type { WeatherKind } from '../clock/types';
@@ -64,6 +64,18 @@ export interface Trial {
   readonly fail: ScriptId;
 }
 
+/** Someone walking along with Ask (an `escort` effect, M8): never saved. */
+export interface Escort {
+  readonly npc: NpcId;
+  hp: number;
+  readonly max: number;
+  /** Runs if she falls. */
+  readonly lost: ScriptId;
+  /** Ask's recent positions, oldest first. */
+  trail: Vec[];
+  iframes: number;
+}
+
 export interface SimRt {
   readonly db: ContentDb;
   readonly state: GameState;
@@ -88,6 +100,8 @@ export interface SimRt {
   burnTicks?: number;
   /** Ís crust on lava (tile index → ticks left), on this screen only (undefined when none). */
   crust?: Map<number, number>;
+  /** An escort under way (undefined when none). */
+  escort?: Escort;
   emit(event: SimEvent): void;
   newId(): number;
   load(id: ScreenId): LoadedScreen;

@@ -67,6 +67,11 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   urdr: { en: 'Urðr', sv: 'Urd' },
   verdandi: { en: 'Verðandi', sv: 'Verdandi' },
   skuld: { en: 'Skuld', sv: 'Skuld' },
+  dvalinn: { en: 'Dvalinn', sv: 'Dvalinn' },
+  hekla: { en: 'Hekla', sv: 'Hekla' },
+  sindri: { en: 'Sindri', sv: 'Sindri' },
+  nyr: { en: 'Nýr', sv: 'Nýr' },
+  nali: { en: 'Náli', sv: 'Náli' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -282,4 +287,22 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   urdr: npc('urdr', [{ screen: 'sae_int_well', at: { x: 20, y: 7 }, facing: 's' }]),
   verdandi: npc('verdandi', [{ screen: 'sae_int_well', at: { x: 15, y: 7 }, facing: 's' }]),
   skuld: npc('skuld', [{ screen: 'sae_int_well', at: { x: 25, y: 7 }, facing: 's' }]),
+  /** Dvergagröf (M8a). The foreman at his camp, by his anvil. */
+  dvalinn: npc('dvalinn', [{ screen: 'dvg_camp', at: { x: 22, y: 8 }, facing: 's' }]),
+  /** His daughter waits at the mine mouth while the escort is on (`q_foreman` 3), else at the camp. */
+  hekla: npc('hekla', [
+    { when: { k: 'flag', id: 'q_foreman', eq: 3 }, screen: 'dvg_minehead', at: { x: 22, y: 6 }, facing: 'w' },
+    { screen: 'dvg_camp', at: { x: 16, y: 7 }, facing: 'e' },
+  ]),
+  /** At his anvil, inside the smithy. */
+  sindri: npc('sindri', [{ screen: 'dvg_int_forge', at: { x: 22, y: 8 }, facing: 's' }]),
+  /** Two of the crew: trapped in the lamp-room until Hekla leads them out, then at the camp's tents. */
+  nyr: npc('nyr', [
+    { when: atLeast('q_foreman', 4), screen: 'dvg_camp', at: { x: 8, y: 6 }, facing: 's' },
+    { screen: 'dvg_int_mine2', at: { x: 9, y: 6 }, facing: 'e' },
+  ]),
+  nali: npc('nali', [
+    { when: atLeast('q_foreman', 4), screen: 'dvg_camp', at: { x: 13, y: 13 }, facing: 'n' },
+    { screen: 'dvg_int_mine2', at: { x: 12, y: 8 }, facing: 'n' },
+  ]),
 };

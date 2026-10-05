@@ -7,6 +7,8 @@ export const dvgIntForge: ScreenDef = {
     "Inside Sindri's smithy: the forge and its great bellows, the anvil, and racks of dwarf-work. Sindri forges the ember byrnie and the dwarf-forged blade here.",
   indoor: true,
   things: [
+    /** Sindri's anvil: talk, then forge for ore. */
+    { k: 'use', at: { x: 22, y: 9 }, script: 'shop_sindri' },
     { k: 'door', at: { x: 19, y: 16 }, dir: 's', to: 'dvg_camp', arrive: { x: 29, y: 6 }, facing: 's' },
   ],
   map: [

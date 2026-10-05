@@ -49,6 +49,7 @@ export const TRADE_ITEMS = [
   'trade_hook',
   'trade_comb',
   'trade_needle',
+  'trade_lens',
 ] as const;
 /** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
 export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
@@ -259,6 +260,12 @@ export const NPCS = [
   'urdr',
   'verdandi',
   'skuld',
+  // Dvergagröf
+  'dvalinn',
+  'hekla',
+  'sindri',
+  'nyr',
+  'nali',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -295,6 +302,8 @@ export const QUESTS = [
   'q_holmr',
   'q_letters',
   'q_loom',
+  'q_foreman',
+  'q_forge',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -309,6 +318,7 @@ export const SHOPS = [
   'vala',
   'hreggvidr',
   'hallbera',
+  'sindri',
 ] as const;
 export type ShopId = (typeof SHOPS)[number];
 
@@ -398,6 +408,11 @@ export const SCRIPTS = [
   'war_table',
   'letter1_box',
   'dvg_arrive',
+  'shop_sindri',
+  'dvg_mine_open',
+  'escort_lost',
+  'escort_done',
+  'letter2_cairn',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

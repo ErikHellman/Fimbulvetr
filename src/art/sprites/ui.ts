@@ -189,6 +189,17 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'sw......',
     'w.......',
   ],
+  /** A round lens of dwarf-glass in a brass rim, light caught in it. */
+  trade_lens: [
+    '..bbbb..',
+    '.bkkkkb.',
+    'bkklkkkb',
+    'bklkkkkb',
+    'bkkkkkKb',
+    'bkkkkKKb',
+    '.bKKKKb.',
+    '..bbbb..',
+  ],
   /** A lump of black ore, glints of metal in it. */
   ore: ['........', '..LLL...', '.LeLlL..', 'LeLLLeL.', 'LLlLeLL.', '.LeLLL..', '..LLL...', '........'],
   /** A round iron bomb, its fuse spitting sparks. */

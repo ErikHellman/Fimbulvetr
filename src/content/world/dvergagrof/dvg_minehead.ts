@@ -8,6 +8,9 @@ export const dvgMinehead: ScreenDef = {
   things: [
     /** The cave-in across the mine mouth: a bomb clears it. */
     { k: 'crack', id: 'dvg_k_cavein', at: { x: 20, y: 4 }, w: 1, h: 1, art: 'rock' },
+    { k: 'door', at: { x: 20, y: 4 }, dir: 'n', to: 'dvg_int_mine1', arrive: { x: 20, y: 19 }, facing: 'n' },
+    /** The cart road's mouth: boarded inside until Dvalinn opens it. */
+    { k: 'door', at: { x: 31, y: 4 }, dir: 'n', to: 'dvg_int_tunnel', arrive: { x: 2, y: 9 }, facing: 's' },
     { k: 'enemy', id: 'jarnvordr', at: { x: 30, y: 14 } },
   ],
   /** Where Dvergagröf's spawn table may put foes (see content/spawns.ts). */
@@ -22,7 +25,7 @@ export const dvgMinehead: ScreenDef = {
     '##########····##########################',
     '##########····##########################',
     '##########····######V##########V########',
-    '#########··········,······##############',
+    '#########··········,······#####·########',
     '#··················,················K··#',
     '#··········,,,,,,,,,···················#',
     '#··················,····················',

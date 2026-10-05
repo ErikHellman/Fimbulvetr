@@ -16,7 +16,8 @@ export const enemyDef = (rt: SimRt, e: Entity): EnemyDef => rt.db.enemies[e.def 
 
 /** Whether an actor blocks the hero like a wall. */
 export function blocksHero(rt: SimRt, e: Entity): boolean {
-  if (e.kind === 'npc') return true;
+  // Someone Ask is escorting never gets in Ask's way.
+  if (e.kind === 'npc') return mem(e, 'escort') !== 1;
   if (e.kind === 'prop') return mem(e, 'carried') === 0 && mem(e, 'thrown') === 0;
   if (e.kind === 'critter') return critterDef(rt, e).solid;
   return e.kind === 'enemy' && enemyDef(rt, e).solid;
@@ -50,7 +51,7 @@ export function moveAll(rt: SimRt): void {
       rt,
       e,
       flies ? sky : def?.swims === true ? swims : walls,
-      e.kind === 'npc' ? hero : [],
+      e.kind === 'npc' && mem(e, 'escort') !== 1 ? hero : [],
       flies,
       belt,
     );

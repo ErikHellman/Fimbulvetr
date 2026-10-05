@@ -297,6 +297,13 @@ export const FLAGS = {
   w_d6_belts: { t: 'bool' },
   /** Dvergagröf reached over the chasm (M8a). */
   st_dvg_reached: { t: 'bool' },
+  /**
+   * Dvalinn's chain (M8a, `q_foreman`): 1 asked, 2 the cave-in cleared, 3 Hekla goes with Ask, 4 the crew
+   * out of the lamp-room, 5 the cart road open.
+   */
+  q_foreman: { t: 'int', max: 5 },
+  /** Embla's second letter followed to the cairn on Haugar's tarn (M8a). */
+  st_letter2_found: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

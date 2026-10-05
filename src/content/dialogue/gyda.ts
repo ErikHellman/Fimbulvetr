@@ -34,6 +34,7 @@ export const GYDA: DialogueDef = {
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_dvg_reached'), node: 'dvg' },
     { when: flag('st_embla_found'), node: 'embla' },
     { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_blood_told'), node: 'leaves' },
@@ -46,6 +47,12 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    dvg: {
+      text: {
+        en: 'Ívaldi. The old songs call him the best smith who ever lived, and the proudest. If the Rime King has his oath, he has his forge too. Mind the heat, child.',
+        sv: 'Ívaldi. De gamla sångerna kallar honom den bäste smed som någonsin levat, och den stoltaste. Om Rimkungen har hans ed har han hans ässja också. Akta dig för hettan, barn.',
+      },
+    },
     embla: {
       text: {
         en: 'I lit a candle for Embla every night since the raid. Last night I lit two, one for her and one for the lake that hid her.',

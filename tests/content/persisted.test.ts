@@ -173,6 +173,7 @@ const PERSISTED = [
   'dvg_c_peak',
   'dvg_k_ore3',
   'dvg_c_ore3',
+  'hp_hau_tarn_letter',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

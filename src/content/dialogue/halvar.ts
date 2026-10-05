@@ -13,6 +13,7 @@ export const HALVAR: DialogueDef = {
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    { when: all(atLeast('q_farm', 2), flag('st_dvg_reached')), node: 'dvg' },
     { when: atLeast('q_farm', 2), node: 'farm_done' },
     { when: atLeast('q_farm', 1), node: 'fold' },
     { when: flag('st_embla_found'), node: 'embla' },
@@ -33,6 +34,12 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    dvg: {
+      text: {
+        en: 'Dwarves, over the chasm? My father swore they bought our wool for iron once. If they still dig ore, the byre and the goats need it more than any king.',
+        sv: 'Dvärgar, bortom klyftan? Min far svor att de en gång köpte vår ull för järn. Om de fortfarande bryter malm behöver ladugården och getterna den mer än någon kung.',
+      },
+    },
     embla: {
       text: {
         en: 'So she is alive, out on an island in the lake. Tell her the farm still stands, and that her bed is made up whenever she wants it.',
