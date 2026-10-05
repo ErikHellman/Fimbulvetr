@@ -1,10 +1,11 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { afterRaid, atLeast, flag, raidNight } from './util';
+import { afterRaid, all, atLeast, flag, not, raidNight } from './util';
 
 /** Sigrún the trader, across her counter. The shop opens after she has spoken. */
 export const SIGRUN: DialogueDef = {
   entry: [
     { when: raidNight, node: 'raid' },
+    { when: all(flag('q_feast_asked'), not(flag('q_feast_mead'))), node: 'feast_mead' },
     { when: flag('q_crates_done'), node: 'crates_after' },
     { when: atLeast('q_crates_home', 3), node: 'crates_won' },
     { when: flag('q_crates_asked'), node: 'crates_wait' },
@@ -14,6 +15,13 @@ export const SIGRUN: DialogueDef = {
     { node: 'hello' },
   ],
   nodes: {
+    feast_mead: {
+      text: {
+        en: 'A feast! I have had a cask of honey-mead put by since the summer before the raid, waiting for something worth opening it for. I will have it carried up to the longhouse.',
+        sv: 'Ett gille! Jag har haft en kagge honungsmjöd undanställd sedan sommaren före räden, i väntan på något värt att öppna den för. Jag ser till att den bärs upp till långhuset.',
+      },
+      do: [{ k: 'set', flag: 'q_feast_mead', value: true }],
+    },
     hello: {
       text: {
         en: 'Welcome! Lanterns, bread and gossip. The gossip is free.',

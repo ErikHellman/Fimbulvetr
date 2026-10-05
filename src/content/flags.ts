@@ -235,6 +235,11 @@ export const FLAGS = {
   w_verse_deadwood: { t: 'bool' },
   w_verse_cairns: { t: 'bool' },
   w_verse_gjoll: { t: 'bool' },
+  /** Bragi's later verses (M11a): the gully's sinkhole, the miners' store, the slag pool, the saddle's tarn-eye. */
+  w_verse_sinkhole: { t: 'bool' },
+  w_verse_store: { t: 'bool' },
+  w_verse_slag: { t: 'bool' },
+  w_verse_thaw: { t: 'bool' },
   /** Into Helgrind (D4, M6b); Garmr dead (its shutters open); Náströnd dead; Kolbeinn's word after. */
   st_d4_entered: { t: 'bool' },
   st_d4_garmr: { t: 'bool' },

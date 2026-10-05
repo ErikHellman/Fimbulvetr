@@ -1166,6 +1166,60 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_record: {
+    id: 'q_record',
+    name: { en: 'The rune-record', sv: 'Runkrönikan' },
+    stages: [
+      {
+        when: flag('q_record_asked'),
+        text: {
+          en: 'Forty huscarls went up the mountain at the first binding; the hof’s record has only thirty-six names. The last four are cut on bauta-stones: by the Myrkviðr road, in Haugar’s stone circle, at Bárðr’s far landing on Sævatn, and by the cairn at the top of Hrímfjöll. Gyða wants them read.',
+          sv: 'Fyrtio huskarlar gick upp på berget vid den första bindningen; hovets krönika har bara trettiosex namn. De sista fyra är ristade på bautastenar: vid vägen genom Myrkviðr, i Haugars stencirkel, vid Bárðrs bortre brygga på Sævatn och vid röset högst upp på Hrímfjöll. Gyða vill att de blir lästa.',
+        },
+      },
+      {
+        when: all(flag('q_record_asked'), atLeast('q_record', 4)),
+        text: {
+          en: 'All four names read. Bring them to Gyða.',
+          sv: 'Alla fyra namnen lästa. Ta dem till Gyða.',
+        },
+      },
+      {
+        when: flag('q_record_done'),
+        text: {
+          en: 'Gyða cut the last four names into the hof’s record. Forty names, and none forgotten.',
+          sv: 'Gyða ristade in de sista fyra namnen i hovets krönika. Fyrtio namn, och inget glömt.',
+        },
+      },
+    ],
+  },
+  q_feast: {
+    id: 'q_feast',
+    name: { en: 'The spring feast', sv: 'Vårgillet' },
+    stages: [
+      {
+        when: flag('q_feast_asked'),
+        text: {
+          en: 'Askdalr will feast for the homecoming. Halvar wants mead from Sigrún, a fish from Kári at the fen, and a cask of the dwarves’ ale from Dvalinn.',
+          sv: 'Askdalr ska hålla gille för hemkomsten. Halvar vill ha mjöd från Sigrún, en fisk från Kári vid kärret och en kagge av dvärgarnas öl från Dvalinn.',
+        },
+      },
+      {
+        when: all(flag('q_feast_mead'), flag('q_feast_fish'), flag('q_feast_cask')),
+        text: {
+          en: 'Everything is brought. Sit at Halvar’s table in the longhouse.',
+          sv: 'Allt är hämtat. Sätt dig vid Halvars bord i långhuset.',
+        },
+      },
+      {
+        when: flag('q_feast_done'),
+        text: {
+          en: 'Askdalr feasted at Halvar’s table, and the dwarves’ ale went round twice.',
+          sv: 'Askdalr höll gille vid Halvars bord, och dvärgarnas öl gick runt två gånger.',
+        },
+      },
+    ],
+  },
 };
 
 /** The side quests (M11: "every side quest" and the progress footer). The rest of QUEST_DEFS is the main line. */
@@ -1193,4 +1247,6 @@ export const SIDE_QUESTS: readonly QuestId[] = [
   'q_loom',
   'q_foreman',
   'q_axes',
+  'q_record',
+  'q_feast',
 ];

@@ -324,6 +324,8 @@ export const QUESTS = [
   'q_forge',
   'q_rime',
   'q_king',
+  'q_record',
+  'q_feast',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -460,6 +462,11 @@ export const SCRIPTS = [
   'd8_ending',
   'end_home',
   'end_shore',
+  'bauta_myr',
+  'bauta_hau',
+  'bauta_sae',
+  'bauta_hrf',
+  'end_feast',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

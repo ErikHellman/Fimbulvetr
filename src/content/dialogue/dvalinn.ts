@@ -1,5 +1,5 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { atLeast, flag } from './util';
+import { all, atLeast, flag, not } from './util';
 
 /**
  * Dvalinn the foreman (M8a): his crew is trapped in the old workings behind a cave-in. His chain
@@ -8,6 +8,7 @@ import { atLeast, flag } from './util';
  */
 export const DVALINN: DialogueDef = {
   entry: [
+    { when: all(flag('q_feast_asked'), not(flag('q_feast_cask'))), node: 'feast_cask' },
     { when: flag('st_thane_hrimgerdr'), node: 'rime' },
     { when: flag('st_hrf_reached'), node: 'hrf' },
     { when: flag('st_thane_ivaldi'), node: 'free' },
@@ -19,6 +20,13 @@ export const DVALINN: DialogueDef = {
     { node: 'ask' },
   ],
   nodes: {
+    feast_cask: {
+      text: {
+        en: 'Ale for the surface folk? The crew would sooner give up their beards. But you dug them out, so. One cask. Tell them to drink it slowly; it is older than your grandfather.',
+        sv: 'Öl åt ytfolket? Laget skulle hellre ge upp sina skägg. Men du grävde ut dem, så. En kagge. Säg åt dem att dricka den långsamt; den är äldre än din farfar.',
+      },
+      do: [{ k: 'set', flag: 'q_feast_cask', value: true }],
+    },
     rime: {
       text: {
         en: 'The meltwater is running in the vents again, long-legs, the first time since my beard was brown. Whatever you broke up there, the mountain is glad of it.',

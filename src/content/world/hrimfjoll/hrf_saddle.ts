@@ -7,6 +7,12 @@ export const hrfSaddle: ScreenDef = {
     'A wind-scoured saddle between two peaks, where the blizzards bite hardest. A seam of black ore rock shows in a rime cliff (a bomb breaks it). The way east climbs to Hrímturn.',
   cold: true,
   things: [
+    /**
+     * A tarn-eye in the saddle (M11a): frozen hard while the winter holds the mountain, it thaws once Hrímnir
+     * is dead, and a diver finds the piece on its bottom.
+     */
+    { k: 'piece', id: 'hp_hrf_thaw', at: { x: 15, y: 17 }, sunk: true },
+
     /** Black ore rock in the cliff: a bomb breaks it, and ore lies behind. */
     { k: 'crack', id: 'hrf_k_ore', at: { x: 30, y: 5 }, w: 1, h: 1, art: 'rock' },
     { k: 'chest', id: 'hrf_c_ore', at: { x: 30, y: 4 }, gives: { item: 'ore', n: 3 } },
@@ -36,9 +42,9 @@ export const hrfSaddle: ScreenDef = {
     '▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',
     '▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',
     '▒∴∴▒▒▒▒▒▒▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
-    '▒∴∴▒▒▒▒▒▒▒∴∴∴K∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
-    '▒∴∴▒▒▒▒▒▒▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
-    '▒∴∴▒▒▒▒▒▒▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
+    '▒∴∴▒▒▒▒▒▒▒∴∴∴~~~~~∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
+    '▒∴∴▒▒▒▒▒▒▒∴∴∴~~~~~∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
+    '▒∴∴▒▒▒▒▒▒▒∴∴∴~~~~~∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
     '▒∴∴▒▒▒▒▒▒▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴∴▒',
     '▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',
     '▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒∴∴∴∴▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒',

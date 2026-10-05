@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ACHIEVEMENT_DEFS, PIECE_TOTAL, WARP_TOTAL } from '@content/achievements';
 import { ACHIEVEMENTS } from '@content/ids';
+import { DB } from '@content/index';
 import { QUEST_DEFS, SIDE_QUESTS } from '@content/quests';
 import { TEST_START } from '@content/start';
 import { unknownChars } from '@art/font';
@@ -70,12 +71,25 @@ describe('achievements', () => {
     expect(earned(ACHIEVEMENT_DEFS, ctxOf(s))).toContain(id);
   });
 
-  it('counts eight warp stones and 36 heart pieces', () => {
+  it('counts eight warp stones and 36 heart pieces, as many as the game holds', () => {
     expect(WARP_TOTAL).toBe(8);
     expect(PIECE_TOTAL).toBe(36);
+    // Every piece in the content: lying on a screen, or handed over by a dialogue or a script.
+    const ids = new Set<string>();
+    const walk = (v: unknown): void => {
+      if (Array.isArray(v)) v.forEach(walk);
+      else if (typeof v === 'object' && v !== null) {
+        const o = v as Record<string, unknown>;
+        if (o['k'] === 'piece' && typeof o['id'] === 'string') ids.add(o['id']);
+        Object.values(o).forEach(walk);
+      }
+    };
+    walk(DB);
+    expect(ids.size).toBe(PIECE_TOTAL);
   });
 
-  it('lists side quests that exist, once each', () => {
+  it('lists the 25 side quests, each once and each defined', () => {
+    expect(SIDE_QUESTS).toHaveLength(25);
     expect(new Set(SIDE_QUESTS).size).toBe(SIDE_QUESTS.length);
     for (const id of SIDE_QUESTS) expect(QUEST_DEFS[id], id).toBeDefined();
   });
