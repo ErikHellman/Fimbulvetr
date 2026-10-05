@@ -157,4 +157,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Solver proofs, route, e2e, v1-m8a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M8b Ívaldi's Forge (D6) — Part 2
+    - [x] The hammer (stakes, weak floors, drifts, plate) and Skjálfti with its stave
+    - [x] Ívaldi's Forge's 28 rooms, Belgr and Thane Ívaldi's three phases
+    - [x] Þorkell and Rannveig home: Rannveig's door, farm stage 3 (the goat-house), Kolbeinn's word
+    - [x] The scree's stakes, Hreggviðr's stave, new lines for Ívaldi's fall
+    - [x] Solver proofs, route, e2e, v1-m8b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

@@ -79,7 +79,9 @@ function after(e: Entity): IvaldiState {
     e.mem['phase'] = p;
     return p === 1 ? 'climb' : 'glow';
   }
-  return mem(e, 'phase') === 1 ? 'climb' : 'stalk';
+  // On the anvil again; or, in the last phase, white-hot again.
+  const phase = mem(e, 'phase');
+  return phase === 1 ? 'climb' : phase === 2 ? 'glow' : 'stalk';
 }
 
 /** White-hot (the last phase) until Ís cools him. */

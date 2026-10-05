@@ -10,7 +10,7 @@ export const d6R20: ScreenDef = {
     { k: 'crack', id: 'd6_k_r20s', at: { x: 19, y: 21 }, w: 2, h: 1, art: 'stake' },
     { k: 'crack', id: 'd6_k_r20e', at: { x: 32, y: 10 }, w: 2, h: 2, art: 'floor' },
     { k: 'shutter', at: { x: 0, y: 10 }, w: 1, h: 2, opens: 'clear' },
-    { k: 'enemy', id: 'jarnvordr', at: { x: 14, y: 10 } },
+    { k: 'enemy', id: 'draugr', at: { x: 14, y: 10 } },
     { k: 'enemy', id: 'glod', at: { x: 24, y: 5 } },
     { k: 'enemy', id: 'draugr', at: { x: 24, y: 16 } },
     { k: 'chest', id: 'd6_c_key3', at: { x: 20, y: 10 }, gives: { item: 'small_key' }, appear: 'clear' },

@@ -5,10 +5,11 @@ export const d6R11: ScreenDef = {
   region: 'dvergagrof',
   dungeon: 'd6',
   purpose:
-    "Ívaldi's forecourt: his great door north, the great lock on it. West to the lava stair and the cells; east to the furnaces.",
+    "Ívaldi's forecourt: his great door north, the great lock on it, and a quench-trough (26, 2) to drink from before it. West to the lava stair and the cells; east to the furnaces.",
   things: [
     { k: 'lock', id: 'd6_lock_b', at: { x: 19, y: 21 }, w: 2, h: 1 },
     { k: 'lock', id: 'd6_lock_big', at: { x: 19, y: 0 }, w: 2, h: 1, big: true },
+    { k: 'use', at: { x: 26, y: 2 }, w: 3, script: 'd6_cistern' },
     {
       k: 'sign',
       at: { x: 16, y: 2 },
@@ -27,7 +28,7 @@ export const d6R11: ScreenDef = {
   map: [
     '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓',
     '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓',
-    '▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░░░░░░░░░░░UUU░░░░░░░░░▓▓',
     '▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓',
     '▓▓░░░░▓▓░░░░░░░░░░░░░░░░░░░░░░░░▓▓░░░░▓▓',
     '▓▓░░░░▓▓░░░░░░░░░░░░░░░░░░░░░░░░▓▓░░░░▓▓',

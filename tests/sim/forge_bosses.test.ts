@@ -99,5 +99,10 @@ describe('Ívaldi, the Anvil', () => {
     until(h, iv, 'cooled', 60);
     hammer(h, iv);
     expect(iv.fsm.s).toBe('open');
+    // The opening over, he glows white-hot again.
+    iv.hp = 8;
+    until(h, iv, 'glow', IVALDI.openTicks + 2);
+    until(h, iv, 'stalk', IVALDI.glowTicks + 2);
+    expect(iv.mem['hot']).toBe(1);
   });
 });

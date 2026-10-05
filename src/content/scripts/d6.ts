@@ -69,6 +69,27 @@ const d6GateOut: ScriptDef = {
 const d6CellThorkell: ScriptDef = { steps: [{ k: 'talk', dialogue: 'thorkell', with: 'thorkell' }] };
 const d6CellRannveig: ScriptDef = { steps: [{ k: 'talk', dialogue: 'rannveig', with: 'rannveig' }] };
 
+/** A dwarf quench-trough of snow-water piped down from the peaks: Ask drinks, and is whole again. */
+const d6Cistern: ScriptDef = {
+  steps: [
+    {
+      k: 'do',
+      effects: [
+        { k: 'heal', n: 80 },
+        { k: 'sfx', id: 'sfx_drink' },
+      ],
+    },
+    {
+      k: 'say',
+      who: null,
+      text: {
+        en: 'Snow-water, piped down from the peaks for quenching iron, and cold enough to ache. Ask drinks, and the heat goes out of every hurt.',
+        sv: 'Snövatten, lett ner från topparna för att härda järn, och så kallt att det värker. Ask dricker, och hettan går ur varje sår.',
+      },
+    },
+  ],
+};
+
 /** Rannveig's door: a word, then her arrows and bombs. */
 const shopRannveig: ScriptDef = {
   steps: [
@@ -84,4 +105,5 @@ export const D6_SCRIPTS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   d6_cell_thorkell: d6CellThorkell,
   d6_cell_rannveig: d6CellRannveig,
   shop_rannveig: shopRannveig,
+  d6_cistern: d6Cistern,
 };

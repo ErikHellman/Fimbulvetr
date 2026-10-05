@@ -11,7 +11,7 @@ export const d6R18: ScreenDef = {
     { k: 'lock', id: 'd6_lock_a', at: { x: 19, y: 21 }, w: 2, h: 1 },
     { k: 'lock', id: 'd6_lock_b', at: { x: 19, y: 0 }, w: 2, h: 1 },
     { k: 'crack', id: 'd6_k_r18e', at: { x: 39, y: 10 }, w: 1, h: 2, art: 'stake' },
-    { k: 'enemy', id: 'jarnvordr', at: { x: 10, y: 10 } },
+    { k: 'enemy', id: 'draugr', at: { x: 10, y: 10 } },
     { k: 'brazier', at: { x: 12, y: 3 }, lit: true },
     { k: 'brazier', at: { x: 27, y: 3 }, lit: true },
     { k: 'prop', id: 'pot', at: { x: 3, y: 3 } },

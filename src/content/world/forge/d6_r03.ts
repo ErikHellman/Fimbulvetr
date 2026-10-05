@@ -13,7 +13,7 @@ export const d6R03: ScreenDef = {
     { k: 'crack', id: 'd6_k_r03w', at: { x: 14, y: 10 }, w: 2, h: 2, art: 'floor' },
     { k: 'crack', id: 'd6_k_r03e', at: { x: 24, y: 10 }, w: 2, h: 2, art: 'floor' },
     { k: 'chest', id: 'd6_c_bigkey', at: { x: 20, y: 10 }, gives: { item: 'big_key' } },
-    { k: 'enemy', id: 'jarnvordr', at: { x: 8, y: 6 } },
+    { k: 'enemy', id: 'draugr', at: { x: 8, y: 6 } },
     { k: 'enemy', id: 'glod', at: { x: 32, y: 15 } },
     { k: 'brazier', at: { x: 10, y: 3 }, lit: true },
     { k: 'brazier', at: { x: 29, y: 3 }, lit: true },

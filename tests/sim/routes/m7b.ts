@@ -35,7 +35,7 @@ export function drinkIfLow(h: Harness): void {
 }
 
 /** Drinks green mead when there is too little seiðr left for a song costing `cost`. */
-function topUp(h: Harness, cost: number): void {
+export function topUp(h: Harness, cost: number): void {
   if (h.sim.state.hero.seidr < cost && (h.sim.state.inv.items.mead_green ?? 0) > 0) {
     h.sim.command({ t: 'eat', item: 'mead_green' });
     h.idle(1);
@@ -87,14 +87,14 @@ export function useAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
 }
 
 /** Stands on (tx, ty) facing `dir` and swings (a wheel beside Ask). */
-function swingAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
+export function swingAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
   walkFighting(h, tx, ty);
   face(h, dir);
   h.press(['sword']).idle(30);
 }
 
 /** Walks into a locked door (standing on (tx, ty)) until it opens and Ask is through to `to`. */
-function unlock(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
+export function unlock(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
   walkFighting(h, tx, ty);
   crossTo(h, dir, to, 900);
   if (h.sim.mode === 'story') finishStory(h);
@@ -102,7 +102,7 @@ function unlock(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): vo
 }
 
 /** Fights until nothing mortal is left on the screen (a `clear` room). */
-function clearRoom(h: Harness): void {
+export function clearRoom(h: Harness): void {
   for (let round = 0; round < 40; round++) {
     drinkIfLow(h);
     const foes = h.sim.enemies.filter((e) => !h.sim.db.enemies[e.def as EnemyId].immortal);
@@ -122,7 +122,7 @@ function clearRoom(h: Harness): void {
 }
 
 /** Stands on (tx, ty) facing `dir` and sings a galdr. */
-function sing(h: Harness, tx: number, ty: number, dir: Dir4, galdr: GaldrId): void {
+export function sing(h: Harness, tx: number, ty: number, dir: Dir4, galdr: GaldrId): void {
   walkFighting(h, tx, ty);
   face(h, dir);
   topUp(h, h.sim.db.galdr[galdr].cost);

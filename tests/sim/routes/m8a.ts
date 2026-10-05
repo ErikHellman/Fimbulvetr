@@ -10,7 +10,7 @@ import { buyInShop, crossTo, face, finishStory, talkTo, walkFighting, walkTo } f
 import { alive, leave, outOfHall, travel, useAt } from './m7b';
 
 /** Stands on (tx, ty) facing `dir` and fires the grapple (slot 1) at a post, riding the pull to its end. */
-function pull(h: Harness, tx: number, ty: number, dir: Dir4): void {
+export function pull(h: Harness, tx: number, ty: number, dir: Dir4): void {
   walkFighting(h, tx, ty);
   face(h, dir);
   h.press(['item1']);
@@ -20,7 +20,7 @@ function pull(h: Harness, tx: number, ty: number, dir: Dir4): void {
 }
 
 /** Stands on (tx, ty) facing `dir`, sets a bomb (slot 2) and backs off the other way until it blows. */
-function bomb(h: Harness, tx: number, ty: number, dir: Dir4): void {
+export function bomb(h: Harness, tx: number, ty: number, dir: Dir4): void {
   const back = ({ n: 'down', s: 'up', e: 'left', w: 'right' } as const)[dir];
   walkFighting(h, tx, ty);
   face(h, dir);
@@ -32,7 +32,7 @@ function bomb(h: Harness, tx: number, ty: number, dir: Dir4): void {
 }
 
 /** Sings Farvegr and picks `region`'s stone. */
-function warpTo(h: Harness, region: RegionId, to: ScreenId): void {
+export function warpTo(h: Harness, region: RegionId, to: ScreenId): void {
   h.sim.command({ t: 'ready', galdr: 'farvegr' });
   h.idle(1);
   h.press(['galdr']);
@@ -45,7 +45,7 @@ function warpTo(h: Harness, region: RegionId, to: ScreenId): void {
 }
 
 /** Walks through a door (standing on (tx, ty), pressing `dir`) to `to`, reading any story there. */
-function through(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
+export function through(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
   walkFighting(h, tx, ty);
   crossTo(h, dir, to, 900);
   if (h.sim.mode === 'story') finishStory(h);

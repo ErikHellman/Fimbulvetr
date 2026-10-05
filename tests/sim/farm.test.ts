@@ -60,7 +60,9 @@ describe('rebuilding the farm, stages 1–2', () => {
     talkTo(h, 'halvar');
     expect(h.sim.state.flags.q_farm).toBe(2);
     expect(h.sim.state.hero.silver).toBe(0);
-    expect(farm(h)?.done).toBe(true);
+    // Stages 1–2 are all silver can buy; the farm goes on once Þorkell is home from Ívaldi's Forge (M8b).
+    expect(farm(h)?.done).toBe(false);
+    expect(farm(h)?.text.en).toContain('must wait for ore');
     warp(h, 'ask_farmyard', 20, 18);
     expect(h.sim.actors.filter((a) => a.art === 'fix_rubble')).toHaveLength(0);
     warp(h, 'ask_pasture', 20, 18);

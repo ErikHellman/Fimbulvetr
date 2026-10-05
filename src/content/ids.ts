@@ -422,6 +422,7 @@ export const SCRIPTS = [
   'd6_cell_thorkell',
   'd6_cell_rannveig',
   'shop_rannveig',
+  'd6_cistern',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
