@@ -13,6 +13,7 @@ export const HALVAR: DialogueDef = {
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
     { when: all(atLeast('q_farm', 2), flag('st_dvg_reached')), node: 'dvg' },
     { when: atLeast('q_farm', 2), node: 'farm_done' },
     { when: atLeast('q_farm', 1), node: 'fold' },
@@ -34,6 +35,12 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    ivaldi: {
+      text: {
+        en: 'Þorkell is home, thinner, and talking about iron like a dwarf. Three of the four thanes, lad. Your mother would not have believed it. I hardly do.',
+        sv: 'Þorkell är hemma, magrare, och pratar om järn som en dvärg. Tre av de fyra hövdingarna, pojk. Din mor skulle inte ha trott det. Jag gör det knappt själv.',
+      },
+    },
     dvg: {
       text: {
         en: 'Dwarves, over the chasm? My father swore they bought our wool for iron once. If they still dig ore, the byre and the goats need it more than any king.',

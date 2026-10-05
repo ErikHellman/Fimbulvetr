@@ -6,6 +6,9 @@ export const dvgForgegate: ScreenDef = {
   purpose:
     "Ívaldi's Forge's great door, cut into the mountain's black face between two carved posts: the way into the third thane's hall (D6, M8b). The road comes in from the mine and up from the vents.",
   things: [
+    /** Through the great door, into Ívaldi's Forge. */
+    { k: 'door', at: { x: 19, y: 6 }, dir: 'n', to: 'd6_r25', arrive: { x: 19, y: 18 }, facing: 'n' },
+    { k: 'door', at: { x: 20, y: 6 }, dir: 'n', to: 'd6_r25', arrive: { x: 20, y: 18 }, facing: 'n' },
     {
       k: 'sign',
       at: { x: 16, y: 7 },

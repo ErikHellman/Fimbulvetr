@@ -321,6 +321,7 @@ export const SHOPS = [
   'hreggvidr',
   'hallbera',
   'sindri',
+  'rannveig',
 ] as const;
 export type ShopId = (typeof SHOPS)[number];
 
@@ -415,6 +416,12 @@ export const SCRIPTS = [
   'escort_lost',
   'escort_done',
   'letter2_cairn',
+  'd6_enter',
+  'd6_kolbeinn',
+  'd6_gate_out',
+  'd6_cell_thorkell',
+  'd6_cell_rannveig',
+  'shop_rannveig',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

@@ -307,6 +307,12 @@ export const FLAGS = {
   /** Ívaldi's Forge (D6) entered, and Belgr its mini-boss broken (M8b): his iron heart lets Sindri forge the dwarf blade. */
   st_d6_entered: { t: 'bool' },
   st_d6_belgr: { t: 'bool' },
+  /** Thane Ívaldi dead (M8b): Þorkell and Rannveig freed, and Kolbeinn's word heard in his hall. */
+  st_d6_boss_dead: { t: 'bool' },
+  st_d6_kolbeinn: { t: 'bool' },
+  st_thane_ivaldi: { t: 'bool' },
+  st_freed_thorkell: { t: 'bool' },
+  st_freed_rannveig: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

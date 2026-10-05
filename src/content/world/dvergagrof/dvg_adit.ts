@@ -4,7 +4,7 @@ export const dvgAdit: ScreenDef = {
   id: 'dvg_adit',
   region: 'dvergagrof',
   purpose:
-    "An old adit below the chasm's road, long worked out: a seam of black ore rock is left in the cliff foot, and the floor of the old cutting rings hollow (a weak floor to a cave below, M8b).",
+    "An old adit below the chasm's road, long worked out: a seam of black ore rock is left in the cliff foot, and the floor of the old cutting rings hollow underfoot.",
   things: [
     { k: 'crack', id: 'dvg_k_ore3', at: { x: 7, y: 12 }, w: 1, h: 1, art: 'rock' },
     { k: 'chest', id: 'dvg_c_ore3', at: { x: 7, y: 13 }, gives: { item: 'ore', n: 3 } },

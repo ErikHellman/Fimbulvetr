@@ -1,5 +1,5 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { atLeast } from './util';
+import { atLeast, flag } from './util';
 
 /**
  * Dvalinn the foreman (M8a): his crew is trapped in the old workings behind a cave-in. His chain
@@ -8,6 +8,7 @@ import { atLeast } from './util';
  */
 export const DVALINN: DialogueDef = {
   entry: [
+    { when: flag('st_thane_ivaldi'), node: 'free' },
     { when: atLeast('q_foreman', 5), node: 'after' },
     { when: atLeast('q_foreman', 4), node: 'road' },
     { when: atLeast('q_foreman', 3), node: 'waiting' },
@@ -16,6 +17,12 @@ export const DVALINN: DialogueDef = {
     { node: 'ask' },
   ],
   nodes: {
+    free: {
+      text: {
+        en: 'The forge has gone quiet. Forty years I have listened to that hammer under my feet, long-legs, and now I cannot sleep for the silence. Thank you.',
+        sv: 'Smedjan har tystnat. Fyrtio år har jag lyssnat på den hammaren under mina fötter, långben, och nu kan jag inte sova för tystnaden. Tack.',
+      },
+    },
     ask: {
       text: {
         en: 'A long-legs, over the chasm? Then you climb better than my crew digs. Six of them are behind the fall at the mine mouth, and the iron wardens walk the camp at night.',

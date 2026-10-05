@@ -161,6 +161,34 @@ import { dvgIntForge } from './dvergagrof/dvg_int_forge';
 import { dvgIntMine1 } from './dvergagrof/dvg_int_mine1';
 import { dvgIntMine2 } from './dvergagrof/dvg_int_mine2';
 import { dvgIntTunnel } from './dvergagrof/dvg_int_tunnel';
+import { d6R01 } from './forge/d6_r01';
+import { d6R02 } from './forge/d6_r02';
+import { d6R03 } from './forge/d6_r03';
+import { d6R04 } from './forge/d6_r04';
+import { d6R05 } from './forge/d6_r05';
+import { d6R06 } from './forge/d6_r06';
+import { d6R07 } from './forge/d6_r07';
+import { d6R08 } from './forge/d6_r08';
+import { d6R09 } from './forge/d6_r09';
+import { d6R10 } from './forge/d6_r10';
+import { d6R11 } from './forge/d6_r11';
+import { d6R12 } from './forge/d6_r12';
+import { d6R13 } from './forge/d6_r13';
+import { d6R14 } from './forge/d6_r14';
+import { d6R15 } from './forge/d6_r15';
+import { d6R16 } from './forge/d6_r16';
+import { d6R17 } from './forge/d6_r17';
+import { d6R18 } from './forge/d6_r18';
+import { d6R19 } from './forge/d6_r19';
+import { d6R20 } from './forge/d6_r20';
+import { d6R21 } from './forge/d6_r21';
+import { d6R22 } from './forge/d6_r22';
+import { d6R23 } from './forge/d6_r23';
+import { d6R24 } from './forge/d6_r24';
+import { d6R25 } from './forge/d6_r25';
+import { d6R26 } from './forge/d6_r26';
+import { d6R27 } from './forge/d6_r27';
+import { d6R28 } from './forge/d6_r28';
 
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
@@ -401,4 +429,32 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   dvg_int_mine1: dvgIntMine1,
   dvg_int_mine2: dvgIntMine2,
   dvg_int_tunnel: dvgIntTunnel,
+  d6_r01: d6R01,
+  d6_r02: d6R02,
+  d6_r03: d6R03,
+  d6_r04: d6R04,
+  d6_r05: d6R05,
+  d6_r06: d6R06,
+  d6_r07: d6R07,
+  d6_r08: d6R08,
+  d6_r09: d6R09,
+  d6_r10: d6R10,
+  d6_r11: d6R11,
+  d6_r12: d6R12,
+  d6_r13: d6R13,
+  d6_r14: d6R14,
+  d6_r15: d6R15,
+  d6_r16: d6R16,
+  d6_r17: d6R17,
+  d6_r18: d6R18,
+  d6_r19: d6R19,
+  d6_r20: d6R20,
+  d6_r21: d6R21,
+  d6_r22: d6R22,
+  d6_r23: d6R23,
+  d6_r24: d6R24,
+  d6_r25: d6R25,
+  d6_r26: d6R26,
+  d6_r27: d6R27,
+  d6_r28: d6R28,
 };

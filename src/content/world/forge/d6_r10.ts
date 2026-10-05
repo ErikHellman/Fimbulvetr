@@ -1,0 +1,50 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d6R10: ScreenDef = {
+  id: 'd6_r10',
+  region: 'dvergagrof',
+  dungeon: 'd6',
+  purpose:
+    "The stave's lava stair: a lava channel four tiles wide. Ís crusts it; across it, Skjálfti's stave in a chest. Lock C north to the great key; west to the cells.",
+  things: [
+    {
+      k: 'chest',
+      id: 'd6_c_skjalfti',
+      at: { x: 8, y: 10 },
+      gives: { item: 'stave_skjalfti' },
+      learn: 'skjalfti',
+      text: {
+        en: 'A rune-stave cut with Skjálfti, the earth-song. Holding it, Ask feels the song in it, and keeps it: Skjálfti can now be sung for seiðr. Weak floors give, foes stagger, and a king on his anvil falls.',
+        sv: 'En runstav ristad med Skjálfti, jordsången. Med den i handen känner Ask sången i den, och behåller den: Skjálfti kan nu sjungas för seiðr. Svaga golv ger vika, fiender vacklar och en kung på sitt städ faller.',
+      },
+    },
+    { k: 'lock', id: 'd6_lock_c', at: { x: 19, y: 0 }, w: 2, h: 1 },
+    { k: 'enemy', id: 'glod', at: { x: 28, y: 6 } },
+    { k: 'enemy', id: 'glod', at: { x: 28, y: 15 } },
+    { k: 'brazier', at: { x: 26, y: 3 }, lit: true },
+  ],
+  map: [
+    '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓',
+    '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '░░░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░░░',
+    '░░░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░░░',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓░░░░░░░░░░░░░░≈≈≈≈░░░░░░░░░░░░░░░░░░▓▓',
+    '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓',
+    '▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓',
+  ],
+};

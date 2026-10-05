@@ -82,10 +82,10 @@ const wet: Cond = { k: 'weather', is: ['rain', 'storm'] };
 const night: Cond = { k: 'phase', is: 'night' };
 
 /** A captive freed from Helgrind is home by day; one still held sits in a cell there. */
-const freed = (who: 'ulf' | 'tofa' | 'oddr' | 'hallbera'): Cond =>
+type Captive = 'ulf' | 'tofa' | 'oddr' | 'hallbera' | 'thorkell' | 'rannveig';
+const freed = (who: Captive): Cond =>
   all(flag(`st_freed_${who}`), { k: 'not', c: { k: 'phase', is: 'night' } });
-const held = (who: 'ulf' | 'tofa' | 'oddr' | 'hallbera'): Cond =>
-  all(afterRaid, not(flag(`st_freed_${who}`)));
+const held = (who: Captive): Cond => all(afterRaid, not(flag(`st_freed_${who}`)));
 
 const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
   id,
@@ -172,8 +172,17 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: held('hallbera'), screen: 'd5_r21', at: { x: 28, y: 10 }, facing: 'w' },
     { when: up, screen: 'ask_village', at: { x: 31, y: 7 }, facing: 's' },
   ]),
-  thorkell: npc('thorkell', [{ when: up, screen: 'ask_village', at: { x: 30, y: 14 }, facing: 's' }]),
-  rannveig: npc('rannveig', [{ when: up, screen: 'ask_village', at: { x: 34, y: 14 }, facing: 'w' }]),
+  /** Taken in the raid to cells in Ívaldi's Forge (M8b); home by day once Ívaldi falls. */
+  thorkell: npc('thorkell', [
+    { when: freed('thorkell'), screen: 'ask_village', at: { x: 26, y: 19 }, facing: 'e' },
+    { when: held('thorkell'), screen: 'd6_r09', at: { x: 27, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_village', at: { x: 30, y: 14 }, facing: 's' },
+  ]),
+  rannveig: npc('rannveig', [
+    { when: freed('rannveig'), screen: 'ask_village', at: { x: 31, y: 19 }, facing: 's' },
+    { when: held('rannveig'), screen: 'd6_r08', at: { x: 27, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_village', at: { x: 34, y: 14 }, facing: 'w' },
+  ]),
   /** The seiðmaðr who leads the raid. Only seen in cutscenes. */
   kolbeinn: npc('kolbeinn', [{ when: raidNight, screen: 'ask_gate', at: { x: 20, y: 6 }, facing: 's' }]),
   /** Myrkviðr. Önundr sleeps in his hut; the others keep to their fires all night. */

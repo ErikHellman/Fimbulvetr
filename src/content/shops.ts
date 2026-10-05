@@ -85,6 +85,7 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
     stock: [
       { item: 'mead_blue', price: 3 },
       { item: 'quiver', price: 8 },
+      { item: 'stave_skjalfti', price: 2, when: { k: 'flag', id: 'st_dvg_reached' } },
     ],
   },
   /** Sindri the smith at Dvergagröf's camp forges for ore (M8a); the dwarf blade joins once Belgr falls (M8b). */
@@ -95,6 +96,14 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
     stock: [
       { armor: 'ember_byrnie', price: 12 },
       { weapon: 'dwarf_blade', price: 16, when: { k: 'flag', id: 'st_d6_belgr' } },
+    ],
+  } /** Rannveig's door in the village, once Ívaldi falls (M8b): arrows and bombs, a little under Uppvík's prices. */,
+  rannveig: {
+    id: 'rannveig',
+    name: { en: 'Rannveig’s door', sv: 'Rannveigs dörr' },
+    stock: [
+      { item: 'arrows', n: 10, price: 12, when: { k: 'owns', id: 'bow' } },
+      { item: 'bombs', n: 5, price: 18, when: { k: 'owns', id: 'bombs' } },
     ],
   },
 };

@@ -4,8 +4,12 @@ export const dvgScree: ScreenDef = {
   id: 'dvg_scree',
   region: 'dvergagrof',
   purpose:
-    'Scree slopes above the chasm, where an iron warden plods its old beat. A ledge in the north-west is fenced with dwarf stakes (the hammer, M8b).',
-  things: [{ k: 'enemy', id: 'jarnvordr', at: { x: 24, y: 14 } }],
+    'Scree slopes above the chasm, where an iron warden plods its old beat. A ledge in the north-west is fenced with dwarf stakes: the hammer drives them down (5, 6), and a piece of heart lies behind.',
+  things: [
+    { k: 'enemy', id: 'jarnvordr', at: { x: 24, y: 14 } },
+    { k: 'crack', id: 'dvg_k_scree', at: { x: 5, y: 6 }, w: 1, h: 2, art: 'stake' },
+    { k: 'piece', id: 'hp_dvg_scree', at: { x: 5, y: 4 } },
+  ],
   /** Where Dvergagröf's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 9, y: 10 },
@@ -19,8 +23,8 @@ export const dvgScree: ScreenDef = {
     '#·#·····#······,···K·····,········######',
     '#·#·····#······,·········,··········K··#',
     '#·#·····#······,·········,·············#',
-    '#·#######······,,,,,,,,,,,·············#',
-    '#·#######······,·······················#',
+    '#·###·###······,,,,,,,,,,,·············#',
+    '#·###·###······,·······················#',
     '#··············,·······················#',
     '#··············,··············K········#',
     '#··············,·······················#',

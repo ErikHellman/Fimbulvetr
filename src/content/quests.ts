@@ -463,6 +463,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Långhuset och fållan står igen, och Hildr har sin hjord i hagen över vintern. Resten får vänta på malm.',
         },
       },
+      {
+        when: all(flag('st_freed_thorkell'), atLeast('q_farm', 2)),
+        text: {
+          en: 'Þorkell is home from Ívaldi’s Forge, and handy with iron now. For 10 lumps of black ore he will build the farm a goat-house.',
+          sv: 'Þorkell är hemma från Ívaldis smedja, och händig med järn nu. För 10 klumpar svart malm bygger han ett gethus åt gården.',
+        },
+      },
+      {
+        when: atLeast('q_farm', 3),
+        text: {
+          en: 'Goats on the farm again, in Þorkell’s iron-shod goat-house. Halvar grumbles about them, happily.',
+          sv: 'Getter på gården igen, i Þorkells järnskodda gethus. Halvar muttrar om dem, förnöjt.',
+        },
+      },
     ],
   },
   q_trade: {
@@ -936,6 +950,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         text: {
           en: 'Inside Ívaldi’s Forge the air shakes with heat, and the floors run like rivers.',
           sv: 'Inne i Ívaldis smedja dallrar luften av hetta, och golven rinner som floder.',
+        },
+      },
+      {
+        when: flag('st_d6_belgr'),
+        text: {
+          en: 'Belgr the bellows lies broken, and the dwarf hammer is Ask’s. Somewhere above, Ívaldi beats his anvil.',
+          sv: 'Blåsbälgen Belgr ligger krossad, och dvärghammaren är Asks. Någonstans ovanför slår Ívaldi på sitt städ.',
+        },
+      },
+      {
+        when: flag('st_thane_ivaldi'),
+        text: {
+          en: 'Thane Ívaldi, the Anvil, is broken. Þorkell and Rannveig are free. Kolbeinn says one thane is left, in the ice.',
+          sv: 'Hövding Ívaldi, Städet, är krossad. Þorkell och Rannveig är fria. Kolbeinn säger att en hövding är kvar, i isen.',
         },
       },
     ],

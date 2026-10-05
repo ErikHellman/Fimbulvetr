@@ -5,17 +5,17 @@ import { afterRaid } from '../../dialogue/util';
 const SHUT: Thing[] = [
   [31, 5, 'st_freed_hallbera'],
   [8, 18, null],
-  [31, 18, null],
+  [31, 18, 'st_freed_rannveig'],
 ].map(([x = 0, y = 0, home]): Thing => ({
   k: 'scenery',
   at: { x: Number(x), y: Number(y) },
   w: 1,
   h: 1,
   art: 'boards',
-  // Hallbera's boards come down once she is home from Sökkva Hof (M7b).
+  // Hallbera's boards come down once she is home from Sökkva Hof (M7b), Rannveig's from Ívaldi's Forge (M8b).
   shown:
-    home === 'st_freed_hallbera'
-      ? { k: 'all', of: [afterRaid, { k: 'not', c: { k: 'flag', id: 'st_freed_hallbera' } }] }
+    home === 'st_freed_hallbera' || home === 'st_freed_rannveig'
+      ? { k: 'all', of: [afterRaid, { k: 'not', c: { k: 'flag', id: home } }] }
       : afterRaid,
 }));
 
@@ -66,6 +66,20 @@ export const askVillage: ScreenDef = {
         k: 'all',
         of: [
           { k: 'flag', id: 'st_freed_hallbera' },
+          { k: 'not', c: { k: 'phase', is: 'night' } },
+        ],
+      },
+    },
+    /** Rannveig's door, by day once she is home from Ívaldi's Forge: arrows and bombs (M8b). */
+    {
+      k: 'use',
+      at: { x: 30, y: 20 },
+      w: 3,
+      script: 'shop_rannveig',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'st_freed_rannveig' },
           { k: 'not', c: { k: 'phase', is: 'night' } },
         ],
       },
