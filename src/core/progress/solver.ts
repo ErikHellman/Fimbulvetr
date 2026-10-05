@@ -284,10 +284,16 @@ interface Ground {
   readonly blocked: ReadonlySet<number>;
   /** Lowered drawbridges, rafts' decks at their stops, and still water once Ís can floor it. */
   readonly open: ReadonlySet<number>;
+  /** The seal-skin is held: dive doors can be taken (walking on Ís over one never does). */
+  readonly dives: boolean;
 }
 
 function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null): Ground {
-  return { blocked: blockedTiles(w, state, reach), open: bridgeTiles(w, state) };
+  return {
+    blocked: blockedTiles(w, state, reach),
+    open: bridgeTiles(w, state),
+    dives: has(state, 'sealskin'),
+  };
 }
 
 /**
@@ -604,7 +610,13 @@ function steps(w: World, t: number, ground: Ground, level: number): number[] {
       out.push(w.tile(id, nx + d.x, ny + d.y));
   }
   for (const thing of w.db.screens[id].things)
-    if (thing.k === 'door' && thing.at.x === x && thing.at.y === y && w.has(thing.to))
+    if (
+      thing.k === 'door' &&
+      thing.at.x === x &&
+      thing.at.y === y &&
+      w.has(thing.to) &&
+      (thing.dive !== true || ground.dives)
+    )
       out.push(w.tile(thing.to, thing.arrive.x, thing.arrive.y));
   return out;
 }

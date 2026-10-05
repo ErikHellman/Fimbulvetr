@@ -51,6 +51,7 @@ const KINDS: Readonly<
   seal: { solid: 'always', anims: ['lit', 'dark'] },
   post: { solid: 'always' },
   raft: { solid: 'never' },
+  ripple: { solid: 'never' },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
 };
 
@@ -104,6 +105,15 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     case 'wheel':
       out.push(fixture(rt.newId(), 'wheel', 'fix_wheel', thing.at, index));
       return;
+    case 'door': {
+      // A dive door lies under a ripple, as a sunk chest does: nothing hooks or strikes it.
+      if (thing.dive !== true) return;
+      const e = fixture(rt.newId(), 'ripple', 'fix_ripple', thing.at, index);
+      e.mem['sunk'] = 1;
+      setAnim(e, 'idle');
+      out.push(e);
+      return;
+    }
     case 'warp':
       out.push(fixture(rt.newId(), 'warp', 'fix_warp', thing.at, index));
       return;

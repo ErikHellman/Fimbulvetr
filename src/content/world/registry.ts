@@ -122,6 +122,30 @@ import { saeNorth } from './saevatn/sae_north';
 import { saeSealRocks } from './saevatn/sae_seal_rocks';
 import { saeFjordmouth } from './saevatn/sae_fjordmouth';
 import { refIntHall } from './saevatn/ref_int_hall';
+import { d5R01 } from './hof/d5_r01';
+import { d5R02 } from './hof/d5_r02';
+import { d5R03 } from './hof/d5_r03';
+import { d5R04 } from './hof/d5_r04';
+import { d5R05 } from './hof/d5_r05';
+import { d5R06 } from './hof/d5_r06';
+import { d5R07 } from './hof/d5_r07';
+import { d5R08 } from './hof/d5_r08';
+import { d5R09 } from './hof/d5_r09';
+import { d5R10 } from './hof/d5_r10';
+import { d5R11 } from './hof/d5_r11';
+import { d5R12 } from './hof/d5_r12';
+import { d5R13 } from './hof/d5_r13';
+import { d5R14 } from './hof/d5_r14';
+import { d5R15 } from './hof/d5_r15';
+import { d5R16 } from './hof/d5_r16';
+import { d5R17 } from './hof/d5_r17';
+import { d5R18 } from './hof/d5_r18';
+import { d5R19 } from './hof/d5_r19';
+import { d5R20 } from './hof/d5_r20';
+import { d5R21 } from './hof/d5_r21';
+import { d5R22 } from './hof/d5_r22';
+import { d5R23 } from './hof/d5_r23';
+import { d5R24 } from './hof/d5_r24';
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
 import { d3R03 } from './konungshaugr/d3_r03';
@@ -322,4 +346,28 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   sae_seal_rocks: saeSealRocks,
   sae_fjordmouth: saeFjordmouth,
   ref_int_hall: refIntHall,
+  d5_r01: d5R01,
+  d5_r02: d5R02,
+  d5_r03: d5R03,
+  d5_r04: d5R04,
+  d5_r05: d5R05,
+  d5_r06: d5R06,
+  d5_r07: d5R07,
+  d5_r08: d5R08,
+  d5_r09: d5R09,
+  d5_r10: d5R10,
+  d5_r11: d5R11,
+  d5_r12: d5R12,
+  d5_r13: d5R13,
+  d5_r14: d5R14,
+  d5_r15: d5R15,
+  d5_r16: d5R16,
+  d5_r17: d5R17,
+  d5_r18: d5R18,
+  d5_r19: d5R19,
+  d5_r20: d5R20,
+  d5_r21: d5R21,
+  d5_r22: d5R22,
+  d5_r23: d5R23,
+  d5_r24: d5R24,
 };

@@ -62,6 +62,12 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
       { item: 'cheese', price: 8 },
     ],
   },
+  /** Hallbera's door in the village, once she is home from Sökkva Hof: red mead again (M7b). */
+  hallbera: {
+    id: 'hallbera',
+    name: { en: 'Hallbera’s mead', sv: 'Hallberas mjöd' },
+    stock: [{ item: 'mead_red', price: 20 }],
+  },
   /** Vala the healer's brews at the Refuge (M7a). */
   vala: {
     id: 'vala',

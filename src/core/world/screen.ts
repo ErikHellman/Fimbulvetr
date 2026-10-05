@@ -31,6 +31,8 @@ export interface DoorThing {
   readonly to: ScreenId;
   readonly arrive: TilePos;
   readonly facing: Dir4;
+  /** Under deep water (M7b, Sökkva Hof's spire): a ripple marks it, and only a dive over it goes through. */
+  readonly dive?: true;
 }
 
 /**
@@ -288,9 +290,9 @@ export type Thing =
 
 /**
  * Scenery that comes and goes with the story: what the raid left (scorched roofs, a burned fold, boarded
- * doors), Hildr's wattle hurdles on the heath, and the wild bees' hive in the pines.
+ * doors), Hildr's wattle hurdles on the heath, the wild bees' hive in the pines, and Oddr's skiff.
  */
-export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive';
+export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive' | 'skiff';
 
 /**
  * A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass, `bars` a

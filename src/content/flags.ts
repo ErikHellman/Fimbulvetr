@@ -277,6 +277,15 @@ export const FLAGS = {
   st_letter1_found: { t: 'bool' },
   /** Sökkva Hof's water level (M7b): 0 low, 1 the lower floors flooded, 2 the upper too. */
   w_d5_level: { t: 'int', max: 2 },
+  /** Hrönn dead (its shutters open); Nykr dead; Kolbeinn's word after. */
+  st_d5_hronn: { t: 'bool' },
+  st_d5_boss_dead: { t: 'bool' },
+  st_d5_kolbeinn: { t: 'bool' },
+  /** Sökkva Hof's fan bridge, lowered by Vindr. */
+  w_d5_r14: { t: 'bool' },
+  /** Oddr and Hallbera, held in Sökkva Hof's cells until Nykr falls. */
+  st_freed_oddr: { t: 'bool' },
+  st_freed_hallbera: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

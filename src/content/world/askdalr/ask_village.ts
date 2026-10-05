@@ -3,16 +3,20 @@ import { afterRaid } from '../../dialogue/util';
 
 /** The captives' houses, boarded up since the raid. */
 const SHUT: Thing[] = [
-  [31, 5],
-  [8, 18],
-  [31, 18],
-].map(([x = 0, y = 0]): Thing => ({
+  [31, 5, 'st_freed_hallbera'],
+  [8, 18, null],
+  [31, 18, null],
+].map(([x = 0, y = 0, home]): Thing => ({
   k: 'scenery',
-  at: { x, y },
+  at: { x: Number(x), y: Number(y) },
   w: 1,
   h: 1,
   art: 'boards',
-  shown: afterRaid,
+  // Hallbera's boards come down once she is home from Sökkva Hof (M7b).
+  shown:
+    home === 'st_freed_hallbera'
+      ? { k: 'all', of: [afterRaid, { k: 'not', c: { k: 'flag', id: 'st_freed_hallbera' } }] }
+      : afterRaid,
 }));
 
 export const askVillage: ScreenDef = {
@@ -52,6 +56,20 @@ export const askVillage: ScreenDef = {
       },
     },
     ...SHUT,
+    /** Hallbera's door, by day once she is home from Sökkva Hof: red mead (M7b). */
+    {
+      k: 'use',
+      at: { x: 30, y: 7 },
+      w: 3,
+      script: 'shop_hallbera',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'st_freed_hallbera' },
+          { k: 'not', c: { k: 'phase', is: 'night' } },
+        ],
+      },
+    },
   ],
   map: [
     'TTTTTTTTTTTTTTTTTT,,,,TTTTTTTTTTTTTTTTTT',

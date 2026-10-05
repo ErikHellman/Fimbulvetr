@@ -46,9 +46,14 @@ describe('screens', () => {
         expect(t !== undefined && DB.terrain[t].swim === true, where).toBe(true);
         continue;
       }
-      if (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) {
+      // Swimmers wait in water, or on the floors they walk as well (the drowned); a dive door lies under it.
+      if (
+        (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) ||
+        (thing.k === 'door' && thing.dive === true)
+      ) {
         const t = cellAt(grid, thing.at.x, thing.at.y);
-        expect(t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t], where).toBe(true);
+        const water = t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t];
+        expect(water || (thing.k === 'enemy' && ok(thing.at.x, thing.at.y)), where).toBe(true);
         continue;
       }
       expect(ok(thing.at.x, thing.at.y), where).toBe(true);

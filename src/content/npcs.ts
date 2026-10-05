@@ -74,9 +74,10 @@ const wet: Cond = { k: 'weather', is: ['rain', 'storm'] };
 const night: Cond = { k: 'phase', is: 'night' };
 
 /** A captive freed from Helgrind is home by day; one still held sits in a cell there. */
-const freed = (who: 'ulf' | 'tofa'): Cond =>
+const freed = (who: 'ulf' | 'tofa' | 'oddr' | 'hallbera'): Cond =>
   all(flag(`st_freed_${who}`), { k: 'not', c: { k: 'phase', is: 'night' } });
-const held = (who: 'ulf' | 'tofa'): Cond => all(afterRaid, not(flag(`st_freed_${who}`)));
+const held = (who: 'ulf' | 'tofa' | 'oddr' | 'hallbera'): Cond =>
+  all(afterRaid, not(flag(`st_freed_${who}`)));
 
 const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
   id,
@@ -152,8 +153,17 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: held('tofa'), screen: 'd4_r19', at: { x: 19, y: 5 }, facing: 's' },
     { when: up, screen: 'ask_field', at: { x: 11, y: 19 }, facing: 'e' },
   ]),
-  oddr: npc('oddr', [{ when: up, screen: 'ask_field', at: { x: 26, y: 19 }, facing: 'w' }]),
-  hallbera: npc('hallbera', [{ when: up, screen: 'ask_village', at: { x: 31, y: 7 }, facing: 's' }]),
+  /** Taken in the raid to a cell in Sökkva Hof (M7b); home by day once Nykr falls. */
+  oddr: npc('oddr', [
+    { when: freed('oddr'), screen: 'ask_field', at: { x: 26, y: 19 }, facing: 'w' },
+    { when: held('oddr'), screen: 'd5_r18', at: { x: 28, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_field', at: { x: 26, y: 19 }, facing: 'w' },
+  ]),
+  hallbera: npc('hallbera', [
+    { when: freed('hallbera'), screen: 'ask_village', at: { x: 31, y: 6 }, facing: 's' },
+    { when: held('hallbera'), screen: 'd5_r21', at: { x: 28, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_village', at: { x: 31, y: 7 }, facing: 's' },
+  ]),
   thorkell: npc('thorkell', [{ when: up, screen: 'ask_village', at: { x: 30, y: 14 }, facing: 's' }]),
   rannveig: npc('rannveig', [{ when: up, screen: 'ask_village', at: { x: 34, y: 14 }, facing: 'w' }]),
   /** The seiðmaðr who leads the raid. Only seen in cutscenes. */

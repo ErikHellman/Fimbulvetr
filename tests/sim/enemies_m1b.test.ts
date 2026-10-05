@@ -27,8 +27,9 @@ function tellToBlow(id: EnemyId): number | null {
 describe('telegraphs', () => {
   it('every attack is preceded by a 300–500 ms tell', () => {
     // Lindormr charges only in its last phase, once flushed out of a mound: its tell (the 30-tick coil) is
-    // timed in lindormr.test.ts.
-    const setPieces: readonly EnemyId[] = ['lindormr'];
+    // timed in lindormr.test.ts. Hrönn bites only when it surfaces at a grate in its turn (its 24-tick tell is
+    // timed in hronn.test.ts).
+    const setPieces: readonly EnemyId[] = ['lindormr', 'hronn'];
     const attackers = ENEMIES.filter((id) => DB.enemies[id].attacks !== undefined && !setPieces.includes(id));
     expect(attackers).toEqual(expect.arrayContaining(['vargr', 'draugr', 'troll']));
     for (const id of attackers) {

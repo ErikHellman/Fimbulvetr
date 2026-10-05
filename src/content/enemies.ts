@@ -110,6 +110,87 @@ export const ENEMY_DEFS = {
     stunnable: 120,
     drops: { heart: 3, silver: 3, none: 4 },
   },
+  /**
+   * Hrönn, the great eel of Sökkva Hof's round hall (see hronn.ts): it lies under its four grates in turn
+   * and bites from them; a bomb in the grate it lies under stuns it. A mini-boss: Vindr's stave lies behind.
+   */
+  hronn: {
+    id: 'hronn',
+    art: 'enemy_hronn',
+    hp: 16,
+    body: { x: -12, y: -8, w: 24, h: 8 },
+    hurt: { x: -14, y: -36, w: 28, h: 36 },
+    behaviour: 'hronn',
+    swims: true,
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    needs: ['bombs'],
+    boss: { name: { en: 'Hrönn', sv: 'Hrönn' }, mini: true },
+    attacks: {
+      surface: {
+        from: 24,
+        to: 40,
+        boxes: around({ x: -24, y: -34, w: 48, h: 44 }),
+        amount: 3,
+        knock: 5,
+        tags: HEAVY,
+      },
+    },
+  },
+  /** One of Hrönn's iron grates: the blade rings off; a blast bursts it, and bombs spill out. */
+  hronn_grate: {
+    id: 'hronn_grate',
+    art: 'enemy_hronn_grate',
+    hp: 1,
+    body: { x: -10, y: -10, w: 20, h: 10 },
+    hurt: { x: -11, y: -14, w: 22, h: 14 },
+    behaviour: 'hronn_grate',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    guard: true,
+    cracks: 'force',
+    drops: { heart: 0, silver: 0, bombs: 1, none: 0 },
+  },
+  /**
+   * Thane Nykr, the Tide (see nykr.ts): a water horse circling its pool about a stone island. Vindr blows it
+   * onto the stone while it rears; at the last it rides a whirlpool until the grapple drags it out. The
+   * boss of Sökkva Hof.
+   */
+  nykr: {
+    id: 'nykr',
+    art: 'enemy_nykr',
+    hp: 30,
+    body: { x: -14, y: -10, w: 28, h: 10 },
+    hurt: { x: -18, y: -40, w: 36, h: 40 },
+    behaviour: 'nykr',
+    swims: true,
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    needs: ['grapple'],
+    boss: { name: { en: 'Nykr', sv: 'Nykr' } },
+    touch: { amount: 2, knock: 5, tags: 0 },
+    attacks: {
+      wave: {
+        from: 4,
+        to: 14,
+        boxes: around({ x: -72, y: -60, w: 144, h: 100 }),
+        amount: 3,
+        knock: 6,
+        tags: HEAVY,
+      },
+      charge: {
+        from: 0,
+        to: 69,
+        boxes: around({ x: -20, y: -34, w: 40, h: 36 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+  },
   /** A raid troll: cannot be hurt; its club comes down after a 500 ms wind-up. */
   troll: {
     id: 'troll',

@@ -14,6 +14,7 @@ import { PASS_SCRIPTS } from './pass';
 import { LOWLAND_SCRIPTS } from './lowlands';
 import { NIFLMYRR_SCRIPTS } from './niflmyrr';
 import { HELGRIND_SCRIPTS } from './helgrind';
+import { D5_SCRIPTS } from './d5';
 import { SAEVATN_SCRIPTS } from './saevatn';
 
 /** Cutscenes and interaction scripts by id. */
@@ -33,4 +34,5 @@ export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ...NIFLMYRR_SCRIPTS,
   ...HELGRIND_SCRIPTS,
   ...SAEVATN_SCRIPTS,
+  ...D5_SCRIPTS,
 };

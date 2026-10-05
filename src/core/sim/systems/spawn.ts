@@ -177,6 +177,9 @@ function spawnThings(rt: SimRt): Entity[] {
         out.push(createRaft(rt, thing, index));
         break;
       case 'door':
+        // A dive door shows its ripple; other doors are gaps in the map.
+        if (thing.dive === true) spawnFixtures(rt, thing, index, out);
+        break;
       case 'sign':
       case 'use':
       case 'trigger':

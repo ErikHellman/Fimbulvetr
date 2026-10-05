@@ -140,6 +140,26 @@ const PERSISTED = [
   'sae_c_ore1',
   'sae_k_ore2',
   'sae_c_ore2',
+  // M7b — Sökkva Hof
+  'd5_c_key1',
+  'd5_c_key2',
+  'd5_c_key3',
+  'd5_c_map',
+  'd5_c_compass',
+  'd5_c_vindr',
+  'd5_c_bigkey',
+  'd5_c_cache',
+  'd5_c_r05',
+  'd5_c_r10',
+  'hp_d5_r17',
+  'd5_hc',
+  'd5_k_r23',
+  'd5_lock_a',
+  'd5_lock_b',
+  'd5_lock_c',
+  'd5_lock_big',
+  'd5_sh_r11n',
+  'd5_sh_r20',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

@@ -116,6 +116,9 @@ export const ENEMIES = [
   'marbendill',
   'nykr_foal',
   'drowned',
+  'hronn',
+  'hronn_grate',
+  'nykr',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -295,6 +298,7 @@ export const SHOPS = [
   'tofa',
   'vala',
   'hreggvidr',
+  'hallbera',
 ] as const;
 export type ShopId = (typeof SHOPS)[number];
 
@@ -362,6 +366,13 @@ export const SCRIPTS = [
   'ulf_herd_lost',
   'd4_cell_ulf',
   'd4_cell_tofa',
+  'd5_enter',
+  'd5_kolbeinn',
+  'd5_gate_out',
+  'd5_cell_oddr',
+  'd5_cell_hallbera',
+  'oddr_skiff',
+  'shop_hallbera',
   'ferry_out',
   'ferry_back',
   'embla_found',

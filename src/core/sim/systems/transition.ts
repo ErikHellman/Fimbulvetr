@@ -103,13 +103,17 @@ export function checkEdges(rt: SimRt): void {
   rt.emit({ t: 'screenTransition', from, to, dir });
 }
 
-/** The door the hero is walking into, if any: feet on its tile while facing its direction. */
+/**
+ * The door the hero is walking into, if any: feet on its tile while facing its direction. A dive door
+ * takes only a diver, whichever way Ask faces.
+ */
 export function doorAt(rt: SimRt): DoorThing | null {
   const tx = Math.floor(rt.hero.pos.x / TILE);
   const ty = Math.floor((rt.hero.pos.y - 1) / TILE);
+  const diving = rt.hero.fsm.s === 'dive';
   for (const thing of rt.db.screens[rt.screen.id].things) {
-    if (thing.k === 'door' && thing.at.x === tx && thing.at.y === ty && thing.dir === rt.hero.facing)
-      return thing;
+    if (thing.k !== 'door' || thing.at.x !== tx || thing.at.y !== ty) continue;
+    if (thing.dive === true ? diving : thing.dir === rt.hero.facing) return thing;
   }
   return null;
 }
