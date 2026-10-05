@@ -45,6 +45,7 @@ export const ITEM_NAMES = {
   stave_is: { en: 'Ís rune-stave', sv: 'Ís-runstav' },
   wisp_ember: { en: 'Wisp ember', sv: 'Irrbloss-glöd' },
   ore: { en: 'Black ore', sv: 'Svart malm' },
+  norn_thread: { en: 'Norn-thread', sv: 'Nornetråd' },
 } as const satisfies Record<ItemId, L10n>;
 
 const MAX: Partial<Record<ItemId, number>> = {
@@ -69,10 +70,15 @@ const MAX: Partial<Record<ItemId, number>> = {
   stave_is: 3,
   wisp_ember: 3,
   ore: 99,
+  norn_thread: 3,
 };
 
 /** What a chest says. Items without a line here say "You found: <name>!". */
 const FOUND: Partial<Record<ItemId, L10n>> = {
+  norn_thread: {
+    en: 'You found a Norn-thread! It shines like wet gold. The Norns at Urðr’s well, under Sævatn, want three.',
+    sv: 'Du hittade en nornetråd! Den glänser som vått guld. Nornorna vid Urðs brunn, under Sævatn, vill ha tre.',
+  },
   ore: {
     en: 'You found black ore! Hreggviðr at the Refuge trades for it.',
     sv: 'Du hittade svart malm! Hreggviðr på Tillflykten byter mot den.',

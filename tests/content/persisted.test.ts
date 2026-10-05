@@ -160,6 +160,9 @@ const PERSISTED = [
   'd5_lock_big',
   'd5_sh_r11n',
   'd5_sh_r20',
+  'myr_c_thread',
+  'myl_c_thread',
+  'hau_c_thread',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

@@ -40,7 +40,7 @@ export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] 
 /** Kept for good and never used from a slot: mead horns (what mead is carried in) and the winter cloak. */
 export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
 /** Things carried for someone: a quest's token or a brew's ingredients. */
-export const QUEST_ITEMS = ['charred_stave', 'fen_moss', 'wisp_ember'] as const;
+export const QUEST_ITEMS = ['charred_stave', 'fen_moss', 'wisp_ember', 'norn_thread'] as const;
 /** The trading chain's goods (`q_trade`): each is traded on for the next. */
 export const TRADE_ITEMS = [
   'trade_bell',
@@ -250,6 +250,9 @@ export const NPCS = [
   // Sævatn
   'vala',
   'hreggvidr',
+  'urdr',
+  'verdandi',
+  'skuld',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -285,6 +288,7 @@ export const QUESTS = [
   'q_sealskin',
   'q_holmr',
   'q_letters',
+  'q_loom',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -303,7 +307,14 @@ export const SHOPS = [
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
-export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat', 'thingstone', 'bardr_ferry'] as const;
+export const DIALOGUES = [
+  ...NPCS,
+  'dev_sign',
+  'dev_chat',
+  'thingstone',
+  'bardr_ferry',
+  'hof_season',
+] as const;
 export type DialogueId = (typeof DIALOGUES)[number];
 
 /** Cutscenes and interaction scripts. */

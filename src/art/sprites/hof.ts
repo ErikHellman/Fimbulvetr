@@ -252,6 +252,38 @@ function skiff(): Raster {
   return outline(r, INK, 1);
 }
 
+const SILK: Rgba = [222, 226, 232, 230];
+const SILK_FAINT: Rgba = [200, 206, 214, 140];
+
+/** The web across Myrkviðr's way (18×32, a gate tile): thick grey silk; `torn`, only rags at the edges. */
+function web(torn: boolean): Raster {
+  const r = createRaster(18, 32);
+  if (torn) {
+    for (const [x0, y0, x1, y1] of [
+      [1, 16, 4, 22],
+      [1, 20, 3, 26],
+      [16, 17, 13, 23],
+      [16, 22, 14, 28],
+    ] as const)
+      line(r, x0, y0, x1, y1, SILK_FAINT);
+    return r;
+  }
+  for (const [x0, y0, x1, y1] of [
+    [1, 16, 16, 30],
+    [16, 16, 1, 30],
+    [9, 16, 9, 30],
+    [1, 23, 16, 23],
+  ] as const)
+    line(r, x0, y0, x1, y1, SILK);
+  for (const k of [3, 6]) {
+    line(r, 9 - k, 23, 9, 23 - k, SILK_FAINT);
+    line(r, 9, 23 - k, 9 + k, 23, SILK_FAINT);
+    line(r, 9 + k, 23, 9, 23 + k, SILK_FAINT);
+    line(r, 9, 23 + k, 9 - k, 23, SILK_FAINT);
+  }
+  return r;
+}
+
 /** A drowned thrall: bloated grey-green, weed in the hair, a rag of a tunic. */
 const DROWNED_LOOK: Look = {
   skin: '#8fa496',
@@ -335,6 +367,10 @@ export function hofFrames(): SpriteFrame[] {
     );
   }
   frames.push({ name: 'fix_skiff_idle_s_0', raster: skiff(), ox: 8, oy: 14 });
+  frames.push(
+    { name: 'fix_web_closed_s_0', raster: web(false), ox: 9, oy: 31 },
+    { name: 'fix_web_open_s_0', raster: web(true), ox: 9, oy: 31 },
+  );
   frames.push({ name: 'fix_fan_off_s_0', raster: fan(0), ox: 9, oy: 25 });
   for (let i = 0; i < 2; i++)
     frames.push({ name: `fix_fan_on_s_${String(i)}`, raster: fan(i), ox: 9, oy: 25 });
@@ -351,6 +387,7 @@ const one = (frames: number, fps: number): AnimDef => ({ frames, fps, loop: true
 const a = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
 
 export const HOF_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  fix_web: { closed: one(1, 1), open: one(1, 1) },
   enemy_drowned: {
     idle: a(1, 1),
     hurt: a(1, 1),

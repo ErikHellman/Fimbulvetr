@@ -16,6 +16,20 @@ export const hauBarrows: ScreenDef = {
   purpose:
     "The barrow field: grave mounds where the dead climb out at night, a great grave-hill whose cracked flank hides a piece of heart, and Geirmundr's tent by the road.",
   things: [
+    /** The Norns' Haugar thread (`q_loom`): shown only at night, to one who knows Ljós. */
+    {
+      k: 'chest',
+      id: 'hau_c_thread',
+      at: { x: 4, y: 6 },
+      gives: { item: 'norn_thread' },
+      when: {
+        k: 'all',
+        of: [
+          { k: 'phase', is: 'night' },
+          { k: 'galdr', id: 'ljos' },
+        ],
+      },
+    },
     /** Geirmundr's tent: his wares by day. */
     {
       k: 'use',

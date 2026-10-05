@@ -81,6 +81,17 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'wWY.....',
     'W.......',
   ],
+  /** A Norn-thread: a hank of shining thread wound on a little spindle. */
+  norn_thread: [
+    '...w....',
+    '..sus...',
+    '.suSus..',
+    '.sSuSs..',
+    '.suSus..',
+    '..sus...',
+    '...w....',
+    '...w.uu.',
+  ],
   fen_moss: ['........', '..v..v..', '.vVvvVv.', 'vvVvvvVv', 'VvvVvVvv', '.vVvvvV.', '..VvvV..', '........'],
   /** A torn leaf of parchment, a rune scratched on it. */
   rune_leaf: ['.sssss..', '.sSssss.', 'ssuSsss.', 'ssuussSs', 'sSsusss.', '.ssuSss.', '.sssss..', '..s.s...'],

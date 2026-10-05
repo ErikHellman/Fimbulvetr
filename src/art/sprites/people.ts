@@ -472,6 +472,34 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     legs: 'pants',
     bottom: '#3a332c',
   },
+  /** Urðr, eldest of the Norns: white-haired and stooped, in undyed grey wool. */
+  urdr: {
+    skin: '#d8c8b8',
+    hair: '#ece8e0',
+    hairStyle: 'long',
+    top: '#8a8680',
+    legs: 'skirt',
+    bottom: '#6a6660',
+  },
+  /** Verðandi, the Norn of what is: dark braids, a blue-green dress the colour of deep water. */
+  verdandi: {
+    skin: SKIN,
+    hair: '#2a2420',
+    hairStyle: 'braid',
+    top: '#2e6a6a',
+    legs: 'skirt',
+    bottom: '#1e4a4c',
+  },
+  /** Skuld, the youngest, of what shall be: veiled, in black. */
+  skuld: {
+    skin: '#e8d8c8',
+    hair: '#1a1a1e',
+    hairStyle: 'kerchief',
+    scarf: '#202024',
+    top: '#26262c',
+    legs: 'skirt',
+    bottom: '#18181c',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

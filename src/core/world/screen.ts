@@ -261,6 +261,8 @@ export type Thing =
       readonly closed: Cond;
       /** Ice that fire melts: an Eldr bolt reaching a closed tile sets this flag (the rime across the gorge). */
       readonly melts?: FlagId;
+      /** A web that wind tears away: a Vindr gust reaching a closed tile sets this flag (M7b). */
+      readonly blows?: FlagId;
     }
   /**
    * Scenery drawn over the map, tile by tile, when `shown` holds as the screen is entered (raid ruins
@@ -296,9 +298,9 @@ export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive' | 's
 
 /**
  * A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass, `bars` a
- * captive's cell in Helgrind.
+ * captive's cell in Helgrind, `web` a spider's web across the way in Myrkviðr.
  */
-export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime' | 'bars';
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime' | 'bars' | 'web';
 
 export interface ScreenDef {
   readonly id: ScreenId;

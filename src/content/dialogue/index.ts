@@ -47,6 +47,7 @@ import { HALLSTEINN } from './hallsteinn';
 import { THRALL } from './thrall';
 import { BRAGI } from './bragi';
 import { HRAFN } from './hrafn';
+import { HOF_SEASON, SKULD, URDR, VERDANDI } from './norns';
 
 /** Dialogue graphs by id. Every NPC's graph lives in its own file next to this one. */
 export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
@@ -98,4 +99,8 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   hreggvidr: HREGGVIDR,
   thingstone: THINGSTONE,
   bardr_ferry: BARDR_FERRY,
+  urdr: URDR,
+  verdandi: VERDANDI,
+  skuld: SKULD,
+  hof_season: HOF_SEASON,
 };

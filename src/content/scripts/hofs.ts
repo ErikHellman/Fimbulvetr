@@ -31,6 +31,8 @@ const hofPray: ScriptDef = {
         sv: 'Gudarna minns det du har gjort.',
       },
     },
+    /** Once the Norns' loom is woven (M7b), the hof may turn the year to another season. */
+    { k: 'if', when: { k: 'flag', id: 'st_loom_woven' }, then: [{ k: 'talk', dialogue: 'hof_season' }] },
   ],
 };
 

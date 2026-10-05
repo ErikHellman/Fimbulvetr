@@ -25,6 +25,8 @@ export const mylFerry: ScreenDef = {
       script: 'oddr_skiff',
       when: { k: 'flag', id: 'st_freed_oddr' },
     },
+    /** The Norns' Mýrland thread (`q_loom`), on the bottom of the warm-spring channel: a dive brings it up. */
+    { k: 'chest', id: 'myl_c_thread', at: { x: 8, y: 2 }, sunk: true, gives: { item: 'norn_thread' } },
   ],
   /** Where Mýrland's spawn table may put foes (see content/spawns.ts). */
   spawns: [

@@ -885,15 +885,17 @@ function gather(w: World, node: Node): boolean {
           return;
         }
         case 'gate': {
-          // Ice that fire melts (the rime): Eldr, once known, melts it from beside it.
-          if (t.melts === undefined || state.flags[t.melts] === true) return;
-          if (!state.inv.galdr.includes('eldr') || !evalCond(t.closed, ctx)) return;
+          // Ice that fire melts (the rime), or a web that wind tears: Eldr or Vindr, once known, from beside it.
+          const flag = t.melts ?? t.blows;
+          const song = t.melts !== undefined ? 'eldr' : 'vindr';
+          if (flag === undefined || state.flags[flag] === true) return;
+          if (!state.inv.galdr.includes(song) || !evalCond(t.closed, ctx)) return;
           let near = false;
           for (let dy = 0; dy < t.h && !near; dy++)
             for (let dx = 0; dx < t.w && !near; dx++)
               near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
           if (!near) return;
-          state.flags[t.melts] = true;
+          state.flags[flag] = true;
           changed = true;
           return;
         }

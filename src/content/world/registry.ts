@@ -122,6 +122,7 @@ import { saeNorth } from './saevatn/sae_north';
 import { saeSealRocks } from './saevatn/sae_seal_rocks';
 import { saeFjordmouth } from './saevatn/sae_fjordmouth';
 import { refIntHall } from './saevatn/ref_int_hall';
+import { saeIntWell } from './saevatn/sae_int_well';
 import { d5R01 } from './hof/d5_r01';
 import { d5R02 } from './hof/d5_r02';
 import { d5R03 } from './hof/d5_r03';
@@ -342,6 +343,7 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   sae_holmr: saeHolmr,
   sae_narrows: saeNarrows,
   sae_well: saeWell,
+  sae_int_well: saeIntWell,
   sae_north: saeNorth,
   sae_seal_rocks: saeSealRocks,
   sae_fjordmouth: saeFjordmouth,

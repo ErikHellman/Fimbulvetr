@@ -5,7 +5,7 @@ import { LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { blowCover } from './cover';
-import { spinFan } from './fixtures';
+import { blowGate, spinFan } from './fixtures';
 import { enemyDef, shove } from './movement';
 import { fillSail } from './raft';
 
@@ -71,11 +71,13 @@ function touch(rt: SimRt, e: Entity): void {
   fillSail(rt, box);
 }
 
-/** The gust runs on until its breath is spent or it meets a wall, touching what lies in its lane. */
+/** The gust runs on until its breath is spent or it meets a wall or a web, touching what lies in its lane. */
 export function stepVindr(rt: SimRt, e: Entity): void {
   const d = DIR_VEC[e.facing];
   const next = { x: e.pos.x + d.x * VINDR.speed, y: e.pos.y + d.y * VINDR.speed };
-  if (e.fsm.t + 1 >= VINDR.ticks || wallAt(rt, next.x, next.y - 6)) {
+  // A web is stamped solid, so it is met before the wall it would otherwise be; the gust tears it away.
+  const tore = blowGate(rt, at(e.body, next));
+  if (tore || e.fsm.t + 1 >= VINDR.ticks || wallAt(rt, next.x, next.y - 6)) {
     rt.actors = rt.actors.filter((x) => x !== e);
     return;
   }

@@ -824,6 +824,33 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_loom: {
+    id: 'q_loom',
+    name: { en: "The Norns' loom", sv: 'Nornornas vävstol' },
+    stages: [
+      {
+        when: flag('q_loom_asked'),
+        text: {
+          en: 'Under the well in the north water three women sit at a loom. Urðr wants three threads: one in Myrkviðr behind a web, one on the bottom of Mýrland’s ferry channel, one in the barrows that only shows at night to one who knows Ljós.',
+          sv: 'Under brunnen i det norra vattnet sitter tre kvinnor vid en vävstol. Urðr vill ha tre trådar: en i Myrkviðr bakom en väv, en på botten av färjeleden i Mýrland, en bland gravhögarna som bara syns om natten för den som kan Ljós.',
+        },
+      },
+      {
+        when: { k: 'item', id: 'norn_thread', gte: 3 },
+        text: {
+          en: 'Ask carries all three threads. Bring them to Urðr at her loom.',
+          sv: 'Ask bär alla tre trådarna. Ta dem till Urðr vid hennes vävstol.',
+        },
+      },
+      {
+        when: flag('st_loom_woven'),
+        text: {
+          en: 'The Norns wove the threads into a seiðr vessel. At any hof, after a prayer, Ask may now ask the year to turn to another season.',
+          sv: 'Nornorna vävde trådarna till ett seiðkärl. Vid vilket hov som helst kan Ask nu, efter en bön, be året vända sig till en annan årstid.',
+        },
+      },
+    ],
+  },
   q_holmr: {
     id: 'q_holmr',
     name: { en: 'The island', sv: 'Ön' },

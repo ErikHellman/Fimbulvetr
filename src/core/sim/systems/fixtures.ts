@@ -515,6 +515,20 @@ export function meltGate(rt: SimRt, box: Box): boolean {
   return true;
 }
 
+/**
+ * Tears away the closed web under `box` (Vindr's gust): its flag is set, and it opens with the next fixture
+ * refresh. Returns whether one blew away.
+ */
+export function blowGate(rt: SimRt, box: Box): boolean {
+  const e = fixtureAt(rt, 'gate', box, (f) => mem(f, 'on') === 1);
+  if (e === null) return false;
+  const thing = thingOf(rt, e);
+  if (thing?.k !== 'gate' || thing.blows === undefined) return false;
+  rt.state.flags[thing.blows] = true;
+  rt.emit({ t: 'sfx', id: 'sfx_gust' });
+  return true;
+}
+
 export function lightBrazier(rt: SimRt, box: Box): boolean {
   if (raining(rt)) return false;
   const e = fixtureAt(rt, 'brazier', box, (f) => mem(f, 'lit') !== 1);

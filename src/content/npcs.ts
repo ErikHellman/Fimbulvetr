@@ -64,6 +64,9 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   hrafn: { en: 'Hrafn', sv: 'Hrafn' },
   vala: { en: 'Vala', sv: 'Vala' },
   hreggvidr: { en: 'Hreggviðr', sv: 'Hreggviðr' },
+  urdr: { en: 'Urðr', sv: 'Urd' },
+  verdandi: { en: 'Verðandi', sv: 'Verdandi' },
+  skuld: { en: 'Skuld', sv: 'Skuld' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -275,4 +278,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   /** The Refuge's healer and ore-trader, each behind a table in the longhouse on Holmr (M7a). */
   vala: npc('vala', [{ screen: 'ref_int_hall', at: { x: 12, y: 12 }, facing: 'e' }]),
   hreggvidr: npc('hreggvidr', [{ screen: 'ref_int_hall', at: { x: 27, y: 12 }, facing: 'w' }]),
+  /** The three Norns at their loom by Urðr's well, under Sævatn (M7b): what was, what is, what shall be. */
+  urdr: npc('urdr', [{ screen: 'sae_int_well', at: { x: 20, y: 7 }, facing: 's' }]),
+  verdandi: npc('verdandi', [{ screen: 'sae_int_well', at: { x: 15, y: 7 }, facing: 's' }]),
+  skuld: npc('skuld', [{ screen: 'sae_int_well', at: { x: 25, y: 7 }, facing: 's' }]),
 };

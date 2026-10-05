@@ -57,6 +57,8 @@ describe('story content', () => {
       if (o['k'] === 'pen' && typeof o['flag'] === 'string') set.add(o['flag']);
       // A latch sets its flag when struck.
       if (o['k'] === 'switch' && typeof o['set'] === 'string') set.add(o['set']);
+      // Gates that fire melts or wind tears set their flag when it happens.
+      if (o['k'] === 'gate') for (const k of ['melts', 'blows']) if (typeof o[k] === 'string') set.add(o[k]);
     }
     const unset = [...read].filter((f) => !set.has(f));
     expect(unset).toEqual([]);

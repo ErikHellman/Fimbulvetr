@@ -3,10 +3,22 @@ import type { ScreenDef } from '@core/world/screen';
 export const myrRoad: ScreenDef = {
   id: 'myr_road',
   region: 'myrkvidr',
-  purpose: 'The Myrkviðr road: Dagný the huntress camps by her fire; a vargr pack hunts along the road.',
+  purpose:
+    'The Myrkviðr road: Dagný the huntress camps by her fire; a vargr pack hunts along the road. In a nook between the trees at the north-west (6, 3) a Norn-thread hangs behind a web that only Vindr tears away (M7b).',
   things: [
     { k: 'enemy', id: 'vargr', at: { x: 8, y: 6 } },
     { k: 'enemy', id: 'vargr', at: { x: 32, y: 15 } },
+    /** The Norns' Myrkviðr thread (`q_loom`), behind a web that only a Vindr gust tears away. */
+    {
+      k: 'gate',
+      at: { x: 6, y: 4 },
+      w: 1,
+      h: 1,
+      art: 'web',
+      closed: { k: 'not', c: { k: 'flag', id: 'w_myr_web' } },
+      blows: 'w_myr_web',
+    },
+    { k: 'chest', id: 'myr_c_thread', at: { x: 6, y: 3 }, gives: { item: 'norn_thread' } },
   ],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
   spawns: [

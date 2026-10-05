@@ -286,6 +286,13 @@ export const FLAGS = {
   /** Oddr and Hallbera, held in Sökkva Hof's cells until Nykr falls. */
   st_freed_oddr: { t: 'bool' },
   st_freed_hallbera: { t: 'bool' },
+  /**
+   * The Norns' loom (M7b, `q_loom`): the web in Myrkviðr blown clear by Vindr, the Norns met at Urðr's
+   * well, and the three threads woven (the hofs can turn the season after).
+   */
+  w_myr_web: { t: 'bool' },
+  q_loom_asked: { t: 'bool' },
+  st_loom_woven: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

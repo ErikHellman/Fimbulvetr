@@ -160,6 +160,7 @@ export const SCREEN_IDS = [
   'sae_seal_rocks',
   'sae_fjordmouth',
   'ref_int_hall',
+  'sae_int_well',
   'd5_r01',
   'd5_r02',
   'd5_r03',
