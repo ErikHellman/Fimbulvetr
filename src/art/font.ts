@@ -1,5 +1,5 @@
 import { decodeGrid } from './grid';
-import type { Raster } from './raster';
+import { createRaster, type Raster } from './raster';
 
 /**
  * The placeholder bitmap font. Glyphs are text grids ('#' ink, '.' empty), 7 rows for capitals and
@@ -12,6 +12,16 @@ export const LINE_HEIGHT = 12;
 /** Gap between glyphs. */
 const TRACKING = 1;
 const SPACE_ADVANCE = 4;
+
+/** The drawn sizes: the text-size setting picks one for dialogue and story cards. */
+export const FONT_SIZES = ['normal', 'large', 'larger'] as const;
+export type FontSize = (typeof FONT_SIZES)[number];
+const SCALE: Readonly<Record<FontSize, number>> = { normal: 1, large: 1.5, larger: 2 };
+
+/** Glyph cell height at a size. */
+export const fontHeight = (size: FontSize): number => Math.ceil(FONT_HEIGHT * SCALE[size]);
+/** Baseline-to-baseline distance at a size. */
+export const lineHeight = (size: FontSize): number => Math.round(LINE_HEIGHT * SCALE[size]);
 
 /** Base glyphs, rows joined by '|'. */
 const BASE: Readonly<Record<string, string>> = {
@@ -128,6 +138,8 @@ const BASE: Readonly<Record<string, string>> = {
   '—': '......|......|......|######|......|......|......',
   '…': '.....|.....|.....|.....|.....|.....|#.#.#',
   '·': '.|.|.|#|.|.|.',
+  // Othala, the "home" rune: the title screen marks a finished game with it.
+  ᛟ: '..#..|.#.#.|#...#|.#.#.|..#..|.#.#.|#...#',
   '←': '.....|..#..|.#...|#####|.#...|..#..|.....',
   '→': '.....|..#..|...#.|#####|...#.|..#..|.....',
   '↑': '..#..|.###.|#.#.#|..#..|..#..|..#..|..#..',
@@ -232,12 +244,53 @@ export function glyphs(): Glyph[] {
   return [...glyphMap().values()];
 }
 
+/**
+ * A raster scaled by nearest neighbour: each target pixel takes the source pixel under it, so the ink
+ * stays crisp and a one-pixel stroke never drops below one pixel.
+ */
+function scaled(r: Raster, k: number, h: number): Raster {
+  const w = r.w === 0 ? 0 : Math.ceil(r.w * k);
+  const out = createRaster(w, h);
+  for (let y = 0; y < h; y++) {
+    const sy = Math.min(r.h - 1, Math.floor(y / k));
+    for (let x = 0; x < w; x++) {
+      const si = (sy * r.w + Math.min(r.w - 1, Math.floor(x / k))) * 4;
+      out.data.set(r.data.subarray(si, si + 4), (y * w + x) * 4);
+    }
+  }
+  return out;
+}
+
+const sized = new Map<FontSize, Map<string, Glyph>>();
+
+/** All glyphs drawn at a size, keyed by character. The normal size is `glyphMap()` itself. */
+export function glyphMapAt(size: FontSize): ReadonlyMap<string, Glyph> {
+  if (size === 'normal') return glyphMap();
+  const hit = sized.get(size);
+  if (hit !== undefined) return hit;
+  const k = SCALE[size];
+  const h = fontHeight(size);
+  const track = Math.round(TRACKING * k);
+  const map = new Map<string, Glyph>();
+  for (const g of glyphMap().values()) {
+    const raster = scaled(g.raster, k, h);
+    const advance = g.ch === ' ' ? Math.round(SPACE_ADVANCE * k) : raster.w + track;
+    map.set(g.ch, { ch: g.ch, raster, advance });
+  }
+  sized.set(size, map);
+  return map;
+}
+
+export function glyphsAt(size: FontSize): Glyph[] {
+  return [...glyphMapAt(size).values()];
+}
+
 /** Width in pixels of a single line (unknown characters count as '?'). */
-export function textWidth(text: string): number {
-  const map = glyphMap();
+export function textWidth(text: string, size: FontSize = 'normal'): number {
+  const map = glyphMapAt(size);
   let w = 0;
   for (const ch of text) w += (map.get(ch) ?? map.get('?'))?.advance ?? 0;
-  return Math.max(0, w - TRACKING);
+  return Math.max(0, w - Math.round(TRACKING * SCALE[size]));
 }
 
 /** Characters of `text` the font cannot draw. */
@@ -247,13 +300,13 @@ export function unknownChars(text: string): string[] {
 }
 
 /** Word-wraps text into lines no wider than `maxW`; `\n` forces a break. Over-long words are kept whole. */
-export function layoutText(text: string, maxW: number): string[] {
+export function layoutText(text: string, maxW: number, size: FontSize = 'normal'): string[] {
   const lines: string[] = [];
   for (const para of text.split('\n')) {
     let line = '';
     for (const word of para.split(' ')) {
       const next = line === '' ? word : `${line} ${word}`;
-      if (line !== '' && textWidth(next) > maxW) {
+      if (line !== '' && textWidth(next, size) > maxW) {
         lines.push(line);
         line = word;
       } else line = next;

@@ -176,6 +176,7 @@ export class PlayScene extends Phaser.Scene {
     this.achCheck = 0;
     const link: UiLink = {
       achievements: () => this.held,
+      textSize: () => this.services.settings.textSize,
       toast: () => this.toasts.shown,
       sim: this.sim,
       frames: data.assets.frames,

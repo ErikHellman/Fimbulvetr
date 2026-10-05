@@ -128,6 +128,8 @@ describe('story content', () => {
         expect(text.trim(), JSON.stringify(o)).not.toBe('');
         expect(unknownChars(text), text).toEqual([]);
         expect(layoutText(text, BOX_W).length, text).toBeLessThanOrEqual(MAX_LINES);
+        // The larger text size grows the box upward; seven lines still leave the top of the screen free.
+        expect(layoutText(text, BOX_W, 'larger').length, text).toBeLessThanOrEqual(7);
         expect(
           textWidth(text.split(' ').reduce((a, b) => (a.length > b.length ? a : b), '')),
           text,

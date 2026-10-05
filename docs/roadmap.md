@@ -191,7 +191,7 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] The ending: the valley, the farm, Kolbeinn's end, stay or go, the final credits
     - [x] The world after: spring at the farm, post-game lines, the Rime King quest
     - [x] Route, e2e, v1-m10b fixture, docs
-    - [ ] Title-screen rune for a finished save (moved to M11 by the cut line)
+    - [x] Title-screen rune for a finished save (moved to M11 by the cut line; done in M11b)
     - [ ] User playtest and Swedish proofread
 - [ ] M11 Completion + ship
   - [ ] M11a Completion — Part 1
@@ -203,8 +203,8 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Route, e2e, v1-m11a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M11b Ship — Part 2
-    - [ ] Drawn font sizes and the text-size setting
-    - [ ] Title-screen rune for a finished save
-    - [ ] Safari audit and fixes; the sim benchmark
-    - [ ] Version 1.0.0, README, route, e2e, v1-m11b fixture, docs
+    - [x] Drawn font sizes and the text-size setting
+    - [x] Title-screen rune for a finished save
+    - [x] Safari audit and fixes; the sim benchmark
+    - [x] Version 1.0.0, README, route, e2e, v1-m11b fixture, docs
     - [ ] User playtest and Swedish proofread

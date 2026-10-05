@@ -118,9 +118,6 @@ export class TitleScene extends Phaser.Scene {
     this.snow(data);
     this.title = this.add.bitmapText(0, 58, FONT_KEY, GAME_TITLE.toUpperCase(), FONT_HEIGHT).setScale(3);
     this.title.setTint(PAPER).setX(Math.round((GAME_W - textWidth(GAME_TITLE.toUpperCase()) * 3) / 2));
-    const tag = t(UI.title_demo, data.settings.lang).toUpperCase();
-    const right = this.title.x + textWidth(GAME_TITLE.toUpperCase()) * 3;
-    this.text(right - textWidth(tag), 88, GOLD).setText(tag);
     const version = versionLabel(__APP_VERSION__, __BUILD_ID__);
     this.text(GAME_W - textWidth(version) - 4, GAME_H - 14, DIM).setText(version);
     this.subtitle = this.text(0, 104, DIM);

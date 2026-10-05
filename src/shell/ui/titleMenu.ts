@@ -7,7 +7,7 @@ import type { SlotId } from '@shell/platform/saveStore';
  * replaces an autosave.
  */
 
-/** The corner line under the demo tag: the version, and the build it came from (none in dev). */
+/** The corner line: the version, and the build it came from (none in dev). */
 export const versionLabel = (version: string, build: string): string =>
   build === 'dev' ? `v${version}` : `v${version} (${build})`;
 

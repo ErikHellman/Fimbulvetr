@@ -8,7 +8,19 @@ A top-down action-adventure in the mould of _A Link to the Past_, set in a Norse
 
 [Ask](https://en.wikipedia.org/wiki/Ask_and_Embla), a farmhand, sets out to rescue [Embla](https://en.wikipedia.org/wiki/Ask_and_Embla), the farmer's daughter, and the villagers taken in a night raid. They were taken by the servants of [Hrímnir](https://en.wikipedia.org/wiki/Hr%C3%ADmnir), the Rime King, a [jötunn](https://en.wikipedia.org/wiki/J%C3%B6tunn) bound beneath the mountains whose binding is failing. Along the way the seasons turn, the weather rolls in and night brings out things that hunt. When the Rime King's breath finally pours over the lowlands, it brings the Fimbulvetr, the [great winter](https://en.wikipedia.org/wiki/Fimbulwinter).
 
-> **Status:** early development. The farm prologue, the raid, the forest of Myrkviðr, the first dungeon (Rótarhellir), the trading town Uppvík and the turning world of seasons and weather are playable. See [`docs/roadmap.md`](docs/roadmap.md) for progress.
+> **Status:** version 1.0.0. The whole game is playable from the raid on Askdalr to the Rime King and the spring after, with eight regions, eight dungeons, 25 side quests, 36 heart pieces and 24 achievements. See [`docs/roadmap.md`](docs/roadmap.md) for what is left to playtest.
+
+## How to play
+
+Choose **New game** on the title screen. A short page shows the controls first (it can be turned off in the settings).
+
+- **Explore and talk.** People in Askdalr and beyond give quests, trade and hints. The pause menu's Quests page tracks what you have been asked, and the map shows where you have been.
+- **Fight with the right tool.** Watch an enemy's tell, then strike, roll away or raise your shield. Many foes and most puzzles want a particular item or galdr (a sung spell).
+- **Mind the world.** Seasons, weather and the hour change paths, enemies and what people say. Sleep in a bed to pass the night. The high cold bites, so come prepared.
+- **Find the hidden things.** Four heart pieces make a heart. Bragi the skald sells verses that hint at the best-hidden ones.
+- **Save often.** The game saves on its own when you move between screens. Save to a slot at a hof or a mead hall, and use **Export** on the title screen to keep a copy as a file.
+
+The settings menu holds the language (English or Swedish), the volume, the text size, key bindings and the accessibility options: colour-blind aid, no screen shake, no lightning flashes, a shield that stays up on a tap, and long days.
 
 ## Goals
 
@@ -38,7 +50,7 @@ The project is also an experiment in building a complete game solo with [Claude 
 
 - [Node.js](https://nodejs.org/) 22.14 or newer.
 - [pnpm](https://pnpm.io/) 10. With Corepack you can run `corepack enable` and the version pinned in `package.json` is used.
-- A desktop browser with WebGL: Chrome, Firefox or Safari.
+- A desktop browser with WebGL: Chrome, Firefox or Safari 15.4 or newer.
 
 ### Start the game
 
