@@ -17,6 +17,7 @@ import { raining } from './weather';
 import { sinkTiles, walkTiles } from './cover';
 import { condCtx, probeBox, startScript } from './story';
 import { footingHolds, levelTiles, waterLevel } from './water';
+import { turnPrism } from './beams';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
 const FIRE = { amount: 2, knock: 4 } as const;
@@ -53,6 +54,9 @@ const KINDS: Readonly<
   raft: { solid: 'never' },
   ripple: { solid: 'never' },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
+  beam: { solid: 'always', anims: ['on', 'off'] },
+  prism: { solid: 'always' },
+  eye: { solid: 'always', anims: ['lit', 'dark'] },
 };
 
 function fixture(id: number, def: string, art: string, tile: TilePos, index: number): Entity {
@@ -126,6 +130,19 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
       out.push(e);
       return;
     }
+    case 'beam':
+      out.push(fixture(rt.newId(), 'beam', 'fix_window', thing.at, index));
+      return;
+    case 'prism': {
+      const e = fixture(rt.newId(), 'prism', 'fix_prism', thing.at, index);
+      e.mem['turn'] = 0;
+      setAnim(e, thing.turn === '/' ? 'slash' : 'back');
+      out.push(e);
+      return;
+    }
+    case 'eye':
+      out.push(fixture(rt.newId(), 'eye', 'fix_crystal', thing.at, index));
+      return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
       e.mem['lit'] = thing.lit === true ? 1 : 0;
@@ -172,7 +189,7 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
   }
 }
 
-const thingOf = (rt: SimRt, e: Entity): Thing | undefined =>
+export const thingOf = (rt: SimRt, e: Entity): Thing | undefined =>
   rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
 
 /** The doors opened for good in the current room's dungeon (none outside dungeons). */
@@ -207,6 +224,10 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return rt.state.world.warps.includes(thing.region);
     case 'seal':
       return evalCond(thing.lit, condCtx(rt));
+    case 'beam':
+      return evalCond(thing.when, condCtx(rt));
+    case 'eye':
+      return rt.state.flags[thing.flag] === true;
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -381,6 +402,12 @@ export function swordSwitches(rt: SimRt): void {
   if (eye !== null) {
     eye.mem['hitSwing'] = swing;
     rt.emit({ t: 'sfx', id: 'sfx_block' });
+  }
+  // A turning prism (M9b) turns a quarter at each swing that strikes it.
+  const prism = fixtureAt(rt, 'prism', box, (f) => mem(f, 'hitSwing') !== swing);
+  if (prism !== null) {
+    prism.mem['hitSwing'] = swing;
+    if (!turnPrism(rt, prism)) rt.emit({ t: 'sfx', id: 'sfx_block' });
   }
 }
 

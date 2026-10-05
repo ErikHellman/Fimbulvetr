@@ -43,6 +43,7 @@ import { FireView } from '@shell/view/fireView';
 import { GhostView } from '@shell/view/ghostView';
 import { WardView } from '@shell/view/wardView';
 import { ChainView } from '@shell/view/chainView';
+import { BeamView } from '@shell/view/beamView';
 import { FishView } from '@shell/view/fishView';
 import { ScreenView } from '@shell/view/screenView';
 
@@ -73,6 +74,7 @@ export class PlayScene extends Phaser.Scene {
   private ghostFloor!: GhostView;
   private ward!: WardView;
   private chain!: ChainView;
+  private beamView!: BeamView;
   private fishing!: FishView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
@@ -139,6 +141,7 @@ export class PlayScene extends Phaser.Scene {
     this.ghostFloor = new GhostView(this, data.assets.frames);
     this.ward = new WardView(this);
     this.chain = new ChainView(this, data.assets.frames);
+    this.beamView = new BeamView(this);
     this.fishing = new FishView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
@@ -399,6 +402,7 @@ export class PlayScene extends Phaser.Scene {
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     this.ghostFloor.draw(this.sim.ghosts(), this.sim.originOf(this.sim.screen.id));
     this.chain.draw(this.sim.grapple(), this.sim.originOf(this.sim.screen.id));
+    this.beamView.draw(this.sim.beams(), this.sim.originOf(this.sim.screen.id), this.sim.tick);
     {
       const hero = this.sim.hero;
       const origin = this.sim.originOf(this.sim.screen.id);

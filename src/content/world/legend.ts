@@ -108,6 +108,7 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '▒': 'rime',
   '▫': 'tower_floor',
   '▪': 'tower_wall',
+  '▧': 'clear_ice',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

@@ -21,6 +21,7 @@ import { SAEVATN_ANIMS, saevatnFrames } from './saevatn';
 import { HOF_ANIMS, hofFrames } from './hof';
 import { FORGE_ANIMS, forgeFrames } from './forge';
 import { RIME_ANIMS, rimeFrames } from './rime';
+import { TOWER_ANIMS, towerFrames } from './tower';
 
 export type { SpriteFrame } from './types';
 
@@ -47,6 +48,7 @@ export const ANIMS: AnimTable = {
   ...HOF_ANIMS,
   ...FORGE_ANIMS,
   ...RIME_ANIMS,
+  ...TOWER_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -71,6 +73,7 @@ export function buildSprites(): SpriteFrame[] {
     ...hofFrames(),
     ...forgeFrames(),
     ...rimeFrames(),
+    ...towerFrames(),
     missingFrame(),
   ];
 }

@@ -39,6 +39,8 @@ export interface TerrainDef {
   readonly lava?: boolean;
   /** Glacier ice (M9): a step onto it slides on until a wall or the ice's edge (see systems/glaze.ts). */
   readonly glaze?: boolean;
+  /** Clear ice (M9b): solid, but a beam of light shines through it (see systems/beams.ts). */
+  readonly clear?: boolean;
 }
 
 /** How a terrain answers the water level: flooded from level `floods` up, or afloat from `floats` up. */

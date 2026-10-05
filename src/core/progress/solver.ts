@@ -14,6 +14,7 @@ import { riseFooting } from '../world/water';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '../world/dims';
 import { indexLayout, neighbourOf, type LayoutIndex, type RoomSignal, type Thing } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
+import { otherSlant, prismTurn, traceBeam, type BeamMeet, type Slant } from '../world/beam';
 
 /**
  * Progression solver v1: floods the world tile by tile from the hero's position under the fixtures of the
@@ -128,6 +129,8 @@ class World {
   /** Glaze tiles (M9), where a step slides on; and the screens under the killing frost. */
   readonly glazed = new Set<number>();
   readonly cold = new Set<ScreenId>();
+  /** Clear ice (M9b): solid, but light shines through. */
+  readonly clear = new Set<number>();
 
   constructor(
     readonly db: ContentDb,
@@ -148,6 +151,7 @@ class World {
     this.grids.forEach((g, i) => {
       g.cells.forEach((cell, c) => {
         if (db.terrain[cell].glaze === true) this.glazed.add(i * 1024 + c);
+        if (db.terrain[cell].clear === true) this.clear.add(i * 1024 + c);
       });
     });
     for (const id of this.ids) if (db.screens[id].cold === true) this.cold.add(id);
@@ -394,6 +398,9 @@ function solidThing(
     case 'seal':
     case 'post':
     case 'brazier':
+    case 'beam':
+    case 'prism':
+    case 'eye':
       return true;
     case 'lock':
       return !doors().includes(t.id);
@@ -786,6 +793,75 @@ function strikable(
   return besideReach(w, reach, id, x, y) || throwable(w, state, reach, id, x, y);
 }
 
+/** How far Bragð's beam flies, in tiles (see systems/bragd.ts). */
+const BRAGD_TILES = 14;
+
+/**
+ * Whether a crystal eye can be lit (M9b), once its room is reached: by Bragð in a straight line from the
+ * reach, or by a window's beam, traced over the prisms (each one Ask can strike, from beside it or by
+ * Bragð, in either slant) and, with the mirror held, turned once from any reached tile on its way.
+ */
+function eyeLit(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  eye: Extract<Thing, { k: 'eye' }>,
+): boolean {
+  if (!roomReached(w, reach, id)) return false;
+  const bragd = state.inv.galdr.includes('bragd');
+  if (bragd && inLine(w, state, reach, id, eye.at.x, eye.at.y, BRAGD_TILES)) return true;
+  const things = w.db.screens[id].things;
+  const ctx = ctxOf(w, state);
+  const blocked = blockedTiles(w, state, reach);
+  const prisms = things.flatMap((t) => (t.k === 'prism' ? [t] : []));
+  const free = prisms.map(
+    (p) =>
+      p.turns === true &&
+      (besideReach(w, reach, id, p.at.x, p.at.y) ||
+        (bragd && inLine(w, state, reach, id, p.at.x, p.at.y, BRAGD_TILES))),
+  );
+  const freeCount = free.filter(Boolean).length;
+  const mirror = has(state, 'mirror');
+  const target = things.indexOf(eye);
+  for (let combo = 0; combo < 1 << Math.min(freeCount, 8); combo++) {
+    const slants = new Map<string, Slant>();
+    let bit = 0;
+    prisms.forEach((p, i) => {
+      const flip = free[i] === true && ((combo >> bit++) & 1) === 1;
+      slants.set(`${String(p.at.x)},${String(p.at.y)}`, flip ? otherSlant(p.turn) : p.turn);
+    });
+    const meet = (x: number, y: number, dir: Dir4): BeamMeet => {
+      const slant = slants.get(`${String(x)},${String(y)}`);
+      if (slant !== undefined) return { k: 'turn', dir: prismTurn(slant, dir) };
+      const i = things.findIndex((t) => t.k === 'eye' && t.at.x === x && t.at.y === y);
+      if (i >= 0) return { k: 'eye', index: i };
+      const tile = w.tile(id, x, y);
+      if (blocked.has(tile)) return { k: 'stop' };
+      const tr = w.terrain(id, x, y);
+      return tr === null || (tr.solid && !tr.low && !w.clear.has(tile)) ? { k: 'stop' } : { k: 'pass' };
+    };
+    for (const b of things) {
+      if (b.k !== 'beam' || !evalCond(b.when, ctx)) continue;
+      const passes: [number, number, Dir4][] = [];
+      const lit = traceBeam(b.at.x, b.at.y, b.dir, (x, y, d) => {
+        passes.push([x, y, d]);
+        return meet(x, y, d);
+      });
+      if (lit.eyes.includes(target)) return true;
+      if (!mirror) continue;
+      for (const [x, y, d] of passes) {
+        if (!reach.has(w.tile(id, x, y))) continue;
+        for (const turn of DIRS4)
+          if (turn !== d && traceBeam(x, y, turn, meet).eyes.includes(target)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+const DIRS4: readonly Dir4[] = ['n', 'e', 's', 'w'];
+
 function roomReached(w: World, reach: ReadonlySet<number>, id: ScreenId): boolean {
   const base = (w.idx.get(id) ?? 0) * 1024;
   for (let i = 0; i < SCREEN_COLS * SCREEN_ROWS; i++) if (reach.has(base + i)) return true;
@@ -911,6 +987,12 @@ function gather(w: World, node: Node): boolean {
           if (!(e.needs ?? []).every((item) => has(state, item))) return;
           for (const eff of t.onDeath ?? []) if (eff.k === 'set') state.flags[eff.flag] = eff.value;
           if (def.dungeon !== undefined) dungeonOf(state, def.dungeon).bossDead = true;
+          changed = true;
+          return;
+        }
+        case 'eye': {
+          if (state.flags[t.flag] === true || !eyeLit(w, state, reach, id, t)) return;
+          state.flags[t.flag] = true;
           changed = true;
           return;
         }

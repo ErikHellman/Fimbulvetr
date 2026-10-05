@@ -12,6 +12,7 @@ import type { CoverGrid } from '../world/cover';
 import type { TerrainGrid } from '../world/textmap';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
+import type { BeamSeg } from './systems/beams';
 
 /** `over`: the hero has fallen; the game waits for Continue. */
 export type Mode = 'play' | 'transition' | 'story' | 'over';
@@ -103,6 +104,8 @@ export interface SimRt {
   freezeTicks?: number;
   /** Ís crust on lava (tile index → ticks left), on this screen only (undefined when none). */
   crust?: Map<number, number>;
+  /** The beams of light shining on this screen this tick (M9b), for the view; undefined when none. */
+  beamSegs?: readonly BeamSeg[];
   /** An escort under way (undefined when none). */
   escort?: Escort;
   emit(event: SimEvent): void;

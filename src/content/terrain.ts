@@ -104,6 +104,8 @@ export const TERRAIN_IDS = [
   'rime',
   'tower_floor',
   'tower_wall',
+  /** Hrímturn (M9b): a wall of clear ice that light shines through. */
+  'clear_ice',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -281,4 +283,6 @@ export const TERRAIN = {
   /** Hrímturn: a floor of frosted glass, and walls of rime-glass. */
   tower_floor: { solid: false },
   tower_wall: { solid: true },
+  /** Clear ice: a wall to walkers and shots, but a beam of light shines through it. */
+  clear_ice: { solid: true, clear: true },
 } as const satisfies Record<TerrainId, TerrainDef>;

@@ -228,6 +228,19 @@ export type Thing =
   /** A grapple post: a solid iron-bound pillar the grapple chain hooks, pulling Ask to the tile before it. */
   | { readonly k: 'post'; readonly at: TilePos }
   /**
+   * A window of rime-light (M9b): while `when` holds, a beam shines from it `dir` across the room, turned
+   * by prisms and Ask's raised mirror, through clear ice, until something solid stops it. Solid.
+   */
+  | { readonly k: 'beam'; readonly at: TilePos; readonly dir: Dir4; readonly when?: Cond }
+  /**
+   * A glass prism (M9b): it turns a beam a quarter, `/` (east to north, south to west) or `\` (east to
+   * south, north to west). With `turns`, a sword blow or a Bragð beam swaps the two until Ask leaves the room.
+   * Solid.
+   */
+  | { readonly k: 'prism'; readonly at: TilePos; readonly turn: '/' | '\\'; readonly turns?: true }
+  /** A crystal eye (M9b): the first beam (or Bragð beam) to reach it sets `flag` for good. Solid. */
+  | { readonly k: 'eye'; readonly at: TilePos; readonly flag: FlagId }
+  /**
    * A raft, 2×2 tiles, resting at `at` (its top-left tile) and plying a straight line through each stop of
    * `path` and back again. Resting, it is footing; Ask aboard as it sets off rides along. Never saved.
    */

@@ -4,10 +4,10 @@ import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import type { ShotId } from '../../actors/enemies/defs';
 import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
-import { ARROW, STUN } from '../../combat/hit';
+import { ARROW, REFLECT, STUN } from '../../combat/hit';
 import { applyEffect } from '../../story/effects';
 import { moveVector, type InputFrame } from '../../input/actions';
-import { at, overlaps } from '../../math/box';
+import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC, dirFromVec } from '../../math/dir';
 import { length, normalize, sub, type Vec } from '../../math/vec';
 import { LOW, SOLID } from '../../world/collision';
@@ -253,6 +253,25 @@ function stepShot(rt: SimRt, e: Entity): void {
   e.pos = next;
   e.fsm.t += 1;
   const box = at(e.body, e.pos);
+  if (mem(e, 'mine') === 1) {
+    // Sent back by the mirror (M9b): it hurts the first foe it meets.
+    const foe = rt.actors.find(
+      (a) => a.kind === 'enemy' && a.iframes === 0 && overlaps(box, at(a.hurt, a.pos)),
+    );
+    if (foe === undefined) return;
+    const dir = { x: mem(e, 'dx'), y: mem(e, 'dy') };
+    damageActor(rt, foe, {
+      amount: s.amount,
+      element: 'none',
+      knock: s.knock,
+      dir,
+      faction: 'hero',
+      tags: REFLECT,
+    });
+    gone();
+    return;
+  }
+  if (e.def === 'bolt' && reflects(rt, e, box)) return;
   const sword = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (sword !== null && overlaps(sword, box)) {
     rt.emit({ t: 'sfx', id: 'sfx_block' });
@@ -262,6 +281,24 @@ function stepShot(rt: SimRt, e: Entity): void {
   }
   if (!overlaps(box, at(rt.hero.hurt, rt.hero.pos))) return;
   if (hurtHero(rt, e, s.amount, s.knock, 0) && s.out === 0) gone();
+}
+
+/**
+ * A rime bolt meeting the front of Ask's raised mirror (M9b) leaves the way Ask faces, Ask's own now.
+ * Returns whether it did.
+ */
+function reflects(rt: SimRt, e: Entity, box: Box): boolean {
+  const h = rt.hero;
+  if (h.fsm.s !== 'mirror' || !overlaps(box, at(h.hurt, h.pos))) return false;
+  const f = DIR_VEC[h.facing];
+  if (mem(e, 'dx') * f.x + mem(e, 'dy') * f.y >= 0) return false;
+  e.mem['dx'] = f.x;
+  e.mem['dy'] = f.y;
+  e.mem['mine'] = 1;
+  e.facing = h.facing;
+  e.fsm = { s: 'fly', t: 0 };
+  rt.emit({ t: 'sfx', id: 'sfx_mirror' });
+  return true;
 }
 
 /**

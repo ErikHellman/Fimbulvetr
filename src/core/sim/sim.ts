@@ -68,6 +68,7 @@ import { tickTimers } from './systems/timers';
 import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
 import { heatMax, stepCold, stepHeat } from './systems/heat';
+import { stepBeams, type BeamSeg } from './systems/beams';
 import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
@@ -126,6 +127,7 @@ export class Sim implements SimRt {
   coldTicks?: number;
   freezeTicks?: number;
   crust?: Map<number, number>;
+  beamSegs?: readonly BeamSeg[];
   escort?: Escort;
   tick = 0;
   readonly rolled: boolean;
@@ -289,6 +291,11 @@ export class Sim implements SimRt {
   /** The killing frost on Ask (M9), for the HUD's frost bar; null when Ask is warm. */
   cold(): { readonly now: number; readonly max: number } | null {
     return this.coldTicks === undefined ? null : { now: this.coldTicks, max: this.db.tuning.hero.cold };
+  }
+
+  /** The beams of light shining on this screen (M9b), in screen pixels, for the view. */
+  beams(): readonly BeamSeg[] {
+    return this.beamSegs ?? [];
   }
 
   /** The escorted NPC's health for the HUD (M8), or null while nobody walks with Ask. */
@@ -460,6 +467,7 @@ export class Sim implements SimRt {
     resolveSword(this);
     swordProps(this);
     swordSwitches(this);
+    stepBeams(this);
     cutCover(this);
     resolveAttacks(this);
     fixtureHazards(this);

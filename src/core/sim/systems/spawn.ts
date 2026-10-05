@@ -170,6 +170,9 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'warp':
       case 'seal':
       case 'post':
+      case 'beam':
+      case 'prism':
+      case 'eye':
       case 'scenery':
         spawnFixtures(rt, thing, index, out);
         break;

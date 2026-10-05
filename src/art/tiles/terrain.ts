@@ -704,6 +704,17 @@ const HRIMFJOLL = {
       p.rect(3, 2, 1, 8, '#8eaecc');
     },
   },
+  clear_ice: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill('#c4e4f6');
+      p.speckle('#e8f6ff', 0.15);
+      p.rect(2, 2, 1, 10, '#ffffff');
+      p.rect(4, 1, 1, 5, '#f0faff');
+      p.rect(0, 13, 16, 3, '#8cb8d6');
+    },
+  },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
