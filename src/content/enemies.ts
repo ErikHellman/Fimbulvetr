@@ -76,6 +76,40 @@ export const ENEMY_DEFS = {
     stunnable: 120,
     drops: { heart: 3, silver: 3, none: 4 },
   },
+  /**
+   * A drowned thrall of Sökkva Hof (M7b): a draugr that walks the bottom of the flooded floors as well as
+   * the dry ones. It rises, raises both arms and brings them down; only a dive passes under the blow.
+   */
+  drowned: {
+    id: 'drowned',
+    art: 'enemy_drowned',
+    hp: 8,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -7, y: -26, w: 14, h: 26 },
+    behaviour: 'draugr',
+    swims: true,
+    knockResist: 0.5,
+    immortal: false,
+    solid: false,
+    touch: { amount: 1, knock: 2, tags: 0 },
+    attacks: {
+      swing: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -26, w: 22, h: 26 },
+          w: { x: -22, y: -26, w: 22, h: 26 },
+          s: { x: -12, y: -12, w: 24, h: 22 },
+          n: { x: -12, y: -36, w: 24, h: 24 },
+        },
+        amount: 4,
+        knock: 5,
+        tags: HEAVY,
+      },
+    },
+    stunnable: 120,
+    drops: { heart: 3, silver: 3, none: 4 },
+  },
   /** A raid troll: cannot be hurt; its club comes down after a 500 ms wind-up. */
   troll: {
     id: 'troll',

@@ -6,6 +6,8 @@ import { C } from '../palette';
 import { blit, createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { flipY } from './haugar';
 import { raft } from './helgrind';
+import { sunk } from './niflmyrr';
+import { drawPerson, type Look } from './people';
 import type { SpriteFrame } from './types';
 
 /** Sökkva Hof (M7b): Vindr's gust, the wind fans that work the sluices, and the sailing raft. */
@@ -101,8 +103,38 @@ function sailRaft(filled: boolean): Raster {
   return r;
 }
 
+/** A drowned thrall: bloated grey-green, weed in the hair, a rag of a tunic. */
+const DROWNED_LOOK: Look = {
+  skin: '#8fa496',
+  hair: '#3a5a3e',
+  hairStyle: 'long',
+  top: '#4a5a50',
+  legs: 'pants',
+  bottom: '#2e3a34',
+};
+const DROWNED_EYES = '#d8ffe8';
+
 export function hofFrames(): SpriteFrame[] {
   const frames: SpriteFrame[] = [];
+  for (const side of ['s', 'n', 'w'] as const) {
+    const d = (anim: string, i: number, raster: Raster): void => {
+      frames.push({ name: `enemy_drowned_${anim}_${side}_${String(i)}`, raster, ox: 16, oy: 30 });
+      if (side === 'w')
+        frames.push({ name: `enemy_drowned_${anim}_e_${String(i)}`, raster: flipX(raster), ox: 16, oy: 30 });
+    };
+    const eyes = DROWNED_EYES;
+    [22, 16, 10, 4].forEach((sink, i) => {
+      d('rise', i, sunk(DROWNED_LOOK, side, sink, eyes));
+    });
+    d('idle', 0, drawPerson(DROWNED_LOOK, side, 0, { eyes }));
+    d('sleep', 0, sunk(DROWNED_LOOK, side, 24, eyes));
+    for (let i = 0; i < 4; i++) d('walk', i, drawPerson(DROWNED_LOOK, side, i, { eyes }));
+    d('tell', 0, drawPerson(DROWNED_LOOK, side, 0, { eyes, arms: 'up' }));
+    d('tell', 1, drawPerson(DROWNED_LOOK, side, 1, { eyes, arms: 'up' }));
+    d('swing', 0, drawPerson(DROWNED_LOOK, side, 0, { eyes, arms: 'forward' }));
+    d('swing', 1, drawPerson(DROWNED_LOOK, side, 2, { eyes, arms: 'forward' }));
+    d('hurt', 0, drawPerson(DROWNED_LOOK, side, 2, { eyes }));
+  }
   for (let i = 0; i < 2; i++) {
     const side = gustSide(i);
     const up = gustUp(i);
@@ -126,7 +158,18 @@ export function hofFrames(): SpriteFrame[] {
 const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 const one = (frames: number, fps: number): AnimDef => ({ frames, fps, loop: true, dirs: ['s'] });
 
+const a = (frames: number, fps: number, loop = true): AnimDef => ({ frames, fps, loop, dirs: ALL });
+
 export const HOF_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
+  enemy_drowned: {
+    idle: a(1, 1),
+    hurt: a(1, 1),
+    walk: a(4, 4),
+    rise: a(4, 6, false),
+    sleep: a(1, 1),
+    tell: a(2, 6),
+    swing: a(2, 12, false),
+  },
   fx_vindr: { blow: { frames: 2, fps: 10, loop: true, dirs: ALL } },
   fix_fan: { off: one(1, 1), on: one(2, 12) },
   fix_sailraft: { idle: one(2, 3) },

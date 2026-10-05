@@ -42,6 +42,8 @@ export interface HeroCtx {
   readonly rollCooldown: number;
   /** Ask's feet are on open deep water, with the seal-skin to swim it. */
   readonly wet: boolean;
+  /** Ask's feet are under a sunken arch: a dive goes on until Ask is out from under it. */
+  readonly under: boolean;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -227,7 +229,7 @@ const dive: HeroDef = {
   },
   tick(e, c) {
     steer(e, c, c.tuning.hero.swimSpeed, true);
-    if (e.fsm.t < c.tuning.hero.diveTicks - 1) return undefined;
+    if (e.fsm.t < c.tuning.hero.diveTicks - 1 || c.under) return undefined;
     return c.wet ? 'swim' : 'move';
   },
   exit(e, c) {

@@ -275,6 +275,8 @@ export const FLAGS = {
   /** Embla's letters (one in M7, M8 and M9), and the first one's vessel found in Myrkviðr's glade. */
   q_letters: { t: 'int', max: 3 },
   st_letter1_found: { t: 'bool' },
+  /** Sökkva Hof's water level (M7b): 0 low, 1 the lower floors flooded, 2 the upper too. */
+  w_d5_level: { t: 'int', max: 2 },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

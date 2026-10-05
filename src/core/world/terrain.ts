@@ -27,6 +27,8 @@ export interface TerrainDef {
   readonly rise?: TerrainRise;
   /** Deep water a swimmer crosses (with the seal-skin): `buildCollision` marks it `DEEP`. */
   readonly swim?: boolean;
+  /** A sunken arch over deep water (M7b): a wall to a swimmer, passed under by a diver. */
+  readonly under?: boolean;
   /** A current that pushes a swimmer this way. */
   readonly current?: Dir4;
   /** A surge: it pushes harder than anyone swims, and passes over a diver. */

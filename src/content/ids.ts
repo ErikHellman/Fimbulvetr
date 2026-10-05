@@ -115,6 +115,7 @@ export const ENEMIES = [
   'tower_shield',
   'marbendill',
   'nykr_foal',
+  'drowned',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 

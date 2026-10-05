@@ -4,7 +4,7 @@ import { mem, type Entity } from '../../actors/entity';
 import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC, type Dir4 } from '../../math/dir';
 import { length, scale, type Vec } from '../../math/vec';
-import { DEEP, gridSolidAt, LOW, moveBox, speedAt, type SolidAt } from '../../world/collision';
+import { DEEP, gridSolidAt, LOW, moveBox, speedAt, UNDER, type SolidAt } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { coverSpeed } from './cover';
@@ -96,23 +96,33 @@ export function heroSolidAt(rt: SimRt): SolidAt {
     return dir === null ? false : neighbours[dir] === null;
   });
   if (!swimmer(rt)) return solid;
-  return (tx, ty) => !openWater(rt, tx, ty) && solid(tx, ty);
+  const diving = rt.hero.fsm.s === 'dive';
+  return (tx, ty) => !openWater(rt, tx, ty, diving) && solid(tx, ty);
 }
 
 const swimmer = (rt: SimRt): boolean => (rt.state.inv.items.sealskin ?? 0) > 0;
 
 /** Whether a tile is deep water nothing stands on (see `heroSolidAt`). */
-export function openWater(rt: SimRt, tx: number, ty: number): boolean {
+export function openWater(rt: SimRt, tx: number, ty: number, under = false): boolean {
   const g = rt.screen.collision;
   if (tx < 0 || ty < 0 || tx >= g.cols || ty >= g.rows) return false;
   const f = g.flags[ty * g.cols + tx] ?? 0;
-  return (f & DEEP) !== 0 && (f & LOW) !== 0;
+  return (f & DEEP) !== 0 && (f & LOW) !== 0 && (under || (f & UNDER) === 0);
+}
+
+/** Whether Ask's feet are under a sunken arch (a dive cannot end there). */
+export function underArch(rt: SimRt): boolean {
+  const g = rt.screen.collision;
+  const tx = Math.floor(rt.hero.pos.x / TILE);
+  const ty = Math.floor((rt.hero.pos.y - 1) / TILE);
+  if (tx < 0 || ty < 0 || tx >= g.cols || ty >= g.rows) return false;
+  return ((g.flags[ty * g.cols + tx] ?? 0) & UNDER) !== 0;
 }
 
 /** Whether Ask's feet are in open deep water with the seal-skin to swim it. */
 export function wet(rt: SimRt): boolean {
   if (!swimmer(rt)) return false;
-  return openWater(rt, Math.floor(rt.hero.pos.x / TILE), Math.floor((rt.hero.pos.y - 1) / TILE));
+  return openWater(rt, Math.floor(rt.hero.pos.x / TILE), Math.floor((rt.hero.pos.y - 1) / TILE), true);
 }
 
 /** The push of the current under a swimmer's feet (a diver passes under a surge). */

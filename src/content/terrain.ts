@@ -85,6 +85,10 @@ export const TERRAIN_IDS = [
   'surge_e',
   'surge_s',
   'surge_w',
+  /** Sökkva Hof (M7b): flagstone floors that flood at water level 1 or 2, and sunken arches over the deep. */
+  'hof_floor',
+  'hof_floor_hi',
+  'arch',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -235,4 +239,10 @@ export const TERRAIN = {
   surge_e: { solid: true, low: true, swim: true, current: 'e', strong: true },
   surge_s: { solid: true, low: true, swim: true, current: 's', strong: true },
   surge_w: { solid: true, low: true, swim: true, current: 'w', strong: true },
+  /** Sökkva Hof's floor: dry flagstones at low water, deep water (swum with the seal-skin) from level 1. */
+  hof_floor: { solid: false, swim: true, rise: { floods: 1 } },
+  /** A higher floor, flooded only at the top level (2). */
+  hof_floor_hi: { solid: false, swim: true, rise: { floods: 2 } },
+  /** A sunken arch over deep water: a wall to walkers and swimmers, passed under by a diver. */
+  arch: { solid: true, low: true, swim: true, under: true },
 } as const satisfies Record<TerrainId, TerrainDef>;

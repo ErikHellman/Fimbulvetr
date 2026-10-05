@@ -542,7 +542,40 @@ const SAEVATN = {
   surge_w: current('w', true),
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Sökkva Hof's drowned stone: green-grey flagstones that the water rises over, and arches over the deep. */
+const SOKKVA_HOF = {
+  hof_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#4a5a56', '#2a3634', v.variant);
+    },
+  },
+  hof_floor_hi: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#5e6e68', '#3a4844', v.variant);
+    },
+  },
+  arch: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.waterShade);
+      p.speckle(C.waterLight, 0.04);
+      // The lintel's dressed stones, with a dark gap of water showing beneath.
+      p.rect(0, 1, 16, 9, '#46545a');
+      p.rect(0, 1, 16, 1, '#6c7e84');
+      p.rect(5, 1, 1, 9, '#28323a');
+      p.rect(11, 1, 1, 9, '#28323a');
+      p.rect(0, 10, 16, 2, C.ink);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...SOKKVA_HOF,
   ...SAEVATN,
   ...NIFLMYRR,
   ...DEEP_WOOD,

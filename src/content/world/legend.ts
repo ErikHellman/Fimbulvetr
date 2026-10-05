@@ -90,6 +90,9 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '}': 'surge_e',
   ']': 'surge_s',
   '{': 'surge_w',
+  '@': 'hof_floor',
+  '!': 'hof_floor_hi',
+  '(': 'arch',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

@@ -12,6 +12,8 @@ export const LEDGE: Readonly<Record<Dir4, number>> = { n: 2, e: 4, s: 8, w: 16 }
 export const LOW = 32;
 /** Deep water a swimmer can cross (see `TerrainDef.swim`); it stays SOLID and LOW for everyone else. */
 export const DEEP = 64;
+/** A sunken arch over deep water (see `TerrainDef.under`): only a diver passes beneath it. */
+export const UNDER = 128;
 /** How far (px) a blocked mover is nudged sideways around a corner it only clips. */
 export const CORNER_SLIDE = 6;
 const EPS = 1e-6;
@@ -38,7 +40,8 @@ export function buildCollision(
       (def.solid || def.ledge !== undefined ? SOLID : 0) |
       (def.ledge ? LEDGE[def.ledge] : 0) |
       (def.low === true ? LOW : 0) |
-      (def.swim === true ? DEEP : 0);
+      (def.swim === true ? DEEP : 0) |
+      (def.under === true ? UNDER : 0);
     speed[i] = def.slow ?? 1;
   });
   return { cols: grid.cols, rows: grid.rows, flags, speed };
