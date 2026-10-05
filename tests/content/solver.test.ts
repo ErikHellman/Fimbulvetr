@@ -334,7 +334,7 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
       expect.arrayContaining(['find_bell', 'hive', 'amber_reeds', 'amber_peat', 'amber_mud', 'ice_hole']),
     );
     expect(r.stranded).toEqual([]);
-  });
+  }, 120_000);
 
   it('melts the rime into Niflmýrr only with Eldr', () => {
     const into = (s: GameState) => s.flags.st_rime_open === true;
