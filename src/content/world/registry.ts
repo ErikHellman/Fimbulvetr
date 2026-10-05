@@ -147,6 +147,18 @@ import { d5R21 } from './hof/d5_r21';
 import { d5R22 } from './hof/d5_r22';
 import { d5R23 } from './hof/d5_r23';
 import { d5R24 } from './hof/d5_r24';
+import { dvgChasm } from './dvergagrof/dvg_chasm';
+import { dvgCamp } from './dvergagrof/dvg_camp';
+import { dvgMinehead } from './dvergagrof/dvg_minehead';
+import { dvgVents } from './dvergagrof/dvg_vents';
+import { dvgForgegate } from './dvergagrof/dvg_forgegate';
+import { dvgScree } from './dvergagrof/dvg_scree';
+import { dvgLedges } from './dvergagrof/dvg_ledges';
+import { dvgSlag } from './dvergagrof/dvg_slag';
+import { dvgPeak } from './dvergagrof/dvg_peak';
+import { dvgAdit } from './dvergagrof/dvg_adit';
+import { dvgIntForge } from './dvergagrof/dvg_int_forge';
+
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
 import { d3R03 } from './konungshaugr/d3_r03';
@@ -372,4 +384,15 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d5_r22: d5R22,
   d5_r23: d5R23,
   d5_r24: d5R24,
+  dvg_chasm: dvgChasm,
+  dvg_camp: dvgCamp,
+  dvg_minehead: dvgMinehead,
+  dvg_vents: dvgVents,
+  dvg_forgegate: dvgForgegate,
+  dvg_scree: dvgScree,
+  dvg_ledges: dvgLedges,
+  dvg_slag: dvgSlag,
+  dvg_peak: dvgPeak,
+  dvg_adit: dvgAdit,
+  dvg_int_forge: dvgIntForge,
 };

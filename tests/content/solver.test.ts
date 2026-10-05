@@ -320,13 +320,14 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
     const within = SCREEN_IDS.filter((id) => DB.screens[id].dungeon !== 'd4');
     const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter', within });
     // Holmr's hall lies past the warm ring and the Norns' cave under a dive: the seal-skin (Hrafn's nights)
-    // has its own proofs (M7a).
+    // has its own proofs (M7a). Dvergagröf lies past the chasm, over the grapple (M8a, its own proofs).
     const lowland = SCREEN_IDS.filter(
       (id) =>
         DB.screens[id].dungeon === undefined &&
         !id.startsWith('test_') &&
         id !== 'ref_int_hall' &&
-        id !== 'sae_int_well',
+        id !== 'sae_int_well' &&
+        (id === 'dvg_chasm' || !id.startsWith('dvg_')),
     );
     for (const id of lowland) expect(r.screens, id).toContain(id);
     expect(r.scripts).toEqual(

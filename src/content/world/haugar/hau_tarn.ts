@@ -4,7 +4,7 @@ export const hauTarn: ScreenDef = {
   id: 'hau_tarn',
   region: 'haugar',
   purpose:
-    'A black tarn under the ridge. A piece of heart lies on the rock in its middle, in reach of the boomerang from the jetty (or on foot over winter ice).',
+    'A black tarn under the ridge. A piece of heart lies on the rock in its middle, in reach of the boomerang from the jetty (or on foot over winter ice). East, the moor runs out to the chasm before Dvergagröf (M8).',
   things: [{ k: 'piece', id: 'hp_hau_tarn', at: { x: 18, y: 13 } }],
   /** Where Haugar's spawn table may put foes (see content/spawns.ts). */
   spawns: [
@@ -22,10 +22,10 @@ export const hauTarn: ScreenDef = {
     ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,EEEEE#',
     ',,,,,,EEEEEEEEEEEE~EEEEEEEEEEEEEE,EEEEE#',
     ',,,,,,EEEEEE~~~~~~~~~~~~~EEEEEEEE,EEEEE#',
-    '#EEEEEEEEE~~~~~~~~~~~~~~~~~yEEEEE,EEEEE#',
-    '#EEEEEEEEy~~~~~~~~~~~~~~~~~~EEEEE,EEEEE#',
-    '#EEEEEEE~~~~~~~~~~~~~~~~~~~~~EEEE,EEEEE#',
-    '#EEETEEE~~~~~~~~~~~~~~~~~~~~~EEEE,EETEE#',
+    '#EEEEEEEEE~~~~~~~~~~~~~~~~~yEEEEE,EEEEEE',
+    '#EEEEEEEEy~~~~~~~~~~~~~~~~~~EEEEE,EEEEEE',
+    '#EEEEEEE~~~~~~~~~~~~~~~~~~~~~EEEE,EEEEEE',
+    '#EEETEEE~~~~~~~~~~~~~~~~~~~~~EEEE,EETEEE',
     '#EEEEEE~~~~~~~~~~~n~~~~~~~~~~~EEE,EEEEE#',
     '#EEEEEEE~~~~~~~~~~~~~~~~~~~~~EEEE,EEEEE#',
     '#EEEEEEE~~~~~~~~~~~~~~~~~~~~~yEEE,EEEEE#',

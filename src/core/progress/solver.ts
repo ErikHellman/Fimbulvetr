@@ -311,7 +311,13 @@ function bridgeTiles(w: World, state: GameState): Set<number> {
         const x = i % SCREEN_COLS;
         const y = Math.floor(i / SCREEN_COLS);
         // Ís never ices a screen's outer ring (see `freezeAround`); it crusts lava as it ices water.
-        if ((cell === 'water' || w.db.terrain[cell].lava === true) && x > 0 && y > 0 && x < SCREEN_COLS - 1 && y < SCREEN_ROWS - 1)
+        if (
+          (cell === 'water' || w.db.terrain[cell].lava === true) &&
+          x > 0 &&
+          y > 0 &&
+          x < SCREEN_COLS - 1 &&
+          y < SCREEN_ROWS - 1
+        )
           out.add(w.tile(id, x, y));
       });
     }

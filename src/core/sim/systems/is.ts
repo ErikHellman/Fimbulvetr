@@ -8,6 +8,7 @@ import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { stampCollision } from './fixtures';
 import { enemyDef } from './movement';
+import { killEnemy } from './combat';
 
 /** The bolt's box around its ground point; it is drawn `FLY_Z` px up, at hand height. */
 const BOX = { x: -5, y: -10, w: 10, h: 10 } as const;
@@ -157,10 +158,17 @@ export function stepCrust(rt: SimRt): void {
 
 /**
  * Freezes a foe where it stands for `Tuning.is.freeze` ticks: it neither moves nor strikes, and the next
- * blow shatters the ice for double damage. Bosses shake it off.
+ * blow shatters the ice for double damage. Bosses shake it off; a foe weak to ice is put out.
  */
 export function freezeFoe(rt: SimRt, foe: Entity): boolean {
-  if (enemyDef(rt, foe).boss !== undefined) {
+  const def = enemyDef(rt, foe);
+  if (def.weak?.includes('ice') === true) {
+    // A thing of fire (an ember sprite) is put out at once.
+    killEnemy(rt, foe, def);
+    rt.emit({ t: 'sfx', id: 'sfx_sizzle' });
+    return true;
+  }
+  if (def.boss !== undefined) {
     rt.emit({ t: 'sfx', id: 'sfx_block' });
     return false;
   }

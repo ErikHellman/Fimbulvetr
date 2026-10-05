@@ -119,6 +119,8 @@ export const ENEMIES = [
   'hronn',
   'hronn_grate',
   'nykr',
+  'jarnvordr',
+  'glod',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -395,6 +397,7 @@ export const SCRIPTS = [
   'shop_hreggvidr',
   'war_table',
   'letter1_box',
+  'dvg_arrive',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

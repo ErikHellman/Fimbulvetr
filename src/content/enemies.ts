@@ -937,4 +937,71 @@ export const ENEMY_DEFS = {
     solid: false,
     guard: true,
   },
+  /**
+   * An iron warden of Dvergagröf (M8): a dwarf-wrought construct that wakes as Ask comes near, plods
+   * after Ask, raises its fists (500 ms) and brings them down. Its plates turn every blade until a
+   * blast (or the hammer) cracks them; then the sword bites.
+   */
+  jarnvordr: {
+    id: 'jarnvordr',
+    art: 'enemy_jarnvordr',
+    hp: 12,
+    body: { x: -7, y: -8, w: 14, h: 8 },
+    hurt: { x: -9, y: -28, w: 18, h: 28 },
+    behaviour: 'draugr',
+    knockResist: 0.8,
+    immortal: false,
+    solid: false,
+    guard: true,
+    cracks: 'force',
+    needs: ['bombs'],
+    touch: { amount: 1, knock: 2, tags: 0 },
+    attacks: {
+      swing: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -28, w: 24, h: 28 },
+          w: { x: -24, y: -28, w: 24, h: 28 },
+          s: { x: -12, y: -12, w: 24, h: 24 },
+          n: { x: -12, y: -38, w: 24, h: 26 },
+        },
+        amount: 4,
+        knock: 5,
+        tags: HEAVY,
+      },
+    },
+    stunnable: 60,
+    drops: { heart: 2, silver: 3, bombs: 3, none: 2 },
+  },
+  /**
+   * An ember sprite of the vents and forges (M8): it drifts toward Ask, flares (400 ms) and darts. Ís
+   * puts it out at once.
+   */
+  glod: {
+    id: 'glod',
+    art: 'enemy_glod',
+    hp: 2,
+    body: { x: -4, y: -4, w: 8, h: 4 },
+    hurt: { x: -7, y: -20, w: 14, h: 14 },
+    behaviour: 'myrljos',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    glow: 40,
+    weak: ['ice'],
+    attacks: {
+      dart: {
+        from: 0,
+        to: 19,
+        boxes: around({ x: -7, y: -18, w: 14, h: 14 }),
+        amount: 2,
+        knock: 3,
+        tags: 0,
+      },
+    },
+    stunnable: 90,
+    drops: { heart: 1, silver: 1, seidr: 2, none: 3 },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;

@@ -19,6 +19,7 @@ import { NIFLMYRR_ANIMS, niflmyrrFrames } from './niflmyrr';
 import { HELGRIND_ANIMS, helgrindFrames } from './helgrind';
 import { SAEVATN_ANIMS, saevatnFrames } from './saevatn';
 import { HOF_ANIMS, hofFrames } from './hof';
+import { FORGE_ANIMS, forgeFrames } from './forge';
 
 export type { SpriteFrame } from './types';
 
@@ -43,6 +44,7 @@ export const ANIMS: AnimTable = {
   ...HELGRIND_ANIMS,
   ...SAEVATN_ANIMS,
   ...HOF_ANIMS,
+  ...FORGE_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -65,6 +67,7 @@ export function buildSprites(): SpriteFrame[] {
     ...helgrindFrames(),
     ...saevatnFrames(),
     ...hofFrames(),
+    ...forgeFrames(),
     missingFrame(),
   ];
 }

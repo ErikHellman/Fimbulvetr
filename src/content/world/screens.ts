@@ -185,6 +185,17 @@ export const SCREEN_IDS = [
   'd5_r22',
   'd5_r23',
   'd5_r24',
+  'dvg_chasm',
+  'dvg_camp',
+  'dvg_minehead',
+  'dvg_vents',
+  'dvg_forgegate',
+  'dvg_scree',
+  'dvg_ledges',
+  'dvg_slag',
+  'dvg_peak',
+  'dvg_adit',
+  'dvg_int_forge',
 ] as const;
 export type ScreenId = (typeof SCREEN_IDS)[number];
 

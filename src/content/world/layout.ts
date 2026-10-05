@@ -76,6 +76,16 @@ export const WORLD_LAYOUT: WorldLayout = {
     ask_hof: [6, 10],
     ask_field: [4, 11],
     ask_brook: [5, 11],
+    dvg_ledges: [9, 2],
+    dvg_slag: [10, 2],
+    dvg_peak: [11, 2],
+    dvg_scree: [9, 3],
+    dvg_minehead: [10, 3],
+    dvg_forgegate: [11, 3],
+    dvg_chasm: [9, 4],
+    dvg_camp: [10, 4],
+    dvg_vents: [11, 4],
+    dvg_adit: [9, 5],
   },
   dungeons: {
     /** Rótarhellir, under Yggdrasil's roots in Myrkviðr: entered from myr_roots into d1_r01. */

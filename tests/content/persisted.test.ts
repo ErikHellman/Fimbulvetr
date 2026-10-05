@@ -163,6 +163,16 @@ const PERSISTED = [
   'myr_c_thread',
   'myl_c_thread',
   'hau_c_thread',
+  // M8a Dvergagröf.
+  'dvg_k_cavein',
+  'dvg_c_vents',
+  'dvg_k_ore1',
+  'dvg_c_ore1',
+  'dvg_k_ore2',
+  'dvg_c_ore2',
+  'dvg_c_peak',
+  'dvg_k_ore3',
+  'dvg_c_ore3',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */
