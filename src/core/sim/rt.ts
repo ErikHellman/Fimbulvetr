@@ -98,6 +98,9 @@ export interface SimRt {
   /** Heat on Ask from hot rooms, in ticks, and ticks spent burning at full heat (undefined at 0). */
   heatTicks?: number;
   burnTicks?: number;
+  /** Cold on Ask from the killing frost, in ticks, and ticks spent freezing at full cold (undefined at 0). */
+  coldTicks?: number;
+  freezeTicks?: number;
   /** Ís crust on lava (tile index → ticks left), on this screen only (undefined when none). */
   crust?: Map<number, number>;
   /** An escort under way (undefined when none). */

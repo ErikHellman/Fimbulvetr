@@ -37,6 +37,8 @@ export interface TerrainDef {
   readonly belt?: Dir4;
   /** Molten rock (M8): no footing; Ís crusts it over for a while (see systems/is.ts). */
   readonly lava?: boolean;
+  /** Glacier ice (M9): a step onto it slides on until a wall or the ice's edge (see systems/glaze.ts). */
+  readonly glaze?: boolean;
 }
 
 /** How a terrain answers the water level: flooded from level `floods` up, or afloat from `floats` up. */

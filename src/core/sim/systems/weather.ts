@@ -3,7 +3,7 @@ import type { RegionId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { WeatherKind } from '../../clock/types';
 import { weatherAt, windAt } from '../../clock/weather';
-import type { Vec } from '../../math/vec';
+import { normalize, scale, type Vec } from '../../math/vec';
 import { evalCond } from '../../story/cond';
 import type { SimRt } from '../rt';
 
@@ -55,4 +55,18 @@ export function raining(rt: SimRt): boolean {
 /** Whether the current screen lies in a region whose fog never lifts (Niflmýrr). */
 export function misty(rt: SimRt): boolean {
   return rt.db.clock.misty?.includes(rt.db.screens[rt.screen.id].region) === true;
+}
+
+/** A blizzard over the current screen (M9): a snow sky, outdoors, in a region whose snow comes so. */
+export function blizzard(rt: SimRt): boolean {
+  if (!outdoors(rt)) return false;
+  return rt.db.clock.blizzard?.includes(rt.db.screens[rt.screen.id].region) === true && skyOf(rt) === 'snow';
+}
+
+/** A blizzard's push on Ask (M9): `Tuning.hero.gust` px a tick along the wind; none on a slide or swim. */
+export function gustPush(rt: SimRt): Vec | null {
+  if (!blizzard(rt)) return null;
+  const w = windOf(rt);
+  if (w.x === 0 && w.y === 0) return null;
+  return scale(normalize(w), rt.db.tuning.hero.gust);
 }

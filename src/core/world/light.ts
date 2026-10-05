@@ -29,6 +29,9 @@ export const FOG_RADIUS = 80;
 export const LANTERN_FOG_RADIUS = 112;
 /** In a fog room (Helgrind) only a small circle round Ask is clear, or the lantern's own light. */
 export const FOG_ROOM_RADIUS = 32;
+/** A blizzard's white veil (M9): a little thinner and wider than fog; the lantern does not help. */
+export const BLIZZARD_THICK = 0.7;
+export const BLIZZARD_RADIUS = 96;
 export const FIRE_RADIUS = 28;
 /** An awake warp stone's faint glow. */
 export const WARP_RADIUS = 28;

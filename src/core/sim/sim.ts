@@ -18,6 +18,8 @@ import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
 import {
   FIRE_RADIUS,
+  BLIZZARD_RADIUS,
+  BLIZZARD_THICK,
   FOG_RADIUS,
   FOG_ROOM_RADIUS,
   LANTERN_FOG_RADIUS,
@@ -65,11 +67,11 @@ import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from '
 import { tickTimers } from './systems/timers';
 import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
-import { heatMax, stepHeat } from './systems/heat';
+import { heatMax, stepCold, stepHeat } from './systems/heat';
 import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
-import { misty, outdoors, skyOf, windOf } from './systems/weather';
+import { blizzard, misty, outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
   checkEdges,
@@ -121,6 +123,8 @@ export class Sim implements SimRt {
   sand?: Trial;
   heatTicks?: number;
   burnTicks?: number;
+  coldTicks?: number;
+  freezeTicks?: number;
   crust?: Map<number, number>;
   escort?: Escort;
   tick = 0;
@@ -247,8 +251,10 @@ export class Sim implements SimRt {
       misty: misty(this),
       fogRoom,
     });
-    // Ljós burns the fog away while it lasts.
-    if (amount === 0 || ljosBurns(this)) return { amount: 0, r: 0 };
+    // Ljós burns the fog away while it lasts (a blizzard's veil too).
+    if (ljosBurns(this)) return { amount: 0, r: 0 };
+    if (amount === 0)
+      return blizzard(this) ? { amount: BLIZZARD_THICK, r: BLIZZARD_RADIUS } : { amount: 0, r: 0 };
     const lantern = (this.state.inv.items.lantern ?? 0) > 0;
     if (fogRoom) return { amount, r: lantern ? LANTERN_RADIUS : FOG_ROOM_RADIUS };
     return { amount, r: lantern ? LANTERN_FOG_RADIUS : FOG_RADIUS };
@@ -273,6 +279,16 @@ export class Sim implements SimRt {
   /** Heat on Ask for the HUD's bar (M8), or null while there is none. */
   heat(): { readonly now: number; readonly max: number } | null {
     return this.heatTicks === undefined ? null : { now: this.heatTicks, max: heatMax(this) };
+  }
+
+  /** Whether a blizzard blows over the current screen (M9): the view draws its white veil. */
+  blizzard(): boolean {
+    return blizzard(this);
+  }
+
+  /** The killing frost on Ask (M9), for the HUD's frost bar; null when Ask is warm. */
+  cold(): { readonly now: number; readonly max: number } | null {
+    return this.coldTicks === undefined ? null : { now: this.coldTicks, max: this.db.tuning.hero.cold };
   }
 
   /** The escorted NPC's health for the HUD (M8), or null while nobody walks with Ask. */
@@ -356,6 +372,8 @@ export class Sim implements SimRt {
         sand: this.sand,
         heat: this.heatTicks,
         burn: this.burnTicks,
+        cold: this.coldTicks,
+        freeze: this.freezeTicks,
         crust: this.crust === undefined ? undefined : [...this.crust],
         escort: this.escort,
         fire: fireKey(this),
@@ -447,6 +465,7 @@ export class Sim implements SimRt {
     fixtureHazards(this);
     stepFire(this);
     stepHeat(this);
+    stepCold(this);
     stepCrust(this);
     checkDeath(this);
     if (this.mode === 'over') return;

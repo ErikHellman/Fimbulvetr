@@ -328,6 +328,8 @@ export interface ScreenDef {
   readonly water?: FlagId;
   /** A forge room or vent field (M8): heat builds on Ask while Ask is here (see systems/heat.ts). */
   readonly hot?: true;
+  /** Under Hrímfjöll's killing frost (M9): cold builds on Ask here unless Ask wears the ember byrnie. */
+  readonly cold?: true;
   /** A lever's flag that turns every conveyor belt on the screen the other way while it is set. */
   readonly belts?: { readonly flag: FlagId };
 }

@@ -202,6 +202,10 @@ export const SFX = [
   'sfx_quake',
   'sfx_sizzle',
   'sfx_bellows',
+  'sfx_frost',
+  'sfx_slide',
+  'sfx_glass',
+  'sfx_mirror',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 

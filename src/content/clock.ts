@@ -21,6 +21,15 @@ export const CLOCK_RULES: ClockRules = {
       winter: { clear: 40, wind: 10, snow: 50 },
       spring: { clear: 70, wind: 30 },
     },
+    /** Always winter on the mountain: half its days are blizzards. */
+    hrimfjoll: {
+      summer: { clear: 35, wind: 15, snow: 50 },
+      autumn: { clear: 35, wind: 15, snow: 50 },
+      winter: { clear: 35, wind: 15, snow: 50 },
+      spring: { clear: 35, wind: 15, snow: 50 },
+    },
   },
   misty: ['niflmyrr'],
+  /** Hrímfjöll's snow comes as blizzards (M9). */
+  blizzard: ['hrimfjoll'],
 };

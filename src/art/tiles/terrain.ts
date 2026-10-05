@@ -652,7 +652,62 @@ const DVERGAGROF = {
   belt_w: belt('w'),
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Hrímfjöll's firn, glaze and rime cliffs, and Hrímturn's frosted glass (M9). */
+const HRIMFJOLL = {
+  firn: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#e4ecf2');
+      p.speckle('#c8d6e2', 0.18);
+      p.speckle('#ffffff', 0.08);
+      p.rect(nextInt(p.rng, 0, 10), nextInt(p.rng, 2, 13), 5, 1, '#d2dee8');
+    },
+  },
+  glaze: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      p.fill('#9cc8e4');
+      p.speckle('#b8dcf0', 0.12);
+      // Long glints across the ice, so a slide reads before it starts.
+      p.rect(1 + v.variant * 4, 3, 7, 1, '#e8f6ff');
+      p.rect(8 - v.variant * 3, 10, 6, 1, '#d4ecfa');
+      p.rect(0, 15, 16, 1, '#86b4d4');
+    },
+  },
+  rime: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#5e7e9c');
+      p.speckle('#7898b6', 0.25);
+      p.speckle('#c8dcec', 0.05);
+      p.rect(0, 12, 16, 4, '#46627e');
+    },
+  },
+  tower_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#b4c8da', '#90a8c0', v.variant);
+      p.speckle('#e0eef8', 0.06);
+    },
+  },
+  tower_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#3e5672');
+      p.speckle('#567090', 0.25);
+      p.rect(0, 12, 16, 4, '#2c3e56');
+      p.rect(3, 2, 1, 8, '#8eaecc');
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...HRIMFJOLL,
   ...DVERGAGROF,
   ...SOKKVA_HOF,
   ...SAEVATN,

@@ -22,4 +22,6 @@ export interface ClockRules {
   >;
   /** Regions where the fog never lifts outdoors, whatever the sky (Niflmýrr). */
   readonly misty?: readonly RegionId[];
+  /** Regions where a snow sky is a blizzard (M9): a white veil, and a wind that pushes Ask. */
+  readonly blizzard?: readonly RegionId[];
 }

@@ -125,6 +125,9 @@ class World {
   readonly span: number;
   /** The water level flag the search turns wheels on, when searching levels (null otherwise). */
   readonly water: FlagId | null;
+  /** Glaze tiles (M9), where a step slides on; and the screens under the killing frost. */
+  readonly glazed = new Set<number>();
+  readonly cold = new Set<ScreenId>();
 
   constructor(
     readonly db: ContentDb,
@@ -142,6 +145,12 @@ class World {
     const flags = new Set(this.ids.flatMap((id) => db.screens[id].water ?? []));
     if (levels && flags.size > 1) throw new Error('solver: one water level flag at a time');
     this.water = levels ? ([...flags][0] ?? null) : null;
+    this.grids.forEach((g, i) => {
+      g.cells.forEach((cell, c) => {
+        if (db.terrain[cell].glaze === true) this.glazed.add(i * 1024 + c);
+      });
+    });
+    for (const id of this.ids) if (db.screens[id].cold === true) this.cold.add(id);
   }
 
   has(id: ScreenId): boolean {
@@ -286,6 +295,8 @@ interface Ground {
   readonly open: ReadonlySet<number>;
   /** The seal-skin is held: dive doors can be taken (walking on Ís over one never does). */
   readonly dives: boolean;
+  /** Warm armour is worn (the ember byrnie): screens under the killing frost can be crossed (M9). */
+  readonly warm: boolean;
 }
 
 function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null): Ground {
@@ -293,6 +304,7 @@ function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null)
     blocked: blockedTiles(w, state, reach),
     open: bridgeTiles(w, state),
     dives: has(state, 'sealskin'),
+    warm: w.db.tuning.armor[state.inv.armor].warm === true,
   };
 }
 
@@ -588,6 +600,7 @@ function flood(w: World, state: GameState, origin: number): Set<number> {
 function walkable(w: World, ground: Ground, id: ScreenId, x: number, y: number, level: number): boolean {
   const tr = w.terrain(id, x, y, level);
   if (tr === null) return false;
+  if (!ground.warm && w.cold.has(id)) return false;
   const tile = w.tile(id, x, y);
   return (!tr.solid || ground.open.has(tile)) && !ground.blocked.has(tile);
 }
@@ -609,7 +622,7 @@ function steps(w: World, t: number, ground: Ground, level: number): number[] {
       continue;
     }
     if (walkable(w, ground, id, nx, ny, level)) {
-      out.push(w.tile(id, nx, ny));
+      out.push(slideEnd(w, ground, id, x, y, dir, level));
       continue;
     }
     // A ledge facing this way is hopped: land on the far side.
@@ -626,6 +639,38 @@ function steps(w: World, t: number, ground: Ground, level: number): number[] {
     )
       out.push(w.tile(thing.to, thing.arrive.x, thing.arrive.y));
   return out;
+}
+
+/**
+ * Where a step from (x, y) to its neighbour `dir` ends (M9): on the neighbour, unless the step is onto
+ * glaze or along it, when Ask slides on until the next tile is unwalkable (stopping on the last glaze tile)
+ * or is not glaze (stopping on it). Slides never cross a screen's edge.
+ */
+function slideEnd(
+  w: World,
+  ground: Ground,
+  id: ScreenId,
+  x: number,
+  y: number,
+  dir: Dir4,
+  level: number,
+): number {
+  const d = DIR_VEC[dir];
+  let cx = x + d.x;
+  let cy = y + d.y;
+  const next = w.tile(id, cx, cy);
+  if (!w.glazed.has(next)) return next;
+  const glazed = (tx: number, ty: number): boolean => w.glazed.has(w.tile(id, tx, ty));
+  for (;;) {
+    const nx = cx + d.x;
+    const ny = cy + d.y;
+    if (nx < 0 || ny < 0 || nx >= SCREEN_COLS || ny >= SCREEN_ROWS) break;
+    if (!walkable(w, ground, id, nx, ny, level)) break;
+    cx = nx;
+    cy = ny;
+    if (!glazed(cx, cy)) break;
+  }
+  return w.tile(id, cx, cy);
 }
 
 const has = (state: GameState, item: ItemId): boolean => (state.inv.items[item] ?? 0) > 0;
