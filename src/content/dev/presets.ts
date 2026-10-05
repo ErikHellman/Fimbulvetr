@@ -697,6 +697,66 @@ export const DEV_PRESETS = {
     hp: 36,
   },
   /**
+   * In Sökkva Hof's hub before the great door, as the M7b route stands there: Embla found, Hrönn dead, Vindr
+   * learned, the second key unspent and the great key carried, the water at the top level, ten hearts.
+   */
+  hof: {
+    ...FIMBUL,
+    screen: 'd5_r13',
+    tile: [19, 3],
+    facing: 'n',
+    minute: 23 * 60,
+    silver: 20,
+    items: { ...FIMBUL.items, stave_is: 3, grapple: 1, sealskin: 1, mead_green: 1, ore: 8 },
+    slots: ['grapple', 'bombs'],
+    galdr: ['vindr', 'eldr', 'farvegr', 'bragd', 'hlif', 'ljos', 'is'],
+    flags: {
+      ...AFTER_RIME,
+      st_d4_entered: true,
+      st_d4_garmr: true,
+      st_d4_boss_dead: true,
+      st_thane_nastrond: true,
+      st_freed_ulf: true,
+      st_freed_tofa: true,
+      q_thanes: 1,
+      q_captives: 2,
+      q_trade: 5,
+      n_hrafn_met: true,
+      q_sealskin_asked: true,
+      q_seal_nights: 3,
+      q_sealskin_done: true,
+      st_embla_found: true,
+      q_letters: 1,
+      st_d5_entered: true,
+      st_d5_hronn: true,
+      w_d5_r14: true,
+      w_d5_level: 2,
+    },
+    maxHp: 40,
+    hp: 40,
+    opened: [
+      ...FIMBUL.opened,
+      'd5_c_key1',
+      'd5_c_key2',
+      'd5_c_key3',
+      'd5_c_map',
+      'd5_c_compass',
+      'd5_c_vindr',
+      'd5_c_r05',
+      'd5_c_bigkey',
+    ],
+    dungeons: {
+      ...FIMBUL.dungeons,
+      d5: {
+        keys: 1,
+        bigKey: true,
+        map: true,
+        compass: true,
+        doors: ['d5_lock_a', 'd5_lock_b', 'd5_sh_r11n'],
+      },
+    },
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

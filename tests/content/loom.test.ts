@@ -11,7 +11,7 @@ const cell = (id: ScreenId, x: number, y: number): string | undefined => {
 
 const threads = SCREEN_IDS.flatMap((id) =>
   SCREENS[id].things.flatMap((t) =>
-    t.k === 'chest' && t.gives.item === 'norn_thread' ? [[id, t] as const] : [],
+    t.k === 'chest' && 'item' in t.gives && t.gives.item === 'norn_thread' ? [[id, t] as const] : [],
   ),
 );
 

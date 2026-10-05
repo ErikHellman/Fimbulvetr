@@ -61,11 +61,12 @@ function burst(rt: SimRt, e: Entity): void {
 
 /**
  * Melts the drifts and ice in the 3×3 tiles around a tile (never under anyone's feet, so nobody ends up
- * inside the water). Returns whether anything melted.
+ * inside the water; fixtures do not count). Returns whether anything melted.
  */
 export function meltAround(rt: SimRt, tx: number, ty: number): boolean {
   const g = rt.screen.cover;
-  const feet = [rt.hero, ...rt.actors].map((a) => at(a.body, a.pos));
+  // Fixtures (a dive door's ripple, a raft) stand in the water already: only those who walk keep their ice.
+  const feet = [rt.hero, ...rt.actors.filter((a) => a.kind !== 'fixture')].map((a) => at(a.body, a.pos));
   let melted = false;
   for (let y = ty - 1; y <= ty + 1; y++)
     for (let x = tx - 1; x <= tx + 1; x++) {

@@ -317,6 +317,8 @@ export function hofFrames(): SpriteFrame[] {
     d('hurt', 0, drawPerson(DROWNED_LOOK, side, 2, { eyes }));
   }
   const poses: readonly [string, HorsePose, number][] = [
+    // `idle` is the pose it spawns in, for the tick before it rises.
+    ['idle', 'rise', 0],
     ['rise', 'rise', 0],
     ['swim', 'swim', 0],
     ['swim', 'swim', 1],
@@ -341,10 +343,18 @@ export function hofFrames(): SpriteFrame[] {
     );
   }
   for (const dir of ALL) {
-    for (const pose of ['under', 'tell', 'bite', 'sink', 'stunned'] as const) {
+    // `idle` (under its grate) is the pose it spawns in, for the tick before it wakes.
+    for (const [name, pose] of [
+      ['idle', 'under'],
+      ['under', 'under'],
+      ['tell', 'tell'],
+      ['bite', 'bite'],
+      ['sink', 'sink'],
+      ['stunned', 'stunned'],
+    ] as const) {
       const raster = eel(pose);
       frames.push({
-        name: `enemy_hronn_${pose}_${dir}_0`,
+        name: `enemy_hronn_${name}_${dir}_0`,
         raster: dir === 'e' ? flipX(raster) : raster,
         ox: 24,
         oy: 44,
@@ -398,6 +408,7 @@ export const HOF_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>
     swing: a(2, 12, false),
   },
   enemy_nykr: {
+    idle: a(1, 1),
     rise: a(1, 1),
     swim: a(2, 4),
     rear: a(1, 1),
@@ -406,7 +417,14 @@ export const HOF_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>
     charge: a(1, 1),
     whirl: a(2, 8),
   },
-  enemy_hronn: { under: a(1, 1), tell: a(1, 1), bite: a(1, 1), sink: a(1, 1), stunned: a(1, 1) },
+  enemy_hronn: {
+    idle: a(1, 1),
+    under: a(1, 1),
+    tell: a(1, 1),
+    bite: a(1, 1),
+    sink: a(1, 1),
+    stunned: a(1, 1),
+  },
   enemy_hronn_grate: { idle: a(1, 1), bubble: a(2, 6) },
   fx_vindr: { blow: { frames: 2, fps: 10, loop: true, dirs: ALL } },
   fix_skiff: { idle: one(1, 1) },

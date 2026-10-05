@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DB } from '@content/index';
 import type { ContentDb } from '@core/sim/db';
+import { SOLID } from '@core/world/collision';
 import { Harness, frameOf } from './harness';
 
 /**
@@ -53,5 +54,15 @@ describe('dive doors', () => {
     h.until((s) => s.hero.pos.x > 14 * 16 + 4, 200, frameOf(['right']));
     h.step(frameOf(['right'], ['roll']));
     h.until((s) => s.screen.id === 'test_b', 200, frameOf(['right']));
+  });
+
+  it('lie under the winter ice until Eldr melts it, ripple and all', () => {
+    const h = new Harness({ db: lake(), tile: [13, 10], facing: 'e', season: 'winter' });
+    h.sim.state.inv.galdr = ['eldr'];
+    h.idle(2);
+    const solid = (x: number) => ((h.sim.screen.collision.flags[10 * 40 + x] ?? 0) & SOLID) !== 0;
+    expect(solid(15)).toBe(false);
+    h.press(['galdr']).idle(30);
+    expect(solid(15)).toBe(true);
   });
 });

@@ -143,4 +143,9 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Embla's first letter, new lowland lines, solver proofs, route, e2e, v1-m7a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M7b Sökkva Hof (D5) — Part 2
+    - [x] Vindr: the gust, fans and sails; flooded rooms, sunken arches and the drowned
+    - [x] Sökkva Hof's 24 rooms, Hrönn and Nykr; Oddr and Hallbera home
+    - [x] The Norns' loom, the three threads and turning the season at a hof
+    - [x] Solver proofs, route, e2e, v1-m7b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
