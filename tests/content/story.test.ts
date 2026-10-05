@@ -45,7 +45,8 @@ const CONTENT = {
  * Flags read now and set by a later milestone's content: the rime beyond the pass melts in M6; Sökkva Hof
  * is entered and Nykr killed in M7b (`q_holmr` names both).
  */
-const SET_LATER = new Set(['st_rime_open', 'st_d5_entered', 'st_thane_nykr']);
+// Set by content still to come: Ívaldi's Forge (M8b).
+const SET_LATER = new Set(['st_rime_open', 'st_d5_entered', 'st_thane_nykr', 'st_d6_entered', 'st_d6_belgr']);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {

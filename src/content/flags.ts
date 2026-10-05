@@ -304,6 +304,9 @@ export const FLAGS = {
   q_foreman: { t: 'int', max: 5 },
   /** Embla's second letter followed to the cairn on Haugar's tarn (M8a). */
   st_letter2_found: { t: 'bool' },
+  /** Ívaldi's Forge (D6) entered, and Belgr its mini-boss broken (M8b): his iron heart lets Sindri forge the dwarf blade. */
+  st_d6_entered: { t: 'bool' },
+  st_d6_belgr: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

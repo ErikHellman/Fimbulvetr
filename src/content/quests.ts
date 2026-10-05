@@ -931,6 +931,13 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Förmannen Dvalinn säger att Ívaldis smedja har ätit upp allt dvärgarnas krut. Dess stora port ligger öster om gruvmynningen.',
         },
       },
+      {
+        when: flag('st_d6_entered'),
+        text: {
+          en: 'Inside Ívaldi’s Forge the air shakes with heat, and the floors run like rivers.',
+          sv: 'Inne i Ívaldis smedja dallrar luften av hetta, och golven rinner som floder.',
+        },
+      },
     ],
   },
   q_holmr: {

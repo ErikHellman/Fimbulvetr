@@ -150,5 +150,11 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [ ] User playtest and Swedish proofread
 - [ ] M8 Dvergagröf + D6 — brief: `docs/briefs/m8.md`, plan: `docs/superpowers/plans/2026-10-05-m8.md`
   - [ ] M8a Dvergagröf — Part 1
+    - [x] Heat, conveyor belts, lava and the Ís crust
+    - [x] Dvergagröf's 10 screens, the iron warden and the ember sprite, the mines and the smithy
+    - [x] The escort: Hekla through the old workings; Dvalinn's chain and the cart road to Uppvík
+    - [x] Sindri's forge for ore; trading step 6; Embla's second letter and the tarn's cairn
+    - [x] Solver proofs, route, e2e, v1-m8a fixture, docs
+    - [ ] User playtest and Swedish proofread
   - [ ] M8b Ívaldi's Forge (D6) — Part 2
 - [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

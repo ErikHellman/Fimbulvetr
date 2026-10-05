@@ -9,12 +9,12 @@ export const dvgIntMine1: ScreenDef = {
   things: [
     { k: 'door', at: { x: 20, y: 20 }, dir: 's', to: 'dvg_minehead', arrive: { x: 20, y: 5 }, facing: 's' },
     { k: 'door', at: { x: 6, y: 1 }, dir: 'n', to: 'dvg_int_mine2', arrive: { x: 34, y: 19 }, facing: 'n' },
-    /** Past the fall for the first time: the way is open (`q_foreman` 2). */
+    /** Past the fall and on along the gallery for the first time: the way is open (`q_foreman` 2). */
     {
       k: 'trigger',
-      at: { x: 17, y: 16 },
-      w: 7,
-      h: 4,
+      at: { x: 14, y: 15 },
+      w: 1,
+      h: 6,
       script: 'dvg_mine_open',
       when: { k: 'flag', id: 'q_foreman', lt: 2 },
     },

@@ -21,13 +21,13 @@ import { crossTo, face, fightNear, finishStory, heroTile, talkTo, walkFighting, 
 
 const KEY: Readonly<Record<Dir4, Action>> = { n: 'up', s: 'down', e: 'right', w: 'left' };
 
-function alive(h: Harness): void {
+export function alive(h: Harness): void {
   expect(h.sim.mode, `fell on ${h.sim.screen.id}`).not.toBe('over');
   h.expectAnims();
 }
 
 /** Drinks the red mead from the menu's action when health runs low (the walker cannot open menus). */
-function drinkIfLow(h: Harness): void {
+export function drinkIfLow(h: Harness): void {
   if (h.sim.hero.hp <= 12 && (h.sim.state.inv.items.mead_red ?? 0) > 0) {
     h.sim.command({ t: 'eat', item: 'mead_red' });
     h.idle(1);
@@ -43,7 +43,7 @@ function topUp(h: Harness, cost: number): void {
 }
 
 /** Picks up the hearts and seiðr jars foes and pots left on the screen. */
-function gather(h: Harness): void {
+export function gather(h: Harness): void {
   for (let i = 0; i < 8; i++) {
     const { seidr, maxSeidr } = h.sim.state.hero;
     const want = h.sim.actors.find(
@@ -61,7 +61,7 @@ function gather(h: Harness): void {
   }
 }
 
-function leave(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
+export function leave(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): void {
   gather(h);
   drinkIfLow(h);
   walkFighting(h, tx, ty);
@@ -73,12 +73,12 @@ function leave(h: Harness, tx: number, ty: number, dir: Dir4, to: ScreenId): voi
 }
 
 /** Walks through the tiles in turn (to keep to dry floor where the shortest way would swim). */
-function via(h: Harness, ...tiles: (readonly [number, number])[]): void {
+export function via(h: Harness, ...tiles: (readonly [number, number])[]): void {
   for (const [x, y] of tiles) walkFighting(h, x, y);
 }
 
 /** Stands on (tx, ty), turns to `dir` and interacts (a chest, a rack, a stone), reading to the end. */
-function useAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
+export function useAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
   walkFighting(h, tx, ty);
   face(h, dir);
   h.step(frameOf([], ['interact']));
@@ -221,7 +221,7 @@ function plan(from: ScreenId, to: ScreenId): [Dir4, ScreenId][] {
 }
 
 /** Walks the overworld screen by screen to `to`, trying the seam tiles nearest first. */
-function travel(h: Harness, to: ScreenId): void {
+export function travel(h: Harness, to: ScreenId): void {
   for (const [dir, next] of plan(h.sim.screen.id, to)) {
     const [hx, hy] = heroTile(h.sim);
     const tiles = seam(h.sim.screen.id, dir, next).sort(
@@ -561,7 +561,7 @@ function nykr(h: Harness): void {
 const d5 = (h: Harness) => dungeonOf(h.sim.state, 'd5');
 
 /** Prays at the Refuge's hof stone, reading to the end (the save offered, and once woven, a season). */
-function pray(h: Harness): void {
+export function pray(h: Harness): void {
   walkFighting(h, 24, 7);
   face(h, 'n');
   h.step(frameOf([], ['interact']));
@@ -578,13 +578,13 @@ function waitForNight(h: Harness): void {
 }
 
 /** Out of the Refuge's hall onto Holmr. */
-function outOfHall(h: Harness): void {
+export function outOfHall(h: Harness): void {
   walkTo(h, 18, 15);
   h.until((s) => s.screen.id === 'sae_holmr' && s.mode === 'play', 120, frameOf(['down']));
 }
 
 /** Into the Refuge's hall from Holmr. */
-function intoHall(h: Harness): void {
+export function intoHall(h: Harness): void {
   travel(h, 'sae_holmr');
   walkFighting(h, 18, 12);
   h.until((s) => s.screen.id === 'ref_int_hall' && s.mode === 'play', 120, frameOf(['up']));

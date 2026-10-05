@@ -4,7 +4,7 @@ export const dvgIntMine2: ScreenDef = {
   id: 'dvg_int_mine2',
   region: 'dvergagrof',
   purpose:
-    "The old workings, lower gallery: an iron warden and ember sprites between the shaft and the lamp-room, where Dvalinn's crew sheltered by their lamps. Hekla's escort ends at the lamp-room's mouth.",
+    "The old workings, lower gallery: a dead miner and ember sprites between the shaft and the lamp-room, where Dvalinn's crew sheltered by their lamps. Hekla's escort ends at the lamp-room's mouth.",
   indoor: true,
   things: [
     { k: 'door', at: { x: 34, y: 20 }, dir: 's', to: 'dvg_int_mine1', arrive: { x: 6, y: 2 }, facing: 's' },
@@ -23,7 +23,7 @@ export const dvgIntMine2: ScreenDef = {
         ],
       },
     },
-    { k: 'enemy', id: 'jarnvordr', at: { x: 28, y: 6 } },
+    { k: 'enemy', id: 'draugr', at: { x: 28, y: 6 } },
     { k: 'enemy', id: 'glod', at: { x: 12, y: 12 } },
     { k: 'enemy', id: 'glod', at: { x: 30, y: 10 } },
   ],

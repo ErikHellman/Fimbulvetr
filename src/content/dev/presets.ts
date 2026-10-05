@@ -757,6 +757,48 @@ export const DEV_PRESETS = {
     },
   },
   /**
+   * Dvergagröf's camp after M7b (M8a): over the chasm, Nykr dead and the loom woven, the sail-needle and
+   * fourteen ore in the pack, Dvalinn not yet met.
+   */
+  dvg: {
+    ...FIMBUL,
+    screen: 'dvg_camp',
+    tile: [22, 10],
+    facing: 'n',
+    minute: 10 * 60,
+    silver: 20,
+    items: { ...FIMBUL.items, stave_is: 3, grapple: 1, sealskin: 1, mead_green: 1, ore: 14, trade_needle: 1 },
+    slots: ['grapple', 'bombs'],
+    galdr: ['vindr', 'eldr', 'farvegr', 'bragd', 'hlif', 'ljos', 'is'],
+    flags: {
+      ...AFTER_RIME,
+      st_d4_entered: true,
+      st_d4_garmr: true,
+      st_d4_boss_dead: true,
+      st_thane_nastrond: true,
+      st_freed_ulf: true,
+      st_freed_tofa: true,
+      q_trade: 5,
+      n_hrafn_met: true,
+      q_sealskin_asked: true,
+      q_seal_nights: 3,
+      q_sealskin_done: true,
+      st_embla_found: true,
+      q_letters: 1,
+      st_d5_entered: true,
+      st_d5_boss_dead: true,
+      st_thane_nykr: true,
+      st_freed_oddr: true,
+      st_freed_hallbera: true,
+      q_thanes: 2,
+      q_captives: 4,
+      st_loom_woven: true,
+      st_dvg_reached: true,
+    },
+    maxHp: 40,
+    hp: 40,
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

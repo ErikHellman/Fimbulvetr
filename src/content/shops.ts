@@ -92,6 +92,9 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
     id: 'sindri',
     name: { en: 'Sindri’s forge', sv: 'Sindris smedja' },
     currency: 'ore',
-    stock: [{ armor: 'ember_byrnie', price: 12 }],
+    stock: [
+      { armor: 'ember_byrnie', price: 12 },
+      { weapon: 'dwarf_blade', price: 16, when: { k: 'flag', id: 'st_d6_belgr' } },
+    ],
   },
 };
