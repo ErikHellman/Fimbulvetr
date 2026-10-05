@@ -1167,3 +1167,30 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
     ],
   },
 };
+
+/** The side quests (M11: "every side quest" and the progress footer). The rest of QUEST_DEFS is the main line. */
+export const SIDE_QUESTS: readonly QuestId[] = [
+  'q_volva',
+  'q_huldra',
+  'q_fisher',
+  'q_vargar',
+  'q_eldr',
+  'q_huscarl',
+  'q_farm',
+  'q_trade',
+  'q_herd',
+  'q_pages',
+  'q_trolls',
+  'q_steinn',
+  'q_barrow_ring',
+  'q_crates',
+  'q_honey',
+  'q_amber',
+  'q_burbot',
+  'q_ljos',
+  'q_sealskin',
+  'q_letters',
+  'q_loom',
+  'q_foreman',
+  'q_axes',
+];

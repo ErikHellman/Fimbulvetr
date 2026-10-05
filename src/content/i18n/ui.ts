@@ -95,6 +95,14 @@ export const UI = {
     en: 'A new game replaces the autosave; your saved slots stay. Enter: begin   Esc: back',
     sv: 'Ett nytt spel ersätter autosparningen; dina sparplatser finns kvar. Enter: börja   Esc: tillbaka',
   },
+  title_achievements: { en: 'Achievements', sv: 'Prestationer' },
+  ach_heading: { en: 'Achievements: {n} of {of}', sv: 'Prestationer: {n} av {of}' },
+  ach_hint: { en: '↑↓←→: choose   Esc: back', sv: '↑↓←→: välj   Esc: tillbaka' },
+  ach_toast: { en: 'Achievement: {detail}', sv: 'Prestation: {detail}' },
+  progress_line: {
+    en: 'Heart pieces {pieces}/{piecesOf} · Side quests {side}/{sideOf} · Achievements {ach}/{achOf}',
+    sv: 'Hjärtbitar {pieces}/{piecesOf} · Sidouppdrag {side}/{sideOf} · Prestationer {ach}/{achOf}',
+  },
   title_hint: { en: '↑↓: choose   Enter: take', sv: '↑↓: välj   Enter: ta' },
   title_load_hint: {
     en: '↑↓: choose   Enter: load   Esc: back',

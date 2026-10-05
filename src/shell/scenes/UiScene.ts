@@ -10,6 +10,9 @@ import type { DungeonId, ItemId } from '@content/ids';
 import { t, type L10n, type Lang } from '@core/i18n/t';
 import { CONTINUE_DELAY } from '@core/sim/systems/death';
 import { condCtx } from '@core/sim/systems/story';
+import { ACHIEVEMENT_DEFS } from '@content/achievements';
+import type { AchievementId } from '@content/ids';
+import { progressLine } from '@shell/ui/progressText';
 import { questLog } from '@core/story/quests';
 import { peekDungeon } from '@core/state/dungeons';
 import { dungeonMap, overworldMap, verseMarks, beaconMarks } from '@core/world/mapModel';
@@ -49,6 +52,9 @@ export interface UiLink {
     readonly settings: { readonly state: SettingsMenuState; readonly values: Settings } | null;
   } | null;
   /** The save-slot picker a hof or mead hall opened, with the slots' summaries; null when closed. */
+  /** Achievements this browser holds, and the one whose toast is up (null when none). */
+  readonly achievements: () => ReadonlySet<AchievementId>;
+  readonly toast: () => AchievementId | null;
   readonly picker: () => {
     readonly state: PickerState;
     readonly slots: Readonly<Record<'s1' | 's2' | 's3', SaveSummary | null>>;
@@ -147,6 +153,8 @@ export class UiScene extends Phaser.Scene {
   /** The second column of the settings menu. */
   private menuValues!: Phaser.GameObjects.BitmapText;
   private menuIcons: Phaser.GameObjects.Image[] = [];
+  private toastBox!: Phaser.GameObjects.Graphics;
+  private toastText!: Phaser.GameObjects.BitmapText;
   private fallen!: Phaser.GameObjects.Rectangle;
   private fallenTitle!: Phaser.GameObjects.BitmapText;
   private fallenPrompt!: Phaser.GameObjects.BitmapText;
@@ -218,6 +226,8 @@ export class UiScene extends Phaser.Scene {
     this.menuHint = this.text(0, 0, '', DIM);
     this.menuValues = this.text(0, 0, '', GOLD);
     this.menuIcons = [];
+    this.toastBox = this.add.graphics();
+    this.toastText = this.text(0, 0, '', GOLD);
   }
 
   override update(): void {
@@ -230,6 +240,27 @@ export class UiScene extends Phaser.Scene {
     this.drawStory(link.sim.storyUi());
     this.drawGameOver();
     this.drawMenu();
+    this.drawToast();
+  }
+
+  /** A newly earned achievement, in a small panel at the top centre. */
+  private drawToast(): void {
+    this.toastBox.clear();
+    const id = this.link.toast();
+    const def = id === null ? undefined : ACHIEVEMENT_DEFS.find((a) => a.id === id);
+    if (def === undefined) {
+      this.toastText.setText('');
+      return;
+    }
+    const line = t(UI.ach_toast, this.link.lang(), { detail: t(def.name, this.link.lang()) });
+    const w = textWidth(line) + 24;
+    const x = Math.round((GAME_W - w) / 2);
+    this.toastBox
+      .fillStyle(INK, 0.92)
+      .fillRect(x, 36, w, 20)
+      .lineStyle(1, GOLD, 1)
+      .strokeRect(x + 0.5, 36.5, w - 1, 19);
+    this.toastText.setText(line).setPosition(x + 12, 41);
   }
 
   /** The pause menu over everything: tab labels, then the page for the open tab. */
@@ -444,7 +475,10 @@ export class UiScene extends Phaser.Scene {
       ...layoutText(t(q.text, lang), MENU.w - 64).map((l) => `   ${l}`),
       '',
     ]);
-    this.menuBody.setText(lines.slice(0, 22).join('\n')).setPosition(MENU.x + 24, top);
+    this.menuBody.setText(lines.slice(0, 21).join('\n')).setPosition(MENU.x + 24, top);
+    this.menuValues
+      .setText(progressLine(condCtx(sim), this.link.achievements(), lang))
+      .setPosition(MENU.x + 24, MENU.y + MENU.h - 32);
   }
 
   /** After the fall: the screen dims and, a moment later, the way to rise again. */

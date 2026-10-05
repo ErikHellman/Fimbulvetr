@@ -370,6 +370,23 @@ export const FLAGS = {
   st_end_go: { t: 'bool' },
   /** The ending and its credits seen (M10b): the world after, and the title screen's rune. */
   st_game_done: { t: 'bool' },
+  /**
+   * The rune-record (M11a): Gyða asked for the names of the huscarls who fell at the first binding; each
+   * bauta-stone read once (`q_record` counts them); the names cut into the hof's record.
+   */
+  q_record_asked: { t: 'bool' },
+  q_record: { t: 'int', max: 4 },
+  st_bauta_myr: { t: 'bool' },
+  st_bauta_hau: { t: 'bool' },
+  st_bauta_sae: { t: 'bool' },
+  st_bauta_hrf: { t: 'bool' },
+  q_record_done: { t: 'bool' },
+  /** The spring feast (M11a, after the ending): Halvar asked, the mead, the fish and the cask brought, the feast held. */
+  q_feast_asked: { t: 'bool' },
+  q_feast_mead: { t: 'bool' },
+  q_feast_fish: { t: 'bool' },
+  q_feast_cask: { t: 'bool' },
+  q_feast_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;
