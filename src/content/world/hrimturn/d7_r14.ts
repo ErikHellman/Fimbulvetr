@@ -5,13 +5,12 @@ export const d7R14: ScreenDef = {
   region: 'hrimfjoll',
   dungeon: 'd7',
   purpose:
-    'The glass hall: a fixed prism throws a window-beam across the room, and ice wolves and a wisp keep it. Arrows in a chest.',
+    'The glass hall: a fixed prism throws a window-beam across the room, and an ice wolf and a wisp keep it. Arrows in a chest.',
   things: [
     { k: 'beam', at: { x: 20, y: 19 }, dir: 'n' },
     { k: 'prism', at: { x: 20, y: 4 }, turn: '\\' },
     { k: 'chest', id: 'd7_c_r14', at: { x: 4, y: 4 }, gives: { item: 'arrows', n: 10 } },
     { k: 'enemy', id: 'isvargr', at: { x: 14, y: 10 } },
-    { k: 'enemy', id: 'isvargr', at: { x: 26, y: 10 } },
     { k: 'enemy', id: 'frostvaettr', at: { x: 20, y: 16 } },
     { k: 'prop', id: 'pot', at: { x: 36, y: 18 } },
   ],

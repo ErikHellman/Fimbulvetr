@@ -17,7 +17,7 @@ const d6 = (h: Harness) => dungeonOf(h.sim.state, 'd6');
 const boss = (h: Harness, id: string): Entity | undefined => h.sim.enemies.find((e) => e.def === id);
 
 /** Waits while the hero is busy (a swing, a song), up to `ticks`. */
-function settle(h: Harness, ticks = 120): void {
+export function settle(h: Harness, ticks = 120): void {
   for (let i = 0; i < ticks && (h.sim.hero.fsm.s !== 'move' || h.sim.mode !== 'play'); i++) h.idle(1);
 }
 
@@ -68,7 +68,7 @@ function crossLava(h: Harness, from: number, to: number, y: number): void {
 }
 
 /** Steps toward a point for one tick (both axes at once), or stands still when there. */
-function stepToward(h: Harness, x: number, y: number, slack = 3): boolean {
+export function stepToward(h: Harness, x: number, y: number, slack = 3): boolean {
   const dx = x - h.sim.hero.pos.x;
   const dy = y - h.sim.hero.pos.y;
   const held: Action[] = [];
@@ -81,7 +81,7 @@ function stepToward(h: Harness, x: number, y: number, slack = 3): boolean {
 }
 
 /** Turns to `dir` in place (a tap, no step) once the hero is free. */
-function turn(h: Harness, dir: Dir4): void {
+export function turn(h: Harness, dir: Dir4): void {
   settle(h);
   if (h.sim.hero.facing !== dir) h.step(frameOf([KEY[dir]], [KEY[dir]]));
 }

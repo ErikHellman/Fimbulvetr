@@ -444,6 +444,7 @@ export const SCRIPTS = [
   'd7_gate_out',
   'd7_cell_asa',
   'd7_cell_bjarni',
+  'd7_basin',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 

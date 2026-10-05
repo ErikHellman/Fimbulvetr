@@ -8,7 +8,6 @@ export const d7R13: ScreenDef = {
   things: [
     { k: 'lock', id: 'd7_lock_c', at: { x: 0, y: 10 }, w: 1, h: 2 },
     { k: 'enemy', id: 'frostvaettr', at: { x: 20, y: 6 } },
-    { k: 'enemy', id: 'isvargr', at: { x: 20, y: 15 } },
     { k: 'prop', id: 'pot', at: { x: 36, y: 3 } },
     { k: 'prop', id: 'pot', at: { x: 36, y: 18 } },
   ],

@@ -5,9 +5,10 @@ export const d7R23: ScreenDef = {
   region: 'hrimfjoll',
   dungeon: 'd7',
   purpose:
-    "The mirror's hall, safe: the ice mirror in a chest (20, 10). A window (30, 2) shines a beam south down the hall; the crystal eye (36, 13) sits in its niche off to the side, where no beam goes alone. Ask stands in the beam with the mirror raised, facing east, and the bars on the east door (37, 10) lift.",
+    "The mirror's hall, safe: the ice mirror in a chest (20, 10), and a basin of meltwater (10, 2) that makes Ask whole. A window (30, 2) shines a beam south down the hall; the crystal eye (36, 13) sits in its niche off to the side, where no beam goes alone. Ask stands in the beam with the mirror raised, facing east, and the bars on the east door (37, 10) lift.",
   things: [
     { k: 'chest', id: 'd7_c_mirror', at: { x: 20, y: 10 }, gives: { item: 'mirror' } },
+    { k: 'use', at: { x: 10, y: 2 }, w: 3, script: 'd7_basin' },
     { k: 'beam', at: { x: 30, y: 2 }, dir: 's' },
     { k: 'eye', at: { x: 36, y: 13 }, flag: 'st_d7_eye_r23' },
     {
@@ -30,7 +31,7 @@ export const d7R23: ScreenDef = {
   map: [
     '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
     '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
-    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫UUU▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
     '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
     '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
     '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',

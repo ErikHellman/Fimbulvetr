@@ -72,7 +72,7 @@ function icePlan(h: Harness, tx: number, ty: number): Dir4[] {
  * Crosses glaze to (tx, ty): plans walks and slides over the ice, and for each slide pushes the stick only
  * until it starts, then rides it out. Re-plans after every move (a foe or the wind may have shifted Ask).
  */
-function iceTo(h: Harness, tx: number, ty: number): void {
+export function iceTo(h: Harness, tx: number, ty: number): void {
   for (let moves = 0; moves < 60; moves++) {
     const [hx, hy] = heroTile(h.sim);
     if (hx === tx && hy === ty) {
@@ -98,7 +98,7 @@ function iceTo(h: Harness, tx: number, ty: number): void {
 }
 
 /** Turns toward `dir` with a tap (on glaze against a block, the slide it starts ends at once). */
-function turnTo(h: Harness, dir: Dir4): void {
+export function turnTo(h: Harness, dir: Dir4): void {
   if (h.sim.hero.facing !== dir) h.step(frameOf([KEY[dir]], [KEY[dir]]));
   h.until((s) => (s.hero.mem['slide'] ?? 0) === 0, 60);
   h.idle(2);

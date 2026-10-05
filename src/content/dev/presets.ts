@@ -896,6 +896,44 @@ export const DEV_PRESETS = {
     warps: ['haugar', 'saevatn', 'dvergagrof', 'hrimfjoll'],
   },
   /**
+   * Inside Hrímturn (M9b), Svellr broken and the ice mirror in slot K, standing in the mirror hall's beam
+   * (30, 13): hold K and face east to light the eye.
+   */
+  d7: {
+    ...FIMBUL,
+    screen: 'd7_r23',
+    tile: [30, 13],
+    facing: 'e',
+    minute: 10 * 60,
+    silver: 20,
+    armor: 'ember_byrnie',
+    items: { ...FIMBUL.items, grapple: 1, sealskin: 1, hammer: 1, ore: 1, mirror: 1 },
+    slots: ['mirror', 'bombs'],
+    galdr: ['vindr', 'eldr', 'farvegr', 'bragd', 'hlif', 'ljos', 'is', 'skjalfti'],
+    flags: {
+      ...AFTER_RIME,
+      st_thane_nastrond: true,
+      st_thane_nykr: true,
+      st_thane_ivaldi: true,
+      q_thanes: 3,
+      q_captives: 6,
+      st_dvg_reached: true,
+      q_foreman: 5,
+      st_embla_found: true,
+      q_letters: 3,
+      q_trade: 7,
+      st_hrf_reached: true,
+      st_beacon_lit: true,
+      w_ring_beacon: true,
+      st_d7_entered: true,
+      st_d7_eye_r30: true,
+      st_d7_svellr: true,
+    },
+    maxHp: 48,
+    hp: 48,
+    warps: ['haugar', 'saevatn', 'dvergagrof', 'hrimfjoll'],
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

@@ -20,7 +20,6 @@ export const d7R11: ScreenDef = {
     },
     { k: 'chest', id: 'd7_c_bigkey', at: { x: 12, y: 12 }, gives: { item: 'big_key' } },
     { k: 'enemy', id: 'frostvaettr', at: { x: 30, y: 10 } },
-    { k: 'enemy', id: 'isvargr', at: { x: 30, y: 15 } },
   ],
   map: [
     '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',

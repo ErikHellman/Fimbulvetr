@@ -172,4 +172,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Solver proofs, route, e2e, v1-m9a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M9b Hrímturn (D7) — Part 2
+    - [x] Light beams: windows, prisms and crystal eyes; Bragð lights an eye
+    - [x] The ice mirror: beams and rime bolts sent the way Ask faces
+    - [x] Hrímturn's 32 rooms, Svellr and Thane Hrímgerðr's three phases
+    - [x] Ása and Bjarni home, Kolbeinn's word, new lines for Hrímgerðr's fall
+    - [x] Solver proofs, route, e2e, v1-m9b fixture, docs
+    - [ ] User playtest and Swedish proofread
 - [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

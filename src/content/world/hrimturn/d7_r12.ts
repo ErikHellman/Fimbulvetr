@@ -5,11 +5,12 @@ export const d7R12: ScreenDef = {
   region: 'hrimfjoll',
   dungeon: 'd7',
   purpose:
-    "Hrímgerðr's forecourt: her great door north, the great lock on it. Lock B south, lock C east, and the vault of the great key west.",
+    "Hrímgerðr's forecourt: her great door north, the great lock on it. Lock B south, lock C east, the vault of the great key west, and a basin of meltwater (26, 2) to drink from before the door.",
   things: [
     { k: 'lock', id: 'd7_lock_b', at: { x: 19, y: 21 }, w: 2, h: 1 },
     { k: 'lock', id: 'd7_lock_c', at: { x: 39, y: 10 }, w: 1, h: 2 },
     { k: 'lock', id: 'd7_lock_big', at: { x: 19, y: 0 }, w: 2, h: 1, big: true },
+    { k: 'use', at: { x: 26, y: 2 }, w: 3, script: 'd7_basin' },
     {
       k: 'sign',
       at: { x: 16, y: 2 },
@@ -18,7 +19,6 @@ export const d7R12: ScreenDef = {
         sv: 'Över den stora dörren, en krona av istappar. Under den: HON HAR SETT DIG KOMMA SEDAN GLACIÄREN.',
       },
     },
-    { k: 'enemy', id: 'isvargr', at: { x: 10, y: 10 } },
     { k: 'enemy', id: 'frostvaettr', at: { x: 30, y: 10 } },
     { k: 'prop', id: 'pot', at: { x: 3, y: 18 } },
     { k: 'prop', id: 'pot', at: { x: 36, y: 18 } },
@@ -26,7 +26,7 @@ export const d7R12: ScreenDef = {
   map: [
     '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▫▫▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
     '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▫▫▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
-    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫UUU▫▫▫▫▫▫▫▫▫▪▪',
     '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
     '▪▪▫▫▫▫▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪▫▫▫▫▪▪',
     '▪▪▫▫▫▫▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪▫▫▫▫▪▪',

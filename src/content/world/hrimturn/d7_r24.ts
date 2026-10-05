@@ -19,7 +19,6 @@ export const d7R24: ScreenDef = {
       closed: { k: 'not', c: { k: 'flag', id: 'st_d7_eye_r24' } },
     },
     { k: 'enemy', id: 'isvargr', at: { x: 14, y: 6 } },
-    { k: 'enemy', id: 'isvargr', at: { x: 32, y: 12 } },
     { k: 'prop', id: 'pot', at: { x: 36, y: 18 } },
   ],
   map: [
