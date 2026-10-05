@@ -150,6 +150,8 @@ test('every screen draws in a winter night and a wet spring day, with rolled foe
   const errors = collectErrors(page);
   await boot(page, 'preset=myr&nosave&rolled=1');
   const ids = await page.evaluate(() => window.__fimbul?.screens() ?? []);
+  // The world keeps growing: allow each warp about half a second on a slow CI runner (WebKit), twice over.
+  test.setTimeout(60_000 + ids.length * 2 * 500);
   for (const [season, time] of [
     ['winter', '23:00'],
     ['spring', '12:00'],
