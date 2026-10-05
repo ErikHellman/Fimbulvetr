@@ -293,6 +293,8 @@ export const FLAGS = {
   w_myr_web: { t: 'bool' },
   q_loom_asked: { t: 'bool' },
   st_loom_woven: { t: 'bool' },
+  /** Ívaldi's Forge's belt lever (M8b): set, the north belts run the other way. */
+  w_d6_belts: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

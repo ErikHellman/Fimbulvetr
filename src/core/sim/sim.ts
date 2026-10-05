@@ -63,6 +63,8 @@ import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from '
 import { tickTimers } from './systems/timers';
 import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
+import { heatMax, stepHeat } from './systems/heat';
+import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
 import { misty, outdoors, skyOf, windOf } from './systems/weather';
@@ -115,6 +117,9 @@ export class Sim implements SimRt {
   god?: boolean;
   weatherOverride?: WeatherKind;
   sand?: Trial;
+  heatTicks?: number;
+  burnTicks?: number;
+  crust?: Map<number, number>;
   tick = 0;
   readonly rolled: boolean;
   private events: SimEvent[] = [];
@@ -262,6 +267,11 @@ export class Sim implements SimRt {
   }
 
   /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
+  /** Heat on Ask for the HUD's bar (M8), or null while there is none. */
+  heat(): { readonly now: number; readonly max: number } | null {
+    return this.heatTicks === undefined ? null : { now: this.heatTicks, max: heatMax(this) };
+  }
+
   boss(): BossView | null {
     for (const e of this.actors) {
       if (e.kind !== 'enemy') continue;
@@ -336,6 +346,9 @@ export class Sim implements SimRt {
         god: this.god,
         weatherOverride: this.weatherOverride,
         sand: this.sand,
+        heat: this.heatTicks,
+        burn: this.burnTicks,
+        crust: this.crust === undefined ? undefined : [...this.crust],
         fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
@@ -422,6 +435,8 @@ export class Sim implements SimRt {
     resolveAttacks(this);
     fixtureHazards(this);
     stepFire(this);
+    stepHeat(this);
+    stepCrust(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);

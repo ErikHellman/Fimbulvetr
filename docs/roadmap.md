@@ -148,4 +148,7 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] The Norns' loom, the three threads and turning the season at a hof
     - [x] Solver proofs, route, e2e, v1-m7b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
+- [ ] M8 Dvergagröf + D6 — brief: `docs/briefs/m8.md`, plan: `docs/superpowers/plans/2026-10-05-m8.md`
+  - [ ] M8a Dvergagröf — Part 1
+  - [ ] M8b Ívaldi's Forge (D6) — Part 2
+- [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship

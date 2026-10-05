@@ -60,6 +60,8 @@ export function enterScreen(
     ? rt.actors.find((a) => a.kind === 'prop' && a.id === carrying && mem(a, 'carried') === 1)
     : undefined;
   rt.screen = rt.load(id);
+  // Ís crust on lava cools away when Ask leaves.
+  rt.crust = undefined;
   rt.actors = spawnActors(rt, heroAt);
   if (carried !== undefined) {
     carried.mem['thing'] = -1;

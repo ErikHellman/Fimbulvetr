@@ -1,0 +1,9 @@
+# Ledger — M8a Dvergagröf
+
+Plan: `docs/superpowers/plans/2026-10-05-m8.md` (Part 1). Brief: `docs/briefs/m8.md`, drafted 2026-10-05 with the recommended answers taken under the user's standing order to build every milestone without stopping to ask. Branch: `claude/m8-dvergagrof`, cut from `claude/m7b-sokkva-hof` at 9aea6a5 (M7b, PR #15); its PR is stacked on #15. Baseline: `pnpm check` green, 3213 tests; golden hash `f865b677`; budget 593.4 KB gz of 730.
+
+## Tasks
+
+| Task | Rulings |
+| --- | --- |
+| 1 Heat, belts, lava | `systems/heat.ts`: `ScreenDef.hot`; heat on the runtime (`heatTicks`, `burnTicks`, undefined at 0 so a cool run keeps the hash), +1 a tick in a hot screen, −4 elsewhere; full at `Tuning.hero.heat` (480) or `heatEmber` (1200) in the ember byrnie, then `heatBurn` (2 hp) a second, no knockback, no armour. `Sim.heat()` and a HUD bar under the seiðr bar (red when full). Terrains `belt_n/e/s/w` (`TerrainDef.belt`, legend arrows `↑ → ↓ ←`) push the hero (not swimming) and walking foes `Tuning.hero.belt` (1) px a tick through `moveEntity`, so walls stop it; `ScreenDef.belts.flag` turns them back (flag `w_d6_belts`). Terrain `lava` (`≈`, solid and low, `TerrainDef.lava`); Ís lays cover `crust` (appended to `COVERS`) on lava in the 3×3 round the first lava tile it reaches, so one cast floors two tiles ahead; `rt.crust` cools each tile after `IS_CRUST_TICKS` (360) unless Ask stands on it; a walking foe left on cooling crust burns; leaving the screen clears it. Also terrains `scree` (`·`, snow grows on it), `forge_floor` (`░`), `forge_wall` (`▓`), with art; sfx `sfx_hammer`, `sfx_quake`, `sfx_sizzle`, `sfx_bellows`. **Ruling:** the legend has run out of ASCII, so M8's terrains use single-unit Unicode characters. Solver: with Ís, lava is footing like still water (not the outer ring). Tests: `heat` (4), `belts` (5), `lava` (4), `solver_forge` (2). |

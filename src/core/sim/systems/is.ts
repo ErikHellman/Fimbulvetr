@@ -86,6 +86,75 @@ export function freezeAround(rt: SimRt, tx: number, ty: number): boolean {
   return true;
 }
 
+/** How long an Ís crust on lava holds, in ticks (6 s). */
+export const IS_CRUST_TICKS = 360;
+
+/** Open lava with no crust on it yet. */
+function openLava(rt: SimRt, i: number): boolean {
+  const id = rt.terrainOf(rt.screen.id).cells[i];
+  return id !== undefined && rt.db.terrain[id].lava === true && (rt.screen.cover.kind[i] ?? 0) === 0;
+}
+
+/**
+ * Lays a crust (`crust`, walkable) on the lava in the 3×3 tiles around a tile, for `IS_CRUST_TICKS`.
+ * Never on the screen's outer ring. Returns whether any lava crusted.
+ */
+export function crustAround(rt: SimRt, tx: number, ty: number): boolean {
+  const g = rt.screen.cover;
+  const kind = rt.db.coverOrder.indexOf('crust') + 1;
+  let crusted = false;
+  for (let y = ty - 1; y <= ty + 1; y++)
+    for (let x = tx - 1; x <= tx + 1; x++) {
+      if (x < 1 || y < 1 || x >= g.cols - 1 || y >= g.rows - 1) continue;
+      const i = y * g.cols + x;
+      if (!openLava(rt, i)) continue;
+      g.kind[i] = kind;
+      g.cleared[i] = 0;
+      rt.crust ??= new Map();
+      rt.crust.set(i, IS_CRUST_TICKS);
+      crusted = true;
+    }
+  if (!crusted) return false;
+  stampCollision(rt);
+  rt.emit({ t: 'coverChanged', screen: rt.screen.id });
+  rt.emit({ t: 'sfx', id: 'sfx_sizzle' });
+  return true;
+}
+
+const feetTile = (rt: SimRt, e: Entity): number => {
+  const g = rt.screen.cover;
+  return Math.floor((e.pos.y - 1) / TILE) * g.cols + Math.floor(e.pos.x / TILE);
+};
+
+/**
+ * Cools the crust on lava a tick at a time. A crust cools away when its time is up, unless Ask stands on
+ * it (it holds until Ask steps off); a walking foe left on it burns.
+ */
+export function stepCrust(rt: SimRt): void {
+  if (rt.crust === undefined) return;
+  const under = feetTile(rt, rt.hero);
+  const gone: number[] = [];
+  for (const [i, t] of rt.crust) {
+    if (t > 1) rt.crust.set(i, t - 1);
+    else if (i !== under) gone.push(i);
+  }
+  if (gone.length === 0) return;
+  const g = rt.screen.cover;
+  for (const i of gone) {
+    rt.crust.delete(i);
+    g.kind[i] = 0;
+  }
+  if (rt.crust.size === 0) rt.crust = undefined;
+  stampCollision(rt);
+  rt.emit({ t: 'coverChanged', screen: rt.screen.id });
+  rt.emit({ t: 'sfx', id: 'sfx_sizzle' });
+  for (const foe of rt.actors.filter((a) => a.kind === 'enemy' && gone.includes(feetTile(rt, a)))) {
+    if (enemyDef(rt, foe).flies === true) continue;
+    rt.actors = rt.actors.filter((a) => a !== foe);
+    rt.emit({ t: 'sfx', id: 'sfx_fire' });
+  }
+}
+
 /**
  * Freezes a foe where it stands for `Tuning.is.freeze` ticks: it neither moves nor strikes, and the next
  * blow shatters the ice for double damage. Bosses shake it off.
@@ -131,6 +200,9 @@ export function stepIs(rt: SimRt, e: Entity): void {
   const ty = Math.floor((e.pos.y - 1) / TILE);
   if (tx >= 0 && ty >= 0 && tx < g.cols && ty < g.rows && stillWater(rt, ty * g.cols + tx)) {
     freezeAround(rt, tx, ty);
+    burst(rt, e);
+  } else if (tx >= 0 && ty >= 0 && tx < g.cols && ty < g.rows && openLava(rt, ty * g.cols + tx)) {
+    crustAround(rt, tx, ty);
     burst(rt, e);
   }
 }

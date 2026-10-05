@@ -299,6 +299,7 @@ function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null)
 /**
  * Tiles of drawbridges that are down, and every tile of still water (outside screens with a water level)
  * once Ask can sing Ís, from the galdr or a stave: the frost lays a floor tile by tile, as far as needed.
+ * Lava takes a crust the same way (M8): it cools only once Ask has stepped off it.
  */
 function bridgeTiles(w: World, state: GameState): Set<number> {
   const out = new Set<number>();
@@ -309,8 +310,8 @@ function bridgeTiles(w: World, state: GameState): Set<number> {
       g?.cells.forEach((cell, i) => {
         const x = i % SCREEN_COLS;
         const y = Math.floor(i / SCREEN_COLS);
-        // Ís never ices a screen's outer ring (see `freezeAround`).
-        if (cell === 'water' && x > 0 && y > 0 && x < SCREEN_COLS - 1 && y < SCREEN_ROWS - 1)
+        // Ís never ices a screen's outer ring (see `freezeAround`); it crusts lava as it ices water.
+        if ((cell === 'water' || w.db.terrain[cell].lava === true) && x > 0 && y > 0 && x < SCREEN_COLS - 1 && y < SCREEN_ROWS - 1)
           out.add(w.tile(id, x, y));
       });
     }

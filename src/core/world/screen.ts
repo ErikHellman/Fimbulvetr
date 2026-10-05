@@ -322,6 +322,10 @@ export interface ScreenDef {
   readonly spawns?: readonly TilePos[];
   /** The flag holding this screen's water level, for terrains that `rise` (see world/water.ts). */
   readonly water?: FlagId;
+  /** A forge room or vent field (M8): heat builds on Ask while Ask is here (see systems/heat.ts). */
+  readonly hot?: true;
+  /** A lever's flag that turns every conveyor belt on the screen the other way while it is set. */
+  readonly belts?: { readonly flag: FlagId };
 }
 
 /** A grid of screens: the overworld, or one floor of a dungeon. */

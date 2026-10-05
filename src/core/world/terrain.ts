@@ -33,6 +33,10 @@ export interface TerrainDef {
   readonly current?: Dir4;
   /** A surge: it pushes harder than anyone swims, and passes over a diver. */
   readonly strong?: boolean;
+  /** A conveyor belt (M8): it carries anyone walking on it this way. */
+  readonly belt?: Dir4;
+  /** Molten rock (M8): no footing; Ís crusts it over for a while (see systems/is.ts). */
+  readonly lava?: boolean;
 }
 
 /** How a terrain answers the water level: flooded from level `floods` up, or afloat from `floats` up. */

@@ -83,6 +83,11 @@ export interface SimRt {
   sand?: Trial;
   /** Dev: the hero takes no damage (undefined when off, so it never changes the hash). */
   god?: boolean;
+  /** Heat on Ask from hot rooms, in ticks, and ticks spent burning at full heat (undefined at 0). */
+  heatTicks?: number;
+  burnTicks?: number;
+  /** Ís crust on lava (tile index → ticks left), on this screen only (undefined when none). */
+  crust?: Map<number, number>;
   emit(event: SimEvent): void;
   newId(): number;
   load(id: ScreenId): LoadedScreen;

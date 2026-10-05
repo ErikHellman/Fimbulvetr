@@ -77,6 +77,8 @@ const GOLD = 0xd9b34a;
 /** The seiðr bar's blue. */
 const SEIDR = 0x7fd8e8;
 const RED = 0xe0433f;
+/** The heat bar in a hot room (M8). */
+const HEAT = 0xf08a2c;
 const CAVE = 0x6e6258;
 const CAVE_SEEN = 0x9a8a78;
 /** Along the bottom edge, clear of the HUD and of whatever the room keeps at its top. */
@@ -122,6 +124,7 @@ export class UiScene extends Phaser.Scene {
   private galdrIcon!: Phaser.GameObjects.Image;
   private galdrLabel!: Phaser.GameObjects.BitmapText;
   private seidrBar!: Phaser.GameObjects.Graphics;
+  private heatBar!: Phaser.GameObjects.Graphics;
   private box!: Phaser.GameObjects.Graphics;
   private name!: Phaser.GameObjects.BitmapText;
   private body!: Phaser.GameObjects.BitmapText;
@@ -193,6 +196,7 @@ export class UiScene extends Phaser.Scene {
     this.galdrIcon = this.add.image(gx + 11, 17, silverRef.key, silverRef.frame).setVisible(false);
     this.galdrLabel = this.text(gx + 8, 29, '', DIM);
     this.seidrBar = this.add.graphics();
+    this.heatBar = this.add.graphics();
     this.breath = this.add.graphics();
     this.box = this.add.graphics();
     this.name = this.text(BOX.x + 12, BOX.y - 14, '', GOLD);
@@ -528,6 +532,7 @@ export class UiScene extends Phaser.Scene {
     });
     this.silver.setText(String(sim.state.hero.silver));
     this.drawGaldr(Math.ceil(hearts / MAX_HEARTS_PER_ROW));
+    this.drawHeat(Math.ceil(hearts / MAX_HEARTS_PER_ROW));
     this.slotLabels.forEach((label, i) => label.setText(this.link.keyLabel(i === 0 ? 'item1' : 'item2')));
     sim.state.inv.slots.forEach((item, i) => {
       const icon = this.slotIcons[i];
@@ -569,6 +574,22 @@ export class UiScene extends Phaser.Scene {
       .fillRect(6, y, w + 2, 5)
       .fillStyle(SEIDR, 1)
       .fillRect(7, y + 1, Math.round((w * hero.seidr) / Math.max(1, hero.maxSeidr)), 3)
+      .lineStyle(1, GOLD, 0.8)
+      .strokeRect(5.5, y - 0.5, w + 3, 6);
+  }
+
+  /** Heat in a hot room (M8): an orange bar under the seiðr bar that fills while Ask stands in the heat. */
+  private drawHeat(heartRows: number): void {
+    const heat = this.link.sim.heat();
+    this.heatBar.clear();
+    if (heat === null) return;
+    const y = 6 + heartRows * 10 + 8;
+    const w = 40;
+    this.heatBar
+      .fillStyle(INK, 0.8)
+      .fillRect(6, y, w + 2, 5)
+      .fillStyle(heat.now >= heat.max ? RED : HEAT, 1)
+      .fillRect(7, y + 1, Math.round((w * heat.now) / Math.max(1, heat.max)), 3)
       .lineStyle(1, GOLD, 0.8)
       .strokeRect(5.5, y - 0.5, w + 3, 6);
   }

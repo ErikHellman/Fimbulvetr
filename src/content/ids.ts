@@ -193,6 +193,10 @@ export const SFX = [
   'sfx_chain',
   'sfx_dive',
   'sfx_gust',
+  'sfx_hammer',
+  'sfx_quake',
+  'sfx_sizzle',
+  'sfx_bellows',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -430,5 +434,15 @@ export type CritterId = (typeof CRITTERS)[number];
  * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
  * grow from the terrain beneath by season (see CoverDef.grows).
  */
-export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood', 'is_ice'] as const;
+export const COVERS = [
+  'tall_grass',
+  'leaves',
+  'snow',
+  'drift',
+  'mud',
+  'ice',
+  'flood',
+  'is_ice',
+  'crust',
+] as const;
 export type CoverId = (typeof COVERS)[number];

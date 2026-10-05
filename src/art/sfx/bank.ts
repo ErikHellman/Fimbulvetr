@@ -698,4 +698,44 @@ export const SFX_BANK = {
     release: 0.25,
     volume: 0.3,
   },
+  /** The dwarf hammer: a heavy, dull clang. */
+  sfx_hammer: {
+    wave: 'square',
+    freq: 140,
+    freqEnd: 70,
+    attack: 0.005,
+    sustain: 0.05,
+    release: 0.2,
+    volume: 0.4,
+  },
+  /** Skjálfti: a long low rumble. */
+  sfx_quake: {
+    wave: 'noise',
+    freq: 90,
+    freqEnd: 40,
+    attack: 0.08,
+    sustain: 0.5,
+    release: 0.6,
+    volume: 0.45,
+  },
+  /** Ís on lava, or a crust cooling away: a hiss. */
+  sfx_sizzle: {
+    wave: 'noise',
+    freq: 3000,
+    freqEnd: 1800,
+    attack: 0.01,
+    sustain: 0.15,
+    release: 0.2,
+    volume: 0.22,
+  },
+  /** Belgr's bellows drawing breath. */
+  sfx_bellows: {
+    wave: 'noise',
+    freq: 400,
+    freqEnd: 900,
+    attack: 0.2,
+    sustain: 0.2,
+    release: 0.3,
+    volume: 0.3,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

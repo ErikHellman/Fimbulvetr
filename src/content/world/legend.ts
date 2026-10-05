@@ -93,6 +93,15 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '@': 'hof_floor',
   '!': 'hof_floor_hi',
   '(': 'arch',
+  /** Dvergagröf and Ívaldi's Forge (M8): scree, forge floor and wall, lava, and belts by the way they run. */
+  '·': 'scree',
+  '░': 'forge_floor',
+  '▓': 'forge_wall',
+  '≈': 'lava',
+  '↑': 'belt_n',
+  '→': 'belt_e',
+  '↓': 'belt_s',
+  '←': 'belt_w',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

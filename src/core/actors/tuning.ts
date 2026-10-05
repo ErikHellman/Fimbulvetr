@@ -45,6 +45,15 @@ export interface HeroTuning {
   readonly parryStun: number;
   /** Swimming pace (px a tick) with the seal-skin, and how long a dive lasts (ticks). */
   readonly swimSpeed: number;
+  /**
+   * Heat (M8): ticks Ask bears a hot room before burning (`heatEmber` in the ember byrnie), and the hp a
+   * burn takes each second once full.
+   */
+  readonly heat: number;
+  readonly heatEmber: number;
+  readonly heatBurn: number;
+  /** A conveyor belt's push on anyone walking it, px a tick. */
+  readonly belt: number;
   readonly diveTicks: number;
   /** How hard a current pushes a swimmer (px a tick), and a surge (more than anyone swims). */
   readonly current: number;

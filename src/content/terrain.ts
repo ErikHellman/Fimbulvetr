@@ -89,6 +89,15 @@ export const TERRAIN_IDS = [
   'hof_floor',
   'hof_floor_hi',
   'arch',
+  /** Dvergagröf and Ívaldi's Forge (M8): scree, the forge's floor and walls, lava and conveyor belts. */
+  'scree',
+  'forge_floor',
+  'forge_wall',
+  'lava',
+  'belt_n',
+  'belt_e',
+  'belt_s',
+  'belt_w',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -245,4 +254,16 @@ export const TERRAIN = {
   hof_floor_hi: { solid: false, swim: true, rise: { floods: 2 } },
   /** A sunken arch over deep water: a wall to walkers and swimmers, passed under by a diver. */
   arch: { solid: true, low: true, swim: true, under: true },
+  /** Dvergagröf's mountainside: grey broken stone. */
+  scree: { solid: false },
+  /** Ívaldi's Forge: iron-dark flags, and walls of black basalt. */
+  forge_floor: { solid: false },
+  forge_wall: { solid: true },
+  /** Molten rock: no footing (arrows and the boomerang fly over it); Ís crusts it for a while. */
+  lava: { solid: true, low: true, lava: true },
+  /** Conveyor belts that carry anyone walking on them, the way they run. */
+  belt_n: { solid: false, belt: 'n' },
+  belt_e: { solid: false, belt: 'e' },
+  belt_s: { solid: false, belt: 's' },
+  belt_w: { solid: false, belt: 'w' },
 } as const satisfies Record<TerrainId, TerrainDef>;

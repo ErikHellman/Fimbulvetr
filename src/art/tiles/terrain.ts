@@ -574,7 +574,86 @@ const SOKKVA_HOF = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** A conveyor belt: dark slats crossing the way it runs, sliding along one px a frame. */
+function belt(dir: Dir4): TerrainArt {
+  const across = dir === 'e' || dir === 'w';
+  const sign = dir === 'e' || dir === 's' ? 1 : -1;
+  return {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: 120,
+    paint: (p, v) => {
+      p.fill('#3a3634');
+      for (let k = 0; k < 4; k++) {
+        const a = (((k * 4 + sign * v.frame) % 16) + 16) % 16;
+        if (across) p.rect(a, 1, 1, 14, '#5c5652');
+        else p.rect(1, a, 14, 1, '#5c5652');
+      }
+      // The rails along both edges.
+      if (across) {
+        p.rect(0, 0, 16, 1, '#1c1a1a');
+        p.rect(0, 15, 16, 1, '#1c1a1a');
+      } else {
+        p.rect(0, 0, 1, 16, '#1c1a1a');
+        p.rect(15, 0, 1, 16, '#1c1a1a');
+      }
+    },
+  };
+}
+
+/** Dvergagröf's scree and Ívaldi's Forge: basalt, iron flags, lava and the belts. */
+const DVERGAGROF = {
+  scree: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#7a7672');
+      p.speckle('#5e5a56', 0.2);
+      p.speckle('#9a9690', 0.08);
+      for (let i = 0; i < 3; i++) p.rect(nextInt(p.rng, 0, 13), nextInt(p.rng, 0, 14), 3, 2, '#68645f');
+    },
+  },
+  forge_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#4a4442', '#2c2826', v.variant);
+    },
+  },
+  forge_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#262224');
+      p.speckle('#3a3436', 0.25);
+      p.rect(0, 12, 16, 4, '#18161a');
+    },
+  },
+  lava: {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: 200,
+    paint: (p, v) => {
+      p.fill('#c4421a');
+      p.speckle('#e0702a', 0.2);
+      for (let k = 0; k < 3; k++) {
+        const x = (nextInt(p.rng, 0, 15) + v.frame * 2) % 16;
+        const y = nextInt(p.rng, 1, 14);
+        p.rect(x, y, Math.min(3, 16 - x), 1, '#f8c04a');
+      }
+      p.speckle('#7a2410', 0.06);
+    },
+  },
+  belt_n: belt('n'),
+  belt_e: belt('e'),
+  belt_s: belt('s'),
+  belt_w: belt('w'),
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...DVERGAGROF,
   ...SOKKVA_HOF,
   ...SAEVATN,
   ...NIFLMYRR,
