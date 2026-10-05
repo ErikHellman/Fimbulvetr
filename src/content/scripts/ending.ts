@@ -79,6 +79,8 @@ const d8Ending: ScriptDef = {
       effects: [
         { k: 'set', flag: 'st_game_done', value: true },
         { k: 'setMinute', minute: 6 * 60 },
+        { k: 'heal', n: 0 },
+        { k: 'seidr', n: 0 },
       ],
     },
     { k: 'warp', screen: 'ask_farmyard', at: { x: 20, y: 14 }, facing: 's' },

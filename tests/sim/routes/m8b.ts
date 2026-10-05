@@ -22,7 +22,7 @@ export function settle(h: Harness, ticks = 120): void {
 }
 
 /** Stands on (tx, ty) facing `dir` and brings the hammer (slot 1) down. */
-function hammerAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
+export function hammerAt(h: Harness, tx: number, ty: number, dir: Dir4): void {
   walkFighting(h, tx, ty);
   face(h, dir);
   settle(h);

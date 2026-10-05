@@ -16,13 +16,14 @@ const d8Enter: ScriptDef = {
   ],
 };
 
-/** A basin of meltwater in the giants' halls: Ask drinks, and is whole again. */
+/** A basin of meltwater in the giants' halls: Ask drinks, and is whole again, seiðr and all. */
 const d8Basin: ScriptDef = {
   steps: [
     {
       k: 'do',
       effects: [
         { k: 'heal', n: 80 },
+        { k: 'seidr', n: 0 },
         { k: 'sfx', id: 'sfx_drink' },
       ],
     },
@@ -30,8 +31,8 @@ const d8Basin: ScriptDef = {
       k: 'say',
       who: null,
       text: {
-        en: 'A trough for a giant’s hands, half full of meltwater. Ask drinks from it like a calf, and every hurt goes quiet.',
-        sv: 'Ett tråg för en jättes händer, halvfullt av smältvatten. Ask dricker ur det som en kalv, och varje sår tystnar.',
+        en: 'A trough for a giant’s hands, half full of meltwater. Ask drinks from it like a calf: every hurt goes quiet, and the seiðr comes back into Ask’s hands like warmth.',
+        sv: 'Ett tråg för en jättes händer, halvfullt av smältvatten. Ask dricker ur det som en kalv: varje sår tystnar, och seiðr strömmar tillbaka i Asks händer som värme.',
       },
     },
   ],

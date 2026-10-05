@@ -21,6 +21,7 @@ function fallen(kolbeinn: 'spared' | 'slain'): Harness {
   for (const f of ['st_utgard_open', 'st_halvar_confessed', 'st_kolbeinn_beaten', 'st_hrimnir_dead'] as const)
     s.flags[f] = true;
   s.flags[kolbeinn === 'spared' ? 'st_kolbeinn_spared' : 'st_kolbeinn_slain'] = true;
+  s.hero.hp = 10;
   const h = new Harness({ state: s, screen: 'd8_r12', tile: [20, 16], facing: 'n' });
   h.sim.god = true;
   return h.idle(2);
@@ -49,6 +50,7 @@ describe('the ending (M10b)', () => {
     expect(h.sim.state.flags.st_end_go).not.toBe(true);
     expect(h.sim.screen.id).toBe('ask_farmyard');
     expect(h.sim.state.clock.season).toBe('spring');
+    expect(h.sim.hero.hp).toBe(h.sim.hero.maxHp);
   });
 
   it('lets Ask go with her instead', () => {

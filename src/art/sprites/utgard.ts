@@ -229,6 +229,9 @@ export function utgardFrames(): SpriteFrame[] {
   }
   for (const pose of ['shadow', 'sweep', 'struck'] as const)
     out.push({ name: `enemy_hrimnir_hand_${pose}_s_0`, raster: hand(pose), ox: 20, oy: 24 });
+  // Spawned mid-fight, the hand and a pillar show for a frame before their machines first run: as shadows.
+  out.push({ name: 'enemy_hrimnir_hand_idle_s_0', raster: hand('shadow'), ox: 20, oy: 24 });
+  out.push({ name: 'enemy_rime_pillar_idle_s_0', raster: pillar('shadow', 0), ox: 18, oy: 47 });
   out.push({ name: 'enemy_rime_pillar_shadow_s_0', raster: pillar('shadow', 0), ox: 18, oy: 47 });
   out.push({ name: 'enemy_rime_pillar_shadow_s_1', raster: pillar('shadow', 1), ox: 18, oy: 47 });
   out.push({ name: 'enemy_rime_pillar_fall_s_0', raster: pillar('fall', 0), ox: 18, oy: 47 });
@@ -271,6 +274,6 @@ export const UTGARD_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimD
     breathe: all(1, 1),
     open: all(1, 1),
   },
-  enemy_hrimnir_hand: { shadow: one, sweep: one, struck: one },
-  enemy_rime_pillar: { shadow: south(2, 3), fall: south(2, 12, false), fallen: one },
+  enemy_hrimnir_hand: { idle: one, shadow: one, sweep: one, struck: one },
+  enemy_rime_pillar: { idle: one, shadow: south(2, 3), fall: south(2, 12, false), fallen: one },
 };

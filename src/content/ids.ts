@@ -323,6 +323,7 @@ export const QUESTS = [
   'q_foreman',
   'q_forge',
   'q_rime',
+  'q_king',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 

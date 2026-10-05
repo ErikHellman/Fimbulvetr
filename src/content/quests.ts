@@ -1016,6 +1016,54 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_king: {
+    id: 'q_king',
+    name: { en: 'The Rime King', sv: 'Rimkungen' },
+    stages: [
+      {
+        when: flag('st_halvar_confessed'),
+        text: {
+          en: 'Halvar was there when the Rime King was bound, and he spoke the binding-words at Útgarðr’s gate. It stands open.',
+          sv: 'Halvar var där när Rimkungen bands, och han talade bindningsorden vid Útgarðrs port. Den står öppen.',
+        },
+      },
+      {
+        when: flag('st_d8_entered'),
+        text: {
+          en: 'Inside Útgarðr, the giants’ stronghold. Each of its three wings ends at a seal; the master key waits behind all three.',
+          sv: 'Inne i Útgarðr, jättarnas borg. Var och en av dess tre flyglar slutar vid ett sigill; huvudnyckeln väntar bakom alla tre.',
+        },
+      },
+      {
+        when: all(flag('st_d8_seal_w'), flag('st_d8_seal_e'), flag('st_d8_seal_n')),
+        text: {
+          en: 'All three seals burn, and the rime door in the seal hall has melted.',
+          sv: 'Alla tre sigillen brinner, och rimdörren i sigillsalen har smält.',
+        },
+      },
+      {
+        when: flag('st_d8_warden'),
+        text: {
+          en: 'Jötunvörðr has fallen, and the master key opens the keep. Kolbeinn is in there.',
+          sv: 'Jötunvörðr har fallit, och huvudnyckeln öppnar borgen. Kolbeinn finns där inne.',
+        },
+      },
+      {
+        when: flag('st_kolbeinn_beaten'),
+        text: {
+          en: 'Kolbeinn is beaten. Past his hall lies the binding hall, where the Rime King is waking.',
+          sv: 'Kolbeinn är besegrad. Bortom hans sal ligger bindningssalen, där Rimkungen håller på att vakna.',
+        },
+      },
+      {
+        when: flag('st_hrimnir_dead'),
+        text: {
+          en: 'The Rime King is bound for good, by his own name. The winter is over.',
+          sv: 'Rimkungen är bunden för gott, med sitt eget namn. Vintern är över.',
+        },
+      },
+    ],
+  },
   q_holmr: {
     id: 'q_holmr',
     name: { en: 'The island', sv: 'Ön' },

@@ -1,4 +1,5 @@
 import type { ScreenDef } from '@core/world/screen';
+import { flag, not } from '../../dialogue/util';
 import { room } from './templates';
 
 export const d8R21: ScreenDef = {
@@ -13,6 +14,7 @@ export const d8R21: ScreenDef = {
       k: 'enemy',
       id: 'jotunvordr',
       at: { x: 20, y: 8 },
+      when: not(flag('st_d8_warden')),
       onDeath: [{ k: 'set', flag: 'st_d8_warden', value: true }],
     },
     {

@@ -178,4 +178,19 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Ása and Bjarni home, Kolbeinn's word, new lines for Hrímgerðr's fall
     - [x] Solver proofs, route, e2e, v1-m9b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
+- [ ] M10 Útgarðr + ending
+  - [ ] M10a Útgarðr (D8) — Part 1
+    - [x] The room-template library; Halvar's confession opens the gate
+    - [x] Útgarðr's 40 rooms: three wings, three seals, four keys, the master key
+    - [x] Jötunvörðr (thawed by Eldr) and Kolbeinn's duel, spared or slain
+    - [x] Solver proofs, route, e2e, v1-m10a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M10b The Rime King and the ending — Part 2
+    - [x] Embla's ring of binding and Hrímnir's three phases (hand, breath, pillars)
+    - [x] Spring on the mountain (`ClockRules.thaw`)
+    - [x] The ending: the valley, the farm, Kolbeinn's end, stay or go, the final credits
+    - [x] The world after: spring at the farm, post-game lines, the Rime King quest
+    - [x] Route, e2e, v1-m10b fixture, docs
+    - [ ] Title-screen rune for a finished save (moved to M11 by the cut line)
+    - [ ] User playtest and Swedish proofread
+- [ ] M11 Completion + ship

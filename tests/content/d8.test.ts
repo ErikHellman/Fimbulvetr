@@ -94,6 +94,15 @@ describe('Útgarðr', () => {
     expect(SCREENS.d8_r13.things.some((t) => t.k === 'lock' && t.big === true)).toBe(true);
   });
 
+  it('keeps its bosses dead once beaten', () => {
+    const bosses = things('enemy').filter(({ t }) => t.k === 'enemy' && DB.enemies[t.id].boss !== undefined);
+    expect(bosses.length).toBe(3);
+    for (const { id, t } of bosses) {
+      expect(t.k === 'enemy' && t.when !== undefined, id).toBe(true);
+      expect(t.k === 'enemy' && t.onDeath !== undefined, id).toBe(true);
+    }
+  });
+
   it('has four small keys for four locks', () => {
     const keys = things('chest').filter(
       ({ t }) => t.k === 'chest' && 'item' in t.gives && t.gives.item === 'small_key',
