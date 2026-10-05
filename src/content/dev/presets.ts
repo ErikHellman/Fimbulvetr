@@ -863,6 +863,39 @@ export const DEV_PRESETS = {
     dungeons: { d6: { bigKey: true, map: true, compass: true } },
   },
   /**
+   * Hrímfjöll's beacon hill by its warp stone (M9), in winter: the ember byrnie against the killing frost,
+   * the grapple in slot K and bombs in L, Sindri's lens for Ormr, and three thanes fallen.
+   */
+  hrf: {
+    ...FIMBUL,
+    screen: 'hrf_beacon',
+    tile: [20, 16],
+    facing: 'n',
+    minute: 10 * 60,
+    silver: 20,
+    armor: 'ember_byrnie',
+    items: { ...FIMBUL.items, grapple: 1, sealskin: 1, hammer: 1, ore: 1, trade_lens: 1 },
+    slots: ['grapple', 'bombs'],
+    galdr: ['vindr', 'eldr', 'farvegr', 'bragd', 'hlif', 'ljos', 'is', 'skjalfti'],
+    flags: {
+      ...AFTER_RIME,
+      st_thane_nastrond: true,
+      st_thane_nykr: true,
+      st_thane_ivaldi: true,
+      q_thanes: 3,
+      q_captives: 6,
+      st_dvg_reached: true,
+      q_foreman: 5,
+      st_embla_found: true,
+      q_letters: 2,
+      q_trade: 6,
+      st_hrf_reached: true,
+    },
+    maxHp: 48,
+    hp: 48,
+    warps: ['haugar', 'saevatn', 'dvergagrof', 'hrimfjoll'],
+  },
+  /**
    * Just inside Sökkva Kvern's door, Þuríðr's tale heard: the boomerang in slot K, the water low, two horns
    * of red mead (Hrafnkell sells the second horn), and five hearts (Rótarhellir's heart and four of the
    * seven pieces to be had before here).

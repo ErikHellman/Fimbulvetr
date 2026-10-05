@@ -163,4 +163,13 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] The scree's stakes, Hreggviðr's stave, new lines for Ívaldi's fall
     - [x] Solver proofs, route, e2e, v1-m8b fixture, docs
     - [ ] User playtest and Swedish proofread
-- [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
+- [ ] M9 Hrímfjöll + D7
+  - [ ] M9a Hrímfjöll — Part 1
+    - [x] The killing frost, glaze sliding and blizzards
+    - [x] Ten cold screens and Ormr's hut; the ice wolf and the frost wisp
+    - [x] Ormr and trading step 7 (the beacon lit, the beacon ring); the warp stone
+    - [x] Embla's third letter and the cairn's seiðr vessel
+    - [x] Solver proofs, route, e2e, v1-m9a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M9b Hrímturn (D7) — Part 2
+- [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
