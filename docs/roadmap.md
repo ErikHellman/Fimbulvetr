@@ -194,3 +194,17 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [ ] Title-screen rune for a finished save (moved to M11 by the cut line)
     - [ ] User playtest and Swedish proofread
 - [ ] M11 Completion + ship
+  - [ ] M11a Completion — Part 1
+    - [x] Piece and warp-stone conditions; 24 achievements, kept in the browser, with a toast
+    - [x] The title menu's Achievements page and the quest page's progress footer
+    - [x] The rune-record (`q_record`): four bauta-stones and Gyða's record
+    - [x] The spring feast (`q_feast`): mead, a burbot and a cask, then Halvar's table
+    - [x] Seven heart pieces placed (36 in all), four new verses from Bragi; solver proofs
+    - [x] Route, e2e, v1-m11a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M11b Ship — Part 2
+    - [ ] Drawn font sizes and the text-size setting
+    - [ ] Title-screen rune for a finished save
+    - [ ] Safari audit and fixes; the sim benchmark
+    - [ ] Version 1.0.0, README, route, e2e, v1-m11b fixture, docs
+    - [ ] User playtest and Swedish proofread
