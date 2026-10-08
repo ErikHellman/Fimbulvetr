@@ -1,4 +1,5 @@
 import { wasPressed, type Action, type InputFrame } from '@core/input/actions';
+import { FONT_SIZES } from '@art/font';
 import { LANGS } from '@core/i18n/t';
 import { DEFAULT_SETTINGS, type Settings } from '@shell/platform/settings';
 import { REMAPPABLE, rebind, type RemappableAction } from '@shell/input/remap';
@@ -12,6 +13,7 @@ export const SETTING_ROWS = [
   'lang',
   'volume',
   'scaling',
+  'textSize',
   'shake',
   'flash',
   'holdShield',
@@ -64,6 +66,11 @@ function nudge(s: Settings, row: SettingRow, dir: 1 | -1): Settings {
       return { ...s, volume: Math.round(Math.min(1, Math.max(0, s.volume + dir * VOLUME_STEP)) * 10) / 10 };
     case 'scaling':
       return { ...s, scaling: s.scaling === 'integer' ? 'fit' : 'integer' };
+    case 'textSize': {
+      const i = FONT_SIZES.indexOf(s.textSize);
+      const n = FONT_SIZES.length;
+      return { ...s, textSize: FONT_SIZES[(i + (dir === 1 ? 1 : n - 1)) % n] ?? s.textSize };
+    }
     case 'shake':
     case 'flash':
     case 'holdShield':

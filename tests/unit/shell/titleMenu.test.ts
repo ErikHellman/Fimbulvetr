@@ -43,8 +43,15 @@ describe('title menu', () => {
   });
 
   it('offers Continue and Export only with an autosave, and Load only with something to load', () => {
-    expect(titleRows(info())).toEqual(['new', 'import', 'settings']);
-    expect(titleRows(info('auto'))).toEqual(['continue', 'new', 'import', 'export', 'settings']);
+    expect(titleRows(info())).toEqual(['new', 'import', 'settings', 'achievements']);
+    expect(titleRows(info('auto'))).toEqual([
+      'continue',
+      'new',
+      'import',
+      'export',
+      'settings',
+      'achievements',
+    ]);
     expect(titleRows(info('auto', 's2'))).toEqual([
       'continue',
       'new',
@@ -52,6 +59,7 @@ describe('title menu', () => {
       'import',
       'export',
       'settings',
+      'achievements',
     ]);
   });
 
@@ -82,11 +90,12 @@ describe('title menu', () => {
     expect(back.state).toEqual({ page: 'main', cursor: 2 });
   });
 
-  it('hands import, export and settings to the scene', () => {
+  it('hands import, export, settings and achievements to the scene', () => {
     const i = info('auto');
     expect(run(i, 'any', ['down'], ['down'], ['confirm']).actions).toEqual([{ k: 'import' }]);
     expect(run(i, 'any', ['down'], ['down'], ['down'], ['confirm']).actions).toEqual([{ k: 'export' }]);
-    expect(run(i, 'any', ['up'], ['confirm']).actions).toEqual([{ k: 'settings' }]);
+    expect(run(i, 'any', ['up'], ['up'], ['confirm']).actions).toEqual([{ k: 'settings' }]);
+    expect(run(i, 'any', ['up'], ['confirm']).actions).toEqual([{ k: 'achievements' }]);
   });
 });
 

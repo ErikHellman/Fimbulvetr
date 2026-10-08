@@ -6,6 +6,14 @@ export const hauGully: ScreenDef = {
   purpose:
     "The way into Haugar: the birch glade's east path runs into a ravine that last autumn's storm filled with fallen rock. Only a bomb clears it. Past the rockfall the ground climbs north onto the heather.",
   things: [
+    /**
+     * The sinkhole (M11a): the ground fell in under the gully's north-west corner, leaving a ledge no foot
+     * reaches. A miner's post on each lip carries the grapple over and back.
+     */
+    { k: 'post', at: { x: 9, y: 4 } },
+    { k: 'post', at: { x: 12, y: 9 } },
+    { k: 'piece', id: 'hp_hau_sinkhole', at: { x: 12, y: 3 } },
+
     /** The rockfall: the bomb gate into Haugar. */
     { k: 'crack', id: 'hau_k_gully', at: { x: 6, y: 16 }, w: 1, h: 3, art: 'rock' },
     /** Past the rockfall: Ask has reached Haugar. */
@@ -21,17 +29,17 @@ export const hauGully: ScreenDef = {
   /** Where Haugar's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 24, y: 10 },
-    { x: 12, y: 7 },
+    { x: 12, y: 12 },
   ],
   map: [
     '##################,,,,##################',
     '##################,,,,##################',
     '##################,,,,##################',
-    '########EEEEEEEEEE,,,,EEEEEEEE##########',
-    '########EEEEEEEEEE,,,,EEEEEKEE##########',
-    '########EEEiEEEEEE,,,,EEEEEEEE##########',
-    '########EEEEEEEEEE,,,,EEEEEEEE##########',
-    '########EEEEEEEEEE,,,,EEEEiEEEE#########',
+    '########EEEEEE#EEE,,,,EEEEEEEE##########',
+    '########EEEEEE#EEE,,,,EEEEEKEE##########',
+    '########EEEEEE#EEE,,,,EEEEEEEE##########',
+    '########000000#EEE,,,,EEEEEEEE##########',
+    '########000000#EEE,,,,EEEEiEEEE#########',
     '########EEKEEEEEEE,,,,EEEEEEEEE#########',
     '########EEEEEEEEEE,,,,EEEEEEEEE#########',
     '########EEEEEEEEEE,,,,EEEEEEEEEE########',

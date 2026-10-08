@@ -33,6 +33,10 @@ export type Cond =
   | { readonly k: 'weather'; readonly is: WeatherKind | readonly WeatherKind[] }
   /** Ask is walking `npc` along with her right now (M8: the escort reached its end). */
   | { readonly k: 'escort'; readonly npc: NpcId }
+  /** At least this many heart pieces found (M11: achievements). */
+  | { readonly k: 'pieces'; readonly gte: number }
+  /** At least this many warp stones lit. */
+  | { readonly k: 'warps'; readonly gte: number }
   | { readonly k: 'all'; readonly of: readonly Cond[] }
   | { readonly k: 'any'; readonly of: readonly Cond[] }
   | { readonly k: 'not'; readonly c: Cond };
@@ -95,6 +99,10 @@ export function evalCond(c: Cond | undefined, ctx: CondCtx): boolean {
     }
     case 'escort':
       return ctx.escort === c.npc;
+    case 'pieces':
+      return s.world.pieces.length >= c.gte;
+    case 'warps':
+      return s.world.warps.length >= c.gte;
     case 'all':
       return c.of.every((x) => evalCond(x, ctx));
     case 'any':

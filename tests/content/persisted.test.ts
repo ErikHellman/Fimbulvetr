@@ -262,6 +262,16 @@ const PERSISTED = [
   'd8_sh_r31s',
   'd8_sh_r33n',
   'hp_d8_keep',
+  // M11a (pieces handed over by side quests)
+  'hp_record',
+  'hp_feast',
+  // M11a (four hidden pieces with Bragi's later verses, and the miners' store's stake)
+  'hp_hau_sinkhole',
+  'hp_dvg_store',
+  'dvg_k_ledges',
+  'hp_dvg_slag',
+  'hp_hrf_thaw',
+  'hp_nif_gjoll',
 ] as const;
 
 /** Pieces of heart handed over by effects in dialogue and scripts (`{k:'piece', id}`). */

@@ -22,6 +22,8 @@ import { ENDING_SCRIPTS } from './ending';
 import { SAEVATN_SCRIPTS } from './saevatn';
 import { DVERGAGROF_SCRIPTS } from './dvergagrof';
 import { HRIMFJOLL_SCRIPTS } from './hrimfjoll';
+import { RECORD_SCRIPTS } from './record';
+import { FEAST_SCRIPTS } from './feast';
 
 /** Cutscenes and interaction scripts by id. */
 export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
@@ -47,4 +49,6 @@ export const SCRIPTS_DEFS: Readonly<Partial<Record<ScriptId, ScriptDef>>> = {
   ...ENDING_SCRIPTS,
   ...DVERGAGROF_SCRIPTS,
   ...HRIMFJOLL_SCRIPTS,
+  ...RECORD_SCRIPTS,
+  ...FEAST_SCRIPTS,
 };

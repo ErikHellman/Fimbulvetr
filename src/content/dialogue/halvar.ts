@@ -15,7 +15,14 @@ export const HALVAR: DialogueDef = {
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
-    { when: flag('st_game_done'), node: 'spring' },
+    /** After the ending (M10b), once the farm stands: the spring feast (M11a), then spring itself. */
+    { when: all(flag('st_game_done'), flag('q_feast_done')), node: 'feast_after' },
+    {
+      when: all(flag('st_game_done'), flag('q_feast_mead'), flag('q_feast_fish'), flag('q_feast_cask')),
+      node: 'feast_ready',
+    },
+    { when: all(flag('st_game_done'), flag('q_feast_asked')), node: 'feast_some' },
+    { when: all(flag('st_game_done'), atLeast('q_farm', 2)), node: 'spring' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_hrimgerdr')), node: 'rime' },
     { when: all(atLeast('q_farm', 2), flag('st_hrf_reached')), node: 'hrf' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
@@ -44,6 +51,32 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'Spring, and nobody has to bleed to keep it. Go on, the chores can wait a day. I never thought I would hear myself say that.',
         sv: 'Vår, och ingen behöver blöda för att hålla den. Gå nu, sysslorna kan vänta en dag. Jag trodde aldrig att jag skulle höra mig själv säga det.',
+      },
+      next: 'feast_ask',
+    },
+    feast_ask: {
+      text: {
+        en: 'No. One chore. Everyone is home, and Askdalr has not feasted since before the winters grew teeth. Bring me mead from Sigrún, a fish from Kári at the fen, and a cask of the dwarves’ ale from Dvalinn, and we will eat at my table in the longhouse.',
+        sv: 'Nej. En syssla. Alla är hemma, och Askdalr har inte hållit gille sedan innan vintrarna fick tänder. Hämta mjöd från Sigrún, en fisk från Kári vid kärret och en kagge av dvärgarnas öl från Dvalinn, så äter vi vid mitt bord i långhuset.',
+      },
+      do: [{ k: 'set', flag: 'q_feast_asked', value: true }],
+    },
+    feast_some: {
+      text: {
+        en: 'Mead from Sigrún, a fish from Kári, and the dwarves’ ale from Dvalinn. Then the longhouse table.',
+        sv: 'Mjöd från Sigrún, en fisk från Kári och dvärgarnas öl från Dvalinn. Sedan bordet i långhuset.',
+      },
+    },
+    feast_ready: {
+      text: {
+        en: 'All of it, and the whole valley talking about it already. Go and sit at the table in the longhouse, lad. Nobody eats until you do.',
+        sv: 'Alltihop, och hela dalen pratar redan om det. Gå och sätt dig vid bordet i långhuset, pojk. Ingen äter förrän du gör det.',
+      },
+    },
+    feast_after: {
+      text: {
+        en: 'My head still hurts from that feast. Worth it. Every drop.',
+        sv: 'Huvudet värker fortfarande efter det gillet. Värt det. Varenda droppe.',
       },
     },
     confess: {

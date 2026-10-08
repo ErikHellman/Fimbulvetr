@@ -70,7 +70,7 @@ test('settings change at once and survive a reload: colour-blind aid and a remap
   await tap(page, 'ArrowDown');
   await tap(page, 'Enter');
   // Down to the colour-blind aid and switch it on.
-  for (let i = 0; i < 7; i++) await tap(page, 'ArrowDown');
+  for (let i = 0; i < 8; i++) await tap(page, 'ArrowDown');
   await tap(page, 'Enter');
   // Past the introduction toggle to Controls…: the sword (fifth row) to U.
   await tap(page, 'ArrowDown');

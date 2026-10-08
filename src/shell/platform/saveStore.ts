@@ -16,6 +16,8 @@ export interface SaveSummary {
   readonly playTicks: number;
   readonly day: number;
   readonly season: Season;
+  /** The game is finished (`st_game_done`); absent in summaries stored before M11b. */
+  readonly done?: boolean;
 }
 
 export interface SaveRecord {
@@ -32,6 +34,7 @@ export function summarize(save: SaveData): SaveSummary {
     playTicks: s.playTicks,
     day: s.clock.day,
     season: s.clock.season,
+    done: s.flags['st_game_done'] === true,
   };
 }
 

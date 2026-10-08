@@ -324,6 +324,8 @@ export const QUESTS = [
   'q_forge',
   'q_rime',
   'q_king',
+  'q_record',
+  'q_feast',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -460,6 +462,11 @@ export const SCRIPTS = [
   'd8_ending',
   'end_home',
   'end_shore',
+  'bauta_myr',
+  'bauta_hau',
+  'bauta_sae',
+  'bauta_hrf',
+  'end_feast',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
@@ -511,3 +518,35 @@ export const COVERS = [
   'crust',
 ] as const;
 export type CoverId = (typeof COVERS)[number];
+
+/**
+ * Achievements (M11). The browser stores earned ids across save slots, so this list is append-only like
+ * every persisted id.
+ */
+export const ACHIEVEMENTS = [
+  'ach_raid',
+  'ach_stone1',
+  'ach_stones',
+  'ach_thane1',
+  'ach_thanes',
+  'ach_embla',
+  'ach_king',
+  'ach_spared',
+  'ach_slain',
+  'ach_stay',
+  'ach_go',
+  'ach_captives',
+  'ach_letters',
+  'ach_trade',
+  'ach_farm',
+  'ach_loom',
+  'ach_gamli',
+  'ach_galdr',
+  'ach_warps',
+  'ach_pieces',
+  'ach_side',
+  'ach_silver',
+  'ach_record',
+  'ach_feast',
+] as const;
+export type AchievementId = (typeof ACHIEVEMENTS)[number];
