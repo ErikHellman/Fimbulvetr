@@ -6,6 +6,8 @@ export const mylSprings: ScreenDef = {
   purpose:
     'The warm springs, steaming in every season: why the channel along this shore never freezes. A pile of old rock in the north-east corner is cracked: a bomb opens the cave behind it, where the bomb bag lies.',
   things: [
+    /** The bank by the warm spring, mud in spring: one of Ragna's lumps of amber (`q_amber`). */
+    { k: 'use', at: { x: 11, y: 5 }, script: 'amber_mud' },
     { k: 'crack', id: 'myl_k_springs', at: { x: 35, y: 3 }, w: 2, h: 1, art: 'rock' },
     { k: 'door', at: { x: 35, y: 3 }, dir: 'n', to: 'myl_int_cave', arrive: { x: 19, y: 14 }, facing: 'n' },
     { k: 'door', at: { x: 36, y: 3 }, dir: 'n', to: 'myl_int_cave', arrive: { x: 20, y: 14 }, facing: 'n' },

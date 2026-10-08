@@ -12,6 +12,8 @@ const DEFS: Record<CoverId, CoverDef> = {
   mud: { id: 'mud', seasons: ['spring'], slow: 0.75, grows: { on: ['grass'], by: ['water'] }, wet: true },
   ice: { id: 'ice', seasons: ['winter'], slow: 1, grows: { on: ['water'] }, walk: true },
   flood: { id: 'flood', seasons: ['spring'], slow: 1, grows: { on: ['shoal'] }, sink: true },
+  is_ice: { id: 'is_ice', seasons: ['summer'], slow: 1, walk: true },
+  crust: { id: 'crust', seasons: ['summer'], slow: 1, walk: true },
 };
 const LEGEND = { '"': 'tall_grass' } as const;
 const MAP = ['..""', '""..'];

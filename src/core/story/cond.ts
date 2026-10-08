@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { GaldrId, ItemId, QuestId, WeaponId } from '@content/ids';
+import type { ArmorId, GaldrId, ItemId, NpcId, QuestId, WeaponId } from '@content/ids';
 import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
 import type { GameState } from '../state/gameState';
@@ -25,10 +25,18 @@ export type Cond =
   | { readonly k: 'season'; readonly is: Season }
   | { readonly k: 'phase'; readonly is: Phase | readonly Phase[] }
   | { readonly k: 'weapon'; readonly is: WeaponId }
+  /** The armour Ask wears, one of these (M9: warm armour on the high road). */
+  | { readonly k: 'armor'; readonly is: readonly ArmorId[] }
   /** A galdr Ask knows. */
   | { readonly k: 'galdr'; readonly id: GaldrId }
   /** The sky over the current region (indoors too: an NPC goes in because it rains outside). */
   | { readonly k: 'weather'; readonly is: WeatherKind | readonly WeatherKind[] }
+  /** Ask is walking `npc` along with her right now (M8: the escort reached its end). */
+  | { readonly k: 'escort'; readonly npc: NpcId }
+  /** At least this many heart pieces found (M11: achievements). */
+  | { readonly k: 'pieces'; readonly gte: number }
+  /** At least this many warp stones lit. */
+  | { readonly k: 'warps'; readonly gte: number }
   | { readonly k: 'all'; readonly of: readonly Cond[] }
   | { readonly k: 'any'; readonly of: readonly Cond[] }
   | { readonly k: 'not'; readonly c: Cond };
@@ -38,6 +46,8 @@ export interface CondCtx {
   readonly quests: Readonly<Partial<Record<QuestId, QuestDef>>>;
   /** The sky, read lazily (only `weather` conditions pay for it); missing means clear. */
   readonly weather?: () => WeatherKind;
+  /** Who Ask is escorting, if anyone; missing means no one. */
+  readonly escort?: NpcId;
 }
 
 export function phaseOf(minute: number): Phase {
@@ -79,12 +89,20 @@ export function evalCond(c: Cond | undefined, ctx: CondCtx): boolean {
     }
     case 'weapon':
       return s.inv.weapon === c.is;
+    case 'armor':
+      return c.is.includes(s.inv.armor);
     case 'galdr':
       return s.inv.galdr.includes(c.id);
     case 'weather': {
       const w = ctx.weather?.() ?? 'clear';
       return typeof c.is === 'string' ? w === c.is : c.is.includes(w);
     }
+    case 'escort':
+      return ctx.escort === c.npc;
+    case 'pieces':
+      return s.world.pieces.length >= c.gte;
+    case 'warps':
+      return s.world.warps.length >= c.gte;
     case 'all':
       return c.of.every((x) => evalCond(x, ctx));
     case 'any':

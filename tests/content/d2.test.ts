@@ -10,7 +10,7 @@ import { cellAt, parseTextMap } from '@core/world/textmap';
 import { riseFooting } from '@core/world/water';
 
 const LEVELS = [0, 1, 2] as const;
-const watery = SCREEN_IDS.filter((id) => SCREENS[id].water !== undefined);
+const watery = SCREEN_IDS.filter((id) => SCREENS[id].water === 'w_d2_level');
 
 /** Whether tile (x, y) of a screen gives footing at a water level. */
 function footing(id: ScreenId, level: number): (x: number, y: number) => boolean {

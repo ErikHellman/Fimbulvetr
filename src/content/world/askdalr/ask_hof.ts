@@ -5,6 +5,19 @@ export const askHof: ScreenDef = {
   region: 'askdalr',
   purpose: "Gyða's hof and the old standing stones: where the legend is told after the raid.",
   things: [
+    /** One of Sigrún's crates, by the hof's stones (`q_crates`): lift it and carry it to her door in the village. */
+    {
+      k: 'prop',
+      id: 'crate_b',
+      at: { x: 34, y: 9 },
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'q_crates_asked' },
+          { k: 'not', c: { k: 'flag', id: 'q_crate_b' } },
+        ],
+      },
+    },
     { k: 'door', at: { x: 20, y: 7 }, dir: 'n', to: 'ask_int_hof', arrive: { x: 20, y: 17 }, facing: 'n' },
     {
       k: 'sign',

@@ -57,8 +57,25 @@ export type Step =
    * the screen (StoryUi `breath`); it holds the stage for `BREATH_TICKS`.
    */
   | { readonly k: 'breath' }
-  /** The credits roll: `CREDITS_TICKS`, or until confirm once `CREDITS_SKIP` ticks have passed. */
-  | { readonly k: 'credits' };
+  /**
+   * Starts a trial against the sand: `done` must hold within `ticks` of play on this screen, or `fail`
+   * runs (also on leaving the screen); once it holds, `win` runs. Instant; the trial is never saved.
+   */
+  | {
+      readonly k: 'trial';
+      readonly ticks: number;
+      readonly done: Cond;
+      readonly win: ScriptId;
+      readonly fail: ScriptId;
+    }
+  /**
+   * The credits roll: `CREDITS_TICKS`, or until confirm once `CREDITS_SKIP` ticks have passed. `roll` picks
+   * the demo's credits (the default, after the pass) or the game's last ones (M10b).
+   */
+  | { readonly k: 'credits'; readonly roll?: CreditsRoll };
+
+/** Which credits roll: the demo's, at the end of Act I, or the game's own at the very end. */
+export type CreditsRoll = 'demo' | 'end';
 
 export interface ScriptDef {
   readonly steps: readonly Step[];

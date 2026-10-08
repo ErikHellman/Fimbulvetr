@@ -5,6 +5,7 @@ import { flag, not } from './util';
 export const JORUNN: DialogueDef = {
   entry: [
     { when: not(flag('n_jorunn_met')), node: 'meet' },
+    { when: { k: 'item', id: 'trade_fleece' }, node: 'fleece' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
     { node: 'day' },
   ],
@@ -21,6 +22,31 @@ export const JORUNN: DialogueDef = {
       text: {
         en: 'Askdalr? Raided? By trolls? Oh, the poor souls. Give me an hour and the whole square will know.',
         sv: 'Askdalr? Plundrat? Av troll? Åh, de stackarna. Ge mig en timme så vet hela torget.',
+      },
+    },
+    fleece: {
+      text: {
+        en: 'Is that Hildr’s fleece? Nobody else on the heath shears that clean. Give it here; my wheel has had nothing to do since the cold came.',
+        sv: 'Är det Hildrs fäll? Ingen annan på heden klipper så rent. Ge hit den; min slända har inte haft något att göra sedan kölden kom.',
+      },
+      choices: [
+        {
+          text: { en: 'Have her spin it.', sv: 'Låt henne spinna den.' },
+          do: [
+            { k: 'take', item: 'trade_fleece' },
+            { k: 'give', item: 'trade_yarn' },
+            { k: 'set', flag: 'q_trade', value: 2 },
+            { k: 'sfx', id: 'sfx_itemget' },
+          ],
+          next: 'yarn',
+        },
+        { text: { en: 'Not yet.', sv: 'Inte än.' } },
+      ],
+    },
+    yarn: {
+      text: {
+        en: 'There, good strong yarn. Too coarse for a cloak, mind; it would do for nets. Old Kári down in Mýrland is always mending his.',
+        sv: 'Så, gott starkt garn. För grovt till en mantel, märk väl; det duger till nät. Gamle Kári nere i Mýrland lagar alltid sina.',
       },
     },
     day: {

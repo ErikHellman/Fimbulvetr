@@ -5,7 +5,10 @@ export const myrGlade: ScreenDef = {
   region: 'myrkvidr',
   purpose:
     'A glade east of the north road: a ring of white birches round an old standing stone. By night the huldra waits there. A path runs east out of it to the rockfall into Haugar.',
-  things: [],
+  things: [
+    /** The split pine where Embla's first letter leads (M7a). */
+    { k: 'use', at: { x: 8, y: 6 }, script: 'letter1_box' },
+  ],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */
   spawns: [
     { x: 7, y: 11 },

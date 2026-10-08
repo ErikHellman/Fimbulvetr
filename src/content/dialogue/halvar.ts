@@ -1,14 +1,36 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { afterRaid, all, choresDone, day, evening, flag, not, paid, raidNight } from './util';
+import { afterRaid, all, atLeast, choresDone, day, evening, flag, not, paid, raidNight } from './util';
 
 const PAY = 10;
+/** What each stage of the rebuilding costs: the longhouse's roof, then the fold and byre. */
+export const FARM_COST = [150, 250] as const;
+const [ROOF, FOLD] = FARM_COST;
 
 /** Halvar hands out the day's chores and pays for them. */
 export const HALVAR: DialogueDef = {
   entry: [
     { when: raidNight, node: 'raid' },
+    { when: all(flag('st_thane_hrimgerdr'), not(flag('st_utgard_open'))), node: 'confess' },
+    { when: all(flag('st_utgard_open'), not(flag('st_hrimnir_dead'))), node: 'gate' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
+    { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    /** After the ending (M10b), once the farm stands: the spring feast (M11a), then spring itself. */
+    { when: all(flag('st_game_done'), flag('q_feast_done')), node: 'feast_after' },
+    {
+      when: all(flag('st_game_done'), flag('q_feast_mead'), flag('q_feast_fish'), flag('q_feast_cask')),
+      node: 'feast_ready',
+    },
+    { when: all(flag('st_game_done'), flag('q_feast_asked')), node: 'feast_some' },
+    { when: all(flag('st_game_done'), atLeast('q_farm', 2)), node: 'spring' },
+    { when: all(atLeast('q_farm', 2), flag('st_thane_hrimgerdr')), node: 'rime' },
+    { when: all(atLeast('q_farm', 2), flag('st_hrf_reached')), node: 'hrf' },
+    { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
+    { when: all(atLeast('q_farm', 2), flag('st_dvg_reached')), node: 'dvg' },
+    { when: atLeast('q_farm', 2), node: 'farm_done' },
+    { when: atLeast('q_farm', 1), node: 'fold' },
+    { when: flag('st_embla_found'), node: 'embla' },
+    { when: flag('st_farm_asked'), node: 'roof' },
     { when: flag('st_home_winter'), node: 'winter' },
     { when: all(afterRaid, flag('n_styrr_met'), not(flag('st_stone3_lit'))), node: 'styrr' },
     { when: afterRaid, node: 'after' },
@@ -25,6 +47,112 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    spring: {
+      text: {
+        en: 'Spring, and nobody has to bleed to keep it. Go on, the chores can wait a day. I never thought I would hear myself say that.',
+        sv: 'Vår, och ingen behöver blöda för att hålla den. Gå nu, sysslorna kan vänta en dag. Jag trodde aldrig att jag skulle höra mig själv säga det.',
+      },
+      next: 'feast_ask',
+    },
+    feast_ask: {
+      text: {
+        en: 'No. One chore. Everyone is home, and Askdalr has not feasted since before the winters grew teeth. Bring me mead from Sigrún, a fish from Kári at the fen, and a cask of the dwarves’ ale from Dvalinn, and we will eat at my table in the longhouse.',
+        sv: 'Nej. En syssla. Alla är hemma, och Askdalr har inte hållit gille sedan innan vintrarna fick tänder. Hämta mjöd från Sigrún, en fisk från Kári vid kärret och en kagge av dvärgarnas öl från Dvalinn, så äter vi vid mitt bord i långhuset.',
+      },
+      do: [{ k: 'set', flag: 'q_feast_asked', value: true }],
+    },
+    feast_some: {
+      text: {
+        en: 'Mead from Sigrún, a fish from Kári, and the dwarves’ ale from Dvalinn. Then the longhouse table.',
+        sv: 'Mjöd från Sigrún, en fisk från Kári och dvärgarnas öl från Dvalinn. Sedan bordet i långhuset.',
+      },
+    },
+    feast_ready: {
+      text: {
+        en: 'All of it, and the whole valley talking about it already. Go and sit at the table in the longhouse, lad. Nobody eats until you do.',
+        sv: 'Alltihop, och hela dalen pratar redan om det. Gå och sätt dig vid bordet i långhuset, pojk. Ingen äter förrän du gör det.',
+      },
+    },
+    feast_after: {
+      text: {
+        en: 'My head still hurts from that feast. Worth it. Every drop.',
+        sv: 'Huvudet värker fortfarande efter det gillet. Värt det. Varenda droppe.',
+      },
+    },
+    confess: {
+      text: {
+        en: 'Lad. Sit a moment. No, stand, it is too cold to sit. I came up because there is a thing I should have told you at the gate, the morning after the raid, and I told you about a seax instead.',
+        sv: 'Pojk. Sätt dig en stund. Nej, stå, det är för kallt att sitta. Jag kom upp för att det finns en sak jag borde ha sagt dig vid grinden, morgonen efter räden, och i stället berättade jag om en sax.',
+      },
+      next: 'confess2',
+    },
+    confess2: {
+      text: {
+        en: 'I was a huscarl once, of the old jarl. Thirty winters back we came up this mountain, forty of us and a goði, and we found him here. Hrímnir. Asleep, and so big I took him for the mountain.',
+        sv: 'Jag var huskarl en gång, hos den gamle jarlen. För trettio vintrar sedan kom vi upp på det här berget, fyrtio man och en gode, och vi fann honom här. Hrímnir. Sovande, och så stor att jag tog honom för berget.',
+      },
+      next: 'confess3',
+    },
+    confess3: {
+      text: {
+        en: 'We could have killed him. The goði said so. But killing a jötunn costs blood, and we had wives and fields. So we bound him instead, on our own blood, and on the blood of every child we would ever have.',
+        sv: 'Vi kunde ha dödat honom. Goden sa det. Men att döda en jätte kostar blod, och vi hade hustrur och åkrar. Så vi band honom i stället, med vårt eget blod, och med blodet från varje barn vi någonsin skulle få.',
+      },
+      next: 'confess4',
+    },
+    confess4: {
+      text: {
+        en: 'Embla’s blood. Ása’s, Bjarni’s, all of theirs. We chose the easy thing, and you have been paying for it all year. I am sorry, lad. That is all an old man has.',
+        sv: 'Emblas blod. Ásas, Bjarnis, allas. Vi valde det lätta, och du har fått betala för det hela året. Förlåt mig, pojk. Det är allt en gammal man har.',
+      },
+      next: 'words',
+    },
+    words: {
+      text: {
+        en: 'But I still know the words we shut this gate with. Stand back. ... There. Finish what we would not. And come back down, all of you.',
+        sv: 'Men jag kan fortfarande orden vi stängde den här porten med. Stig undan. ... Så. Gör färdigt det vi inte ville. Och kom ner igen, allihop.',
+      },
+      do: [
+        { k: 'set', flag: 'st_halvar_confessed', value: true },
+        { k: 'set', flag: 'st_utgard_open', value: true },
+      ],
+    },
+    gate: {
+      text: {
+        en: 'I will keep the gate, lad. Nothing comes out of it behind you. Go on.',
+        sv: 'Jag håller porten, pojk. Inget kommer ut ur den bakom dig. Gå nu.',
+      },
+    },
+    rime: {
+      text: {
+        en: 'Ása at her loom and Bjarni at his jetty, and every one of them home. I count heads at supper now, lad, like a fool counting sheep. They are all there.',
+        sv: 'Ása vid sin vävstol och Bjarni på sin brygga, och varenda en av dem hemma. Jag räknar huvuden vid kvällsmaten nu, pojk, som en dåre som räknar får. Alla är där.',
+      },
+    },
+    ivaldi: {
+      text: {
+        en: 'Þorkell is home, thinner, and talking about iron like a dwarf. Three of the four thanes, lad. Your mother would not have believed it. I hardly do.',
+        sv: 'Þorkell är hemma, magrare, och pratar om järn som en dvärg. Tre av de fyra hövdingarna, pojk. Din mor skulle inte ha trott det. Jag gör det knappt själv.',
+      },
+    },
+    hrf: {
+      text: {
+        en: 'Hrímfjöll. My grandfather went up there once, after a lost ewe, and came down without two toes. Whatever is in that tower, lad, come down with all of yours.',
+        sv: 'Hrímfjöll. Min farfar gick upp dit en gång, efter en bortsprungen tacka, och kom ner utan två tår. Vad det än är i det där tornet, pojk, kom ner med alla dina.',
+      },
+    },
+    dvg: {
+      text: {
+        en: 'Dwarves, over the chasm? My father swore they bought our wool for iron once. If they still dig ore, the byre and the goats need it more than any king.',
+        sv: 'Dvärgar, bortom klyftan? Min far svor att de en gång köpte vår ull för järn. Om de fortfarande bryter malm behöver ladugården och getterna den mer än någon kung.',
+      },
+    },
+    embla: {
+      text: {
+        en: 'So she is alive, out on an island in the lake. Tell her the farm still stands, and that her bed is made up whenever she wants it.',
+        sv: 'Så hon lever, ute på en ö i sjön. Säg att gården står kvar, och att hennes säng är bäddad när hon än vill ha den.',
+      },
+    },
     intro: {
       text: {
         en: 'Up with the sun, good. The sheep broke out of the pen again, and the trough is bone dry.',
@@ -204,6 +332,108 @@ export const HALVAR: DialogueDef = {
       text: {
         en: 'Go to Gyða. If anyone knows why the mountain breathed, she does. I will mend in this bed until the roof does.',
         sv: 'Gå till Gyða. Om någon vet varför berget andades så är det hon. Jag får läka i den här sängen tills taket gör det.',
+      },
+      next: 'farm',
+    },
+    farm: {
+      text: {
+        en: 'And the roof will not mend itself. Turf and timber can be bought, if there is silver. We build it back, Ask, a piece at a time.',
+        sv: 'Och taket lagar inte sig självt. Torv och timmer går att köpa, om det finns silver. Vi bygger upp det igen, Ask, en bit i taget.',
+      },
+      do: [{ k: 'set', flag: 'st_farm_asked', value: true }],
+      next: 'roof',
+    },
+    roof: {
+      text: {
+        en: 'The roof first. Snow lies on my blanket every morning.',
+        sv: 'Taket först. Det ligger snö på min filt varje morgon.',
+      },
+      choices: [
+        {
+          text: {
+            en: `Turf the roof (${String(ROOF)} silver).`,
+            sv: `Torva taket (${String(ROOF)} silver).`,
+          },
+          when: { k: 'silver', gte: ROOF },
+          do: [
+            { k: 'silver', n: -ROOF },
+            { k: 'set', flag: 'q_farm', value: 1 },
+            { k: 'sfx', id: 'sfx_buy' },
+          ],
+          next: 'roof_done',
+        },
+        {
+          text: { en: `The roof (${String(ROOF)} silver)…`, sv: `Taket (${String(ROOF)} silver)…` },
+          when: { k: 'not', c: { k: 'silver', gte: ROOF } },
+          next: 'poor',
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    roof_done: {
+      text: {
+        en: 'Green turf on a winter roof. It will look like a fool’s work until spring. Help me up, lad. I have lain here long enough.',
+        sv: 'Grön torv på ett vintertak. Det ser ut som ett dårverk fram till våren. Hjälp mig upp, pojk. Jag har legat här länge nog.',
+      },
+    },
+    fold: {
+      text: {
+        en: 'Hildr’s flock is scattered over the heath. Raise the fold and the byre again, and she could winter them here.',
+        sv: 'Hildrs hjord är skingrad över heden. Res fållan och fähuset igen, så kunde hon ha dem här över vintern.',
+      },
+      choices: [
+        {
+          text: {
+            en: `Raise the fold and byre (${String(FOLD)} silver).`,
+            sv: `Res fållan och fähuset (${String(FOLD)} silver).`,
+          },
+          when: { k: 'silver', gte: FOLD },
+          do: [
+            { k: 'silver', n: -FOLD },
+            { k: 'set', flag: 'q_farm', value: 2 },
+            { k: 'sfx', id: 'sfx_buy' },
+          ],
+          next: 'fold_done',
+        },
+        {
+          text: { en: `The fold (${String(FOLD)} silver)…`, sv: `Fållan (${String(FOLD)} silver)…` },
+          when: { k: 'not', c: { k: 'silver', gte: FOLD } },
+          next: 'poor',
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    fold_done: {
+      text: {
+        en: 'A fold with sheep in it again. I will send word to Hildr on the heath. She will come; the cold leaves her no choice.',
+        sv: 'En fålla med får i igen. Jag skickar bud till Hildr på heden. Hon kommer; kölden lämnar henne inget val.',
+      },
+    },
+    poor: {
+      text: {
+        en: 'Timber costs silver, even now. Come back with a fuller purse. I am not going anywhere.',
+        sv: 'Timmer kostar silver, även nu. Kom tillbaka med en fullare pung. Jag ska ingenstans.',
+      },
+    },
+    clasp: {
+      text: {
+        en: 'Where did you get that? … Steinn. The old dog is still alive, then.',
+        sv: 'Var fick du tag i det där? … Steinn. Den gamle hunden lever alltså.',
+      },
+      do: [{ k: 'take', item: 'mail_clasp' }],
+      next: 'clasp2',
+    },
+    clasp2: {
+      text: {
+        en: 'Do I remember what we swore? Tell him: every word, and I wish I did not. Tell him only that, Ask. Nothing more.',
+        sv: 'Om jag minns vad vi svor? Säg till honom: varje ord, och jag önskar att jag inte gjorde det. Säg bara det, Ask. Inget mer.',
+      },
+      do: [{ k: 'set', flag: 'q_steinn_answer', value: true }],
+    },
+    farm_done: {
+      text: {
+        en: 'A roof, a fold, sheep. The smithy and the rest want iron, and there is no ore this side of the rime.',
+        sv: 'Ett tak, en fålla, får. Smedjan och resten vill ha järn, och det finns ingen malm på den här sidan rimfrosten.',
       },
     },
   },

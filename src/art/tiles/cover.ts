@@ -29,7 +29,22 @@ function holes(p: Painter, n: number): void {
   for (let i = 0; i < n; i++) setPixel(p.r, nextInt(p.rng, 0, 15), nextInt(p.rng, 0, 15), [0, 0, 0, 0]);
 }
 
-export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
+const ART: Readonly<Record<Exclude<CoverId, 'is_ice'>, CoverArt>> = {
+  /** Ís on lava: a black crust, cracked, with the glow showing through the seams. */
+  crust: {
+    standing: (p) => {
+      p.fill('#2a2422');
+      p.speckle('#4a403a', 0.18);
+      for (let i = 0; i < 3; i++) {
+        const x = nextInt(p.rng, 1, 12);
+        const y = nextInt(p.rng, 2, 13);
+        p.rect(x, y, 3, 1, '#c8501e');
+        p.px(x + 3, y + 1, '#f08a2c');
+      }
+      holes(p, 12);
+    },
+    cut: () => {},
+  },
   /** Spring floodwater over the shoal: brown with silt, streaked with foam. */
   flood: {
     standing: (p) => {
@@ -119,4 +134,10 @@ export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
       p.rect(10, 9, 3, 2, C.iceLight);
     },
   },
+};
+
+export const COVER_ART: Readonly<Record<CoverId, CoverArt>> = {
+  ...ART,
+  /** Ís laid by the ice-song looks like the winter ice it imitates. */
+  is_ice: ART.ice,
 };

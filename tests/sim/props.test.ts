@@ -73,7 +73,7 @@ describe('throwing', () => {
     expect(h.count('hit')).toBe(1);
   });
 
-  it('is lost when the hero leaves the screen', () => {
+  it('is lost when the hero is warped off the screen', () => {
     const h = new Harness({ db: propDb(), tile: [12, 13], facing: 's' });
     h.press(['interact']).idle(20);
     h.sim.command({ t: 'warp', screen: 'test_b', x: 100, y: 100 });
@@ -92,6 +92,31 @@ describe('setting down', () => {
     h.idle(15);
     expect(h.sim.state.flags.q_water_d1).toBe(true);
     expect(props(h, 'pail')).toHaveLength(0);
+  });
+
+  it('ignores a drop zone whose condition does not hold', () => {
+    const shut: Thing = {
+      k: 'drop',
+      at: { x: 16, y: 17 },
+      w: 2,
+      h: 2,
+      accepts: 'pail',
+      when: { k: 'flag', id: 'q_axes_asked' },
+      do: [{ k: 'set', flag: 'q_axes_done', value: true }],
+    };
+    const db = propDb();
+    const things = db.screens.test_a.things.filter((t) => t.k !== 'drop');
+    const h = new Harness({
+      db: { ...db, screens: { ...db.screens, test_a: { ...db.screens.test_a, things: [...things, shut] } } },
+      tile: [16, 13],
+      facing: 's',
+    });
+    h.press(['interact']).idle(20);
+    h.hold(['down'], 30);
+    h.press(['interact']);
+    h.idle(15);
+    expect(h.sim.state.flags.q_axes_done).toBeUndefined();
+    expect(props(h, 'pail')).toHaveLength(1);
   });
 
   it('leaves the pail where it is set outside the zone', () => {

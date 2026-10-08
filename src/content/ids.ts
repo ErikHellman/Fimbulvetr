@@ -40,7 +40,25 @@ export const DUNGEON_ITEMS = ['small_key', 'big_key', 'dungeon_map', 'compass'] 
 /** Kept for good and never used from a slot: mead horns (what mead is carried in) and the winter cloak. */
 export const KEEPSAKES = ['horn', 'winter_cloak'] as const;
 /** Things carried for someone: a quest's token or a brew's ingredients. */
-export const QUEST_ITEMS = ['charred_stave', 'fen_moss'] as const;
+export const QUEST_ITEMS = ['charred_stave', 'fen_moss', 'wisp_ember', 'norn_thread'] as const;
+/** The trading chain's goods (`q_trade`): each is traded on for the next. */
+export const TRADE_ITEMS = [
+  'trade_bell',
+  'trade_fleece',
+  'trade_yarn',
+  'trade_hook',
+  'trade_comb',
+  'trade_needle',
+  'trade_lens',
+] as const;
+/** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
+export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
+/** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
+export const FETCH_ITEMS = ['honey', 'amber'] as const;
+/** Rune-staves: each sings its galdr once, from an item slot, for no seiðr. */
+export const STAVES = ['stave_is', 'stave_skjalfti'] as const;
+/** Counted goods that pay where silver does not: ore, for Hreggviðr at the Refuge (M7a). */
+export const MATERIALS = ['ore'] as const;
 export const ITEMS = [
   ...SUB_ITEMS,
   ...CONSUMABLES,
@@ -48,6 +66,11 @@ export const ITEMS = [
   ...DUNGEON_ITEMS,
   ...KEEPSAKES,
   ...QUEST_ITEMS,
+  ...TRADE_ITEMS,
+  ...LORE_ITEMS,
+  ...FETCH_ITEMS,
+  ...STAVES,
+  ...MATERIALS,
 ] as const;
 export type ItemId = (typeof ITEMS)[number];
 
@@ -85,6 +108,32 @@ export const ENEMIES = [
   'haugvordr',
   'haugkonungr',
   'styrr_duel',
+  'mara',
+  'fog_draugr',
+  'helhound',
+  'garmr',
+  'nastrond',
+  'tower_shield',
+  'marbendill',
+  'nykr_foal',
+  'drowned',
+  'hronn',
+  'hronn_grate',
+  'nykr',
+  'jarnvordr',
+  'glod',
+  'belgr',
+  'ivaldi',
+  'isvargr',
+  'frostvaettr',
+  'svellr',
+  'hrimgerdr',
+  'icicle',
+  'jotunvordr',
+  'kolbeinn_boss',
+  'hrimnir',
+  'hrimnir_hand',
+  'rime_pillar',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -153,6 +202,20 @@ export const SFX = [
   'sfx_ward',
   'sfx_seal',
   'sfx_breath',
+  'sfx_melt',
+  'sfx_is',
+  'sfx_ljos',
+  'sfx_chain',
+  'sfx_dive',
+  'sfx_gust',
+  'sfx_hammer',
+  'sfx_quake',
+  'sfx_sizzle',
+  'sfx_bellows',
+  'sfx_frost',
+  'sfx_slide',
+  'sfx_glass',
+  'sfx_mirror',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -203,6 +266,24 @@ export const NPCS = [
   'hildr',
   'geirmundr',
   'hallsteinn',
+  // Niflmýrr
+  'thrall',
+  'bragi',
+  'hrafn',
+  // Sævatn
+  'vala',
+  'hreggvidr',
+  'urdr',
+  'verdandi',
+  'skuld',
+  // Dvergagröf
+  'dvalinn',
+  'hekla',
+  'sindri',
+  'nyr',
+  'nali',
+  // Hrímfjöll
+  'ormr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -221,14 +302,58 @@ export const QUESTS = [
   'q_runestone_3',
   'q_huscarl',
   'q_fimbulvetr',
+  'q_farm',
+  'q_trade',
+  'q_herd',
+  'q_pages',
+  'q_trolls',
+  'q_steinn',
+  'q_barrow_ring',
+  'q_crates',
+  'q_honey',
+  'q_axes',
+  'q_amber',
+  'q_burbot',
+  'q_act2',
+  'q_ljos',
+  'q_sealskin',
+  'q_holmr',
+  'q_letters',
+  'q_loom',
+  'q_foreman',
+  'q_forge',
+  'q_rime',
+  'q_king',
+  'q_record',
+  'q_feast',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
-export const SHOPS = ['sigrun', 'dev_shop', 'hrafnkell', 'ketill', 'heidr', 'geirmundr'] as const;
+export const SHOPS = [
+  'sigrun',
+  'dev_shop',
+  'hrafnkell',
+  'ketill',
+  'heidr',
+  'geirmundr',
+  'tofa',
+  'vala',
+  'hreggvidr',
+  'hallbera',
+  'sindri',
+  'rannveig',
+] as const;
 export type ShopId = (typeof SHOPS)[number];
 
 /** Dialogue graphs: one per NPC plus signs and dev samples. */
-export const DIALOGUES = [...NPCS, 'dev_sign', 'dev_chat', 'thingstone'] as const;
+export const DIALOGUES = [
+  ...NPCS,
+  'dev_sign',
+  'dev_chat',
+  'thingstone',
+  'bardr_ferry',
+  'hof_season',
+] as const;
 export type DialogueId = (typeof DIALOGUES)[number];
 
 /** Cutscenes and interaction scripts. */
@@ -267,6 +392,81 @@ export const SCRIPTS = [
   'duel_won',
   'pass_open',
   'home_winter',
+  'find_bell',
+  'herd_start',
+  'herd_won',
+  'herd_lost',
+  'ring_laid',
+  'hive',
+  'axes_start',
+  'axes_won',
+  'axes_lost',
+  'amber_reeds',
+  'amber_peat',
+  'amber_mud',
+  'ice_hole',
+  'nif_arrive',
+  'd4_enter',
+  'd4_pedestal',
+  'd4_kolbeinn',
+  'd4_gate_out',
+  'shop_tofa',
+  'ulf_herd_start',
+  'ulf_herd_won',
+  'ulf_herd_lost',
+  'd4_cell_ulf',
+  'd4_cell_tofa',
+  'd5_enter',
+  'd5_kolbeinn',
+  'd5_gate_out',
+  'd5_cell_oddr',
+  'd5_cell_hallbera',
+  'oddr_skiff',
+  'shop_hallbera',
+  'ferry_out',
+  'ferry_back',
+  'embla_found',
+  'shop_vala',
+  'shop_hreggvidr',
+  'war_table',
+  'letter1_box',
+  'dvg_arrive',
+  'shop_sindri',
+  'dvg_mine_open',
+  'escort_lost',
+  'escort_done',
+  'letter2_cairn',
+  'd6_enter',
+  'd6_kolbeinn',
+  'd6_gate_out',
+  'd6_cell_thorkell',
+  'd6_cell_rannveig',
+  'shop_rannveig',
+  'd6_cistern',
+  'hrf_arrive',
+  'hrf_turned_back',
+  'hrf_letter3',
+  'hrf_sealed',
+  'd7_enter',
+  'd7_kolbeinn',
+  'd7_gate_out',
+  'd7_cell_asa',
+  'd7_cell_bjarni',
+  'd7_basin',
+  'd8_enter',
+  'd8_basin',
+  'd8_kolbeinn',
+  'd8_kolbeinn_yield',
+  // The binding hall and the ending (M10b)
+  'd8_embla',
+  'd8_ending',
+  'end_home',
+  'end_shore',
+  'bauta_myr',
+  'bauta_hau',
+  'bauta_sae',
+  'bauta_hrf',
+  'end_feast',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
@@ -290,6 +490,11 @@ export const PROPS = [
   'bomb_pot',
   'arrow_pot',
   'grave_gold',
+  'crate_a',
+  'crate_b',
+  'crate_c',
+  'axe',
+  'wisp_ember',
 ] as const;
 export type PropId = (typeof PROPS)[number];
 
@@ -301,5 +506,47 @@ export type CritterId = (typeof CRITTERS)[number];
  * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
  * grow from the terrain beneath by season (see CoverDef.grows).
  */
-export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood'] as const;
+export const COVERS = [
+  'tall_grass',
+  'leaves',
+  'snow',
+  'drift',
+  'mud',
+  'ice',
+  'flood',
+  'is_ice',
+  'crust',
+] as const;
 export type CoverId = (typeof COVERS)[number];
+
+/**
+ * Achievements (M11). The browser stores earned ids across save slots, so this list is append-only like
+ * every persisted id.
+ */
+export const ACHIEVEMENTS = [
+  'ach_raid',
+  'ach_stone1',
+  'ach_stones',
+  'ach_thane1',
+  'ach_thanes',
+  'ach_embla',
+  'ach_king',
+  'ach_spared',
+  'ach_slain',
+  'ach_stay',
+  'ach_go',
+  'ach_captives',
+  'ach_letters',
+  'ach_trade',
+  'ach_farm',
+  'ach_loom',
+  'ach_gamli',
+  'ach_galdr',
+  'ach_warps',
+  'ach_pieces',
+  'ach_side',
+  'ach_silver',
+  'ach_record',
+  'ach_feast',
+] as const;
+export type AchievementId = (typeof ACHIEVEMENTS)[number];

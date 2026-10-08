@@ -32,7 +32,7 @@ export function weatherAt(
   season: Season,
   rules: ClockRules,
 ): WeatherKind {
-  const table = rules.weather[season];
+  const table = rules.regionWeather?.[region]?.[season] ?? rules.weather[season];
   const base = hashInts(seed, day, fnv1a(region));
   const morning = pick(table, unitFromHash(base));
   if (unitFromHash(hashInts(base, 1)) >= CHANGE_CHANCE) return morning;

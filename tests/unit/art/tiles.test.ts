@@ -50,7 +50,7 @@ describe('tileset', () => {
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 
-  it('animates the waters in four frames (rapids fast, springs and sap slower), everything else in one', () => {
+  it('animates the waters, lava and belts in four frames (rapids and surges fast, springs, sap and black pools slower), everything else in one', () => {
     for (const id of TERRAIN_IDS) {
       const e = ts.entries[id];
       if (id === 'water' || id === 'ford' || id === 'shoal')
@@ -58,13 +58,20 @@ describe('tileset', () => {
       else if (id === 'rapids') expect(e, id).toMatchObject({ frames: 4, frameMs: 90 });
       else if (id === 'spring') expect(e, id).toMatchObject({ frames: 4, frameMs: 240 });
       else if (id === 'sap') expect(e, id).toMatchObject({ frames: 4, frameMs: 260 });
+      else if (id === 'blackwater' || id === 'drowned_path')
+        expect(e, id).toMatchObject({ frames: 4, frameMs: 400 });
+      else if (id.startsWith('current_')) expect(e, id).toMatchObject({ frames: 4, frameMs: 160 });
+      else if (id.startsWith('surge_')) expect(e, id).toMatchObject({ frames: 4, frameMs: 80 });
+      else if (id === 'lava') expect(e, id).toMatchObject({ frames: 4, frameMs: 200 });
+      else if (id.startsWith('belt_')) expect(e, id).toMatchObject({ frames: 4, frameMs: 120 });
       else expect(e.frames, id).toBe(1);
     }
   });
 
-  it('lists one tile animation per variant of each animated water and the sap, frame-major', () => {
+  it('lists one tile animation per variant of each animated water, the sap, lava and belts, frame-major', () => {
     const anims = tileAnimations(ts);
-    expect(anims).toHaveLength(6 * 47);
+    // Eight auto-tiled waters, Sævatn's eight currents drawn whole, and the forge's lava and four belts.
+    expect(anims).toHaveLength(8 * 47 + 8 + 5);
     const s = ts.entries.water.start;
     expect(anims.find((a) => a.tile === s + 46)).toEqual({
       tile: s + 46,

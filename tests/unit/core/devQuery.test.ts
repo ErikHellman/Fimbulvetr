@@ -87,6 +87,16 @@ describe('presets', () => {
     expect(bad.warnings).toHaveLength(2);
   });
 
+  it('sizes the purse to the purses a preset carries, as picking them up would', () => {
+    const state = newGame(1, NEW_GAME);
+    applyPreset(state, DEV_PRESETS.farm);
+    expect(state.hero.purse).toBe(2);
+    expect(state.hero.silver).toBe(400);
+    const fimbul = newGame(1, NEW_GAME);
+    applyPreset(fimbul, DEV_PRESETS.fimbul);
+    expect(fimbul.hero.purse).toBe(1);
+  });
+
   it('applies the kit, flags and place of a preset', () => {
     const state = newGame(1, NEW_GAME);
     applyPreset(state, {
@@ -135,6 +145,14 @@ describe('presets', () => {
     expect(state.world.opened).toEqual(['d1_c_map']);
     expect(state.dungeons.d1).toMatchObject({ keys: 2, map: true, compass: false, doors: [] });
     expect(state.dungeons.d2.keys).toBe(0);
+  });
+
+  it('puts Ask on Holmr’s ford with the seal-skin, after Helgrind, for Sævatn (sae)', () => {
+    const state = newGame(1, NEW_GAME);
+    applyPreset(state, DEV_PRESETS.sae);
+    expect(state.hero.screen).toBe('sae_holmr_ford');
+    expect(state.inv.items.sealskin).toBe(1);
+    expect(state.flags).toMatchObject({ q_sealskin_done: true, st_thane_nastrond: true });
   });
 
   it('every dev preset starts on a known screen', () => {

@@ -1,9 +1,34 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { day, eve, evening, eveningDue, raid } from './util';
+import { all, day, eve, evening, eveningDue, flag, not, raid } from './util';
 
-/** Embla: small talk by day, and one evening scene on each of the three farm days. */
+/**
+ * Embla: small talk by day, and one evening scene on each of the three farm days. At the Refuge on Holmr
+ * (M7a): the meeting on the shore, the comb for her sail-needle (trading step 5), and lines by time of day.
+ */
 export const EMBLA: DialogueDef = {
   entry: [
+    { when: all(flag('st_hrimnir_dead'), not(flag('st_game_done'))), node: 'shore' },
+    { when: all(flag('st_game_done'), flag('st_end_go')), node: 'after_go' },
+    { when: flag('st_game_done'), node: 'after_stay' },
+    { when: all(raid, not(flag('st_embla_found'))), node: 'found' },
+    { when: all(flag('st_embla_found'), { k: 'item', id: 'trade_comb' }), node: 'comb' },
+    { when: all(flag('st_embla_found'), { k: 'flag', id: 'q_letters', lt: 1 }), node: 'letter1' },
+    {
+      when: all(flag('st_embla_found'), flag('st_dvg_reached'), { k: 'flag', id: 'q_letters', eq: 1 }),
+      node: 'letter2',
+    },
+    {
+      when: all(flag('st_embla_found'), flag('st_hrf_reached'), { k: 'flag', id: 'q_letters', eq: 2 }),
+      node: 'letter3',
+    },
+    { when: all(flag('st_embla_found'), flag('st_halvar_confessed')), node: 'r_halvar' },
+    {
+      when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr'), not(flag('st_halvar_confessed'))),
+      node: 'r_north',
+    },
+    { when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr')), node: 'r_rime' },
+    { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
+    { when: flag('st_embla_found'), node: 'r_day' },
     { when: raid, node: 'raid' },
     { when: eveningDue(1), node: 'e1' },
     { when: eveningDue(2), node: 'e2' },
@@ -14,6 +39,126 @@ export const EMBLA: DialogueDef = {
     { when: day(3), node: 'd3' },
   ],
   nodes: {
+    shore: {
+      text: {
+        en: 'I said I would sail south when this was over. It is over. Ask, the boat holds two, and I can split my own wood now. Come with me?',
+        sv: 'Jag sa att jag skulle segla söderut när det här var över. Nu är det över. Ask, båten rymmer två, och jag kan klyva min egen ved nu. Följer du med mig?',
+      },
+      choices: [
+        { text: { en: 'Askdalr needs me.', sv: 'Askdalr behöver mig.' }, next: 'stay' },
+        { text: { en: 'I will come.', sv: 'Jag följer med.' }, next: 'go' },
+      ],
+    },
+    stay: {
+      text: {
+        en: 'I thought you would say that. Then I will stay too, one more summer. Somebody has to laugh at you chasing the sheep.',
+        sv: 'Jag trodde väl att du skulle säga så. Då stannar jag också, en sommar till. Någon måste ju skratta åt dig när du jagar fåren.',
+      },
+      do: [{ k: 'set', flag: 'st_end_stay', value: true }],
+    },
+    go: {
+      text: {
+        en: 'Truly? Then finish what you must here, say your goodbyes, and meet me on the shore. The wind will wait for us. I asked it.',
+        sv: 'På riktigt? Gör då klart det du måste här, säg adjö, och möt mig på stranden. Vinden väntar på oss. Jag har frågat den.',
+      },
+      do: [{ k: 'set', flag: 'st_end_go', value: true }],
+    },
+    after_stay: {
+      text: {
+        en: 'The whole valley is green. I keep waiting for the cold to come back, and it never does.',
+        sv: 'Hela dalen är grön. Jag väntar hela tiden på att kylan ska komma tillbaka, och det gör den aldrig.',
+      },
+    },
+    after_go: {
+      text: {
+        en: 'The boat is ready whenever you are. There is no hurry. For once in our lives, there is no hurry.',
+        sv: 'Båten är redo när du är det. Det är ingen brådska. För en gångs skull i våra liv är det ingen brådska.',
+      },
+    },
+    r_north: {
+      text: {
+        en: 'A boat came over from the shore at dawn with my father in it, of all people. He asked where Útgarðr was, and went up the mountain without his breakfast. Go after him, Ask.',
+        sv: 'En båt kom över från stranden i gryningen med min far i, av alla människor. Han frågade var Útgarðr låg, och gick upp på berget utan att äta frukost. Gå efter honom, Ask.',
+      },
+    },
+    r_halvar: {
+      text: {
+        en: 'So he told you. He was there, at the binding, and he never said a word, all those years. I am angry with him, and I will be angry later. When I go up there, it will be to finish it.',
+        sv: 'Så han berättade. Han var där, vid bindningen, och han sa aldrig ett ord, i alla år. Jag är arg på honom, och jag tänker vara arg sen. När jag går upp dit blir det för att göra slut på det.',
+      },
+    },
+    r_rime: {
+      text: {
+        en: 'All four. I felt the oath go slack, like a rope cut in the dark. Ask, the King was bound with our blood, and it is our blood that loosed him. Kolbeinn knew that from the start.',
+        sv: 'Alla fyra. Jag kände eden slakna, som ett rep som skärs av i mörkret. Ask, Kungen bands med vårt blod, och det är vårt blod som lösgjort honom. Det visste Kolbeinn från början.',
+      },
+    },
+    found: {
+      text: {
+        en: 'Ask! No, do not say it. I know what the cold took from Askdalr, and I know why. I heard it in the old songs long before the trolls came.',
+        sv: 'Ask! Nej, säg det inte. Jag vet vad kylan tog från Askdalr, och jag vet varför. Jag hörde det i de gamla sångerna långt innan trollen kom.',
+      },
+      next: 'found2',
+    },
+    found2: {
+      text: {
+        en: 'The binding was sworn on our blood, the whole village’s. When they came I ran, because I knew what they wanted us for. I am sorry I could not take you with me.',
+        sv: 'Bindningen svors på vårt blod, hela byns. När de kom sprang jag, för jag visste vad de ville ha oss till. Förlåt att jag inte kunde ta dig med mig.',
+      },
+      next: 'found3',
+    },
+    found3: {
+      text: {
+        en: 'But I have not been idle. Others got away too, and they are here. Four thanes keep the Rime King’s oath, and every one that falls loosens it. Come inside; I will show you the table.',
+        sv: 'Men jag har inte suttit sysslolös. Fler kom undan, och de är här. Fyra hövdingar håller Rimkungens ed, och varje som faller lossar den. Kom in, så visar jag dig bordet.',
+      },
+      do: [{ k: 'set', flag: 'st_embla_found', value: true }],
+    },
+    comb: {
+      text: {
+        en: 'Is that a comb? Walrus ivory. Nobody has given me anything that was not for running in a long time. Here, take my sail-needle. For a dwarf who mends bellows and swears at them.',
+        sv: 'Är det en kam? Valrossben. Ingen har gett mig något som inte var till för att fly på länge. Här, ta min segelnål. Till en dvärg som lagar blåsbälgar och svär åt dem.',
+      },
+      do: [
+        { k: 'take', item: 'trade_comb' },
+        { k: 'give', item: 'trade_needle' },
+        { k: 'set', flag: 'q_trade', value: 5 },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+    },
+    letter1: {
+      text: {
+        en: 'Here. I wrote this the night I ran, when I thought I would never see you again. Read it later. It tells you where we hid as children: the split pine west of the birch ring in Myrkviðr’s glade. I left something there for whoever came after me.',
+        sv: 'Här. Jag skrev det här natten jag sprang, när jag trodde att jag aldrig skulle se dig igen. Läs det sedan. Det berättar var vi gömde oss som barn: den kluvna tallen väster om björkringen i Myrkviðrs glänta. Jag lämnade något där åt den som kom efter mig.',
+      },
+      do: [{ k: 'set', flag: 'q_letters', value: 1 }],
+    },
+    letter2: {
+      text: {
+        en: 'You crossed into the dwarf country? Then you passed our tarn. Here, my second letter. Do you remember the little cairn on the south shore, where we hid from Father the day we lost his goat? Look under the top stone.',
+        sv: 'Har du tagit dig in i dvärglandet? Då gick du förbi vår tjärn. Här, mitt andra brev. Minns du det lilla röset på södra stranden, där vi gömde oss för Far den dagen vi tappade bort hans get? Titta under översta stenen.',
+      },
+      do: [{ k: 'set', flag: 'q_letters', value: 2 }],
+    },
+    letter3: {
+      text: {
+        en: 'You walked through the killing frost? Then you can go where I never could. My last letter: I climbed as far as the cairn past the frozen tarn once, before the cold drove me back. I left the last thing I had there.',
+        sv: 'Gick du genom den dödande frosten? Då kan du gå dit jag aldrig kunde. Mitt sista brev: jag klättrade en gång ända till röset bortom den frusna tjärnen, innan kylan drev mig tillbaka. Jag lämnade det sista jag hade där.',
+      },
+      do: [{ k: 'set', flag: 'q_letters', value: 3 }],
+    },
+    r_day: {
+      text: {
+        en: 'The table does not lie; it only waits. Look how many are still in the Rime King’s halls, and how many thanes still hold his oath.',
+        sv: 'Bordet ljuger inte, det bara väntar. Se hur många som fortfarande sitter i Rimkungens salar, och hur många hövdingar som fortfarande håller hans ed.',
+      },
+    },
+    r_eve: {
+      text: {
+        en: 'Sit by the fire a while. Out here even the smoke smells of home, if you close your eyes.',
+        sv: 'Sitt vid elden en stund. Här ute luktar till och med röken hemma, om du blundar.',
+      },
+    },
     e1: {
       text: {
         en: 'There you are. Father had you chasing sheep all day?',

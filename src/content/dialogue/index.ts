@@ -34,7 +34,14 @@ import { THORKELL } from './thorkell';
 import { TOFA } from './tofa';
 import { ULF } from './ulf';
 import { KARI } from './kari';
-import { BARDR } from './bardr';
+import { BARDR, BARDR_FERRY } from './bardr';
+import { VALA } from './vala';
+import { HREGGVIDR } from './hreggvidr';
+import { DVALINN } from './dvalinn';
+import { HEKLA } from './hekla';
+import { NALI, NYR } from './miners';
+import { ORMR } from './ormr';
+import { SINDRI } from './sindri';
 import { THURIDR } from './thuridr';
 import { LJOTR } from './ljotr';
 import { AUDR } from './audr';
@@ -42,6 +49,10 @@ import { STYRR } from './styrr';
 import { HILDR } from './hildr';
 import { GEIRMUNDR } from './geirmundr';
 import { HALLSTEINN } from './hallsteinn';
+import { THRALL } from './thrall';
+import { BRAGI } from './bragi';
+import { HRAFN } from './hrafn';
+import { HOF_SEASON, SKULD, URDR, VERDANDI } from './norns';
 
 /** Dialogue graphs by id. Every NPC's graph lives in its own file next to this one. */
 export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
@@ -86,5 +97,21 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   hildr: HILDR,
   geirmundr: GEIRMUNDR,
   hallsteinn: HALLSTEINN,
+  thrall: THRALL,
+  bragi: BRAGI,
+  hrafn: HRAFN,
+  vala: VALA,
+  hreggvidr: HREGGVIDR,
+  dvalinn: DVALINN,
+  hekla: HEKLA,
+  sindri: SINDRI,
+  nyr: NYR,
+  nali: NALI,
+  ormr: ORMR,
   thingstone: THINGSTONE,
+  bardr_ferry: BARDR_FERRY,
+  urdr: URDR,
+  verdandi: VERDANDI,
+  skuld: SKULD,
+  hof_season: HOF_SEASON,
 };

@@ -81,7 +81,142 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'wWY.....',
     'W.......',
   ],
+  /** A Norn-thread: a hank of shining thread wound on a little spindle. */
+  norn_thread: [
+    '...w....',
+    '..sus...',
+    '.suSus..',
+    '.sSuSs..',
+    '.suSus..',
+    '..sus...',
+    '...w....',
+    '...w.uu.',
+  ],
   fen_moss: ['........', '..v..v..', '.vVvvVv.', 'vvVvvvVv', 'VvvVvVvv', '.vVvvvV.', '..VvvV..', '........'],
+  /** A torn leaf of parchment, a rune scratched on it. */
+  rune_leaf: ['.sssss..', '.sSssss.', 'ssuSsss.', 'ssuussSs', 'sSsusss.', '.ssuSss.', '.sssss..', '..s.s...'],
+  /** An old clasp of ring-mail, its rings dark with age. */
+  mail_clasp: [
+    '..llll..',
+    '.lLllLl.',
+    'lLgggLLl',
+    'lLgGgLLl',
+    'lLgggLLl',
+    '.lLllLl.',
+    '..llll..',
+    '........',
+  ],
+  /** A gold ring from a barrow, cold and greenish. */
+  grave_ring: [
+    '........',
+    '..gggg..',
+    '.gGvvGg.',
+    '.gv..vg.',
+    '.gv..vg.',
+    '.gGvvGg.',
+    '..gggg..',
+    '........',
+  ],
+  /** A dripping piece of honeycomb. */
+  honey: ['........', '.yyyyyy.', 'yYyYyYyy', 'yyYyYyYy', 'yYyYyYyy', '.yyyyyy.', '...Y....', '...Y....'],
+  /** A lump of amber, warm-gold. */
+  amber: ['........', '...yy...', '..yYYy..', '.yYyyYy.', '.yyYyyY.', '..YyyY..', '...YY...', '........'],
+  /** A bronze sheep's bell on its leather strap. */
+  trade_bell: [
+    '.wwwww..',
+    'w.....w.',
+    '..ggg...',
+    '.gGGgg..',
+    '.gGggg..',
+    'gGgggGg.',
+    'ggggggg.',
+    '...e....',
+  ],
+  /** A rolled fleece, raw and grey-white. */
+  trade_fleece: [
+    '........',
+    '..ssss..',
+    '.sSssSs.',
+    'ssssSsss',
+    'sSssssSs',
+    'ssSssSss',
+    '.ssssss.',
+    '........',
+  ],
+  /** A skein of spun yarn. */
+  trade_yarn: [
+    '........',
+    '.bbbbbb.',
+    'bBbBbBbb',
+    'bbBbBbBb',
+    'bBbBbBbb',
+    'bbBbBbBb',
+    '.bbbbbb.',
+    '........',
+  ],
+  /** A curved hook of old bone. */
+  trade_hook: [
+    '....ss..',
+    '...s..s.',
+    '......s.',
+    '......s.',
+    '.s....s.',
+    '.ss..s..',
+    '..sss...',
+    '........',
+  ],
+  /** An Ís rune-stave: a short ash stave with frost-blue runes cut down it. */
+  stave_is: ['......w.', '.....wk.', '....wW..', '...kw...', '..wW....', '.kw.....', 'wW......', 'w.......'],
+  /** A comb of walrus ivory, its back carved. */
+  trade_comb: [
+    '........',
+    '.ssssss.',
+    'sSssSssS',
+    'ssssssss',
+    's.s.s.s.',
+    's.s.s.s.',
+    's.s.s.s.',
+    '........',
+  ],
+  /** A curved bone sail-needle with a thread through its eye. */
+  trade_needle: [
+    '......s.',
+    '.....sSs',
+    '....s.s.',
+    '...s....',
+    '..s.....',
+    '.sw.....',
+    'sw......',
+    'w.......',
+  ],
+  /** The dwarf hammer: a squat iron head on a short haft. */
+  hammer: ['.LLLLLL.', 'LllllllL', 'LLLLLLLL', '...ww...', '...ww...', '...wW...', '...wW...', '...WW...'],
+  /** The ice mirror: a round pane of clear rime in a rim of steel, a glint across it, on a short grip. */
+  mirror: ['.LLLLL..', 'LlkkllL.', 'LkllkkL.', 'LklkkkL.', 'LlkkkKL.', '.LLLLL..', '...ww...', '...WW...'],
+  /** A Skjálfti rune-stave: a short ash stave with ember runes cut down it. */
+  stave_skjalfti: [
+    '......w.',
+    '.....wy.',
+    '....wW..',
+    '...yw...',
+    '..wW....',
+    '.yw.....',
+    'wW......',
+    'w.......',
+  ],
+  /** A round lens of dwarf-glass in a brass rim, light caught in it. */
+  trade_lens: [
+    '..bbbb..',
+    '.bkkkkb.',
+    'bkklkkkb',
+    'bklkkkkb',
+    'bkkkkkKb',
+    'bkkkkKKb',
+    '.bKKKKb.',
+    '..bbbb..',
+  ],
+  /** A lump of black ore, glints of metal in it. */
+  ore: ['........', '..LLL...', '.LeLlL..', 'LeLLLeL.', 'LLlLeLL.', '.LeLLL..', '..LLL...', '........'],
   /** A round iron bomb, its fuse spitting sparks. */
   bombs: ['.....y.y', '......Y.', '....ww..', '..iiii..', '.iliiii.', '.iiiiii.', '.iiiiiL.', '..iiLL..'],
   /** A short hunting bow, strung. */
@@ -90,6 +225,8 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
   arrows: ['.....l.l', '......l.', '.....w.w', '....w.w.', '...w.w..', '..w.w...', '.ss.s...', 'ss......'],
   /** A leather quiver full of arrows. */
   quiver: ['..s.s.s.', '..w.w.w.', '.WWWWWW.', '.WwwwwW.', '.WwwwwW.', '.WwwwwW.', '.WwwwwW.', '..WWWW..'],
+  /** A coil of iron chain with its hook. */
+  grapple: ['.....l.l', '......Ll', '.....lL.', '.LlLl...', 'L....L..', 'l....l..', 'L....L..', '.lLlL...'],
   /** A sack bulging with bombs. */
   bomb_bag: ['..ss....', '.sSSs...', 'ssssss..', 'sSssSs..', 'sssiiis.', 'sSsilis.', '.sssiis.', '..ssss..'],
 };
@@ -202,6 +339,50 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '.iiiiii.',
     '........',
   ],
+  /** The arm-ring of stamina: a green stone. */
+  ring_stamina: [
+    '........',
+    '..bbbb..',
+    '.b.vv.b.',
+    'b..vv..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
+  /** The arm-ring of thrift: a silver stone. */
+  ring_thrift: [
+    '........',
+    '..bbbb..',
+    '.b.ll.b.',
+    'b..ll..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
+  /** The arm-ring of the beacon: an ember. */
+  ring_beacon: [
+    '........',
+    '..bbbb..',
+    '.b.yy.b.',
+    'b..yy..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
+  /** The arm-ring of the berserker: a blood-red stone. */
+  ring_berserker: [
+    '........',
+    '..bbbb..',
+    '.b.rr.b.',
+    'b..rr..b',
+    'b......b',
+    '.b....b.',
+    '..bbbb..',
+    '........',
+  ],
   /** Farvegr: a path of runes winding to a standing stone. */
   galdr_farvegr: [
     '......i.',
@@ -235,6 +416,30 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '.u....u.',
     '..uu.u..',
   ],
+  /** Ljós: a light with rays all round it. */
+  galdr_ljos: [
+    'y...y..y',
+    '.y..y.y.',
+    '..bbbb..',
+    'yybYYbyy',
+    '..bYYb..',
+    '..bbbb..',
+    '.y..y.y.',
+    'y...y..y',
+  ],
+  /** Vindr: three curling streaks of wind. */
+  galdr_vindr: [
+    '........',
+    'lllll.L.',
+    '.....ll.',
+    '.LLLLLL.',
+    '.......L',
+    'lllll.L.',
+    '.....l..',
+    '........',
+  ],
+  /** Ís: a six-armed frost star. */
+  galdr_is: ['...k....', '.k.k.k..', '..kkk...', 'kkk.kkk.', '..kkk...', '.k.k.k..', '...k....', '........'],
   galdr_eldr: [
     '...y....',
     '..yY....',

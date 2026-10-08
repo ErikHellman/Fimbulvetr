@@ -25,6 +25,11 @@ export type HeroMode =
   | 'toss'
   | 'shoot'
   | 'cast'
+  | 'chain'
+  | 'hammer'
+  | 'mirror'
+  | 'swim'
+  | 'dive'
   | 'dying';
 
 export interface HeroCtx {
@@ -35,6 +40,12 @@ export interface HeroCtx {
   readonly armed: boolean;
   /** Styrr's dash thrust is learned: the sword pressed mid-roll lunges. */
   readonly dash: boolean;
+  /** Ticks after a roll before the next (the arm-ring of stamina shortens it). */
+  readonly rollCooldown: number;
+  /** Ask's feet are on open deep water, with the seal-skin to swim it. */
+  readonly wet: boolean;
+  /** Ask's feet are under a sunken arch: a dive goes on until Ask is out from under it. */
+  readonly under: boolean;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -62,6 +73,10 @@ function swing(e: Entity, c: HeroCtx, anim: string, sound: 'sfx_swing' | 'sfx_sp
 
 const move: HeroDef = {
   tick(e, c) {
+    if (c.wet) {
+      c.emit({ t: 'sfx', id: 'sfx_splash' });
+      return 'swim';
+    }
     if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'roll';
     if (wasPressed(c.input, 'sword') && c.armed) return 'attack';
     if (isHeld(c.input, 'shield') && c.hasShield) return 'shield';
@@ -189,8 +204,38 @@ const roll: HeroDef = {
     return e.fsm.t >= h.rollTicks - 1 ? 'move' : undefined;
   },
   exit(e, c) {
-    e.mem['rollCd'] = c.tuning.hero.rollCooldown;
+    e.mem['rollCd'] = c.rollCooldown;
     still(e);
+  },
+};
+
+/** Swimming with the seal-skin: slower than walking, and no hand free for the sword, shield or items. */
+const swim: HeroDef = {
+  enter(e) {
+    setAnim(e, 'swim');
+  },
+  tick(e, c) {
+    if (!c.wet) return 'move';
+    if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'dive';
+    steer(e, c, c.tuning.hero.swimSpeed, true);
+    setAnim(e, 'swim');
+    return undefined;
+  },
+};
+
+/** Under the water for `diveTicks`: blows pass over, surges do not carry, and the bottom can be searched. */
+const dive: HeroDef = {
+  enter(e, c) {
+    setAnim(e, 'dive');
+    c.emit({ t: 'sfx', id: 'sfx_dive' });
+  },
+  tick(e, c) {
+    steer(e, c, c.tuning.hero.swimSpeed, true);
+    if (e.fsm.t < c.tuning.hero.diveTicks - 1 || c.under) return undefined;
+    return c.wet ? 'swim' : 'move';
+  },
+  exit(e, c) {
+    e.mem['rollCd'] = c.rollCooldown;
   },
 };
 
@@ -211,7 +256,7 @@ const thrust: HeroDef = {
   },
   exit(e, c) {
     e.mem['thrustOn'] = 0;
-    e.mem['rollCd'] = c.tuning.hero.rollCooldown;
+    e.mem['rollCd'] = c.rollCooldown;
     still(e);
   },
 };
@@ -222,7 +267,7 @@ const shield: HeroDef = {
     setAnim(e, 'shield');
   },
   tick(e, c) {
-    if (!isHeld(c.input, 'shield')) return 'move';
+    if (!isHeld(c.input, 'shield') || c.wet) return 'move';
     if (wasPressed(c.input, 'sword')) return 'attack';
     if (wasPressed(c.input, 'roll') && mem(e, 'rollCd') === 0) return 'roll';
     steer(e, c, c.tuning.hero.shieldSpeed, false);
@@ -313,6 +358,35 @@ const cast: HeroDef = {
   },
 };
 
+/** The dwarf hammer (M8b): raised overhead, then brought down; the blow itself is `stepHammer`'s. */
+const hammer: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'lift');
+  },
+  tick(e, c) {
+    still(e);
+    const h = c.tuning.hero;
+    if (e.fsm.t === h.hammerHit - 2) setAnim(e, 'throw');
+    return e.fsm.t >= h.hammerTicks - 1 ? 'move' : undefined;
+  },
+};
+
+/**
+ * The grapple chain is out (or pulling Ask along it): Ask stands still with the arm out. The chain's own
+ * step ends it, back to `move`, when the head is caught or Ask lands.
+ */
+const chain: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'toss');
+  },
+  tick(e) {
+    still(e);
+    return undefined;
+  },
+};
+
 /** Fallen at 0 hp. The sim is in `over` mode, which advances the clock of this state by hand. */
 const dying: HeroDef = {
   enter(e) {
@@ -324,6 +398,29 @@ const dying: HeroDef = {
   tick(e) {
     still(e);
     return undefined;
+  },
+};
+
+/**
+ * The ice mirror (M9b), raised while its item key is held (`mem.mirrorKey`: 1 for K, 2 for L): Ask stands
+ * still behind it and turns with the stick. Its front blocks like the shield; beams and rime bolts that
+ * reach it leave the way Ask faces (see systems/beams.ts and projectiles.ts).
+ */
+const mirror: HeroDef = {
+  enter(e) {
+    still(e);
+    e.mem['shielding'] = 1;
+    setAnim(e, 'shield');
+  },
+  tick(e, c) {
+    still(e);
+    if (c.wet || !isHeld(c.input, mem(e, 'mirrorKey') === 2 ? 'item2' : 'item1')) return 'move';
+    const m = moveVector(c.input);
+    if (m.x !== 0 || m.y !== 0) e.facing = dirFromVec(m, e.facing);
+    return undefined;
+  },
+  exit(e) {
+    e.mem['shielding'] = 0;
   },
 };
 
@@ -343,6 +440,11 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   toss,
   shoot,
   cast,
+  chain,
+  hammer,
+  mirror,
+  swim,
+  dive,
   dying,
 };
 
@@ -350,6 +452,8 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
 export function heroPreTick(e: Entity): void {
   const cd = mem(e, 'rollCd');
   if (cd > 0) e.mem['rollCd'] = cd - 1;
+  const ljos = mem(e, 'ljosT');
+  if (ljos > 0) e.mem['ljosT'] = ljos - 1;
   // Hlíf's ward fades when its time runs out, whatever is left of it.
   const ward = mem(e, 'wardT');
   if (ward > 0) {

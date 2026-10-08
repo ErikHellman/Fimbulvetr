@@ -1,12 +1,13 @@
 import { stepBragd } from './bragd';
+import { stepVindr } from './vindr';
 import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
 import { changeState } from '../../actors/fsm';
 import type { ShotId } from '../../actors/enemies/defs';
 import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
-import { ARROW, STUN } from '../../combat/hit';
+import { ARROW, REFLECT, STUN } from '../../combat/hit';
 import { applyEffect } from '../../story/effects';
 import { moveVector, type InputFrame } from '../../input/actions';
-import { at, overlaps } from '../../math/box';
+import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC, dirFromVec } from '../../math/dir';
 import { length, normalize, sub, type Vec } from '../../math/vec';
 import { LOW, SOLID } from '../../world/collision';
@@ -18,6 +19,8 @@ import { eyeAt, strikeSwitch, strikeWheel } from './fixtures';
 import { heroCtx } from './hero';
 import { windOf } from './weather';
 import { stepEldr } from './eldr';
+import { stepIs } from './is';
+import { stepGrapple } from './grapple';
 import { enemyDef } from './movement';
 
 /** The boomerang's box around its ground point; it is drawn `FLY_Z` px up, at hand height. */
@@ -79,9 +82,12 @@ export function stepProjectiles(rt: SimRt): void {
   for (const e of flying) {
     if (e.def === 'boomerang') stepBoomerang(rt, e, wind);
     else if (e.def === 'eldr') stepEldr(rt, e, wind);
+    else if (e.def === 'is') stepIs(rt, e);
+    else if (e.def === 'grapple') stepGrapple(rt, e);
     else if (e.def === 'bragd') stepBragd(rt, e);
+    else if (e.def === 'vindr') stepVindr(rt, e);
     else if (e.def === 'arrow' && e.faction === 'hero') stepArrow(rt, e);
-    else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe') stepShot(rt, e);
+    else if (e.def === 'spit' || e.def === 'arrow' || e.def === 'axe' || e.def === 'bolt') stepShot(rt, e);
   }
 }
 
@@ -164,6 +170,7 @@ export const SHOTS = {
   spit: { art: 'fx_spit', speed: 2.5, life: 120, amount: 2, knock: 3, z: 10, out: 0 },
   arrow: { art: 'fx_arrow', speed: 4, life: 90, amount: 2, knock: 2, z: 10, out: 0 },
   axe: { art: 'fx_axe', speed: 3, life: 240, amount: 4, knock: 4, z: 14, out: 120 },
+  bolt: { art: 'fx_bolt', speed: 3, life: 150, amount: 3, knock: 3, z: 10, out: 0 },
 } as const satisfies Record<
   ShotId,
   { art: string; speed: number; life: number; amount: number; knock: number; z: number; out: number }
@@ -195,7 +202,10 @@ export function shoot(rt: SimRt, def: ShotId, pos: Vec, dir: Vec, owner?: number
   e.mem['z'] = s.z;
   if (owner !== undefined) e.mem['owner'] = owner;
   rt.actors.push(e);
-  rt.emit({ t: 'sfx', id: def === 'axe' ? 'sfx_axe' : def === 'arrow' ? 'sfx_bow' : 'sfx_spit' });
+  rt.emit({
+    t: 'sfx',
+    id: def === 'axe' ? 'sfx_axe' : def === 'arrow' ? 'sfx_bow' : def === 'bolt' ? 'sfx_frost' : 'sfx_spit',
+  });
 }
 
 /**
@@ -243,6 +253,25 @@ function stepShot(rt: SimRt, e: Entity): void {
   e.pos = next;
   e.fsm.t += 1;
   const box = at(e.body, e.pos);
+  if (mem(e, 'mine') === 1) {
+    // Sent back by the mirror (M9b): it hurts the first foe it meets.
+    const foe = rt.actors.find(
+      (a) => a.kind === 'enemy' && a.iframes === 0 && overlaps(box, at(a.hurt, a.pos)),
+    );
+    if (foe === undefined) return;
+    const dir = { x: mem(e, 'dx'), y: mem(e, 'dy') };
+    damageActor(rt, foe, {
+      amount: s.amount,
+      element: 'none',
+      knock: s.knock,
+      dir,
+      faction: 'hero',
+      tags: REFLECT,
+    });
+    gone();
+    return;
+  }
+  if (e.def === 'bolt' && reflects(rt, e, box)) return;
   const sword = heroSwordBox(rt.hero, rt.db.tuning, rt.state.inv.weapon);
   if (sword !== null && overlaps(sword, box)) {
     rt.emit({ t: 'sfx', id: 'sfx_block' });
@@ -252,6 +281,24 @@ function stepShot(rt: SimRt, e: Entity): void {
   }
   if (!overlaps(box, at(rt.hero.hurt, rt.hero.pos))) return;
   if (hurtHero(rt, e, s.amount, s.knock, 0) && s.out === 0) gone();
+}
+
+/**
+ * A rime bolt meeting the front of Ask's raised mirror (M9b) leaves the way Ask faces, Ask's own now.
+ * Returns whether it did.
+ */
+function reflects(rt: SimRt, e: Entity, box: Box): boolean {
+  const h = rt.hero;
+  if (h.fsm.s !== 'mirror' || !overlaps(box, at(h.hurt, h.pos))) return false;
+  const f = DIR_VEC[h.facing];
+  if (mem(e, 'dx') * f.x + mem(e, 'dy') * f.y >= 0) return false;
+  e.mem['dx'] = f.x;
+  e.mem['dy'] = f.y;
+  e.mem['mine'] = 1;
+  e.facing = h.facing;
+  e.fsm = { s: 'fly', t: 0 };
+  rt.emit({ t: 'sfx', id: 'sfx_mirror' });
+  return true;
 }
 
 /**
@@ -311,7 +358,11 @@ function strike(rt: SimRt, e: Entity, back: boolean): void {
   }
   if (mem(e, 'fetch') === 0) {
     const pickup = rt.actors.find(
-      (a) => a.kind === 'pickup' && mem(a, 'hidden') !== 1 && overlaps(box, at(a.body, a.pos)),
+      (a) =>
+        a.kind === 'pickup' &&
+        mem(a, 'hidden') !== 1 &&
+        mem(a, 'sunk') !== 1 &&
+        overlaps(box, at(a.body, a.pos)),
     );
     if (pickup !== undefined) {
       e.mem['fetch'] = pickup.id;

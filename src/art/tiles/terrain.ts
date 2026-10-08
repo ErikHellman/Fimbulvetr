@@ -1,5 +1,6 @@
 import type { TerrainId } from '@content/terrain';
 import { nextFloat, nextInt } from '@core/math/rng';
+import type { Dir4 } from '@core/math/dir';
 import { C } from '../palette';
 import type { Painter } from '../painter';
 import { insideBlob, onBlobEdge } from './blob';
@@ -448,7 +449,303 @@ const KONUNGSHAUGR = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Niflmýrr's grey sedge over sodden peat. */
+function mire(p: Painter): void {
+  p.fill('#4e5a4c');
+  p.speckle('#3c463b', 0.2);
+  p.speckle('#6c7a64', 0.08);
+  p.speckle('#8e9a84', 0.02);
+}
+
+/** Niflmýrr (M6a): the sedge mire, black pools that never freeze, and the ground under a dead tree. */
+/** Niflmýrr's still black pools (and the drowned path that hides under them). */
+const BLACKWATER: TerrainArt = {
+  autotile: true,
+  variants: 0,
+  frames: 4,
+  frameMs: 400,
+  group: 'water',
+  paint: (p, v) => {
+    mire(p);
+    region(p, v.mask, 3, '#1c2224', '#3a4642', '#283032', 0.12);
+    // A slow glint sliding across the still surface.
+    const gx = (nextInt(p.rng, 2, 9) + v.frame * 2) % 16;
+    const gy = nextInt(p.rng, 5, 11);
+    if (insideBlob(v.mask, gx, gy, 4)) p.rect(gx, gy, 2, 1, '#5a6a68');
+  },
+};
+
+const NIFLMYRR = {
+  mire: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      mire(p);
+    },
+  },
+  blackwater: BLACKWATER,
+  /** Drawn as the black water it runs under: only light shows it. */
+  drowned_path: BLACKWATER,
+
+  snag: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      mire(p);
+      p.speckle('#3c463b', 0.22);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/** Streaks of foam sliding the way a current runs, `step` px a frame (a surge's are longer and quicker). */
+function streaks(p: Painter, frame: number, dir: Dir4, colour: string, len: number, step: number): void {
+  const across = dir === 'e' || dir === 'w';
+  const sign = dir === 'e' || dir === 's' ? 1 : -1;
+  for (let k = 0; k < 2; k++) {
+    const lane = k * 8 + 2 + nextInt(p.rng, 0, 3);
+    const head = (((nextInt(p.rng, 0, 15) + sign * frame * step) % 16) + 16) % 16;
+    for (let i = 0; i < len; i++) {
+      const a = (((head - sign * i) % 16) + 16) % 16;
+      p.px(across ? a : lane, across ? lane : a, colour);
+    }
+  }
+}
+
+/**
+ * Running lake water, drawn whole (it always lies inside open water, which runs into it with no bank):
+ * a current slides pale streaks along; a surge is darker, with longer, quicker foam.
+ */
+function current(dir: Dir4, strong: boolean): TerrainArt {
+  return {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: strong ? 80 : 160,
+    group: 'water',
+    paint: (p, v) => {
+      p.fill(strong ? C.waterShade : C.water);
+      p.speckle(C.waterLight, 0.05);
+      streaks(p, v.frame, dir, strong ? C.foam : C.waterLight, strong ? 5 : 3, strong ? 4 : 2);
+    },
+  };
+}
+
+/** Sævatn's running water: currents a swimmer rides, and surges only a diver crosses. */
+const SAEVATN = {
+  current_n: current('n', false),
+  current_e: current('e', false),
+  current_s: current('s', false),
+  current_w: current('w', false),
+  surge_n: current('n', true),
+  surge_e: current('e', true),
+  surge_s: current('s', true),
+  surge_w: current('w', true),
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/** Sökkva Hof's drowned stone: green-grey flagstones that the water rises over, and arches over the deep. */
+const SOKKVA_HOF = {
+  hof_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#4a5a56', '#2a3634', v.variant);
+    },
+  },
+  hof_floor_hi: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#5e6e68', '#3a4844', v.variant);
+    },
+  },
+  arch: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill(C.waterShade);
+      p.speckle(C.waterLight, 0.04);
+      // The lintel's dressed stones, with a dark gap of water showing beneath.
+      p.rect(0, 1, 16, 9, '#46545a');
+      p.rect(0, 1, 16, 1, '#6c7e84');
+      p.rect(5, 1, 1, 9, '#28323a');
+      p.rect(11, 1, 1, 9, '#28323a');
+      p.rect(0, 10, 16, 2, C.ink);
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/** A conveyor belt: dark slats crossing the way it runs, sliding along one px a frame. */
+function belt(dir: Dir4): TerrainArt {
+  const across = dir === 'e' || dir === 'w';
+  const sign = dir === 'e' || dir === 's' ? 1 : -1;
+  return {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: 120,
+    paint: (p, v) => {
+      p.fill('#3a3634');
+      for (let k = 0; k < 4; k++) {
+        const a = (((k * 4 + sign * v.frame) % 16) + 16) % 16;
+        if (across) p.rect(a, 1, 1, 14, '#5c5652');
+        else p.rect(1, a, 14, 1, '#5c5652');
+      }
+      // The rails along both edges.
+      if (across) {
+        p.rect(0, 0, 16, 1, '#1c1a1a');
+        p.rect(0, 15, 16, 1, '#1c1a1a');
+      } else {
+        p.rect(0, 0, 1, 16, '#1c1a1a');
+        p.rect(15, 0, 1, 16, '#1c1a1a');
+      }
+    },
+  };
+}
+
+/** Dvergagröf's scree and Ívaldi's Forge: basalt, iron flags, lava and the belts. */
+const DVERGAGROF = {
+  scree: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#7a7672');
+      p.speckle('#5e5a56', 0.2);
+      p.speckle('#9a9690', 0.08);
+      for (let i = 0; i < 3; i++) p.rect(nextInt(p.rng, 0, 13), nextInt(p.rng, 0, 14), 3, 2, '#68645f');
+    },
+  },
+  forge_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#4a4442', '#2c2826', v.variant);
+    },
+  },
+  forge_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#262224');
+      p.speckle('#3a3436', 0.25);
+      p.rect(0, 12, 16, 4, '#18161a');
+    },
+  },
+  lava: {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: 200,
+    paint: (p, v) => {
+      p.fill('#c4421a');
+      p.speckle('#e0702a', 0.2);
+      for (let k = 0; k < 3; k++) {
+        const x = (nextInt(p.rng, 0, 15) + v.frame * 2) % 16;
+        const y = nextInt(p.rng, 1, 14);
+        p.rect(x, y, Math.min(3, 16 - x), 1, '#f8c04a');
+      }
+      p.speckle('#7a2410', 0.06);
+    },
+  },
+  belt_n: belt('n'),
+  belt_e: belt('e'),
+  belt_s: belt('s'),
+  belt_w: belt('w'),
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/** Hrímfjöll's firn, glaze and rime cliffs, and Hrímturn's frosted glass (M9). */
+const HRIMFJOLL = {
+  firn: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#e4ecf2');
+      p.speckle('#c8d6e2', 0.18);
+      p.speckle('#ffffff', 0.08);
+      p.rect(nextInt(p.rng, 0, 10), nextInt(p.rng, 2, 13), 5, 1, '#d2dee8');
+    },
+  },
+  glaze: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      p.fill('#9cc8e4');
+      p.speckle('#b8dcf0', 0.12);
+      // Long glints across the ice, so a slide reads before it starts.
+      p.rect(1 + v.variant * 4, 3, 7, 1, '#e8f6ff');
+      p.rect(8 - v.variant * 3, 10, 6, 1, '#d4ecfa');
+      p.rect(0, 15, 16, 1, '#86b4d4');
+    },
+  },
+  rime: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#5e7e9c');
+      p.speckle('#7898b6', 0.25);
+      p.speckle('#c8dcec', 0.05);
+      p.rect(0, 12, 16, 4, '#46627e');
+    },
+  },
+  tower_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#b4c8da', '#90a8c0', v.variant);
+      p.speckle('#e0eef8', 0.06);
+    },
+  },
+  tower_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#3e5672');
+      p.speckle('#567090', 0.25);
+      p.rect(0, 12, 16, 4, '#2c3e56');
+      p.rect(3, 2, 1, 8, '#8eaecc');
+    },
+  },
+  clear_ice: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill('#c4e4f6');
+      p.speckle('#e8f6ff', 0.15);
+      p.rect(2, 2, 1, 10, '#ffffff');
+      p.rect(4, 1, 1, 5, '#f0faff');
+      p.rect(0, 13, 16, 3, '#8cb8d6');
+    },
+  },
+  giant_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      // One great flag per tile pair: a seam every other tile, so the floor reads as giant-sized.
+      p.fill('#8a96a4');
+      p.speckle('#9ca8b4', 0.2);
+      p.speckle('#d8e4ee', 0.04);
+      if (v.variant === 0) p.rect(0, 15, 16, 1, '#6a7684');
+      else p.rect(15, 0, 1, 16, '#6a7684');
+    },
+  },
+  giant_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#4a5462');
+      p.speckle('#5e6a7a', 0.25);
+      p.rect(0, 7, 16, 1, '#343c48');
+      p.rect(0, 12, 16, 4, '#2e3540');
+      p.rect(1, 1, 6, 1, '#b8d0e4');
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...HRIMFJOLL,
+  ...DVERGAGROF,
+  ...SOKKVA_HOF,
+  ...SAEVATN,
+  ...NIFLMYRR,
   ...DEEP_WOOD,
   ...KONUNGSHAUGR,
   ...HAUGAR,

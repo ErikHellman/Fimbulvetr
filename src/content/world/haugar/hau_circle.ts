@@ -4,7 +4,15 @@ export const hauCircle: ScreenDef = {
   id: 'hau_circle',
   region: 'haugar',
   purpose: "The stone circle, the crossroads of Haugar. Haugar's warp stone stands at its heart.",
-  things: [{ k: 'warp', region: 'haugar', at: { x: 20, y: 8 }, arrive: { x: 20, y: 9 } }],
+  things: [
+    /** A bauta-stone with one of the fallen huscarls' names (`q_record`, M11a). */
+    {
+      k: 'use',
+      at: { x: 10, y: 9 },
+      script: 'bauta_hau',
+    },
+    { k: 'warp', region: 'haugar', at: { x: 20, y: 8 }, arrive: { x: 20, y: 9 } },
+  ],
   /** Where Haugar's spawn table may put foes (see content/spawns.ts). */
   spawns: [
     { x: 6, y: 5 },
@@ -22,7 +30,7 @@ export const hauCircle: ScreenDef = {
     '#EEEEEEEEEEEEMEEEjjjjjjEEEMEEEEEEEEEEEE#',
     '#EEEEEEEEEEEEEEjjjjjjjjjjEEEEEEEEEEEEEE#',
     '#EEEEEEEEEEEEEjjjjjjjjjjjjEEEEEEEEEEEEE#',
-    '#EEEEEEEEEEEEjjjjjjjjjjjjjjEEEEEEEEEEEE#',
+    '#EEEEEEEEEMEEjjjjjjjjjjjjjjEEEEEEEEEEEE#',
     ',,,,,,,,,,,,,jjjjjjjjjjjjjj,,,,,,,,,,,,,',
     ',,,,,,,,,,,,,jjjjjjjjjjjjjj,,,,,,,,,,,,,',
     ',,,,,,,,,,,,,jjjjjjjjjjjjjj,,,,,,,,,,,,,',

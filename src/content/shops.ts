@@ -10,6 +10,8 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
     stock: [
       { item: 'lantern', price: 25 },
       { item: 'flatbread', price: 5 },
+      /** Embla's cheese, back on the shelf once the crates are home (`q_crates`). */
+      { item: 'cheese', price: 8, when: { k: 'flag', id: 'q_crates_done' } },
     ],
   },
   /** Mead, a second horn to carry it in (Þórdís gives the first), and bombs once Ask carries them. */
@@ -49,6 +51,59 @@ export const SHOP_DEFS: Readonly<Partial<Record<ShopId, ShopDef>>> = {
     stock: [
       { weapon: 'uppvik_sword', price: 80 },
       { armor: 'byrnie', price: 100 },
+    ],
+  },
+  /** Tófa's stall at the field fence, once she is home from Helgrind. */
+  tofa: {
+    id: 'tofa',
+    name: { en: 'Tófa’s stall', sv: 'Tófas stånd' },
+    stock: [
+      { item: 'flatbread', price: 5 },
+      { item: 'cheese', price: 8 },
+    ],
+  },
+  /** Hallbera's door in the village, once she is home from Sökkva Hof: red mead again (M7b). */
+  hallbera: {
+    id: 'hallbera',
+    name: { en: 'Hallbera’s mead', sv: 'Hallberas mjöd' },
+    stock: [{ item: 'mead_red', price: 20 }],
+  },
+  /** Vala the healer's brews at the Refuge (M7a). */
+  vala: {
+    id: 'vala',
+    name: { en: 'Vala’s brews', sv: 'Valas brygder' },
+    stock: [
+      { item: 'mead_green', price: 25 },
+      { item: 'mead_red', price: 20 },
+    ],
+  },
+  /** Hreggviðr the ore-trader at the Refuge: he takes black ore, not silver (M7a). */
+  hreggvidr: {
+    id: 'hreggvidr',
+    name: { en: 'Hreggviðr’s trade', sv: 'Hreggviðrs byteshandel' },
+    currency: 'ore',
+    stock: [
+      { item: 'mead_blue', price: 3 },
+      { item: 'quiver', price: 8 },
+      { item: 'stave_skjalfti', price: 2, when: { k: 'flag', id: 'st_dvg_reached' } },
+    ],
+  },
+  /** Sindri the smith at Dvergagröf's camp forges for ore (M8a); the dwarf blade joins once Belgr falls (M8b). */
+  sindri: {
+    id: 'sindri',
+    name: { en: 'Sindri’s forge', sv: 'Sindris smedja' },
+    currency: 'ore',
+    stock: [
+      { armor: 'ember_byrnie', price: 12 },
+      { weapon: 'dwarf_blade', price: 16, when: { k: 'flag', id: 'st_d6_belgr' } },
+    ],
+  } /** Rannveig's door in the village, once Ívaldi falls (M8b): arrows and bombs, a little under Uppvík's prices. */,
+  rannveig: {
+    id: 'rannveig',
+    name: { en: 'Rannveig’s door', sv: 'Rannveigs dörr' },
+    stock: [
+      { item: 'arrows', n: 10, price: 12, when: { k: 'owns', id: 'bow' } },
+      { item: 'bombs', n: 5, price: 18, when: { k: 'owns', id: 'bombs' } },
     ],
   },
 };

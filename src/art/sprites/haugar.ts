@@ -315,7 +315,7 @@ function axe(i: number): Raster {
 }
 
 /** Nearest-neighbour scale by 3/2: the warden is the wight drawn half again as large. */
-function grow(src: Raster): Raster {
+export function grow(src: Raster): Raster {
   const w = Math.floor((src.w * 3) / 2);
   const h = Math.floor((src.h * 3) / 2);
   const r = createRaster(w, h);

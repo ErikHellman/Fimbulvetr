@@ -29,7 +29,7 @@ import { LETTERBOX } from '@shell/scale';
 import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
-import { menuItems, openMenu, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
+import { menuItems, openMenu, ownedRings, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
 import { EntityViews } from '@shell/view/entityViews';
 import { DarknessView, FOG } from '@shell/view/darknessView';
 import { FxView } from '@shell/view/fxView';
@@ -37,11 +37,19 @@ import { WeatherView } from '@shell/view/weatherView';
 import { bindingsOf, keyLabel } from '@shell/input/remap';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
+import { ACHIEVEMENT_DEFS } from '@content/achievements';
+import type { AchievementId } from '@content/ids';
+import { fresh as freshAchievements } from '@core/progress/achievements';
+import { condCtx } from '@core/sim/systems/story';
+import { loadAchievements, saveAchievements } from '@shell/platform/achievements';
+import { noToasts, pushToasts, tickToasts, type Toasts } from '@shell/ui/toast';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { ARM_FRAMES, openPicker, pickerDone, stepPicker, type PickerState } from '@shell/ui/slotPicker';
 import { FireView } from '@shell/view/fireView';
 import { GhostView } from '@shell/view/ghostView';
 import { WardView } from '@shell/view/wardView';
+import { ChainView } from '@shell/view/chainView';
+import { BeamView } from '@shell/view/beamView';
 import { FishView } from '@shell/view/fishView';
 import { ScreenView } from '@shell/view/screenView';
 
@@ -49,6 +57,8 @@ import { ScreenView } from '@shell/view/screenView';
 const INDOOR_LIGHT = 0.85;
 /** Dungeons: a fixed, cool cave light. */
 const CAVE_LIGHT = 0.8;
+/** Frames between achievement checks. */
+const ACH_CHECK_FRAMES = 30;
 
 /** Everything drawn for one screen: its tiles and decor, and its ambient smoke and fish. */
 interface Stage {
@@ -71,6 +81,8 @@ export class PlayScene extends Phaser.Scene {
   private flames!: FireView;
   private ghostFloor!: GhostView;
   private ward!: WardView;
+  private chain!: ChainView;
+  private beamView!: BeamView;
   private fishing!: FishView;
   private colour!: Phaser.Filters.ColorMatrix;
   private fadeRect!: Phaser.GameObjects.Rectangle;
@@ -89,6 +101,10 @@ export class PlayScene extends Phaser.Scene {
   private pickerResult: 'saved' | 'failed' | null = null;
   /** Keys held last frame, to find the one freshly pressed (for rebinding). */
   private lastCodes: ReadonlySet<string> = new Set();
+  /** Achievements this browser holds, the toasts of new ones, and frames until the next check. */
+  private held = new Set<AchievementId>();
+  private toasts: Toasts = noToasts();
+  private achCheck = 0;
   private tileAnims: readonly TileAnim[] = [];
 
   constructor() {
@@ -136,6 +152,8 @@ export class PlayScene extends Phaser.Scene {
     this.flames = new FireView(this, data.assets.frames, ANIMS);
     this.ghostFloor = new GhostView(this, data.assets.frames);
     this.ward = new WardView(this);
+    this.chain = new ChainView(this, data.assets.frames);
+    this.beamView = new BeamView(this);
     this.fishing = new FishView(this, data.assets.frames, ANIMS);
     this.weather = new WeatherView(this, data.assets.frames, {
       sfx: (id) => {
@@ -153,7 +171,13 @@ export class PlayScene extends Phaser.Scene {
       .setAlpha(0);
     this.showScreen(this.sim.screen.id);
     this.draw(0);
+    this.held = loadAchievements(browserStorage());
+    this.toasts = noToasts();
+    this.achCheck = 0;
     const link: UiLink = {
+      achievements: () => this.held,
+      textSize: () => this.services.settings.textSize,
+      toast: () => this.toasts.shown,
       sim: this.sim,
       frames: data.assets.frames,
       lang: () => data.settings.lang,
@@ -170,7 +194,7 @@ export class PlayScene extends Phaser.Scene {
           ? null
           : {
               state: this.menu,
-              items: menuItems(this.sim.state.inv, this.services.db.items),
+              items: menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
               settings:
                 this.settingsMenu === null
                   ? null
@@ -211,6 +235,7 @@ export class PlayScene extends Phaser.Scene {
         break;
       }
       this.sim.step(frame);
+      this.stepAchievements();
     }
     this.stats.record(delta, performance.now() - started);
     const events = this.sim.drainEvents();
@@ -218,6 +243,19 @@ export class PlayScene extends Phaser.Scene {
     this.audio.handle(events);
     this.services.dev?.onEvents(events);
     this.draw(alpha);
+  }
+
+  /** Every half second of play, newly earned achievements are stored and queued as toasts. */
+  private stepAchievements(): void {
+    this.toasts = tickToasts(this.toasts);
+    if (this.sim.mode !== 'play' || ++this.achCheck < ACH_CHECK_FRAMES) return;
+    this.achCheck = 0;
+    const ids = freshAchievements(ACHIEVEMENT_DEFS, condCtx(this.sim), this.held);
+    if (ids.length === 0) return;
+    for (const id of ids) this.held.add(id);
+    saveAchievements(browserStorage(), this.held);
+    this.toasts = pushToasts(this.toasts, ids);
+    document.body.dataset.achievements = [...this.held].join(',');
   }
 
   /** Settings changed in a menu: keys, the shield toggle, the long day and colours take effect at once. */
@@ -296,7 +334,11 @@ export class PlayScene extends Phaser.Scene {
   private updateMenu(frame: InputFrame): void {
     const menu = this.menu;
     if (menu === null) return;
-    const r = stepMenu(menu, frame, menuItems(this.sim.state.inv, this.services.db.items));
+    const r = stepMenu(
+      menu,
+      frame,
+      menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
+    );
     for (const a of r.actions) {
       if (a.k === 'settings') {
         this.settingsMenu = openSettings();
@@ -304,6 +346,7 @@ export class PlayScene extends Phaser.Scene {
       } else if (a.k === 'equip') this.sim.command({ t: 'equip', slot: a.slot, item: a.item });
       else if (a.k === 'eat') this.sim.command({ t: 'eat', item: a.item });
       else if (a.k === 'ready') this.sim.command({ t: 'ready', galdr: a.galdr });
+      else if (a.k === 'ring') this.sim.command({ t: 'ring', id: a.id });
       else if (a.k === 'startOver') {
         const state = newGame(crypto.getRandomValues(new Uint32Array(1))[0] ?? 1, NEW_GAME);
         this.services.saves.autosaver.request(state);
@@ -390,6 +433,14 @@ export class PlayScene extends Phaser.Scene {
     this.fx.tick(this.sim.tick);
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     this.ghostFloor.draw(this.sim.ghosts(), this.sim.originOf(this.sim.screen.id));
+    this.chain.draw(this.sim.grapple(), this.sim.originOf(this.sim.screen.id));
+    this.beamView.draw(
+      this.sim.beams(),
+      this.sim.originOf(this.sim.screen.id),
+      this.sim.tick,
+      this.sim.rimeFloor(),
+      this.sim.ring(),
+    );
     {
       const hero = this.sim.hero;
       const origin = this.sim.originOf(this.sim.screen.id);
@@ -438,7 +489,7 @@ export class PlayScene extends Phaser.Scene {
     this.weather.update(
       {
         kind: this.sim.weather(),
-        season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock),
+        season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock, this.sim.state.flags),
         wind: this.sim.wind(),
       },
       this.time.now,
@@ -507,6 +558,7 @@ export class PlayScene extends Phaser.Scene {
       fog: this.fog.shown.dark,
       flames: this.flames.shown,
       ghosts: this.ghostFloor.shown,
+      chain: this.chain.shown,
       ward: this.ward.shown,
       lights: this.darkness.shown.lights,
     };

@@ -1,11 +1,14 @@
 import type { FlagId } from '@content/flags';
-import type { ArmorId, GaldrId, ItemId, SfxId, WeaponId } from '@content/ids';
+import type { ArmorId, GaldrId, ItemId, NpcId, ScriptId, SfxId, WeaponId } from '@content/ids';
 import { setMinute, setPolicy, setSeason, sleepUntil } from '../clock/clock';
 import type { ClockState, Season } from '../clock/types';
 import { itemMax } from '../items/defs';
 import { dungeonOf } from '../state/dungeons';
 import type { FlagValue } from '../state/flags';
 import type { SimRt } from '../sim/rt';
+import { wakeTheDead } from '../sim/systems/wake';
+import { endEscort, startEscort } from '../sim/systems/escort';
+import { clearDawnFlags } from '../sim/systems/clock';
 
 /** Silver caps by purse size. */
 export const PURSE_CAP = [100, 300, 999] as const;
@@ -40,7 +43,15 @@ export type Effect =
   | { readonly k: 'sleep'; readonly until: number }
   | { readonly k: 'sfx'; readonly id: SfxId }
   /** A piece of heart handed over (a reward), counted like one picked up; `id` is saved in `world.pieces`. */
-  | { readonly k: 'piece'; readonly id: string };
+  | { readonly k: 'piece'; readonly id: string }
+  /** Every sleeper on the screen rises (a grave-ring laid back on its mound). */
+  | { readonly k: 'wake' }
+  /**
+   * Starts an escort (M8): `npc` walks along with Ask with `hp` of her own, and `lost` runs if she falls;
+   * `npc: null` ends it.
+   */
+  | { readonly k: 'escort'; readonly npc: NpcId; readonly hp: number; readonly lost: ScriptId }
+  | { readonly k: 'escort'; readonly npc: null };
 
 export function applyEffect(e: Effect, rt: SimRt): void {
   const s = rt.state;
@@ -109,12 +120,20 @@ export function applyEffect(e: Effect, rt: SimRt): void {
       break;
     case 'sleep':
       for (const ev of sleepUntil(s.clock, rt.db.clock, e.until)) rt.emit({ t: 'clock', e: ev });
+      clearDawnFlags(rt);
       break;
     case 'sfx':
       rt.emit({ t: 'sfx', id: e.id });
       break;
     case 'piece':
       grantPiece(rt, e.id);
+      break;
+    case 'wake':
+      wakeTheDead(rt);
+      break;
+    case 'escort':
+      if (e.npc === null) endEscort(rt);
+      else startEscort(rt, e.npc, e.hp, e.lost);
       break;
   }
 }

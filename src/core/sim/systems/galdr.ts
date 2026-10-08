@@ -5,6 +5,10 @@ import { wasPressed, type InputFrame } from '../../input/actions';
 import type { SimRt } from '../rt';
 import { castBragd } from './bragd';
 import { castEldr } from './eldr';
+import { castIs } from './is';
+import { castLjos } from './ljos';
+import { castSkjalfti } from './skjalfti';
+import { castVindr } from './vindr';
 import { heroCtx } from './hero';
 import { startStory } from './story';
 
@@ -37,12 +41,40 @@ const SONGS: Partial<Record<GaldrId, Song>> = {
     castEldr(rt, input);
     return 'pay';
   },
+  is: (rt, input) => {
+    castIs(rt, input);
+    return 'pay';
+  },
+  ljos: (rt) => {
+    castLjos(rt);
+    return 'pay';
+  },
   farvegr,
   bragd: (rt) => {
     castBragd(rt);
     return 'pay';
   },
+  vindr: (rt) => {
+    castVindr(rt);
+    return 'pay';
+  },
+  skjalfti: (rt) => {
+    castSkjalfti(rt);
+    return 'pay';
+  },
 };
+
+/**
+ * A rune-stave from an item slot: sings its galdr for no seiðr, strikes the cast pose and uses up one
+ * stave. A song that fizzles, or only opens a picker (Farvegr), keeps the stave.
+ */
+export function singStave(rt: SimRt, input: InputFrame, id: GaldrId): boolean {
+  const sung = SONGS[id]?.(rt, input) ?? 'fizzle';
+  if (sung === 'fizzle') rt.emit({ t: 'sfx', id: 'sfx_fizzle' });
+  if (sung !== 'pay') return false;
+  changeState(HERO_MACHINE, rt.hero, 'cast', heroCtx(rt, input));
+  return true;
+}
 
 /**
  * The galdr button in play: Ask sings the readied galdr (the first in `inv.galdr`), paying its seiðr; with

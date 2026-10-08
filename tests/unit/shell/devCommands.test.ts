@@ -40,6 +40,7 @@ function bridge(): { b: DevBridge; h: Harness } {
       fog: 0,
       flames: 0,
       ghosts: 0,
+      chain: 0,
       ward: 0,
       bolts: 0,
       dark: 0,
@@ -85,6 +86,20 @@ describe('dev console commands', () => {
     expect(h.sim.weather()).toBe('clear');
     expect(run(b, 'give nothing')).toBe("unknown item 'nothing'");
     expect(run(b, 'weather monsoon')).toMatch(/^weather: clear, rain/);
+  });
+
+  it('readies an item in a slot, or empties one', () => {
+    const { b, h } = bridge();
+    run(b, 'give lantern');
+    h.idle(1);
+    expect(run(b, 'slot 2 lantern')).toBe('slot 2: lantern');
+    h.idle(1);
+    expect(h.sim.state.inv.slots[1]).toBe('lantern');
+    expect(run(b, 'slot 2 none')).toBe('slot 2: none');
+    h.idle(1);
+    expect(h.sim.state.inv.slots[1]).toBeNull();
+    expect(run(b, 'slot 3 lantern')).toBe('usage: slot <1|2> <item|none>');
+    expect(run(b, 'slot 1 nothing')).toBe("unknown item 'nothing'");
   });
 
   it('switches god mode on and off without leaving a trace in the hash', () => {
@@ -155,6 +170,7 @@ describe('dev console commands', () => {
         fog: 0,
         flames: 0,
         ghosts: 0,
+        chain: 0,
         ward: 0,
         bolts: 0,
         dark: 0,

@@ -18,10 +18,14 @@ import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
 import {
   FIRE_RADIUS,
+  BLIZZARD_RADIUS,
+  BLIZZARD_THICK,
   FOG_RADIUS,
+  FOG_ROOM_RADIUS,
   LANTERN_FOG_RADIUS,
   LANTERN_RADIUS,
   WARP_RADIUS,
+  EMBER_RADIUS,
   darknessOf,
   fogOf,
   type Light,
@@ -33,7 +37,9 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
-import type { Entry, LoadedScreen, Mode, SimRt, Transition } from './rt';
+import type { Entry, Escort, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
+import { stepEscort } from './systems/escort';
+import { takeSunkChest } from './systems/chests';
 import { tickWorldClock } from './systems/clock';
 import { killEnemy, resolveAttacks, resolveSword } from './systems/combat';
 import { coverFor, cutCover, refreshCover } from './systems/cover';
@@ -48,15 +54,27 @@ import { eat, equip, useItems } from './systems/items';
 import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
 import { stepBombs } from './systems/bombs';
+import { stepHammer } from './systems/hammer';
 import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
+import { stepRiders } from './systems/mara';
+import { LJOS, ljosBurns, stepLjos } from './systems/ljos';
+import { grappleLine } from './systems/grapple';
+import { stepRafts } from './systems/raft';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
 import { tickTimers } from './systems/timers';
+import { ringFlag } from '../items/rings';
+import { stepTrial } from './systems/trial';
+import { heatMax, stepCold, stepHeat } from './systems/heat';
+import { stepBeams, type BeamSeg } from './systems/beams';
+import { rimeFloor } from './systems/glaze';
+import { ringOf, stepBinding, type Ring } from './systems/binding';
+import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
-import { outdoors, skyOf, windOf } from './systems/weather';
+import { blizzard, misty, outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
   checkEdges,
@@ -89,6 +107,9 @@ export interface SimOptions {
 }
 
 /** The whole game rules engine. Deterministic: same state + same inputs ⇒ same result. */
+/** A foe that fills its room with fog while it lives (Náströnd's last phase sets `mem.fog`). */
+const fogRaised = (rt: SimRt): boolean => rt.actors.some((e) => e.kind === 'enemy' && mem(e, 'fog') === 1);
+
 export class Sim implements SimRt {
   readonly state: GameState;
   mode: Mode = 'play';
@@ -102,6 +123,14 @@ export class Sim implements SimRt {
   /** Dev switches; undefined when off so they never change the hash. */
   god?: boolean;
   weatherOverride?: WeatherKind;
+  sand?: Trial;
+  heatTicks?: number;
+  burnTicks?: number;
+  coldTicks?: number;
+  freezeTicks?: number;
+  crust?: Map<number, number>;
+  beamSegs?: readonly BeamSeg[];
+  escort?: Escort;
   tick = 0;
   readonly rolled: boolean;
   private events: SimEvent[] = [];
@@ -201,13 +230,14 @@ export class Sim implements SimRt {
     return windOf(this);
   }
 
-  /** How much of the picture the dark hides (0 … 1): night outdoors, storms, dark rooms. */
+  /** How much of the picture the dark hides (0 … 1): night outdoors, storms, misty regions, dark rooms. */
   darkness(): number {
     const def = this.db.screens[this.screen.id];
     return darknessOf(daylight(this.state.clock, this.db.clock), {
       indoor: def.indoor === true || def.dungeon !== undefined,
       dark: def.dark === true,
       weather: this.weather(),
+      misty: misty(this),
     });
   }
 
@@ -217,15 +247,72 @@ export class Sim implements SimRt {
    */
   fog(): { readonly amount: number; readonly r: number } {
     const def = this.db.screens[this.screen.id];
-    const amount = fogOf({ indoor: !outdoors(this), dark: def.dark === true, weather: this.weather() });
-    if (amount === 0) return { amount: 0, r: 0 };
-    return { amount, r: (this.state.inv.items.lantern ?? 0) > 0 ? LANTERN_FOG_RADIUS : FOG_RADIUS };
+    const fogRoom = def.fog === true || fogRaised(this);
+    const amount = fogOf({
+      indoor: !outdoors(this),
+      dark: def.dark === true,
+      weather: this.weather(),
+      misty: misty(this),
+      fogRoom,
+    });
+    // Ljós burns the fog away while it lasts (a blizzard's veil too).
+    if (ljosBurns(this)) return { amount: 0, r: 0 };
+    if (amount === 0)
+      return blizzard(this) ? { amount: BLIZZARD_THICK, r: BLIZZARD_RADIUS } : { amount: 0, r: 0 };
+    const lantern = (this.state.inv.items.lantern ?? 0) > 0;
+    if (fogRoom) return { amount, r: lantern ? LANTERN_RADIUS : FOG_ROOM_RADIUS };
+    return { amount, r: lantern ? LANTERN_FOG_RADIUS : FOG_RADIUS };
   }
 
-  /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
+  /** The grapple chain while it is out: from Ask's hand to its head, in screen pixels; else null. */
+  grapple(): { readonly hand: Vec; readonly head: Vec } | null {
+    return grappleLine(this);
+  }
+
   /** Hlíf's ward on Ask: the hits it still holds and the ticks it has left (both 0 when there is none). */
   ward(): { readonly hits: number; readonly ticks: number } {
     return { hits: mem(this.hero, 'ward'), ticks: mem(this.hero, 'wardT') };
+  }
+
+  /** The running trial's sand: play-ticks left of all it had, or null when there is none. */
+  trial(): { readonly left: number; readonly of: number } | null {
+    return this.sand === undefined ? null : { left: this.sand.left, of: this.sand.of };
+  }
+
+  /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
+  /** Heat on Ask for the HUD's bar (M8), or null while there is none. */
+  heat(): { readonly now: number; readonly max: number } | null {
+    return this.heatTicks === undefined ? null : { now: this.heatTicks, max: heatMax(this) };
+  }
+
+  /** Whether a blizzard blows over the current screen (M9): the view draws its white veil. */
+  blizzard(): boolean {
+    return blizzard(this);
+  }
+
+  /** The row from which Hrímgerðr has glazed her hall's floor (M9b), for the view's rime; null if none. */
+  rimeFloor(): number | null {
+    return rimeFloor(this);
+  }
+
+  /** The ring of binding in Hrímnir's hall (M10b), in screen px, for the view; null when none burns. */
+  ring(): Ring | null {
+    return ringOf(this);
+  }
+
+  /** The killing frost on Ask (M9), for the HUD's frost bar; null when Ask is warm. */
+  cold(): { readonly now: number; readonly max: number } | null {
+    return this.coldTicks === undefined ? null : { now: this.coldTicks, max: this.db.tuning.hero.cold };
+  }
+
+  /** The beams of light shining on this screen (M9b), in screen pixels, for the view. */
+  beams(): readonly BeamSeg[] {
+    return this.beamSegs ?? [];
+  }
+
+  /** The escorted NPC's health for the HUD (M8), or null while nobody walks with Ask. */
+  escortHp(): { readonly hp: number; readonly max: number } | null {
+    return this.escort === undefined ? null : { hp: this.escort.hp, max: this.escort.max };
   }
 
   boss(): BossView | null {
@@ -247,6 +334,8 @@ export class Sim implements SimRt {
     const out: Light[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LANTERN_RADIUS, hero: true });
+    if (ljosBurns(this))
+      out.push({ x: this.hero.pos.x, y: this.hero.pos.y - 12, r: LJOS.radius, hero: true });
     // Burning tiles and walls of fire (a gate drawn as fire) glow.
     for (const e of this.actors)
       if (e.kind === 'fixture' && (e.art === 'fix_fire' || e.def === 'brazier') && e.mem['on'] === 1)
@@ -256,6 +345,10 @@ export class Sim implements SimRt {
     for (const e of this.actors)
       if (e.kind === 'fixture' && e.def === 'warp' && e.mem['on'] === 1)
         out.push({ x: e.pos.x, y: e.pos.y - 16, r: WARP_RADIUS });
+    // Wisp embers drifting over the marsh glow faintly.
+    for (const e of this.actors)
+      if (e.kind === 'prop' && e.def === 'wisp_ember')
+        out.push({ x: e.pos.x, y: e.pos.y - 8, r: EMBER_RADIUS });
     // Bog-lights shine.
     for (const e of this.actors) {
       const glow = e.kind === 'enemy' ? this.db.enemies[e.def as EnemyId].glow : undefined;
@@ -272,6 +365,7 @@ export class Sim implements SimRt {
     const lights: GhostLight[] = [];
     if ((this.state.inv.items.lantern ?? 0) > 0)
       lights.push({ x: this.hero.pos.x, y: this.hero.pos.y - 8, r: GHOST_LANTERN });
+    if (ljosBurns(this)) lights.push({ x: this.hero.pos.x, y: this.hero.pos.y - 8, r: LJOS.ghost });
     for (const e of this.actors)
       if (e.kind === 'fixture' && e.def === 'brazier' && e.mem['on'] === 1)
         lights.push({ x: e.pos.x, y: e.pos.y - 8, r: GHOST_BRAZIER });
@@ -294,6 +388,13 @@ export class Sim implements SimRt {
         entry: this.entry,
         god: this.god,
         weatherOverride: this.weatherOverride,
+        sand: this.sand,
+        heat: this.heatTicks,
+        burn: this.burnTicks,
+        cold: this.coldTicks,
+        freeze: this.freezeTicks,
+        crust: this.crust === undefined ? undefined : [...this.crust],
+        escort: this.escort,
         fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
@@ -356,32 +457,44 @@ export class Sim implements SimRt {
     useItems(this, input);
     castGaldr(this, input);
     runFsm(HERO_MACHINE, this.hero, heroCtx(this, input));
+    stepRafts(this);
     const ctx = actorCtx(this);
+    stepLjos(this);
     runEnemies(this, ctx);
+    stepRiders(this);
     runCritters(this, ctx);
     scheduleNpcs(this);
     stepNpcs(this);
+    stepEscort(this);
     moveAll(this);
     bumpLocks(this, input);
     pushBlocks(this, input);
     stepProjectiles(this);
     collectPickups(this);
+    takeSunkChest(this);
     settleCritters(this);
     stepProps(this, input);
     stepBombs(this);
+    stepHammer(this);
     resolveSword(this);
     swordProps(this);
     swordSwitches(this);
+    stepBeams(this);
     cutCover(this);
     resolveAttacks(this);
     fixtureHazards(this);
     stepFire(this);
+    stepHeat(this);
+    stepCold(this);
+    stepBinding(this);
+    stepCrust(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);
     if (this.mode === 'play') checkEdges(this);
     if (this.mode === 'play') checkDoors(this);
     if (this.mode === 'play') checkTriggers(this);
+    if (this.mode === 'play') stepTrial(this);
   }
 
   private apply(c: Command): void {
@@ -420,6 +533,9 @@ export class Sim implements SimRt {
         if (known.includes(c.galdr)) this.state.inv.galdr = [c.galdr, ...known.filter((g) => g !== c.galdr)];
         break;
       }
+      case 'ring':
+        if (c.id === null || this.state.flags[ringFlag(c.id)] === true) this.state.inv.ring = c.id;
+        break;
       case 'setHp':
         this.hero.hp = Math.max(0, Math.min(this.hero.maxHp, Math.floor(c.hp)));
         break;

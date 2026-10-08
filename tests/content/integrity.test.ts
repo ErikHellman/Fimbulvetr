@@ -40,9 +40,20 @@ describe('screens', () => {
     for (const thing of SCREENS[id].things) {
       if (!standing.has(thing.k)) continue;
       const where = `${id} ${thing.k} at ${thing.at.x},${thing.at.y}`;
-      if (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) {
+      // A sunk piece lies on the bottom of deep water, for a diver.
+      if (thing.k === 'piece' && thing.sunk === true) {
         const t = cellAt(grid, thing.at.x, thing.at.y);
-        expect(t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t], where).toBe(true);
+        expect(t !== undefined && DB.terrain[t].swim === true, where).toBe(true);
+        continue;
+      }
+      // Swimmers wait in water, or on the floors they walk as well (the drowned); a dive door lies under it.
+      if (
+        (thing.k === 'enemy' && DB.enemies[thing.id].swims === true) ||
+        (thing.k === 'door' && thing.dive === true)
+      ) {
+        const t = cellAt(grid, thing.at.x, thing.at.y);
+        const water = t !== undefined && TERRAIN[t].solid && 'low' in TERRAIN[t];
+        expect(water || (thing.k === 'enemy' && ok(thing.at.x, thing.at.y)), where).toBe(true);
         continue;
       }
       expect(ok(thing.at.x, thing.at.y), where).toBe(true);
@@ -196,16 +207,58 @@ describe('world layout', () => {
       }
     },
   );
+
+  // With the seal-skin: a swimmer crossing a seam must come out in water or on ground, never in a wall.
+  it('lets a swimmer out of every seam it can swim into', () => {
+    const index = indexLayout(WORLD_LAYOUT, SCREEN_IDS);
+    const open = (id: ScreenId): ((x: number, y: number) => boolean) => {
+      const grid = parseTextMap(SCREENS[id].map, LEGEND);
+      return (x, y) => {
+        const t = cellAt(grid, x, y);
+        return t !== undefined && (!TERRAIN[t].solid || DB.terrain[t].swim === true);
+      };
+    };
+    const swim = (id: ScreenId): ((x: number, y: number) => boolean) => {
+      const grid = parseTextMap(SCREENS[id].map, LEGEND);
+      return (x, y) => {
+        const t = cellAt(grid, x, y);
+        return t !== undefined && DB.terrain[t].swim === true;
+      };
+    };
+    for (const id of SCREEN_IDS) {
+      for (const [dir, other] of [
+        ['e', neighbourOf(index, id, 'e')],
+        ['s', neighbourOf(index, id, 's')],
+      ] as const) {
+        if (other === null) continue;
+        const n = dir === 'e' ? SCREEN_ROWS : SCREEN_COLS;
+        for (let k = 0; k < n; k++) {
+          const [hx, hy, tx, ty] = dir === 'e' ? [SCREEN_COLS - 1, k, 0, k] : [k, SCREEN_ROWS - 1, k, 0];
+          if (swim(id)(hx, hy)) expect(open(other)(tx, ty), `${id} → ${other} at ${String(k)}`).toBe(true);
+          if (swim(other)(tx, ty)) expect(open(id)(hx, hy), `${other} → ${id} at ${String(k)}`).toBe(true);
+        }
+      }
+    }
+  });
 });
 
 describe('the sleeping dead', () => {
-  it('lie only where grave-gold can wake them', () => {
+  it('lie only where grave-gold or a script can wake them', () => {
+    const wakers = new Set(
+      Object.entries(DB.scripts).flatMap(([sid, def]) =>
+        JSON.stringify(def).includes('"k":"wake"') ? [sid] : [],
+      ),
+    );
     for (const id of SCREEN_IDS) {
       const things = SCREENS[id].things;
       if (!things.some((t) => t.k === 'enemy' && t.asleep === true)) continue;
       expect(
-        things.some((t) => t.k === 'prop' && DB.props[t.id].wakes === true),
-        `${id} has sleepers but no grave-gold`,
+        things.some(
+          (t) =>
+            (t.k === 'prop' && DB.props[t.id].wakes === true) ||
+            ((t.k === 'use' || t.k === 'trigger') && wakers.has(t.script)),
+        ),
+        `${id} has sleepers but nothing to wake them`,
       ).toBe(true);
     }
   });
@@ -226,7 +279,16 @@ describe('warp stones', () => {
       expect(walkable(id)(t.arrive.x, t.arrive.y), `${id} arrival`).toBe(true);
       expect(walkable(id)(t.at.x, t.at.y), `${id} stone on walkable ground`).toBe(true);
     }
-    expect([...seen].sort()).toEqual(['askdalr', 'haugar', 'myrkvidr', 'myrland']);
+    expect([...seen].sort()).toEqual([
+      'askdalr',
+      'dvergagrof',
+      'haugar',
+      'hrimfjoll',
+      'myrkvidr',
+      'myrland',
+      'niflmyrr',
+      'saevatn',
+    ]);
   });
 });
 

@@ -21,6 +21,7 @@ import { createHeart, createPiece, herbGrows } from './pickups';
 import { placeNpcs } from './npcs';
 import { holdBack } from './rooms';
 import { condCtx } from './story';
+import { createRaft } from './raft';
 
 /** Whether the current room's dungeon has lost its boss (who then never comes back). */
 function bossDown(rt: SimRt): boolean {
@@ -83,7 +84,7 @@ function spawnRolled(rt: SimRt, heroAt: Vec): void {
   const free = (p: TilePos): boolean =>
     ((g.flags[p.y * g.cols + p.x] ?? SOLID) & SOLID) === 0 &&
     Math.max(Math.abs(p.x - hx), Math.abs(p.y - hy)) > SPAWN_CLEARANCE;
-  const season = seasonAt(c, def.region, rt.db.clock);
+  const season = seasonAt(c, def.region, rt.db.clock, rt.state.flags);
   // Foes Ask has no way to beat yet (a mud-crab before bombs) are left out of the draw.
   const beatable = (e: SpawnEntry): boolean =>
     (rt.db.enemies[e.id].needs ?? []).every((item) => owns(rt.state.inv.items, item));
@@ -108,8 +109,8 @@ function spawnThings(rt: SimRt): Entity[] {
         if (!evalCond(thing.when, ctx) || (def.boss !== undefined && def.boss.mini !== true && bossDown(rt)))
           break;
         const e = createEnemy(rt.newId(), def, tileFeet(thing.at));
-        // The thing index is only kept for enemies that do something when they die.
-        if (thing.onDeath !== undefined) e.mem['thing'] = index;
+        // The thing index is only kept for enemies that do something when they die or turn to stone.
+        if (thing.onDeath !== undefined || thing.onStone !== undefined) e.mem['thing'] = index;
         if (thing.asleep === true) {
           e.mem['asleep'] = 1;
           e.iframes = 2;
@@ -140,8 +141,13 @@ function spawnThings(rt: SimRt): Entity[] {
         break;
       }
       case 'piece':
-        if (!rt.state.world.pieces.includes(thing.id))
-          out.push(createPiece(rt.newId(), tileFeet(thing.at), index));
+        if (!rt.state.world.pieces.includes(thing.id)) {
+          // On the bottom under a ripple: only a diver brings it up (see `collectPickups`).
+          const art = thing.sunk === true ? 'fix_ripple' : undefined;
+          const e = createPiece(rt.newId(), tileFeet(thing.at), index, 'heart_piece', art);
+          if (thing.sunk === true) e.mem['sunk'] = 1;
+          out.push(e);
+        }
         break;
       case 'heart':
         if (!rt.state.world.opened.includes(thing.id))
@@ -163,10 +169,20 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'wheel':
       case 'warp':
       case 'seal':
+      case 'post':
+      case 'beam':
+      case 'prism':
+      case 'eye':
       case 'scenery':
         spawnFixtures(rt, thing, index, out);
         break;
+      case 'raft':
+        out.push(createRaft(rt, thing, index));
+        break;
       case 'door':
+        // A dive door shows its ripple; other doors are gaps in the map.
+        if (thing.dive === true) spawnFixtures(rt, thing, index, out);
+        break;
       case 'sign':
       case 'use':
       case 'trigger':

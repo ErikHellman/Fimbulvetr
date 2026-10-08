@@ -43,6 +43,34 @@ export interface HeroTuning {
   readonly parryTicks: number;
   /** Ticks a parried foe stands stunned (a boss half as long). */
   readonly parryStun: number;
+  /** Swimming pace (px a tick) with the seal-skin, and how long a dive lasts (ticks). */
+  readonly swimSpeed: number;
+  /**
+   * Heat (M8): ticks Ask bears a hot room before burning (`heatEmber` in the ember byrnie), and the hp a
+   * burn takes each second once full.
+   */
+  readonly heat: number;
+  readonly heatEmber: number;
+  readonly heatBurn: number;
+  /**
+   * The killing frost (M9): ticks Ask bears a cold screen before freezing, and the hp each second takes
+   * once full. The ember byrnie keeps it out.
+   */
+  readonly cold: number;
+  readonly coldBurn: number;
+  /** A slide on glaze (M9), px a tick; and a blizzard's push on Ask along the wind. */
+  readonly slide: number;
+  readonly gust: number;
+  /** A conveyor belt's push on anyone walking it, px a tick. */
+  readonly belt: number;
+  /** The dwarf hammer (M8b): how long a blow takes, the tick it lands, and what it deals a foe. */
+  readonly hammerTicks: number;
+  readonly hammerHit: number;
+  readonly hammerDamage: number;
+  readonly diveTicks: number;
+  /** How hard a current pushes a swimmer (px a tick), and a surge (more than anyone swims). */
+  readonly current: number;
+  readonly strongCurrent: number;
   readonly body: Box;
   readonly hurt: Box;
 }
@@ -70,6 +98,15 @@ export interface PushTuning {
 }
 
 /** The Eldr galdr's bolt of fire. */
+export interface IsTuning {
+  /** px per tick. */
+  readonly speed: number;
+  /** px flown before it melts away. */
+  readonly range: number;
+  /** Ticks a foe stays frozen. */
+  readonly freeze: number;
+}
+
 export interface EldrTuning {
   /** px per tick. */
   readonly speed: number;
@@ -132,18 +169,40 @@ export interface BoomerangTuning {
   readonly range: number;
 }
 
+/** The grapple chain's head. */
+export interface GrappleTuning {
+  /** px per tick, out and back. */
+  readonly speed: number;
+  /** px flown before it turns back (six tiles). */
+  readonly range: number;
+  /** px per tick Ask is pulled along it to a post. */
+  readonly pull: number;
+}
+
+/** What the arm-rings do while worn. */
+export interface RingTuning {
+  /** The arm-ring of stamina scales the wait between rolls by this. */
+  readonly staminaRoll: number;
+  /** The arm-ring of thrift scales shop prices by this (rounded up). */
+  readonly thriftPrice: number;
+}
+
 export interface Tuning {
   readonly hero: HeroTuning;
+  readonly rings: RingTuning;
   readonly boomerang: BoomerangTuning;
   readonly bow: BowTuning;
+  readonly grapple: GrappleTuning;
   readonly throw: ThrowTuning;
   readonly push: PushTuning;
   /** Per-weapon swings; weapons not listed swing like `sword`. */
   readonly weapons: Readonly<Partial<Record<WeaponId, SwordTuning>>>;
   readonly fire: FireTuning;
   readonly eldr: EldrTuning;
+  readonly is: IsTuning;
   /** Share of each blow an armour takes off (rounded; a blow always deals at least 1). */
-  readonly armor: Readonly<Record<ArmorId, { readonly reduce: number }>>;
+  /** Each armour's damage reduction; `warm` keeps Hrímfjöll's killing frost out (M9). */
+  readonly armor: Readonly<Record<ArmorId, { readonly reduce: number; readonly warm?: boolean }>>;
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;

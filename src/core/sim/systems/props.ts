@@ -16,7 +16,9 @@ import { critterDef } from './critters';
 import { stampCollision } from './fixtures';
 import { heroCtx } from './hero';
 import { spillDrop } from './pickups';
-import { applyAll, probeBox } from './story';
+import { evalCond } from '../../story/cond';
+import { applyAll, condCtx, probeBox } from './story';
+import { wakeTheDead } from './wake';
 
 export const propDef = (rt: SimRt, e: Entity): PropDef => rt.db.props[e.def as PropId];
 const isCarried = (e: Entity): boolean => mem(e, 'carried') === 1;
@@ -68,30 +70,27 @@ function breakProp(rt: SimRt, e: Entity): void {
   if (thing?.k === 'prop') applyAll(rt, thing.onBreak ?? []);
 }
 
-/** Interact in front of a liftable prop: lift it. */
+/** Interact in front of a liftable prop: lift it (or, for a wisp ember, catch it in a jar). */
 export function tryLift(rt: SimRt): boolean {
   const probe = probeBox(rt);
   const prop = rt.actors.find(
     (a) => isResting(a) && propDef(rt, a).liftable && overlaps(probe, at(a.body, a.pos)),
   );
   if (prop === undefined) return false;
+  const caught = propDef(rt, prop).catches;
+  if (caught !== undefined) {
+    const thing = rt.db.screens[rt.screen.id].things[mem(prop, 'thing')];
+    remove(rt, prop);
+    applyAll(rt, [{ k: 'give', item: caught }, ...(thing?.k === 'prop' ? (thing.onBreak ?? []) : [])]);
+    rt.emit({ t: 'sfx', id: 'sfx_itemget' });
+    return true;
+  }
   prop.mem['carried'] = 1;
   rt.hero.mem['carrying'] = prop.id;
   if (propDef(rt, prop).wakes === true) wakeTheDead(rt);
   changeState(HERO_MACHINE, rt.hero, 'lift', heroCtx(rt, EMPTY_FRAME));
   rt.emit({ t: 'sfx', id: 'sfx_lift' });
   return true;
-}
-
-/** Grave-gold lifted: every sleeper on the screen wakes and rises. */
-function wakeTheDead(rt: SimRt): void {
-  const sleepers = rt.actors.filter((a) => a.kind === 'enemy' && mem(a, 'asleep') === 1);
-  if (sleepers.length === 0) return;
-  for (const e of sleepers) {
-    e.mem['asleep'] = 0;
-    e.iframes = 0;
-  }
-  rt.emit({ t: 'sfx', id: 'sfx_wake' });
 }
 
 /** Carried props ride overhead; interact throws (while moving) or sets down (standing); throws fly. */
@@ -202,7 +201,7 @@ function settle(rt: SimRt, e: Entity): void {
   const tx = Math.floor(e.pos.x / TILE);
   const ty = Math.floor((e.pos.y - 1) / TILE);
   for (const thing of rt.db.screens[rt.screen.id].things) {
-    if (thing.k !== 'drop' || thing.accepts !== e.def) continue;
+    if (thing.k !== 'drop' || thing.accepts !== e.def || !evalCond(thing.when, condCtx(rt))) continue;
     if (tx < thing.at.x || tx >= thing.at.x + thing.w || ty < thing.at.y || ty >= thing.at.y + thing.h)
       continue;
     remove(rt, e);

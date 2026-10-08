@@ -15,7 +15,7 @@ const WOLF_EYE = hex('#f2d45c');
 const FANG = hex('#f4efe2');
 
 /** Fur colours: the grey vargr, and the pack leader (near black with a white ruff and red eyes). */
-interface WolfPal {
+export interface WolfPal {
   readonly fur: Rgba;
   readonly shade: Rgba;
   readonly light: Rgba;
@@ -37,7 +37,7 @@ const ALPHA_WOLF: WolfPal = {
   ruff: hex('#d8d4cc'),
 };
 
-type WolfPose = 'stand' | 'crouch' | 'lunge' | 'howl';
+export type WolfPose = 'stand' | 'crouch' | 'lunge' | 'howl';
 
 function wolfSide(phase: number, pose: WolfPose, p: WolfPal): Raster {
   const r = createRaster(32, 32);
@@ -143,7 +143,7 @@ function wolfBack(phase: number, pose: WolfPose, p: WolfPal): Raster {
   return outline(r, INK, 2);
 }
 
-function wolf(side: Side, phase: number, pose: WolfPose, p: WolfPal = GREY_WOLF): Raster {
+export function wolf(side: Side, phase: number, pose: WolfPose, p: WolfPal = GREY_WOLF): Raster {
   if (side === 'w') return wolfSide(phase, pose, p);
   return side === 's' ? wolfFront(phase, pose, p) : wolfBack(phase, pose, p);
 }

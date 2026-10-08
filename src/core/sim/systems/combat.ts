@@ -73,9 +73,15 @@ export function damageActor(rt: SimRt, target: Entity, hit: HitData): HitResult 
     target.mem['stun'] = mem(target, 'stunFor') > 0 ? mem(target, 'stunFor') : def.stunnable;
     target.vel = { x: 0, y: 0 };
   }
-  // A foe weak to the element (a draugr to fire) takes double.
+  // A foe weak to the element (a draugr to fire) takes double, and so does one frozen in Ís: it shatters.
   const weak = def?.weak?.includes(hit.element) === true && hit.amount > 0;
-  const result = resolveHit(target, weak ? { ...hit, amount: hit.amount * 2 } : hit, {
+  const shatters = mem(target, 'frozen') > 0 && hit.amount > 0 && target.faction !== hit.faction;
+  if (shatters) {
+    target.mem['frozen'] = 0;
+    rt.emit({ t: 'sfx', id: 'sfx_break' });
+  }
+  const times = (weak ? 2 : 1) * (shatters ? 2 : 1);
+  const result = resolveHit(target, times > 1 ? { ...hit, amount: hit.amount * times } : hit, {
     shielding: false,
     iframes: rt.db.tuning.enemyIframes,
     knockResist: def?.knockResist ?? 0,
@@ -157,7 +163,7 @@ export function resolveAttacks(rt: SimRt): void {
   const { hero } = rt;
   const heroBox = at(hero.hurt, hero.pos);
   for (const e of rt.actors) {
-    if (e.kind !== 'enemy' || mem(e, 'stun') > 0 || mem(e, 'asleep') === 1) continue;
+    if (e.kind !== 'enemy' || mem(e, 'stun') > 0 || mem(e, 'frozen') > 0 || mem(e, 'asleep') === 1) continue;
     const def = enemyDef(rt, e);
     const w = def.attacks?.[e.fsm.s];
     const blow =
@@ -219,6 +225,8 @@ type HitSource = { readonly pos: Vec; readonly faction: Faction } | Entity;
 export function hurtHero(rt: SimRt, source: HitSource, amount: number, knock: number, tags: number): boolean {
   const { hero, db } = rt;
   if (rt.god === true) return false;
+  // Under the water every blow passes over.
+  if (hero.fsm.s === 'dive') return false;
   const away = normalize(sub(hero.pos, source.pos));
   const dir = away.x === 0 && away.y === 0 ? DIR_VEC[hero.facing] : away;
   if (warded(rt, amount)) return true;

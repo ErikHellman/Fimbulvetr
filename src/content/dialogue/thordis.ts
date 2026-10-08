@@ -5,6 +5,9 @@ import { evening, flag, not } from './util';
 export const THORDIS: DialogueDef = {
   entry: [
     { when: not(flag('w_horn_thordis')), node: 'meet' },
+    { when: flag('q_honey_done'), node: 'honey_after' },
+    { when: { k: 'item', id: 'honey' }, node: 'honey' },
+    { when: flag('q_honey_asked'), node: 'honey_wait' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: evening, node: 'night' },
     { when: { k: 'weather', is: ['rain', 'storm'] }, node: 'rain' },
@@ -65,6 +68,38 @@ export const THORDIS: DialogueDef = {
       text: {
         en: 'Half the valley sleeps on my benches, and the other half wants to. I have never sold so much mead in a winter, nor wanted to less.',
         sv: 'Halva dalen sover på mina bänkar, och andra halvan vill göra det. Aldrig har jag sålt så mycket mjöd på en vinter, och aldrig har jag velat det mindre.',
+      },
+      next: 'honey_ask',
+    },
+    honey_ask: {
+      text: {
+        en: 'And my mead runs thin. There is a wild hive in the Myrkviðr pines, east of the forest road; smoke the bees with a lantern, in summer or autumn, and bring me the comb?',
+        sv: 'Och mitt mjöd tryter. Det finns en vild bikupa bland tallarna i Myrkviðr, öster om skogsvägen; rök bina med en lykta, på sommaren eller hösten, och ge mig vaxkakan?',
+      },
+      do: [{ k: 'set', flag: 'q_honey_asked', value: true }],
+    },
+    honey_wait: {
+      text: {
+        en: 'The hive in the Myrkviðr pines. Summer or autumn, mind; in the cold the bees sleep on a frozen comb.',
+        sv: 'Kupan bland tallarna i Myrkviðr. Sommar eller höst, märk väl; i kylan sover bina på en frusen kaka.',
+      },
+    },
+    honey: {
+      text: {
+        en: 'Wild honey! That is a summer in a cask. Here, a horn of your own to carry what I brew with it.',
+        sv: 'Vildhonung! Det är en sommar i en tunna. Här, ett eget horn att bära det jag brygger med den.',
+      },
+      do: [
+        { k: 'take', item: 'honey' },
+        { k: 'give', item: 'horn' },
+        { k: 'set', flag: 'q_honey_done', value: true },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+    },
+    honey_after: {
+      text: {
+        en: 'The honey-mead is working. Come back when it is ready, and bring a thirst.',
+        sv: 'Honungsmjödet jäser. Kom tillbaka när det är klart, och ta med dig törsten.',
       },
     },
   },

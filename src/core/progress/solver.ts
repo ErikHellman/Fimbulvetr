@@ -14,6 +14,7 @@ import { riseFooting } from '../world/water';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '../world/dims';
 import { indexLayout, neighbourOf, type LayoutIndex, type RoomSignal, type Thing } from '../world/screen';
 import { parseTextMap, type TerrainGrid } from '../world/textmap';
+import { otherSlant, prismTurn, traceBeam, type BeamMeet, type Slant } from '../world/beam';
 
 /**
  * Progression solver v1: floods the world tile by tile from the hero's position under the fixtures of the
@@ -21,11 +22,17 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
  * floods again, and so on until nothing changes. Small keys are the only real choice, so it branches on
  * which reachable lock a key opens and explores every order. Root blocks and vines never block (pushing and
  * cutting are always possible), nor do props Ask can lift; brambles block until Eldr is known. A `use`
- * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask. Enemies
+ * whose script warps (knocking at a barred gate) leads from beside it to where the warp puts Ask; one whose
+ * script sets flags, teaches a galdr or gives what Ask lacks does so once it is reached. Enemies
  * other than bosses are assumed beaten with the sword.
  *
  * Given a season, the ground cover that season grows by itself counts too: winter ice makes still water
- * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored.
+ * walkable, and a spring flood makes a shoal impassable. Without one, cover is ignored. Once Ís can be
+ * sung (the galdr or a stave), still water off a screen's outer ring is walkable in any season. Hidden
+ * floor (the ghost floor, the drowned path) is floor, as it is to the sim: light only shows it. Once the
+ * grapple chain is held, a post in a straight line from a reached tile pulls Ask to the tile before it.
+ * With the seal-skin, deep water (currents and surges too: a dive passes under a surge) is swum, and a
+ * sunk chest or piece is dived for once its own tile is reached.
  */
 
 export interface SolveOptions {
@@ -60,8 +67,12 @@ export interface SolveResult {
 }
 
 const FETCH_TILES = 7;
+/** How far the grapple chain reaches a post, in tiles (it flies 96 px). */
+const GRAPPLE_TILES = 6;
 /** How far an arrow carries to an eye switch, in tiles (it flies 72 ticks at 5 px a tick). */
 const ARROW_TILES = 12;
+/** How far a Vindr gust carries to a wind fan or a sail, in tiles. */
+const GUST_TILES = 5;
 const DIRS8: readonly (readonly [number, number])[] = [
   [1, 0],
   [-1, 0],
@@ -115,6 +126,11 @@ class World {
   readonly span: number;
   /** The water level flag the search turns wheels on, when searching levels (null otherwise). */
   readonly water: FlagId | null;
+  /** Glaze tiles (M9), where a step slides on; and the screens under the killing frost. */
+  readonly glazed = new Set<number>();
+  readonly cold = new Set<ScreenId>();
+  /** Clear ice (M9b): solid, but light shines through. */
+  readonly clear = new Set<number>();
 
   constructor(
     readonly db: ContentDb,
@@ -132,6 +148,13 @@ class World {
     const flags = new Set(this.ids.flatMap((id) => db.screens[id].water ?? []));
     if (levels && flags.size > 1) throw new Error('solver: one water level flag at a time');
     this.water = levels ? ([...flags][0] ?? null) : null;
+    this.grids.forEach((g, i) => {
+      g.cells.forEach((cell, c) => {
+        if (db.terrain[cell].glaze === true) this.glazed.add(i * 1024 + c);
+        if (db.terrain[cell].clear === true) this.clear.add(i * 1024 + c);
+      });
+    });
+    for (const id of this.ids) if (db.screens[id].cold === true) this.cold.add(id);
   }
 
   has(id: ScreenId): boolean {
@@ -272,20 +295,62 @@ function settle(w: World, state: GameState, origin: number): Node {
 interface Ground {
   /** Gates, locks, shutters, chests, switches, braziers left shut or standing. */
   readonly blocked: ReadonlySet<number>;
-  /** Lowered drawbridges. */
+  /** Lowered drawbridges, rafts' decks at their stops, and still water once Ís can floor it. */
   readonly open: ReadonlySet<number>;
+  /** The seal-skin is held: dive doors can be taken (walking on Ís over one never does). */
+  readonly dives: boolean;
+  /** Warm armour is worn (the ember byrnie): screens under the killing frost can be crossed (M9). */
+  readonly warm: boolean;
 }
 
 function groundOf(w: World, state: GameState, reach: ReadonlySet<number> | null): Ground {
-  return { blocked: blockedTiles(w, state, reach), open: bridgeTiles(w, state) };
+  return {
+    blocked: blockedTiles(w, state, reach),
+    open: bridgeTiles(w, state),
+    dives: has(state, 'sealskin'),
+    warm: w.db.tuning.armor[state.inv.armor].warm === true,
+  };
 }
 
-/** Tiles of drawbridges that are down. */
+/**
+ * Tiles of drawbridges that are down, and every tile of still water (outside screens with a water level)
+ * once Ask can sing Ís, from the galdr or a stave: the frost lays a floor tile by tile, as far as needed.
+ * Lava takes a crust the same way (M8): it cools only once Ask has stepped off it.
+ */
 function bridgeTiles(w: World, state: GameState): Set<number> {
   const out = new Set<number>();
+  if (state.inv.galdr.includes('is') || has(state, 'stave_is'))
+    for (const id of w.ids) {
+      if (w.db.screens[id].water !== undefined) continue;
+      const g = w.grids[w.idx.get(id) ?? 0];
+      g?.cells.forEach((cell, i) => {
+        const x = i % SCREEN_COLS;
+        const y = Math.floor(i / SCREEN_COLS);
+        // Ís never ices a screen's outer ring (see `freezeAround`); it crusts lava as it ices water.
+        if (
+          (cell === 'water' || w.db.terrain[cell].lava === true) &&
+          x > 0 &&
+          y > 0 &&
+          x < SCREEN_COLS - 1 &&
+          y < SCREEN_ROWS - 1
+        )
+          out.add(w.tile(id, x, y));
+      });
+    }
+  // With the seal-skin, deep water is swum (a surge is crossed by diving under it).
+  if (has(state, 'sealskin'))
+    for (const id of w.ids) {
+      const g = w.grids[w.idx.get(id) ?? 0];
+      g?.cells.forEach((cell, i) => {
+        if (w.db.terrain[cell].swim === true)
+          out.add(w.tile(id, i % SCREEN_COLS, Math.floor(i / SCREEN_COLS)));
+      });
+    }
   const ctx = ctxOf(w, state);
   for (const id of w.ids)
     for (const t of w.db.screens[id].things) {
+      if (t.k === 'raft')
+        for (const stop of [t.at, ...t.path]) for (const i of deckOf(w, id, stop)) out.add(i);
       if (t.k !== 'bridge' || !evalCond(t.down, ctx)) continue;
       for (let dy = 0; dy < t.h; dy++)
         for (let dx = 0; dx < t.w; dx++) out.add(w.tile(id, t.at.x + dx, t.at.y + dy));
@@ -326,11 +391,16 @@ function solidThing(
     case 'gate':
       return evalCond(t.closed, ctx);
     case 'chest':
+      return t.sunk !== true;
     case 'switch':
     case 'wheel':
     case 'warp':
     case 'seal':
+    case 'post':
     case 'brazier':
+    case 'beam':
+    case 'prism':
+    case 'eye':
       return true;
     case 'lock':
       return !doors().includes(t.id);
@@ -371,6 +441,80 @@ function warpEdges(w: World, state: GameState): Map<number, number[]> {
           out.set(from, [...(out.get(from) ?? []), to]);
         }
     }
+  return out;
+}
+
+/**
+ * Once the grapple is held: from each tile in a straight four-way line of up to `GRAPPLE_TILES` from a post,
+ * over floor or anything low (water, pits) and nothing left shut, to the tile before the post, when Ask can
+ * stand there. One way only: the chain pulls, it never carries Ask back.
+ */
+function grappleEdges(w: World, state: GameState): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  if (!has(state, 'grapple')) return out;
+  const blocked = blockedTiles(w, state, null);
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'post') continue;
+      for (const dir of ['n', 's', 'e', 'w'] as const) {
+        const d = DIR_VEC[dir];
+        const lx = t.at.x - d.x;
+        const ly = t.at.y - d.y;
+        const land = w.terrain(id, lx, ly);
+        const to = w.tile(id, lx, ly);
+        if (land === null || land.solid || blocked.has(to)) continue;
+        for (let k = 2; k <= GRAPPLE_TILES; k++) {
+          const fx = t.at.x - d.x * k;
+          const fy = t.at.y - d.y * k;
+          const between = w.terrain(id, fx + d.x, fy + d.y);
+          if (between === null || (between.solid && !between.low)) break;
+          if (k > 2 && blocked.has(w.tile(id, fx + d.x, fy + d.y))) break;
+          const from = w.terrain(id, fx, fy);
+          if (from === null) break;
+          const f = w.tile(id, fx, fy);
+          out.set(f, [...(out.get(f) ?? []), to]);
+        }
+      }
+    }
+  return out;
+}
+
+/** The four tiles of a raft's deck resting with its top-left tile at `at`. */
+const deckOf = (w: World, id: ScreenId, at: { x: number; y: number }): number[] => [
+  w.tile(id, at.x, at.y),
+  w.tile(id, at.x + 1, at.y),
+  w.tile(id, at.x, at.y + 1),
+  w.tile(id, at.x + 1, at.y + 1),
+];
+
+/** A raft carries Ask from each stop's deck to the next stop's and back (its decks are footing); a sailing one needs Vindr. */
+function raftEdges(w: World, state: GameState): Map<number, number[]> {
+  const out = new Map<number, number[]>();
+  // A sailing raft only leaves a stop when a gust fills its sail (Ask aboard sings it).
+  const vindr = state.inv.galdr.includes('vindr');
+  for (const id of w.ids)
+    for (const t of w.db.screens[id].things) {
+      if (t.k !== 'raft' || (t.sail === true && !vindr)) continue;
+      const stops = [t.at, ...t.path];
+      for (let i = 1; i < stops.length; i++) {
+        const a = stops[i - 1];
+        const b = stops[i];
+        if (a === undefined || b === undefined) continue;
+        const [ta] = deckOf(w, id, a);
+        const [tb] = deckOf(w, id, b);
+        if (ta === undefined || tb === undefined) continue;
+        for (const f of deckOf(w, id, a)) out.set(f, [...(out.get(f) ?? []), tb]);
+        for (const f of deckOf(w, id, b)) out.set(f, [...(out.get(f) ?? []), ta]);
+      }
+    }
+  return out;
+}
+
+/** Every move that is not a step: warps from a `use`, pulls along the grapple chain, and raft rides. */
+function jumpEdges(w: World, state: GameState): Map<number, number[]> {
+  const out = warpEdges(w, state);
+  for (const more of [grappleEdges(w, state), raftEdges(w, state)])
+    for (const [from, to] of more) out.set(from, [...(out.get(from) ?? []), ...to]);
   return out;
 }
 
@@ -436,7 +580,7 @@ function wheelSpots(w: World, state: GameState): Map<number, number[]> {
  */
 function flood(w: World, state: GameState, origin: number): Set<number> {
   let reach = new Set<number>();
-  const warps = warpEdges(w, state);
+  const warps = jumpEdges(w, state);
   const spots = wheelSpots(w, state);
   const fixed = levelOf(w, state);
   const start = w.water === null ? origin : origin + fixed * w.span;
@@ -463,6 +607,7 @@ function flood(w: World, state: GameState, origin: number): Set<number> {
 function walkable(w: World, ground: Ground, id: ScreenId, x: number, y: number, level: number): boolean {
   const tr = w.terrain(id, x, y, level);
   if (tr === null) return false;
+  if (!ground.warm && w.cold.has(id)) return false;
   const tile = w.tile(id, x, y);
   return (!tr.solid || ground.open.has(tile)) && !ground.blocked.has(tile);
 }
@@ -484,7 +629,7 @@ function steps(w: World, t: number, ground: Ground, level: number): number[] {
       continue;
     }
     if (walkable(w, ground, id, nx, ny, level)) {
-      out.push(w.tile(id, nx, ny));
+      out.push(slideEnd(w, ground, id, x, y, dir, level));
       continue;
     }
     // A ledge facing this way is hopped: land on the far side.
@@ -492,9 +637,47 @@ function steps(w: World, t: number, ground: Ground, level: number): number[] {
       out.push(w.tile(id, nx + d.x, ny + d.y));
   }
   for (const thing of w.db.screens[id].things)
-    if (thing.k === 'door' && thing.at.x === x && thing.at.y === y && w.has(thing.to))
+    if (
+      thing.k === 'door' &&
+      thing.at.x === x &&
+      thing.at.y === y &&
+      w.has(thing.to) &&
+      (thing.dive !== true || ground.dives)
+    )
       out.push(w.tile(thing.to, thing.arrive.x, thing.arrive.y));
   return out;
+}
+
+/**
+ * Where a step from (x, y) to its neighbour `dir` ends (M9): on the neighbour, unless the step is onto
+ * glaze or along it, when Ask slides on until the next tile is unwalkable (stopping on the last glaze tile)
+ * or is not glaze (stopping on it). Slides never cross a screen's edge.
+ */
+function slideEnd(
+  w: World,
+  ground: Ground,
+  id: ScreenId,
+  x: number,
+  y: number,
+  dir: Dir4,
+  level: number,
+): number {
+  const d = DIR_VEC[dir];
+  let cx = x + d.x;
+  let cy = y + d.y;
+  const next = w.tile(id, cx, cy);
+  if (!w.glazed.has(next)) return next;
+  const glazed = (tx: number, ty: number): boolean => w.glazed.has(w.tile(id, tx, ty));
+  for (;;) {
+    const nx = cx + d.x;
+    const ny = cy + d.y;
+    if (nx < 0 || ny < 0 || nx >= SCREEN_COLS || ny >= SCREEN_ROWS) break;
+    if (!walkable(w, ground, id, nx, ny, level)) break;
+    cx = nx;
+    cy = ny;
+    if (!glazed(cx, cy)) break;
+  }
+  return w.tile(id, cx, cy);
 }
 
 const has = (state: GameState, item: ItemId): boolean => (state.inv.items[item] ?? 0) > 0;
@@ -552,6 +735,32 @@ function shootable(
   y: number,
 ): boolean {
   if (!has(state, 'bow')) return false;
+  return inLine(w, state, reach, id, x, y, ARROW_TILES);
+}
+
+/** Whether a wind fan can be spun from the reach: Vindr known, a straight lane of up to five tiles. */
+function gustable(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+): boolean {
+  if (!state.inv.galdr.includes('vindr')) return false;
+  return inLine(w, state, reach, id, x, y, GUST_TILES);
+}
+
+/** Whether a reached tile lies up to `tiles` off (x, y) in a straight line over nothing that stops a shot. */
+function inLine(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+  tiles: number,
+): boolean {
   const blocked = blockedTiles(w, state, null);
   for (const [dx, dy] of [
     [1, 0],
@@ -559,7 +768,7 @@ function shootable(
     [0, 1],
     [0, -1],
   ] as const)
-    for (let k = 1; k <= ARROW_TILES; k++) {
+    for (let k = 1; k <= tiles; k++) {
       const fx = x - dx * k;
       const fy = y - dy * k;
       const tr = w.terrain(id, fx, fy);
@@ -569,7 +778,7 @@ function shootable(
   return false;
 }
 
-/** Whether a switch can be struck from the reach: an eye only by an arrow, a plain one any way. */
+/** Whether a switch can be struck from the reach: a fan only by a gust, an eye only by an arrow, a plain one any way. */
 function strikable(
   w: World,
   state: GameState,
@@ -578,10 +787,80 @@ function strikable(
   t: Extract<Thing, { k: 'switch' }>,
 ): boolean {
   const { x, y } = t.at;
+  if (t.fan === true) return gustable(w, state, reach, id, x, y);
   if (shootable(w, state, reach, id, x, y)) return true;
   if (t.eye === true) return false;
   return besideReach(w, reach, id, x, y) || throwable(w, state, reach, id, x, y);
 }
+
+/** How far Bragð's beam flies, in tiles (see systems/bragd.ts). */
+const BRAGD_TILES = 14;
+
+/**
+ * Whether a crystal eye can be lit (M9b), once its room is reached: by Bragð in a straight line from the
+ * reach, or by a window's beam, traced over the prisms (each one Ask can strike, from beside it or by
+ * Bragð, in either slant) and, with the mirror held, turned once from any reached tile on its way.
+ */
+function eyeLit(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  eye: Extract<Thing, { k: 'eye' }>,
+): boolean {
+  if (!roomReached(w, reach, id)) return false;
+  const bragd = state.inv.galdr.includes('bragd');
+  if (bragd && inLine(w, state, reach, id, eye.at.x, eye.at.y, BRAGD_TILES)) return true;
+  const things = w.db.screens[id].things;
+  const ctx = ctxOf(w, state);
+  const blocked = blockedTiles(w, state, reach);
+  const prisms = things.flatMap((t) => (t.k === 'prism' ? [t] : []));
+  const free = prisms.map(
+    (p) =>
+      p.turns === true &&
+      (besideReach(w, reach, id, p.at.x, p.at.y) ||
+        (bragd && inLine(w, state, reach, id, p.at.x, p.at.y, BRAGD_TILES))),
+  );
+  const freeCount = free.filter(Boolean).length;
+  const mirror = has(state, 'mirror');
+  const target = things.indexOf(eye);
+  for (let combo = 0; combo < 1 << Math.min(freeCount, 8); combo++) {
+    const slants = new Map<string, Slant>();
+    let bit = 0;
+    prisms.forEach((p, i) => {
+      const flip = free[i] === true && ((combo >> bit++) & 1) === 1;
+      slants.set(`${String(p.at.x)},${String(p.at.y)}`, flip ? otherSlant(p.turn) : p.turn);
+    });
+    const meet = (x: number, y: number, dir: Dir4): BeamMeet => {
+      const slant = slants.get(`${String(x)},${String(y)}`);
+      if (slant !== undefined) return { k: 'turn', dir: prismTurn(slant, dir) };
+      const i = things.findIndex((t) => t.k === 'eye' && t.at.x === x && t.at.y === y);
+      if (i >= 0) return { k: 'eye', index: i };
+      const tile = w.tile(id, x, y);
+      if (blocked.has(tile)) return { k: 'stop' };
+      const tr = w.terrain(id, x, y);
+      return tr === null || (tr.solid && !tr.low && !w.clear.has(tile)) ? { k: 'stop' } : { k: 'pass' };
+    };
+    for (const b of things) {
+      if (b.k !== 'beam' || !evalCond(b.when, ctx)) continue;
+      const passes: [number, number, Dir4][] = [];
+      const lit = traceBeam(b.at.x, b.at.y, b.dir, (x, y, d) => {
+        passes.push([x, y, d]);
+        return meet(x, y, d);
+      });
+      if (lit.eyes.includes(target)) return true;
+      if (!mirror) continue;
+      for (const [x, y, d] of passes) {
+        if (!reach.has(w.tile(id, x, y))) continue;
+        for (const turn of DIRS4)
+          if (turn !== d && traceBeam(x, y, turn, meet).eyes.includes(target)) return true;
+      }
+    }
+  }
+  return false;
+}
+
+const DIRS4: readonly Dir4[] = ['n', 'e', 's', 'w'];
 
 function roomReached(w: World, reach: ReadonlySet<number>, id: ScreenId): boolean {
   const base = (w.idx.get(id) ?? 0) * 1024;
@@ -649,9 +928,16 @@ function gather(w: World, node: Node): boolean {
         case 'chest': {
           if (state.world.opened.includes(t.id) || !evalCond(t.when, ctx)) return;
           if (t.appear !== undefined && !signal(w, state, id, t.appear, reach)) return;
-          if (!besideReach(w, reach, id, t.at.x, t.at.y)) return;
+          // A sunk chest is dived for: Ask swims onto its tile.
+          if (
+            t.sunk === true
+              ? !divable(w, state, reach, id, t.at.x, t.at.y)
+              : !besideReach(w, reach, id, t.at.x, t.at.y)
+          )
+            return;
           state.world.opened.push(t.id);
           if ('item' in t.gives) give(w, state, id, t.gives.item, t.gives.n ?? 1);
+          if (t.learn !== undefined && !state.inv.galdr.includes(t.learn)) state.inv.galdr.push(t.learn);
           changed = true;
           return;
         }
@@ -664,7 +950,12 @@ function gather(w: World, node: Node): boolean {
             (!evalCond(t.when, ctx) || (t.appear !== undefined && !signal(w, state, id, t.appear, reach)))
           )
             return;
-          if (!reach.has(w.tile(id, t.at.x, t.at.y)) && !throwable(w, state, reach, id, t.at.x, t.at.y))
+          if (t.k === 'piece' && t.sunk === true) {
+            if (!divable(w, state, reach, id, t.at.x, t.at.y)) return;
+          } else if (
+            !reach.has(w.tile(id, t.at.x, t.at.y)) &&
+            !throwable(w, state, reach, id, t.at.x, t.at.y)
+          )
             return;
           got.push(t.id);
           changed = true;
@@ -686,16 +977,27 @@ function gather(w: World, node: Node): boolean {
         }
         case 'enemy': {
           const e = w.db.enemies[t.id];
-          if (
-            e.boss === undefined ||
-            e.boss.mini === true ||
-            !evalCond(t.when, ctx) ||
-            !bossAlive(w, state, id)
-          )
+          if (e.boss?.mini === true) {
+            // A mini-boss in a reached room is beaten with what it needs; its death's flags hold for good
+            // (Kolbeinn beaten opens the way on, M10a).
+            if (!evalCond(t.when, ctx) || !(e.needs ?? []).every((item) => has(state, item))) return;
+            for (const eff of t.onDeath ?? [])
+              if (eff.k === 'set' && state.flags[eff.flag] !== eff.value) {
+                state.flags[eff.flag] = eff.value;
+                changed = true;
+              }
             return;
+          }
+          if (e.boss === undefined || !evalCond(t.when, ctx) || !bossAlive(w, state, id)) return;
           if (!(e.needs ?? []).every((item) => has(state, item))) return;
           for (const eff of t.onDeath ?? []) if (eff.k === 'set') state.flags[eff.flag] = eff.value;
           if (def.dungeon !== undefined) dungeonOf(state, def.dungeon).bossDead = true;
+          changed = true;
+          return;
+        }
+        case 'eye': {
+          if (state.flags[t.flag] === true || !eyeLit(w, state, reach, id, t)) return;
+          state.flags[t.flag] = true;
           changed = true;
           return;
         }
@@ -721,9 +1023,31 @@ function gather(w: World, node: Node): boolean {
           changed = true;
           return;
         }
+        case 'gate': {
+          // Ice that fire melts (the rime), or a web that wind tears: Eldr or Vindr, once known, from beside it.
+          const flag = t.melts ?? t.blows;
+          const song = t.melts !== undefined ? 'eldr' : 'vindr';
+          if (flag === undefined || state.flags[flag] === true) return;
+          if (!state.inv.galdr.includes(song) || !evalCond(t.closed, ctx)) return;
+          let near = false;
+          for (let dy = 0; dy < t.h && !near; dy++)
+            for (let dx = 0; dx < t.w && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
+          state.flags[flag] = true;
+          changed = true;
+          return;
+        }
         case 'crack': {
-          // Bombs, once owned, are never used up: every crack beside the reach can be blown open.
-          if (state.world.opened.includes(t.id) || !owns(state.inv.items, 'bombs')) return;
+          // Bombs, once owned, are never used up: every crack beside the reach can be blown open. A weak
+          // floor gives to the hammer or Skjálfti, a stake to the hammer (M8b).
+          if (state.world.opened.includes(t.id)) return;
+          const tool =
+            t.art === 'wall' || t.art === 'rock'
+              ? owns(state.inv.items, 'bombs')
+              : owns(state.inv.items, 'hammer') ||
+                (t.art === 'floor' && state.inv.galdr.includes('skjalfti'));
+          if (!tool) return;
           let near = false;
           for (let dy = 0; dy < t.h && !near; dy++)
             for (let dx = 0; dx < t.w && !near; dx++)
@@ -734,13 +1058,27 @@ function gather(w: World, node: Node): boolean {
           return;
         }
         case 'use': {
-          if (!evalCond(t.when, ctx) || !besideReach(w, reach, id, t.at.x, t.at.y)) return;
+          if (!evalCond(t.when, ctx)) return;
+          // A wide use (a table, a boat) is used from beside any of its tiles.
+          let near = false;
+          for (let dy = 0; dy < (t.h ?? 1) && !near; dy++)
+            for (let dx = 0; dx < (t.w ?? 1) && !near; dx++)
+              near = besideReach(w, reach, id, t.at.x + dx, t.at.y + dy);
+          if (!near) return;
           node.scripts.add(t.script);
+          // What the script does for good: flags set, galdr taught, and things given that Ask lacks (so a
+          // stave rack that refills an empty hand counts once, not over and over).
           for (const step of w.db.scripts[t.script]?.steps ?? [])
             if (step.k === 'do')
               for (const eff of step.effects)
                 if (eff.k === 'set' && state.flags[eff.flag] !== eff.value) {
                   state.flags[eff.flag] = eff.value;
+                  changed = true;
+                } else if (eff.k === 'learn' && !state.inv.galdr.includes(eff.galdr)) {
+                  state.inv.galdr.push(eff.galdr);
+                  changed = true;
+                } else if (eff.k === 'give' && !has(state, eff.item)) {
+                  give(w, state, id, eff.item, eff.n ?? 1);
                   changed = true;
                 }
           return;
@@ -751,6 +1089,22 @@ function gather(w: World, node: Node): boolean {
     });
   }
   return changed;
+}
+
+/**
+ * A sunk thing's tile is reached as open water by a seal-skin owner: the season's ice over it is ground to
+ * walk on, and no one dives through it.
+ */
+function divable(
+  w: World,
+  state: GameState,
+  reach: ReadonlySet<number>,
+  id: ScreenId,
+  x: number,
+  y: number,
+): boolean {
+  if (!has(state, 'sealskin') || !reach.has(w.tile(id, x, y))) return false;
+  return w.passage[w.idx.get(id) ?? 0]?.get(y * SCREEN_COLS + x) !== true;
 }
 
 function give(w: World, state: GameState, id: ScreenId, item: ItemId, n: number): void {
@@ -792,7 +1146,7 @@ function openableLocks(w: World, node: Node): { id: string; dungeon: DungeonId }
 /** Reachable tiles (at some water level) from which no path leads back to the starting tile. */
 function strandedTiles(w: World, node: Node, origin: number): number[] {
   const ground = groundOf(w, node.state, node.reach);
-  const warps = warpEdges(w, node.state);
+  const warps = jumpEdges(w, node.state);
   const spots = wheelSpots(w, node.state);
   const fixed = levelOf(w, node.state);
   const back = new Map<number, number[]>();

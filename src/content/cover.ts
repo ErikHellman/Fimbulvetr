@@ -3,7 +3,17 @@ import type { CoverId } from './ids';
 import type { TerrainId } from './terrain';
 
 /** Open ground where snow lies and mud gathers. */
-const GROUND: readonly TerrainId[] = ['grass', 'path', 'field', 'yard', 'mound', 'heath', 'flagstone'];
+const GROUND: readonly TerrainId[] = [
+  'grass',
+  'path',
+  'field',
+  'yard',
+  'mound',
+  'heath',
+  'flagstone',
+  'mire',
+  'scree',
+];
 
 export const COVER_DEFS = {
   tall_grass: { id: 'tall_grass', seasons: ['summer'], slow: 0.6, burns: true },
@@ -40,6 +50,29 @@ export const COVER_DEFS = {
     grows: { on: ['shoal'] },
     cut: false,
     sink: true,
+  },
+  /**
+   * Ís laid on still water by the ice-song, in any season: walkable, fire melts it. It never grows; the
+   * song places it, and it thaws when Ask leaves the screen (it is never saved).
+   */
+  is_ice: {
+    id: 'is_ice',
+    seasons: ['spring', 'summer', 'autumn', 'winter'],
+    slow: 1,
+    cut: false,
+    walk: true,
+    melts: true,
+  },
+  /**
+   * Ís laid on lava (M8): a black crust Ask can cross, for a while. It never grows; the song places it, a
+   * timer on the runtime cools it away (see systems/is.ts), and it is never saved.
+   */
+  crust: {
+    id: 'crust',
+    seasons: ['spring', 'summer', 'autumn', 'winter'],
+    slow: 1,
+    cut: false,
+    walk: true,
   },
 } as const satisfies Record<CoverId, CoverDef>;
 

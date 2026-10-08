@@ -15,6 +15,21 @@ export const askRidge: ScreenDef = {
       },
     },
     { k: 'piece', id: 'hp_ask_ridge', at: { x: 33, y: 5 } },
+    // A leaf of Gyða's record (q_pages): an eye carved in a stone opens to an arrow, and the chest appears.
+    { k: 'switch', at: { x: 4, y: 5 }, set: 'w_ask_leaf_eye', eye: true },
+    {
+      k: 'chest',
+      id: 'ask_c_leaf',
+      at: { x: 6, y: 5 },
+      gives: { item: 'rune_leaf' },
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'st_blood_told' },
+          { k: 'flag', id: 'w_ask_leaf_eye' },
+        ],
+      },
+    },
     { k: 'prop', id: 'rock', at: { x: 32, y: 5 } },
     { k: 'prop', id: 'rock', at: { x: 34, y: 5 } },
     { k: 'prop', id: 'rock', at: { x: 33, y: 4 } },

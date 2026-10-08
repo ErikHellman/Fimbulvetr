@@ -31,12 +31,13 @@ import {
   type FishPhase,
   type FishResult,
 } from '../../story/fishing';
-import { buyRow, visibleStock, wareOf, type BuyResult, type Ware } from '../../story/shop';
+import { buyRow, priceOf, visibleStock, wareOf, type BuyResult, type Ware } from '../../story/shop';
 import {
   FADE_STEP_TICKS,
   MAX_INSTANT_STEPS,
   newStoryRun,
   type ActorRef,
+  type CreditsRoll,
   type Step,
   type StoryRun,
 } from '../../story/script';
@@ -66,6 +67,8 @@ export type StoryUi =
       readonly name: L10n;
       /** `item` repeats the ware's item id when it is one. */
       readonly rows: readonly { readonly item?: ItemId; readonly ware: Ware; readonly price: number }[];
+      /** What the prices are paid in, when not silver (Hreggviðr's ore). */
+      readonly currency?: ItemId;
       /** Rows, then one more for "leave". */
       readonly cursor: number;
       readonly last: BuyResult | null;
@@ -97,8 +100,8 @@ export type StoryUi =
   | { readonly k: 'warps'; readonly rows: readonly RegionId[]; readonly cursor: number }
   /** The Rime King's breath rolls over the screen, north to south: `t` ticks of `of`. */
   | { readonly k: 'breath'; readonly t: number; readonly of: number }
-  /** The credits are rolling: `t` ticks of `of`. */
-  | { readonly k: 'credits'; readonly t: number; readonly of: number }
+  /** The credits are rolling: `t` ticks of `of`, the demo's or the game's last (`roll`). */
+  | { readonly k: 'credits'; readonly t: number; readonly of: number; readonly roll: CreditsRoll }
   | null;
 
 /** How long the breath of the Rime King holds the stage, in ticks. */
@@ -114,6 +117,7 @@ export const condCtx = (rt: SimRt): CondCtx => ({
   state: rt.state,
   quests: rt.db.quests,
   weather: () => skyOf(rt),
+  ...(rt.escort === undefined ? {} : { escort: rt.escort.npc }),
 });
 
 function dialogueEnv(rt: SimRt, id: keyof SimRt['db']['dialogue']): DialogueEnv {
@@ -235,6 +239,16 @@ function begin(rt: SimRt, run: StoryRun, step: Step): boolean {
     case 'farvegr':
       run.warps = { cursor: 0 };
       return true;
+    case 'trial':
+      rt.sand = {
+        left: step.ticks,
+        of: step.ticks,
+        screen: rt.screen.id,
+        done: step.done,
+        win: step.win,
+        fail: step.fail,
+      };
+      return false;
     case 'breath':
       rt.emit({ t: 'sfx', id: 'sfx_breath' });
       rt.emit({ t: 'shake', amount: 4 });
@@ -297,6 +311,7 @@ function tick(rt: SimRt, run: StoryRun, step: Step, input: InputFrame): boolean 
     case 'warp':
     case 'if':
     case 'run':
+    case 'trial':
       return false;
   }
 }
@@ -361,7 +376,7 @@ function stepFarvegr(rt: SimRt, run: StoryRun, input: InputFrame): boolean {
 /** The fish that bite here and now: the season of this region, the part of the day. */
 function bitingNow(rt: SimRt): FishDef[] {
   const c = rt.state.clock;
-  const season = seasonAt(c, rt.db.screens[rt.screen.id].region, rt.db.clock);
+  const season = seasonAt(c, rt.db.screens[rt.screen.id].region, rt.db.clock, rt.state.flags);
   const phase = phaseOf(c.minute);
   return Object.values(rt.db.fish).filter(
     (f) => f.seasons.includes(season) && (f.phases === undefined || f.phases.includes(phase)),
@@ -446,7 +461,7 @@ export function storyUi(rt: SimRt): StoryUi {
       result: f.result,
     };
   }
-  if (step.k === 'credits') return { k: 'credits', t: run.t, of: CREDITS_TICKS };
+  if (step.k === 'credits') return { k: 'credits', t: run.t, of: CREDITS_TICKS, roll: step.roll ?? 'demo' };
   if (step.k === 'breath') return { k: 'breath', t: run.t, of: BREATH_TICKS };
   if (step.k === 'farvegr' && run.warps !== undefined)
     return { k: 'warps', rows: [...rt.state.world.warps], cursor: run.warps.cursor };
@@ -461,8 +476,10 @@ export function storyUi(rt: SimRt): StoryUi {
       name: shop.name,
       rows: visibleStock(shop, condCtx(rt)).map((s) => {
         const ware = wareOf(s);
-        return 'item' in ware ? { item: ware.item, ware, price: s.price } : { ware, price: s.price };
+        const price = priceOf(rt, s.price, shop.currency);
+        return 'item' in ware ? { item: ware.item, ware, price } : { ware, price };
       }),
+      ...(shop.currency === undefined ? {} : { currency: shop.currency }),
       cursor: run.shop.cursor,
       last: run.shop.last,
     };

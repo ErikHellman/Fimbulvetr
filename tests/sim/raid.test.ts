@@ -87,10 +87,14 @@ describe('the raid night', () => {
       'thorkell',
       'rannveig',
     ] as const;
+    // Gone from Askdalr: nowhere at all, or held in a dungeon (Ulf and Tófa in Helgrind's cells).
     for (const id of taken) {
       s.clock.minute = 12 * 60;
       const def = h.sim.db.npcs[id];
-      expect(def && placeOf(h.sim, def), id).toBeNull();
+      const at = def && placeOf(h.sim, def);
+      expect(at === null || h.sim.db.screens[at?.place.screen ?? 'test_a'].dungeon !== undefined, id).toBe(
+        true,
+      );
     }
   });
 

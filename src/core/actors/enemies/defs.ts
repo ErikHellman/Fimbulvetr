@@ -48,6 +48,8 @@ export interface EnemyDef {
   readonly struckBy?: number;
   /** The element that breaks its `guard` for good (a bomb's force cracks a mud-crab's shell). */
   readonly cracks?: Element;
+  /** Light enough for the grapple chain to drag it to Ask (who then finds it stunned). */
+  readonly light?: true;
   /** Ticks a stunning hit (the boomerang) freezes it; absent = cannot be stunned. */
   readonly stunnable?: number;
   /**
@@ -125,6 +127,8 @@ export interface ActorCtx {
   readonly heroFacing: Dir4;
   /** Wall lookup for the current screen (off-screen tiles are solid). */
   readonly solidAt: SolidAt;
+  /** Whether a tile is open deep water (no ice, raft or wall on it): where swimmers go. */
+  waterAt(tx: number, ty: number): boolean;
   /** Everything else live on the screen (pack members, bulbs, props). Read only. */
   readonly others: readonly Readonly<Entity>[];
   emit(event: SimEvent): void;
@@ -134,5 +138,8 @@ export interface ActorCtx {
   shoot(def: ShotId, pos: Vec, dir: Vec, owner?: number): void;
 }
 
-/** Things enemies throw or spit: a water-worm's spit, a draugr's arrow, the Haugbúi King's spectral axe. */
-export type ShotId = 'spit' | 'arrow' | 'axe';
+/**
+ * Things enemies throw or spit: a water-worm's spit, a draugr's arrow, the Haugbúi King's spectral axe, a
+ * rime bolt (M9: a frost wisp's or Hrímgerðr's, which the ice mirror turns).
+ */
+export type ShotId = 'spit' | 'arrow' | 'axe' | 'bolt';

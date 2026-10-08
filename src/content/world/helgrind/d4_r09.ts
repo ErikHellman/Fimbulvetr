@@ -1,0 +1,51 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d4R09: ScreenDef = {
+  id: 'd4_r09',
+  region: 'niflmyrr',
+  dungeon: 'd4',
+  purpose:
+    'Past Garmr: a carved stave in a chest between two rune-stones teaches Ís for good. The second key lies on an islet in the still pool.',
+  things: [
+    {
+      k: 'chest',
+      id: 'd4_c_is',
+      at: { x: 20, y: 4 },
+      gives: { item: 'stave_is' },
+      learn: 'is',
+      text: {
+        en: 'A rune-stave carved deep with Ís. Holding it, Ask hears the song in it, and keeps it: Ís can now be sung for seiðr, staves or no staves.',
+        sv: 'En runstav djupt ristad med Ís. Med den i handen hör Ask sången i den, och behåller den: nu kan Ís sjungas för seiðr, med eller utan stavar.',
+      },
+    },
+    { k: 'chest', id: 'd4_c_key2', at: { x: 29, y: 14 }, gives: { item: 'small_key' } },
+    { k: 'enemy', id: 'draugr', at: { x: 10, y: 8 } },
+    { k: 'enemy', id: 'draugr', at: { x: 12, y: 15 } },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 3 } },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 18 } },
+  ],
+  map: [
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777Y7Y777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '7777777777777777777777777777777777777777',
+    '7777777777777777777777777777777777777777',
+    '887777777777777777777777~~~~~~~~~~~~7788',
+    '887777777777777777777777~~~~~~~~~~~~7788',
+    '887777777777777777777777~~~~777~~~~~7788',
+    '887777777777777777777777~~~~777~~~~~7788',
+    '887777777777777777777777~~~~777~~~~~7788',
+    '887777777777777777777777~~~~~~~~~~~~7788',
+    '887777777777777777777777~~~~~~~~~~~~7788',
+    '8877777777777777777777777777777777777788',
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+  ],
+};

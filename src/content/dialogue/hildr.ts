@@ -1,10 +1,15 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { flag, not } from './util';
+import { all, atLeast, flag, not } from './util';
 
 /** Hildr, the shepherd on the heath: the barrow-wights, Styrr's habits, her sheep. */
 export const HILDR: DialogueDef = {
   entry: [
     { when: not(flag('n_hildr_met')), node: 'meet' },
+    { when: { k: 'item', id: 'trade_bell' }, node: 'bell' },
+    { when: all(flag('q_herd_done'), atLeast('q_farm', 2)), node: 'pasture' },
+    { when: flag('q_herd_done'), node: 'herded' },
+    { when: all(flag('st_pass_open'), flag('q_herd_asked')), node: 'herd' },
+    { when: flag('q_sealskin_done'), node: 'skin' },
     { when: flag('st_pass_open'), node: 'fimbul' },
     { when: flag('st_stone3_lit'), node: 'lit' },
     { when: flag('st_barrow_open'), node: 'opened' },
@@ -12,6 +17,12 @@ export const HILDR: DialogueDef = {
     { node: 'day' },
   ],
   nodes: {
+    skin: {
+      text: {
+        en: 'You smell of the deep water, child. The lake has let you in. Do not forget that it can change its mind.',
+        sv: 'Du luktar djupt vatten, barn. Sjön har släppt in dig. Glöm inte att den kan ändra sig.',
+      },
+    },
     meet: {
       text: {
         en: 'Careful, you will scatter them. Hildr. These are my sheep, and that is my heather, and none of it is for sale.',
@@ -51,10 +62,62 @@ export const HILDR: DialogueDef = {
         sv: 'De döda ligger stilla sedan du kom upp ur kullen. Jag sover med dörren öppen nu. Nåja, lite öppen.',
       },
     },
+    bell: {
+      text: {
+        en: 'That is Ulf’s bell, I would know its note anywhere. My bellwether lost hers in the cold, and the flock will not follow a quiet ewe.',
+        sv: 'Det där är Ulfs skälla, jag känner igen klangen var som helst. Min skällgumma tappade sin i kölden, och hjorden följer inte ett tyst får.',
+      },
+      choices: [
+        {
+          text: { en: 'Give her the bell.', sv: 'Ge henne skällan.' },
+          do: [
+            { k: 'take', item: 'trade_bell' },
+            { k: 'give', item: 'trade_fleece' },
+            { k: 'set', flag: 'q_trade', value: 1 },
+            { k: 'sfx', id: 'sfx_itemget' },
+          ],
+          next: 'fleece',
+        },
+        { text: { en: 'Not yet.', sv: 'Inte än.' } },
+      ],
+    },
+    fleece: {
+      text: {
+        en: 'Here, a fleece for it, the best I sheared this year. Raw as it comes; someone in Uppvík spins.',
+        sv: 'Här, en fäll för den, den bästa jag klippte i år. Rå som den är; någon i Uppvík spinner.',
+      },
+    },
     fimbul: {
       text: {
         en: 'The cold scattered my flock across the heath in one night. A farm with a whole fold could winter them. I have a hut and a dog.',
         sv: 'Kölden skingrade min hjord över heden på en enda natt. En gård med en hel fålla kunde ta dem genom vintern. Jag har en koja och en hund.',
+      },
+      do: [{ k: 'set', flag: 'q_herd_asked', value: true }],
+      next: 'herd',
+    },
+    herd: {
+      text: {
+        en: 'And the dog is too old to run. Could you gather them? Six into my hurdles, south of the road, before the sand runs out. Walk at a sheep and it runs the other way.',
+        sv: 'Och hunden är för gammal för att springa. Kan du samla ihop dem? Sex innanför gärdsgården, söder om vägen, innan sanden runnit ut. Gå mot ett får så springer det åt andra hållet.',
+      },
+      choices: [
+        {
+          text: { en: 'Gather the flock.', sv: 'Samla hjorden.' },
+          do: [{ k: 'set', flag: 'ev_herd_on', value: true }],
+        },
+        { text: { en: 'Not now.', sv: 'Inte nu.' } },
+      ],
+    },
+    herded: {
+      text: {
+        en: 'They are safe in the hurdles, but hurdles are no fold. If Halvar’s farm ever has one again, I would winter them there.',
+        sv: 'De är trygga innanför gärdsgården, men en gärdsgård är ingen fålla. Om Halvars gård får en igen, skulle jag ha dem där över vintern.',
+      },
+    },
+    pasture: {
+      text: {
+        en: 'A real fold, and hay in the byre. The flock has not been this fat since summer. Tell Halvar he snores through the wall.',
+        sv: 'En riktig fålla, och hö i fähuset. Hjorden har inte varit så fet sedan i somras. Säg till Halvar att han snarkar genom väggen.',
       },
     },
   },

@@ -6,6 +6,9 @@ export const myrPines: ScreenDef = {
   purpose: 'Dense old pines; a piece of heart hides under a leaf pile in a pocket of the wood.',
   things: [
     { k: 'piece', id: 'hp_myr_pines', at: { x: 12, y: 15 } },
+    /** The wild bees' hive in a pine (`q_honey`): its comb can be taken in summer and autumn, smoked with the lantern. */
+    { k: 'scenery', at: { x: 30, y: 5 }, w: 1, h: 1, art: 'hive', shown: { k: 'all', of: [] } },
+    { k: 'use', at: { x: 30, y: 5 }, script: 'hive' },
     { k: 'enemy', id: 'vargr', at: { x: 20, y: 14 } },
   ],
   /** Where the Myrkviðr spawn table may put foes (rolled by day and night, see content/spawns.ts). */

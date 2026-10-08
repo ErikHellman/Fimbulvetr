@@ -9,6 +9,8 @@ export interface ShopDef {
   readonly id: ShopId;
   readonly name: L10n;
   readonly stock: readonly StockEntry[];
+  /** What the prices are paid in: a counted item (Hreggviðr's ore), or silver when unset. */
+  readonly currency?: ItemId;
 }
 
 /** What a shop sells: an item into the bag, or a weapon, armour or galdr straight onto Ask. */
@@ -33,6 +35,15 @@ export function wareOf(entry: StockEntry): Ware {
   return { galdr: entry.galdr };
 }
 
+/**
+ * What a ware costs Ask now: the arm-ring of thrift takes its share off silver prices, rounded up (a
+ * trader paid in goods haggles over nothing).
+ */
+export function priceOf(rt: SimRt, price: number, currency?: ItemId): number {
+  if (currency !== undefined) return price;
+  return rt.state.inv.ring === 'ring_thrift' ? Math.ceil(price * rt.db.tuning.rings.thriftPrice) : price;
+}
+
 export type BuyResult = 'ok' | 'poor' | 'owned' | 'full' | 'unknown';
 
 export function visibleStock(shop: ShopDef, ctx: CondCtx): readonly StockEntry[] {
@@ -47,13 +58,13 @@ const stockOf = (rt: SimRt, shopId: ShopId): readonly StockEntry[] => {
 /** Buys one lot of `item` (the dev `buy` command). */
 export function buy(rt: SimRt, shopId: ShopId, item: ItemId): BuyResult {
   const entry = stockOf(rt, shopId).find((s) => 'item' in s && s.item === item);
-  return entry === undefined ? 'unknown' : purchase(rt, entry);
+  return entry === undefined ? 'unknown' : purchase(rt, entry, rt.db.shops[shopId]?.currency);
 }
 
 /** Buys the shop screen's row `index` (of the visible stock). */
 export function buyRow(rt: SimRt, shopId: ShopId, index: number): BuyResult {
   const entry = stockOf(rt, shopId)[index];
-  return entry === undefined ? 'unknown' : purchase(rt, entry);
+  return entry === undefined ? 'unknown' : purchase(rt, entry, rt.db.shops[shopId]?.currency);
 }
 
 /** Why a ware cannot be taken now, or null when it can. */
@@ -73,11 +84,15 @@ function refusal(rt: SimRt, entry: StockEntry): BuyResult | null {
   return null;
 }
 
-function purchase(rt: SimRt, entry: StockEntry): BuyResult {
+function purchase(rt: SimRt, entry: StockEntry, currency?: ItemId): BuyResult {
   const no = refusal(rt, entry);
   if (no !== null) return no;
-  if (rt.state.hero.silver < entry.price) return 'poor';
-  rt.state.hero.silver -= entry.price;
+  const price = priceOf(rt, entry.price, currency);
+  const items = rt.state.inv.items;
+  const purse = currency === undefined ? rt.state.hero.silver : (items[currency] ?? 0);
+  if (purse < price) return 'poor';
+  if (currency === undefined) rt.state.hero.silver -= price;
+  else items[currency] = purse - price;
   const inv = rt.state.inv;
   if ('item' in entry) giveItem(rt, entry.item, entry.n ?? 1);
   else if ('weapon' in entry) inv.weapon = entry.weapon;

@@ -3,7 +3,14 @@ import { DB } from '@content/index';
 import type { Action } from '@core/input/actions';
 import { newGame } from '@core/state/gameState';
 import { TEST_START } from '@content/start';
-import { menuItems, openMenu, stepMenu, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
+import {
+  menuItems,
+  openMenu,
+  ownedRings,
+  stepMenu,
+  type MenuItem,
+  type MenuState,
+} from '@shell/ui/pauseMenu';
 import { frameOf } from '../../sim/harness';
 
 const press = (...a: Action[]) => frameOf([], a);
@@ -110,5 +117,33 @@ describe('galdr in the pause menu', () => {
     ]);
     const r = run({ ...openMenu('items'), cursor: items.length - 1 }, items, ['confirm']);
     expect(r.actions).toEqual([{ k: 'ready', galdr: 'farvegr' }]);
+  });
+});
+
+describe('arm-rings in the pause menu', () => {
+  it('lists the rings owned last, marks the one worn, and confirm wears another or takes it off', () => {
+    const inv = inventory();
+    inv.galdr = ['eldr'];
+    inv.ring = 'ring_thrift';
+    const items = menuItems(inv, DB.items, ['ring_stamina', 'ring_thrift']);
+    expect(items.slice(-2).map((i) => [i.id, i.kind, i.kind === 'ring' && i.worn])).toEqual([
+      ['ring_stamina', 'ring', false],
+      ['ring_thrift', 'ring', true],
+    ]);
+    const wear = run({ ...openMenu('items'), cursor: items.length - 2 }, items, ['confirm']);
+    expect(wear.actions).toEqual([{ k: 'ring', id: 'ring_stamina' }]);
+    const off = run({ ...openMenu('items'), cursor: items.length - 1 }, items, ['confirm']);
+    expect(off.actions).toEqual([{ k: 'ring', id: null }]);
+  });
+
+  it('lists none when none are owned', () => {
+    expect(menuItems(inventory(), DB.items).some((i) => i.kind === 'ring')).toBe(false);
+  });
+
+  it('owns the rings whose flags are set, in ring order', () => {
+    const s = newGame(1, TEST_START);
+    expect(ownedRings(s)).toEqual([]);
+    Object.assign(s.flags, { w_ring_thrift: true, w_ring_stamina: true });
+    expect(ownedRings(s)).toEqual(['ring_stamina', 'ring_thrift']);
   });
 });

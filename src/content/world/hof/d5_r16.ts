@@ -1,0 +1,51 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d5R16: ScreenDef = {
+  id: 'd5_r16',
+  region: 'saevatn',
+  dungeon: 'd5',
+  water: 'w_d5_level',
+  purpose:
+    'Behind Hrönn: a carved stave between two rune-stones teaches Vindr. North, the lake runs in strong.',
+  things: [
+    {
+      k: 'chest',
+      id: 'd5_c_vindr',
+      at: { x: 20, y: 6 },
+      gives: { item: 'ore', n: 3 },
+      learn: 'vindr',
+      text: {
+        en: 'A stave carved with Vindr, the wind-song, and three lumps of ore with it. Holding the stave, Ask hears the song in it, and keeps it: Vindr can now be sung for seiðr.',
+        sv: 'En stav ristad med Vindr, vindsången, och tre klumpar malm med den. Med staven i handen hör Ask sången i den, och behåller den: nu kan Vindr sjungas för seiðr.',
+      },
+    },
+    { k: 'brazier', at: { x: 14, y: 4 }, lit: true },
+    { k: 'brazier', at: { x: 25, y: 4 }, lit: true },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 18 } },
+    { k: 'prop', id: 'pot', at: { x: 35, y: 18 } },
+  ],
+  map: [
+    '8888888888888888888778888888888888888888',
+    '8888888888888888888778888888888888888888',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '88777777777777777Y7777Y77777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '7777777777777777777777777777777777777788',
+    '7777777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8877777777777777777777777777777777777788',
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+  ],
+};

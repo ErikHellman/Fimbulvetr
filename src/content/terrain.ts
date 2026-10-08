@@ -72,13 +72,50 @@ export const TERRAIN_IDS = [
   'crypt_wall',
   'pit',
   'ghost',
+  'blackwater',
+  'snag',
+  'mire',
+  'drowned_path',
+  /** Sævatn (M7a): currents a swimmer is carried by, and surges only a diver crosses. */
+  'current_n',
+  'current_e',
+  'current_s',
+  'current_w',
+  'surge_n',
+  'surge_e',
+  'surge_s',
+  'surge_w',
+  /** Sökkva Hof (M7b): flagstone floors that flood at water level 1 or 2, and sunken arches over the deep. */
+  'hof_floor',
+  'hof_floor_hi',
+  'arch',
+  /** Dvergagröf and Ívaldi's Forge (M8): scree, the forge's floor and walls, lava and conveyor belts. */
+  'scree',
+  'forge_floor',
+  'forge_wall',
+  'lava',
+  'belt_n',
+  'belt_e',
+  'belt_s',
+  'belt_w',
+  /** Hrímfjöll and Hrímturn (M9): firn, glaze, rime cliffs, and the tower's glass floor and walls. */
+  'firn',
+  'glaze',
+  'rime',
+  'tower_floor',
+  'tower_wall',
+  /** Hrímturn (M9b): a wall of clear ice that light shines through. */
+  'clear_ice',
+  /** Útgarðr (M10a): the giants' floor of great grey flags, and walls of blocks a giant could lift. */
+  'giant_floor',
+  'giant_wall',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
 export const TERRAIN = {
   grass: { solid: false },
   path: { solid: false },
-  water: { solid: true, low: true },
+  water: { solid: true, low: true, swim: true },
   rock: { solid: true },
   tree: { solid: true, decor: { art: ['decor_tree', 'decor_pine'], w: 1, h: 1 } },
   /** A low bank you can hop down (south) but not climb. */
@@ -161,7 +198,7 @@ export const TERRAIN = {
   /** White water over stones: too fast to wade, and it never freezes (the boomerang flies over it). */
   rapids: { solid: true, low: true },
   /** Warm spring water, steaming: no footing, and no winter ever freezes it. */
-  spring: { solid: true, low: true },
+  spring: { solid: true, low: true, swim: true },
   /** A gravel shoal across a river: wadeable, slow, and under the spring flood (see COVER_DEFS.flood). */
   shoal: { solid: false, slow: 0.7 },
   /** Cut peat banks: dark, soft ground. */
@@ -203,5 +240,55 @@ export const TERRAIN = {
   /** A drop into the barrow's depths: no footing, but arrows and the boomerang fly over it. */
   pit: { solid: true, low: true },
   /** Hidden floor over the pits: sound underfoot, but drawn as the pit it spans; only light shows it. */
-  ghost: { solid: false },
+  ghost: { solid: false, hidden: true },
+  /** Niflmýrr's still black pools: no footing, and so cold and dead that no winter skins them with ice. */
+  blackwater: { solid: true, low: true },
+  /** A dead tree in the fog marsh, grey and barkless. */
+  snag: { solid: true, decor: { art: ['decor_snag'], w: 1, h: 1 } },
+  /** Niflmýrr's ground: grey-green sedge over sodden peat. */
+  mire: { solid: false },
+  /** A drowned causeway just under the black water: sound underfoot, but only light shows it. */
+  drowned_path: { solid: false, hidden: true },
+  /** Lake water running one way: it carries a swimmer along and never freezes. */
+  current_n: { solid: true, low: true, swim: true, current: 'n' },
+  current_e: { solid: true, low: true, swim: true, current: 'e' },
+  current_s: { solid: true, low: true, swim: true, current: 's' },
+  current_w: { solid: true, low: true, swim: true, current: 'w' },
+  /** A surge: faster than anyone swims; only a diver passes under it. */
+  surge_n: { solid: true, low: true, swim: true, current: 'n', strong: true },
+  surge_e: { solid: true, low: true, swim: true, current: 'e', strong: true },
+  surge_s: { solid: true, low: true, swim: true, current: 's', strong: true },
+  surge_w: { solid: true, low: true, swim: true, current: 'w', strong: true },
+  /** Sökkva Hof's floor: dry flagstones at low water, deep water (swum with the seal-skin) from level 1. */
+  hof_floor: { solid: false, swim: true, rise: { floods: 1 } },
+  /** A higher floor, flooded only at the top level (2). */
+  hof_floor_hi: { solid: false, swim: true, rise: { floods: 2 } },
+  /** A sunken arch over deep water: a wall to walkers and swimmers, passed under by a diver. */
+  arch: { solid: true, low: true, swim: true, under: true },
+  /** Dvergagröf's mountainside: grey broken stone. */
+  scree: { solid: false },
+  /** Ívaldi's Forge: iron-dark flags, and walls of black basalt. */
+  forge_floor: { solid: false },
+  forge_wall: { solid: true },
+  /** Molten rock: no footing (arrows and the boomerang fly over it); Ís crusts it for a while. */
+  lava: { solid: true, low: true, lava: true },
+  /** Conveyor belts that carry anyone walking on them, the way they run. */
+  belt_n: { solid: false, belt: 'n' },
+  belt_e: { solid: false, belt: 'e' },
+  belt_s: { solid: false, belt: 's' },
+  belt_w: { solid: false, belt: 'w' },
+  /** Hrímfjöll's wind-packed snow: firm going, no drifts on it. */
+  firn: { solid: false },
+  /** Glacier ice: a step onto it slides Ask on until a wall or the ice's edge. */
+  glaze: { solid: false, glaze: true },
+  /** Cliffs of blue rime. */
+  rime: { solid: true },
+  /** Hrímturn: a floor of frosted glass, and walls of rime-glass. */
+  tower_floor: { solid: false },
+  tower_wall: { solid: true },
+  /** Clear ice: a wall to walkers and shots, but a beam of light shines through it. */
+  clear_ice: { solid: true, clear: true },
+  /** Útgarðr: flags the size of a farmhouse door, and walls of rime-bound blocks. */
+  giant_floor: { solid: false },
+  giant_wall: { solid: true },
 } as const satisfies Record<TerrainId, TerrainDef>;

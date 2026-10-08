@@ -68,6 +68,23 @@ describe('chests', () => {
     expect(h.sim.state.hero.silver).toBe(before + 20);
   });
 
+  it('can teach a galdr with the gift, under a line of their own', () => {
+    const is: Thing = {
+      k: 'chest',
+      id: 'c_is',
+      at: { x: 20, y: 8 },
+      gives: { item: 'stave_is' },
+      learn: 'is',
+      text: { en: 'Ís, for good!', sv: 'Ís, för gott!' },
+    };
+    const h = new Harness({ db: room([is]), tile: [20, 12] });
+    interactNorth(h, 20, 8).idle(1);
+    expect(h.sim.storyUi()).toMatchObject({ text: { en: 'Ís, for good!' } });
+    finishStory(h);
+    expect(h.sim.state.inv.galdr).toContain('is');
+    expect(h.sim.state.inv.items.stave_is).toBe(1);
+  });
+
   it("put keys, the map and the compass into the dungeon's state, not the bag", () => {
     const gifts = ['small_key', 'small_key', 'big_key', 'dungeon_map', 'compass'] as const;
     const things: Thing[] = gifts.map((item, i) => ({

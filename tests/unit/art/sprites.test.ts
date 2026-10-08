@@ -170,6 +170,7 @@ describe('enemies', () => {
       fix_biglock: ['closed', 'open'],
       fix_crack_wall: ['closed', 'open'],
       fix_crack_rock: ['closed', 'open'],
+      fix_bars: ['closed', 'open'],
     };
     for (const [art, anims] of Object.entries(used))
       for (const anim of anims) expect(ANIMS[art]?.[anim], `${art} ${anim}`).toBeDefined();
@@ -274,6 +275,21 @@ describe('content art', () => {
     for (const m of text.matchAll(/"k":"learn","galdr":"(\w+)"/g)) taught.add(m[1] ?? '');
     expect(taught.size).toBeGreaterThanOrEqual(4);
     for (const g of taught) expect(ANIMS[`galdr_${g}`]?.['idle'], g).toBeDefined();
+  });
+
+  it('has an icon for every trade good', async () => {
+    const { TRADE_ITEMS } = await import('@content/ids');
+    for (const id of TRADE_ITEMS) expect(byName.has(`item_${id}_idle_s_0`), id).toBe(true);
+  });
+
+  it('has an icon for every rune-stave', async () => {
+    const { STAVES } = await import('@content/ids');
+    for (const id of STAVES) expect(byName.has(`item_${id}_idle_s_0`), id).toBe(true);
+  });
+
+  it('has a menu icon for every arm-ring', async () => {
+    const { RINGS } = await import('@content/ids');
+    for (const id of RINGS) expect(ANIMS[id]?.['idle'], id).toBeDefined();
   });
 
   it('has an idle animation for every decor art the terrain names', async () => {

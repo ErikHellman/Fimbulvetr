@@ -15,6 +15,14 @@ import type { SpriteFrame } from './types';
 import { UI_ANIMS, uiFrames } from './ui';
 import { HAUGAR_ANIMS, haugarFrames } from './haugar';
 import { PASS_ANIMS, passFrames } from './pass';
+import { NIFLMYRR_ANIMS, niflmyrrFrames } from './niflmyrr';
+import { HELGRIND_ANIMS, helgrindFrames } from './helgrind';
+import { SAEVATN_ANIMS, saevatnFrames } from './saevatn';
+import { HOF_ANIMS, hofFrames } from './hof';
+import { FORGE_ANIMS, forgeFrames } from './forge';
+import { RIME_ANIMS, rimeFrames } from './rime';
+import { TOWER_ANIMS, towerFoeFrames, towerFrames } from './tower';
+import { UTGARD_ANIMS, utgardFrames } from './utgard';
 
 export type { SpriteFrame } from './types';
 
@@ -35,6 +43,14 @@ export const ANIMS: AnimTable = {
   ...SOKKVA_ANIMS,
   ...HAUGAR_ANIMS,
   ...PASS_ANIMS,
+  ...NIFLMYRR_ANIMS,
+  ...HELGRIND_ANIMS,
+  ...SAEVATN_ANIMS,
+  ...HOF_ANIMS,
+  ...FORGE_ANIMS,
+  ...RIME_ANIMS,
+  ...TOWER_ANIMS,
+  ...UTGARD_ANIMS,
 };
 
 export function buildSprites(): SpriteFrame[] {
@@ -53,6 +69,15 @@ export function buildSprites(): SpriteFrame[] {
     ...sokkvaFrames(),
     ...haugarFrames(),
     ...passFrames(),
+    ...niflmyrrFrames(),
+    ...helgrindFrames(),
+    ...saevatnFrames(),
+    ...hofFrames(),
+    ...forgeFrames(),
+    ...rimeFrames(),
+    ...towerFrames(),
+    ...towerFoeFrames(),
+    ...utgardFrames(),
     missingFrame(),
   ];
 }

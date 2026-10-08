@@ -343,6 +343,24 @@ function birch(): Raster {
   return r;
 }
 
+/** A dead tree in the fog marsh: a grey barkless trunk, split at the top into crooked bare limbs. */
+function snag(): Raster {
+  const r = createRaster(22, 40);
+  const wood = hex('#9a9a8c');
+  const shade = hex('#6a6a5e');
+  rect(r, 9, 12, 4, 27, wood);
+  rect(r, 12, 12, 1, 27, shade);
+  rect(r, 7, 36, 8, 3, shade);
+  // Crooked limbs: up-left, up-right, and a broken stub.
+  for (let i = 0; i < 7; i++) rect(r, 8 - i, 12 - i, 2, 1, wood);
+  for (let i = 0; i < 6; i++) rect(r, 12 + i, 13 - i, 2, 1, wood);
+  for (let i = 0; i < 4; i++) rect(r, 17 + (i % 2), 7 - i, 1, 1, shade);
+  rect(r, 10, 4, 2, 8, wood);
+  rect(r, 13, 20, 3, 1, shade);
+  rect(r, 5, 24, 4, 1, wood);
+  return r;
+}
+
 /** A round boulder furred with moss. */
 function boulder(): Raster {
   const r = createRaster(18, 18);
@@ -452,6 +470,7 @@ export function decorFrames(): SpriteFrame[] {
     frame('decor_boat_idle_s_0', boat()),
     frame('decor_cairn_idle_s_0', cairn()),
     frame('decor_tent_idle_s_0', tent()),
+    frame('decor_snag_idle_s_0', snag()),
   ];
   for (let f = 0; f < 4; f++) {
     out.push(frame(`decor_well_idle_s_${f}`, well(f)));
@@ -484,6 +503,7 @@ export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDe
   decor_boat: STILL,
   decor_cairn: STILL,
   decor_tent: STILL,
+  decor_snag: STILL,
   decor_well: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_trough: { idle: { frames: 4, fps: 4, loop: true, dirs: ['s'] } },
   decor_hearth: { idle: { frames: 4, fps: 8, loop: true, dirs: ['s'] } },

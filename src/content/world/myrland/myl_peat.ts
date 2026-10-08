@@ -9,6 +9,8 @@ export const mylPeat: ScreenDef = {
     { k: 'enemy', id: 'myrljos', at: { x: 16, y: 9 }, when: { k: 'phase', is: 'night' } },
     { k: 'crack', id: 'myl_k_peat', at: { x: 35, y: 4 }, w: 2, h: 1, art: 'rock' },
     { k: 'piece', id: 'hp_myl_peat', at: { x: 35, y: 3 } },
+    /** Under the cut peat at the southern bank: one of Ragna's lumps of amber (`q_amber`). */
+    { k: 'use', at: { x: 8, y: 16 }, script: 'amber_peat' },
   ],
   /** Where Mýrland's spawn table may put foes (see content/spawns.ts). */
   spawns: [

@@ -6,10 +6,17 @@ import { CONTROL_ROWS, SETTING_ROWS, type SettingRow, type SettingsMenuState } f
 
 const LANG_NAME: Readonly<Record<Lang, string>> = { en: 'English', sv: 'Svenska' };
 
+const TEXT_SIZE_NAME = {
+  normal: UI.set_text_normal,
+  large: UI.set_text_large,
+  larger: UI.set_text_larger,
+} as const;
+
 const ROW_LABEL = {
   lang: UI.set_lang,
   volume: UI.set_volume,
   scaling: UI.set_scaling,
+  textSize: UI.set_text_size,
   shake: UI.set_shake,
   flash: UI.set_flash,
   holdShield: UI.set_hold_shield,
@@ -45,6 +52,8 @@ function value(row: SettingRow, s: Settings, lang: Lang): string {
       return `${String(Math.round(s.volume * 10))}/10`;
     case 'scaling':
       return t(s.scaling === 'integer' ? UI.set_scaling_integer : UI.set_scaling_fit, lang);
+    case 'textSize':
+      return t(TEXT_SIZE_NAME[s.textSize], lang);
     case 'shake':
     case 'flash':
     case 'holdShield':

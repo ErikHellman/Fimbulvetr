@@ -13,4 +13,28 @@ export const CLOCK_RULES: ClockRules = {
     spring: { clear: 40, rain: 40, wind: 15, fog: 5 },
   },
   fixedSeason: { hrimfjoll: 'winter' },
+  /** The Rime King dead (M10b): the mountain thaws and follows the calendar like everywhere else. */
+  thaw: { flag: 'st_hrimnir_dead', regions: ['hrimfjoll'] },
+  /** Niflmýrr's fog is its own (see `misty`): its sky never rains, and in winter it snows through the fog. */
+  regionWeather: {
+    niflmyrr: {
+      summer: { clear: 70, wind: 30 },
+      autumn: { clear: 60, wind: 40 },
+      winter: { clear: 40, wind: 10, snow: 50 },
+      spring: { clear: 70, wind: 30 },
+    },
+    /**
+     * Winter on the mountain: half its days are blizzards. Its other seasons come only after the thaw
+     * (M10b): a high, windy summer, and snow again from autumn.
+     */
+    hrimfjoll: {
+      summer: { clear: 60, wind: 30, fog: 10 },
+      autumn: { clear: 35, wind: 30, fog: 10, snow: 25 },
+      winter: { clear: 35, wind: 15, snow: 50 },
+      spring: { clear: 40, wind: 25, fog: 15, rain: 20 },
+    },
+  },
+  misty: ['niflmyrr'],
+  /** Hrímfjöll's snow comes as blizzards (M9). */
+  blizzard: ['hrimfjoll'],
 };

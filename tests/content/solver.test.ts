@@ -314,22 +314,92 @@ function underTheFimbulvetr(): GameState {
   return s;
 }
 
-describe('the progression solver after the pass opens (the Fimbulvetr, M5a)', () => {
-  it('leads home from the pass over every lowland region in winter, and nothing strands Ask', () => {
-    const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter' });
-    for (const id of [
-      'hau_pass',
-      'hau_circle',
-      'hau_huscarl',
-      'hau_int_styrr',
-      'ask_farmyard',
-      'ask_village',
-      'ask_int_longhouse',
-      'ask_int_hof',
-      'upp_int_runehall',
-      'myl_ferry',
-    ] as const)
-      expect(r.screens, id).toContain(id);
+describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
+  it('reaches every lowland screen and every M5b side-quest spot in winter, and nothing strands Ask', () => {
+    // Helgrind has proofs of its own (solver_d4): leaving it out keeps this solve from branching on its keys.
+    const within = SCREEN_IDS.filter((id) => DB.screens[id].dungeon !== 'd4');
+    const r = solve(DB, underTheFimbulvetr(), nothing, { season: 'winter', within });
+    // Holmr's hall lies past the warm ring and the Norns' cave under a dive: the seal-skin (Hrafn's nights)
+    // has its own proofs (M7a). Dvergagröf lies past the chasm, over the grapple (M8a, its own proofs).
+    const lowland = SCREEN_IDS.filter(
+      (id) =>
+        DB.screens[id].dungeon === undefined &&
+        !id.startsWith('test_') &&
+        id !== 'ref_int_hall' &&
+        id !== 'sae_int_well' &&
+        (id === 'dvg_chasm' || !id.startsWith('dvg_')) &&
+        // Hrímfjöll lies past Dvergagröf and the killing frost (M9a, its own proofs).
+        !id.startsWith('hrf_'),
+    );
+    for (const id of lowland) expect(r.screens, id).toContain(id);
+    expect(r.scripts).toEqual(
+      expect.arrayContaining(['find_bell', 'hive', 'amber_reeds', 'amber_peat', 'amber_mud', 'ice_hole']),
+    );
     expect(r.stranded).toEqual([]);
+  }, 120_000);
+
+  it('melts the rime into Niflmýrr only with Eldr', () => {
+    const into = (s: GameState) => s.flags.st_rime_open === true;
+    const atThePass = (eldr: boolean): GameState => {
+      const s = underTheFimbulvetr();
+      s.hero.screen = 'hau_pass';
+      s.hero.x = 20 * TILE + TILE / 2;
+      s.hero.y = 8 * TILE + TILE - 1;
+      if (!eldr) s.inv.galdr = s.inv.galdr.filter((g) => g !== 'eldr');
+      return s;
+    };
+    const pass = { season: 'winter', within: ['hau_pass', 'nif_gorge'] } as const;
+    const warm = solve(DB, atThePass(true), into, pass);
+    expect(warm.finishable).toBe(true);
+    expect(warm.screens).toContain('nif_gorge');
+    const cold = solve(DB, atThePass(false), into, pass);
+    expect(cold.finishable).toBe(false);
+    expect(cold.screens).not.toContain('nif_gorge');
+  });
+
+  it('reaches the cairns pool’s heart piece in summer only with Ís (a stave will do)', () => {
+    const got = (s: GameState) => s.world.pieces.includes('hp_nif_cairns');
+    const atTheCairns = (frost: 'none' | 'galdr' | 'stave'): GameState => {
+      const s = underTheFimbulvetr();
+      s.hero.screen = 'nif_cairns';
+      s.hero.x = 17 * TILE + TILE / 2;
+      s.hero.y = 4 * TILE + TILE - 1;
+      if (frost === 'galdr') s.inv.galdr = [...s.inv.galdr, 'is'];
+      if (frost === 'stave') s.inv.items = { ...s.inv.items, stave_is: 1 };
+      return s;
+    };
+    const cairns = { season: 'summer', within: ['nif_cairns'] } as const;
+    expect(solve(DB, atTheCairns('none'), got, cairns).finishable).toBe(false);
+    expect(solve(DB, atTheCairns('galdr'), got, cairns).finishable).toBe(true);
+    expect(solve(DB, atTheCairns('stave'), got, cairns).finishable).toBe(true);
+    expect(solve(DB, atTheCairns('none'), got, { ...cairns, season: 'winter' }).finishable).toBe(true);
+  });
+
+  it('walks the dead wood’s drowned path to its heart piece', () => {
+    const s = underTheFimbulvetr();
+    s.hero.screen = 'nif_deadwood';
+    s.hero.x = 8 * TILE + TILE / 2;
+    s.hero.y = 14 * TILE + TILE - 1;
+    const r = solve(DB, s, (g) => g.world.pieces.includes('hp_nif_deadwood'), {
+      season: 'summer',
+      within: ['nif_deadwood'],
+    });
+    expect(r.finishable).toBe(true);
+  });
+
+  it('walks all of Niflmýrr from the pass once the rime is melted, in every season, stranding nothing', () => {
+    const nif = SCREEN_IDS.filter((id) => id.startsWith('nif_'));
+    expect(nif).toHaveLength(12);
+    for (const season of ['winter', 'summer'] as const) {
+      const s = underTheFimbulvetr();
+      s.flags.st_rime_open = true;
+      s.hero.screen = 'hau_pass';
+      s.hero.x = 20 * TILE + TILE / 2;
+      s.hero.y = 8 * TILE + TILE - 1;
+      const r = solve(DB, s, nothing, { season, within: ['hau_pass', ...nif] });
+      for (const id of nif) expect(r.screens, `${season} ${id}`).toContain(id);
+      expect(r.opened, season).toEqual(expect.arrayContaining(['nif_k_jars', 'nif_c_cave']));
+      expect(r.stranded, season).toEqual([]);
+    }
   });
 });

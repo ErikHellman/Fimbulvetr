@@ -6,7 +6,7 @@ import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { dungeonOf } from '../../state/dungeons';
 import { evalCond } from '../../story/cond';
-import { LOW, SOLID } from '../../world/collision';
+import { DEEP, LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import { tileFeet, type Thing, type TilePos } from '../../world/screen';
 import type { SimRt } from '../rt';
@@ -17,6 +17,7 @@ import { raining } from './weather';
 import { sinkTiles, walkTiles } from './cover';
 import { condCtx, probeBox, startScript } from './story';
 import { footingHolds, levelTiles, waterLevel } from './water';
+import { turnPrism } from './beams';
 
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
 const FIRE = { amount: 2, knock: 4 } as const;
@@ -49,7 +50,13 @@ const KINDS: Readonly<
   wheel: { solid: 'always', anims: ['on', 'off'] },
   warp: { solid: 'always', anims: ['awake', 'dormant'] },
   seal: { solid: 'always', anims: ['lit', 'dark'] },
+  post: { solid: 'always' },
+  raft: { solid: 'never' },
+  ripple: { solid: 'never' },
   brazier: { solid: 'always', anims: ['burn', 'out'] },
+  beam: { solid: 'always', anims: ['on', 'off'] },
+  prism: { solid: 'always' },
+  eye: { solid: 'always', anims: ['lit', 'dark'] },
 };
 
 function fixture(id: number, def: string, art: string, tile: TilePos, index: number): Entity {
@@ -80,13 +87,21 @@ function fixture(id: number, def: string, art: string, tile: TilePos, index: num
 export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entity[]): void {
   switch (thing.k) {
     case 'chest': {
-      const e = fixture(rt.newId(), 'chest', 'fix_chest', thing.at, index);
+      const e = fixture(
+        rt.newId(),
+        'chest',
+        thing.sunk === true ? 'fix_ripple' : 'fix_chest',
+        thing.at,
+        index,
+      );
+      if (thing.sunk === true) e.mem['sunk'] = 1;
       setAnim(e, rt.state.world.opened.includes(thing.id) ? 'open' : 'closed');
       out.push(e);
       return;
     }
     case 'switch': {
-      const e = fixture(rt.newId(), 'switch', thing.eye === true ? 'fix_eye' : 'fix_switch', thing.at, index);
+      const art = thing.fan === true ? 'fix_fan' : thing.eye === true ? 'fix_eye' : 'fix_switch';
+      const e = fixture(rt.newId(), 'switch', art, thing.at, index);
       if (thing.set !== undefined && rt.state.flags[thing.set] === true) e.mem['lit'] = 1;
       out.push(e);
       return;
@@ -94,11 +109,39 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
     case 'wheel':
       out.push(fixture(rt.newId(), 'wheel', 'fix_wheel', thing.at, index));
       return;
+    case 'door': {
+      // A dive door lies under a ripple, as a sunk chest does: nothing hooks or strikes it.
+      if (thing.dive !== true) return;
+      const e = fixture(rt.newId(), 'ripple', 'fix_ripple', thing.at, index);
+      e.mem['sunk'] = 1;
+      setAnim(e, 'idle');
+      out.push(e);
+      return;
+    }
     case 'warp':
       out.push(fixture(rt.newId(), 'warp', 'fix_warp', thing.at, index));
       return;
     case 'seal':
       out.push(fixture(rt.newId(), 'seal', 'fix_seal', thing.at, index));
+      return;
+    case 'post': {
+      const e = fixture(rt.newId(), 'post', 'fix_post', thing.at, index);
+      setAnim(e, 'idle');
+      out.push(e);
+      return;
+    }
+    case 'beam':
+      out.push(fixture(rt.newId(), 'beam', 'fix_window', thing.at, index));
+      return;
+    case 'prism': {
+      const e = fixture(rt.newId(), 'prism', 'fix_prism', thing.at, index);
+      e.mem['turn'] = 0;
+      setAnim(e, thing.turn === '/' ? 'slash' : 'back');
+      out.push(e);
+      return;
+    }
+    case 'eye':
+      out.push(fixture(rt.newId(), 'eye', 'fix_crystal', thing.at, index));
       return;
     case 'brazier': {
       const e = fixture(rt.newId(), 'brazier', 'fix_brazier', thing.at, index);
@@ -146,7 +189,7 @@ export function spawnFixtures(rt: SimRt, thing: Thing, index: number, out: Entit
   }
 }
 
-const thingOf = (rt: SimRt, e: Entity): Thing | undefined =>
+export const thingOf = (rt: SimRt, e: Entity): Thing | undefined =>
   rt.db.screens[rt.screen.id].things[mem(e, 'thing')];
 
 /** The doors opened for good in the current room's dungeon (none outside dungeons). */
@@ -169,7 +212,8 @@ function isOn(rt: SimRt, e: Entity): boolean {
     case 'fire':
       return evalCond(thing.when, condCtx(rt));
     case 'chest':
-      return mem(e, 'wait') !== 1;
+      // A sunk chest lies on the bottom under a ripple: a swimmer passes over it.
+      return mem(e, 'wait') !== 1 && mem(e, 'sunk') !== 1;
     case 'lock':
       return !(doorsOf(rt)?.includes(thing.id) ?? false);
     case 'crack':
@@ -180,6 +224,10 @@ function isOn(rt: SimRt, e: Entity): boolean {
       return rt.state.world.warps.includes(thing.region);
     case 'seal':
       return evalCond(thing.lit, condCtx(rt));
+    case 'beam':
+      return evalCond(thing.when, condCtx(rt));
+    case 'eye':
+      return rt.state.flags[thing.flag] === true;
     case 'shutter':
       return evalCond(thing.when, condCtx(rt)) && mem(e, 'armed') === 1 && mem(e, 'done') !== 1;
     case 'switch':
@@ -248,6 +296,19 @@ export function refreshFixtures(rt: SimRt, arm = true): void {
   if (changed) stampCollision(rt);
 }
 
+/** The tiles of the resting rafts: footing over the water (see `stampCollision`). */
+export function raftTiles(rt: SimRt): number[] {
+  const out: number[] = [];
+  const cols = rt.screen.collision.cols;
+  for (const e of rt.actors) {
+    if (e.kind !== 'fixture' || e.def !== 'raft' || mem(e, 'moving') === 1) continue;
+    const x = mem(e, 'tx');
+    const y = mem(e, 'ty');
+    out.push(y * cols + x, y * cols + x + 1, (y + 1) * cols + x, (y + 1) * cols + x + 1);
+  }
+  return out;
+}
+
 /**
  * collision = base terrain + the tiles of solid fixtures (closed gates, locks and shutters, chests in
  * sight, switches, braziers) + wall props (root blocks, vines).
@@ -270,16 +331,19 @@ export function stampCollision(rt: SimRt): void {
     const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
     collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
   }
+  // A raft resting at its stop: footing over the water.
+  for (const i of raftTiles(rt)) collision.flags[i] = (collision.flags[i] ?? 0) & ~(SOLID | LOW);
+  // Walls and solid fixtures stand on the water as on land: nobody swims through them (`DEEP` off).
   for (const t of wallTiles(rt)) {
     const i = t.y * collision.cols + t.x;
-    collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
+    collision.flags[i] = ((collision.flags[i] ?? 0) | SOLID) & ~DEEP;
   }
   for (const e of rt.actors) {
     if (e.kind !== 'fixture') continue;
     const solid = KINDS[e.def]?.solid;
     if (solid === 'never' || (solid === 'on' && mem(e, 'on') !== 1)) continue;
     const i = mem(e, 'ty') * collision.cols + mem(e, 'tx');
-    collision.flags[i] = (collision.flags[i] ?? 0) | SOLID;
+    collision.flags[i] = ((collision.flags[i] ?? 0) | SOLID) & ~DEEP;
   }
 }
 
@@ -339,6 +403,12 @@ export function swordSwitches(rt: SimRt): void {
     eye.mem['hitSwing'] = swing;
     rt.emit({ t: 'sfx', id: 'sfx_block' });
   }
+  // A turning prism (M9b) turns a quarter at each swing that strikes it.
+  const prism = fixtureAt(rt, 'prism', box, (f) => mem(f, 'hitSwing') !== swing);
+  if (prism !== null) {
+    prism.mem['hitSwing'] = swing;
+    if (!turnPrism(rt, prism)) rt.emit({ t: 'sfx', id: 'sfx_block' });
+  }
 }
 
 /** Whether a switch fixture is an eye carved in stone (only an arrow opens it). */
@@ -346,6 +416,23 @@ const isEye = (rt: SimRt, f: Entity): boolean => {
   const t = thingOf(rt, f);
   return t?.k === 'switch' && t.eye === true;
 };
+
+/** Whether a switch fixture is a wind fan (only a gust spins it). */
+const isFan = (rt: SimRt, f: Entity): boolean => {
+  const t = thingOf(rt, f);
+  return t?.k === 'switch' && t.fan === true;
+};
+
+/** Spins the still wind fan under `box` (a Vindr gust): it sets its flag. Returns whether one spun. */
+export function spinFan(rt: SimRt, box: Box): boolean {
+  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1 && isFan(rt, f));
+  if (e === null) return false;
+  e.mem['lit'] = 1;
+  const thing = thingOf(rt, e);
+  if (thing?.k === 'switch' && thing.set !== undefined) rt.state.flags[thing.set] = true;
+  rt.emit({ t: 'sfx', id: 'sfx_switch' });
+  return true;
+}
 
 /** An unlit eye under `box` (what a boomerang clinks off). */
 export function eyeAt(rt: SimRt, box: Box): boolean {
@@ -357,7 +444,12 @@ export function eyeAt(rt: SimRt, box: Box): boolean {
  * arrow lights an eye. Returns whether one was lit.
  */
 export function strikeSwitch(rt: SimRt, box: Box, arrow = false): boolean {
-  const e = fixtureAt(rt, 'switch', box, (f) => mem(f, 'lit') !== 1 && (arrow || !isEye(rt, f)));
+  const e = fixtureAt(
+    rt,
+    'switch',
+    box,
+    (f) => mem(f, 'lit') !== 1 && !isFan(rt, f) && (arrow || !isEye(rt, f)),
+  );
   if (e === null) return false;
   e.mem['lit'] = 1;
   const thing = thingOf(rt, e);
@@ -366,15 +458,25 @@ export function strikeSwitch(rt: SimRt, box: Box, arrow = false): boolean {
   return true;
 }
 
-/** Opens every cracked wall or rock under `box` (a blast), for good. Returns whether one was opened. */
-export function openCracks(rt: SimRt, box: Box): boolean {
+/** What can break a crack open: a blast (bombs), the hammer's blow or Skjálfti's quake (M8b). */
+export type CrackBreaker = 'blast' | 'hammer' | 'quake';
+
+/** Walls and rocks open to a blast; a weak floor to the hammer or a quake; a stake to the hammer only. */
+export function breaks(by: CrackBreaker, art: 'wall' | 'rock' | 'floor' | 'stake'): boolean {
+  if (art === 'wall' || art === 'rock') return by === 'blast';
+  if (art === 'floor') return by !== 'blast';
+  return by === 'hammer';
+}
+
+/** Opens every crack under `box` that `by` breaks, for good. Returns whether one was opened. */
+export function openCracks(rt: SimRt, box: Box, by: CrackBreaker = 'blast'): boolean {
   const opened = rt.state.world.opened;
   let any = false;
   for (const e of rt.actors) {
     if (e.kind !== 'fixture' || e.def !== 'crack' || mem(e, 'on') !== 1) continue;
     if (!overlaps(box, at(e.hurt, e.pos))) continue;
     const thing = thingOf(rt, e);
-    if (thing?.k !== 'crack' || opened.includes(thing.id)) continue;
+    if (thing?.k !== 'crack' || opened.includes(thing.id) || !breaks(by, thing.art)) continue;
     opened.push(thing.id);
     any = true;
   }
@@ -435,6 +537,35 @@ function douseBraziers(rt: SimRt): void {
 }
 
 /** Lights the cold brazier under `box` (from the lantern). Returns whether one was lit; never in the rain. */
+/**
+ * Melts the closed melting gate under `box` (the rime across the gorge): its flag is set, the screen shakes,
+ * and the whole gate opens with the next fixture refresh. Returns whether one melted.
+ */
+export function meltGate(rt: SimRt, box: Box): boolean {
+  const e = fixtureAt(rt, 'gate', box, (f) => mem(f, 'on') === 1);
+  if (e === null) return false;
+  const thing = thingOf(rt, e);
+  if (thing?.k !== 'gate' || thing.melts === undefined) return false;
+  rt.state.flags[thing.melts] = true;
+  rt.emit({ t: 'sfx', id: 'sfx_melt' });
+  rt.emit({ t: 'shake', amount: 3 });
+  return true;
+}
+
+/**
+ * Tears away the closed web under `box` (Vindr's gust): its flag is set, and it opens with the next fixture
+ * refresh. Returns whether one blew away.
+ */
+export function blowGate(rt: SimRt, box: Box): boolean {
+  const e = fixtureAt(rt, 'gate', box, (f) => mem(f, 'on') === 1);
+  if (e === null) return false;
+  const thing = thingOf(rt, e);
+  if (thing?.k !== 'gate' || thing.blows === undefined) return false;
+  rt.state.flags[thing.blows] = true;
+  rt.emit({ t: 'sfx', id: 'sfx_gust' });
+  return true;
+}
+
 export function lightBrazier(rt: SimRt, box: Box): boolean {
   if (raining(rt)) return false;
   const e = fixtureAt(rt, 'brazier', box, (f) => mem(f, 'lit') !== 1);

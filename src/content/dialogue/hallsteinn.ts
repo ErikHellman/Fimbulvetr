@@ -5,12 +5,19 @@ import { flag, not } from './util';
 export const HALLSTEINN: DialogueDef = {
   entry: [
     { when: not(flag('n_hallsteinn_met')), node: 'meet' },
+    { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_pass_open'), node: 'open' },
     { when: flag('st_stone3_lit'), node: 'three' },
     { when: flag('st_stone2_lit'), node: 'two' },
     { node: 'seals' },
   ],
   nodes: {
+    rime: {
+      text: {
+        en: 'Melted. My fathers watched that ice for four hundred winters, and you sang it away before my supper. Go on, then. Someone has to see what it was keeping in.',
+        sv: 'Smält. Mina fäder vaktade den isen i fyrahundra vintrar, och du sjöng bort den före min kvällsmat. Gå då. Någon måste se vad den höll inne.',
+      },
+    },
     meet: {
       text: {
         en: 'Halt. Well, not halt: nobody goes anywhere. Hallsteinn. My fathers kept this pass, and I keep the door that shuts it.',

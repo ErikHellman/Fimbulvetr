@@ -1,5 +1,5 @@
 import { GALDR_DEFS } from '@content/galdr';
-import { ARMOR_NAMES, WEAPON_NAMES } from '@content/gear';
+import { ARMOR_NAMES, RING_NAMES, WEAPON_NAMES } from '@content/gear';
 import { UI } from '@content/i18n/ui';
 import { ITEM_NAMES } from '@content/items';
 import { t, type Lang } from '@core/i18n/t';
@@ -36,6 +36,8 @@ export function gearLines(s: GameState, lang: Lang): GearLine[] {
   ];
   if (galdr !== undefined)
     lines.push({ icon: null, text: t(UI.gear_seidr, lang, { n: s.hero.seidr, max: s.hero.maxSeidr }) });
+  if (inv.ring !== null)
+    lines.push({ icon: inv.ring, text: t(UI.gear_ring, lang, { detail: t(RING_NAMES[inv.ring], lang) }) });
   if (horns > 0) lines.push({ icon: 'item_horn', text: t(UI.gear_horns, lang, { n: horns, full }) });
   if ((inv.items.winter_cloak ?? 0) > 0)
     lines.push({ icon: 'item_winter_cloak', text: t(ITEM_NAMES.winter_cloak, lang) });

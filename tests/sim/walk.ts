@@ -4,7 +4,7 @@ import type { Action } from '@core/input/actions';
 import type { Dir4 } from '@core/math/dir';
 import type { Sim } from '@core/sim/sim';
 import { SCREEN_COLS, SCREEN_ROWS, TILE } from '@core/world/dims';
-import { SOLID } from '@core/world/collision';
+import { DEEP, LOW, SOLID } from '@core/world/collision';
 import { tileFeet } from '@core/world/screen';
 import { Harness, frameOf } from './harness';
 
@@ -17,9 +17,15 @@ export const heroTile = (sim: Sim): readonly [number, number] => [
   Math.floor((sim.hero.pos.y - 1) / TILE),
 ];
 
-/** Tiles that block walking: solid terrain, anything solid standing on the tile, and burning tiles. */
+/**
+ * Tiles that block walking: solid terrain, glaze (Ask would slide off it; see the M9 routes' `iceTo`),
+ * anything solid standing on the tile, and burning tiles. With the seal-skin, open deep water is no block:
+ * the walker swims it.
+ */
 function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   const g = sim.screen.collision;
+  const swims = (sim.state.inv.items.sealskin ?? 0) > 0;
+  const terrain = sim.terrainOf(sim.screen.id).cells;
   const occupied = new Set<string>();
   for (const a of sim.actors)
     if (a.kind === 'fixture' && a.def === 'fire' && a.mem['on'] === 1)
@@ -34,7 +40,11 @@ function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   }
   return (tx, ty) => {
     if (tx < 0 || ty < 0 || tx >= SCREEN_COLS || ty >= SCREEN_ROWS) return true;
-    if (((g.flags[ty * g.cols + tx] ?? 0) & SOLID) !== 0) return true;
+    const f = g.flags[ty * g.cols + tx] ?? 0;
+    const water = swims && (f & DEEP) !== 0 && (f & LOW) !== 0;
+    if ((f & SOLID) !== 0 && !water) return true;
+    const t = terrain[ty * SCREEN_COLS + tx];
+    if (t !== undefined && sim.db.terrain[t].glaze === true) return true;
     return occupied.has(`${String(tx)},${String(ty)}`);
   };
 }
@@ -185,15 +195,26 @@ const UNTOUCHABLE = new Set(['rise', 'buried', 'retract', 'circle', 'fade']);
  * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls and whole shells
  * (armoured), the immortal (bulbs, spikes) and bosses (fought by hand) are left alone.
  */
+/** Whether an actor stands in deep water. */
+function inWater(sim: Sim, e: Sim['actors'][number]): boolean {
+  const g = sim.screen.collision;
+  const tx = Math.floor(e.pos.x / TILE);
+  const ty = Math.floor((e.pos.y - 1) / TILE);
+  const f = g.flags[ty * g.cols + tx] ?? 0;
+  return (f & DEEP) !== 0 && (f & SOLID) !== 0;
+}
+
 function nearestFoe(sim: Sim): { e: Sim['actors'][number]; d: number } | null {
   let best: { e: Sim['actors'][number]; d: number } | null = null;
   for (const e of sim.actors) {
     if (e.kind !== 'enemy') continue;
     const def = sim.db.enemies[e.def as EnemyId];
-    // Water-worms are left in their pools: the walker passes them by. Armour is left alone until a bomb
-    // has cracked it (a mud-crab's shell).
+    // Water-worms are left in their pools, and swimmers in the water: the walker passes them by (the
+    // drowned are fought once they climb out). Armour is left alone until a bomb has cracked it (a
+    // mud-crab's shell).
     const armoured = def.guard === true && e.mem['cracked'] !== 1;
-    if (armoured || def.immortal || def.boss !== undefined || def.swims === true) continue;
+    if (armoured || def.immortal || def.boss !== undefined) continue;
+    if (def.swims === true && (e.def !== 'drowned' || inWater(sim, e))) continue;
     if (UNTOUCHABLE.has(e.fsm.s)) continue;
     const d = Math.sqrt((e.pos.x - sim.hero.pos.x) ** 2 + (e.pos.y - sim.hero.pos.y) ** 2);
     if (best === null || d < best.d) best = { e, d };
@@ -305,6 +326,68 @@ export function duel(h: Harness, foe: Sim['actors'][number], budget = 2400): Har
     if (h.sim.hero.facing !== ({ right: 'e', left: 'w', down: 's', up: 'n' } as const)[toward])
       h.step(frameOf([toward], [toward]));
     else h.step(frameOf([]));
+  }
+  return h;
+}
+
+/**
+ * Herds the tagged sheep not yet penned into a pen around `goal` (px): picks the free sheep nearest the
+ * goal, circles round behind it and walks it in. Stops when `done` holds or the budget runs out.
+ */
+export function herdInto(
+  h: Harness,
+  goal: { x: number; y: number },
+  done: () => boolean,
+  budget = 6000,
+): Harness {
+  type V = { x: number; y: number };
+  const unit = (v: V): V => {
+    const l = Math.sqrt(v.x * v.x + v.y * v.y);
+    return l === 0 ? { x: 0, y: 0 } : { x: v.x / l, y: v.y / l };
+  };
+  const hold = (d: V): Action[] => {
+    const keys: Action[] = [];
+    if (d.x < -0.38) keys.push('left');
+    if (d.x > 0.38) keys.push('right');
+    if (d.y < -0.38) keys.push('up');
+    if (d.y > 0.38) keys.push('down');
+    return keys;
+  };
+  for (let tick = 0; tick < budget && !done() && h.sim.mode === 'play'; tick++) {
+    const hero = h.sim.hero.pos;
+    const d2 = (p: V): number => (p.x - goal.x) ** 2 + (p.y - goal.y) ** 2;
+    const sheep = h.sim.actors
+      .filter((a) => a.kind === 'critter' && a.mem['tag'] !== undefined && (a.mem['penned'] ?? 0) === 0)
+      .sort((a, b) => d2(a.pos) - d2(b.pos))[0];
+    if (sheep === undefined) break;
+    const s = sheep.pos;
+    const dir = unit({ x: goal.x - s.x, y: goal.y - s.y });
+    const rel = { x: hero.x - s.x, y: hero.y - s.y };
+    const along = rel.x * dir.x + rel.y * dir.y;
+    const across = rel.x * -dir.y + rel.y * dir.x;
+    let move: V;
+    if (along < -10 && Math.abs(across) < 12) move = dir;
+    else {
+      // Behind the sheep, but never off the screen's edge.
+      const staging = {
+        x: Math.min((SCREEN_COLS - 1.5) * TILE, Math.max(1.5 * TILE, s.x - dir.x * 48)),
+        y: Math.min((SCREEN_ROWS - 1) * TILE, Math.max(2 * TILE, s.y - dir.y * 48)),
+      };
+      const toStaging = { x: staging.x - hero.x, y: staging.y - hero.y };
+      const dist = Math.sqrt(rel.x * rel.x + rel.y * rel.y);
+      if (dist < 46 && along > -30) {
+        // Too close and not behind: step away sideways before circling round.
+        const side = across >= 0 ? 1 : -1;
+        move = unit({ x: -dir.y * side + rel.x / dist, y: dir.x * side + rel.y / dist });
+      } else move = unit(toStaging);
+      if (Math.abs(toStaging.x) < 3 && Math.abs(toStaging.y) < 3) move = dir;
+    }
+    // Never walk out over an edge mid-herd.
+    if (hero.y < 2 * TILE && move.y < 0) move = { x: move.x, y: 0.5 };
+    if (hero.y > (SCREEN_ROWS - 1) * TILE && move.y > 0) move = { x: move.x, y: -0.5 };
+    if (hero.x < 1.5 * TILE && move.x < 0) move = { x: 0.5, y: move.y };
+    if (hero.x > (SCREEN_COLS - 1.5) * TILE && move.x > 0) move = { x: -0.5, y: move.y };
+    h.step(frameOf(hold(move)));
   }
   return h;
 }

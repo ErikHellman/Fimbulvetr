@@ -36,6 +36,9 @@ function setup(hasShield = true): {
         hasShield,
         armed: true,
         dash: false,
+        rollCooldown: TUNING.hero.rollCooldown,
+        wet: false,
+        under: false,
         ledgeHop: () => null,
         emit: (ev) => events.push(ev),
       });

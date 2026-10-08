@@ -25,6 +25,7 @@ export function testCtx(over: Partial<ActorCtx> = {}): ActorCtx & {
     heroFsm: 'move',
     heroFacing: 's',
     solidAt: () => false,
+    waterAt: () => false,
     others: [],
     emit: (e) => {
       events.push(e);

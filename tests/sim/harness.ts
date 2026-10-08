@@ -9,7 +9,7 @@ import type { Dir4 } from '@core/math/dir';
 import type { ContentDb } from '@core/sim/db';
 import type { SimEvent } from '@core/sim/events';
 import { Sim } from '@core/sim/sim';
-import { newGame, type NewGameInit } from '@core/state/gameState';
+import { newGame, type GameState, type NewGameInit } from '@core/state/gameState';
 import { tileFeet } from '@core/world/screen';
 
 export interface HarnessOptions {
@@ -26,6 +26,8 @@ export interface HarnessOptions {
   readonly preset?: DevPreset;
   /** Rolled weather and spawn tables (off by default, so older tests keep the story-only world). */
   readonly rolled?: boolean;
+  /** A whole game state to go on from (a copy is taken; `start` and `preset` are then ignored). */
+  readonly state?: GameState;
 }
 
 export function frameOf(
@@ -49,8 +51,11 @@ export class Harness {
   readonly events: SimEvent[] = [];
 
   constructor(o: HarnessOptions = {}) {
-    const state = newGame(o.seed ?? 1, o.start ?? (o.preset === undefined ? TEST_START : NEW_GAME));
-    if (o.preset !== undefined) applyPreset(state, o.preset);
+    const state =
+      o.state !== undefined
+        ? structuredClone(o.state)
+        : newGame(o.seed ?? 1, o.start ?? (o.preset === undefined ? TEST_START : NEW_GAME));
+    if (o.state === undefined && o.preset !== undefined) applyPreset(state, o.preset);
     if (o.screen !== undefined) state.hero.screen = o.screen;
     if (o.tile !== undefined) {
       const p = tileFeet({ x: o.tile[0], y: o.tile[1] });

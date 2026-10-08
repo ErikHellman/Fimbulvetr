@@ -10,6 +10,14 @@ export const mylIntCave: ScreenDef = {
     { k: 'door', at: { x: 19, y: 15 }, dir: 's', to: 'myl_springs', arrive: { x: 35, y: 4 }, facing: 's' },
     { k: 'door', at: { x: 20, y: 15 }, dir: 's', to: 'myl_springs', arrive: { x: 36, y: 4 }, facing: 's' },
     { k: 'chest', id: 'myl_c_bombbag', at: { x: 19, y: 8 }, gives: { item: 'bomb_bag' } },
+    // A leaf of Gyða's record (q_pages), behind the cracked rock.
+    {
+      k: 'chest',
+      id: 'myl_c_leaf',
+      at: { x: 24, y: 11 },
+      gives: { item: 'rune_leaf' },
+      when: { k: 'flag', id: 'st_blood_told' },
+    },
     { k: 'prop', id: 'bomb_pot', at: { x: 15, y: 9 } },
     { k: 'prop', id: 'bomb_pot', at: { x: 24, y: 9 } },
   ],

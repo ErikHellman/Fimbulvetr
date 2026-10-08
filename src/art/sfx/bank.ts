@@ -638,4 +638,144 @@ export const SFX_BANK = {
     release: 1.2,
     volume: 0.3,
   },
+  /** Rime giving way to fire: a hiss of steam over a cracking groan. */
+  sfx_melt: {
+    wave: 'noise',
+    freq: 2200,
+    freqEnd: 400,
+    attack: 0.02,
+    sustain: 0.4,
+    release: 0.6,
+    volume: 0.3,
+  },
+  /** Ís sung, or a foe frozen: a bright, glassy crackle falling away. */
+  sfx_is: {
+    wave: 'square',
+    freq: 2600,
+    freqEnd: 1300,
+    attack: 0,
+    sustain: 0.08,
+    release: 0.3,
+    volume: 0.22,
+  },
+  /** Ljós sung: a soft rising chime that blooms and hangs. */
+  sfx_ljos: {
+    wave: 'sine',
+    freq: 520,
+    freqEnd: 1560,
+    attack: 0.05,
+    sustain: 0.35,
+    release: 0.6,
+    volume: 0.28,
+  },
+  /** The grapple chain paying out: a dry iron rattle that rises. */
+  sfx_chain: {
+    wave: 'square',
+    freq: 180,
+    freqEnd: 420,
+    attack: 0.01,
+    sustain: 0.12,
+    release: 0.08,
+    volume: 0.22,
+  },
+  /** A dive: a low gulp sinking under. */
+  sfx_dive: {
+    wave: 'sine',
+    freq: 420,
+    freqEnd: 140,
+    attack: 0.01,
+    sustain: 0.1,
+    release: 0.2,
+    volume: 0.28,
+  },
+  /** Vindr: a short rushing gust that swells and falls away. */
+  sfx_gust: {
+    wave: 'noise',
+    freq: 700,
+    freqEnd: 1600,
+    attack: 0.04,
+    sustain: 0.12,
+    release: 0.25,
+    volume: 0.3,
+  },
+  /** The dwarf hammer: a heavy, dull clang. */
+  sfx_hammer: {
+    wave: 'square',
+    freq: 140,
+    freqEnd: 70,
+    attack: 0.005,
+    sustain: 0.05,
+    release: 0.2,
+    volume: 0.4,
+  },
+  /** Skjálfti: a long low rumble. */
+  sfx_quake: {
+    wave: 'noise',
+    freq: 90,
+    freqEnd: 40,
+    attack: 0.08,
+    sustain: 0.5,
+    release: 0.6,
+    volume: 0.45,
+  },
+  /** Ís on lava, or a crust cooling away: a hiss. */
+  sfx_sizzle: {
+    wave: 'noise',
+    freq: 3000,
+    freqEnd: 1800,
+    attack: 0.01,
+    sustain: 0.15,
+    release: 0.2,
+    volume: 0.22,
+  },
+  /** Belgr's bellows drawing breath. */
+  sfx_bellows: {
+    wave: 'noise',
+    freq: 400,
+    freqEnd: 900,
+    attack: 0.2,
+    sustain: 0.2,
+    release: 0.3,
+    volume: 0.3,
+  },
+  /** The killing frost biting: a thin, cold whine. */
+  sfx_frost: {
+    wave: 'sine',
+    freq: 1800,
+    freqEnd: 1200,
+    attack: 0.02,
+    sustain: 0.1,
+    release: 0.25,
+    volume: 0.2,
+  },
+  /** A slide starting on glaze: a short scrape. */
+  sfx_slide: {
+    wave: 'noise',
+    freq: 2400,
+    freqEnd: 1400,
+    attack: 0.01,
+    sustain: 0.08,
+    release: 0.12,
+    volume: 0.15,
+  },
+  /** Glass ringing: a crystal eye lit, a prism turned, a giantess struck. */
+  sfx_glass: {
+    wave: 'triangle',
+    freq: 1760,
+    freqEnd: 2200,
+    attack: 0.005,
+    sustain: 0.1,
+    release: 0.4,
+    volume: 0.3,
+  },
+  /** A bolt turned off the ice mirror. */
+  sfx_mirror: {
+    wave: 'square',
+    freq: 900,
+    freqEnd: 1600,
+    attack: 0.005,
+    sustain: 0.04,
+    release: 0.12,
+    volume: 0.25,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

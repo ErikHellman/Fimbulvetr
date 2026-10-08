@@ -100,4 +100,90 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
       ],
     },
   },
+  /**
+   * Niflmýrr: fog-draugr wait in the mist by day and night; by night the mara ride and the drowned dead
+   * walk, and bog-lights drift over the pools (ravens instead in winter).
+   */
+  niflmyrr: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'myrljos', weight: 1, time: 'night' },
+      ],
+      autumn: [
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'myrljos', weight: 1, time: 'night' },
+      ],
+      winter: [
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'rime_raven', weight: 1, time: 'night' },
+      ],
+      spring: [
+        { id: 'fog_draugr', weight: 3 },
+        { id: 'mara', weight: 2, time: 'night' },
+        { id: 'draugr', weight: 1, time: 'night' },
+        { id: 'myrljos', weight: 1, time: 'night' },
+      ],
+    },
+  } /** Sævatn: the marbendill climb out onto its banks at night; in winter ravens cross the ice instead. */,
+  saevatn: {
+    count: { summer: 1, autumn: 1, winter: 1, spring: 1 },
+    entries: {
+      summer: [{ id: 'marbendill', weight: 1, time: 'night' }],
+      autumn: [{ id: 'marbendill', weight: 1, time: 'night' }],
+      winter: [{ id: 'rime_raven', weight: 1, time: 'night' }],
+      spring: [{ id: 'marbendill', weight: 1, time: 'night' }],
+    },
+  },
+  /** Dvergagröf: iron wardens walk their old beats by day and night; ember sprites drift out after dark. */
+  dvergagrof: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'glod', weight: 2, time: 'night' },
+      ],
+      autumn: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'glod', weight: 2, time: 'night' },
+      ],
+      winter: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'rime_raven', weight: 1, time: 'night' },
+      ],
+      spring: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'glod', weight: 2, time: 'night' },
+      ],
+    },
+  },
+  /** Hrímfjöll (M9a): ice wolves by day and night, frost wisps after dark; always winter up here. */
+  hrimfjoll: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      autumn: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      winter: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      spring: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+    },
+  },
 };

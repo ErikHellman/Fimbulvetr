@@ -1,5 +1,5 @@
 import type { FlagId } from '@content/flags';
-import type { GaldrId, ItemId, ShopId } from '@content/ids';
+import type { GaldrId, ItemId, RingId, ShopId } from '@content/ids';
 import type { ScreenId } from '@content/world/screens';
 import type { Season, WeatherKind } from '../clock/types';
 import type { FlagValue } from '../state/flags';
@@ -15,6 +15,8 @@ export type Command =
   | { readonly t: 'equip'; readonly slot: 0 | 1; readonly item: ItemId | null }
   /** Readies a known galdr for the galdr button (it moves to the front of those known). */
   | { readonly t: 'ready'; readonly galdr: GaldrId }
+  /** Wears an owned arm-ring (its `w_` flag set), or takes the worn one off (null). */
+  | { readonly t: 'ring'; readonly id: RingId | null }
   /** Eats food (or drinks mead) from the pack. */
   | { readonly t: 'eat'; readonly item: ItemId }
   /** Dev: give items. */
