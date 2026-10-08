@@ -18,4 +18,10 @@ describe('the credits roll', () => {
   it('speaks Swedish too', () => {
     expect(creditsRoll('sv', 0, 1000, 360, 12).lines.at(-1)).toContain('norrut');
   });
+
+  it('rolls the game’s last credits at the very end', () => {
+    const end = creditsRoll('en', 0, 1000, 360, 12, 'end').lines;
+    expect(end.at(-1)).toBe('Thank you for playing.');
+    expect(creditsRoll('sv', 0, 1000, 360, 12, 'end').lines.at(-2)).toBe('Vintern är över.');
+  });
 });

@@ -4,10 +4,12 @@ export const hrfUtgard: ScreenDef = {
   id: 'hrf_utgard',
   region: 'hrimfjoll',
   purpose:
-    "Útgarðr's gate in the ice: the giants' stronghold, shut with rime that no song melts. It opens once the last thane falls, and Útgarðr itself is M10's.",
+    "Útgarðr's gate in the ice: the giants' stronghold, shut with rime that no song melts. Halvar waits by it once the last thane falls, and his binding-words open it on Útgarðr (D8).",
   cold: true,
   things: [
-    /** Útgarðr's gate (M10 opens it). */
+    { k: 'door', at: { x: 19, y: 5 }, dir: 'n', to: 'd8_r36', arrive: { x: 19, y: 18 }, facing: 'n' },
+    { k: 'door', at: { x: 20, y: 5 }, dir: 'n', to: 'd8_r36', arrive: { x: 20, y: 18 }, facing: 'n' },
+    /** Útgarðr's gate: Halvar's binding-words melt it (M10a). */
     {
       k: 'gate',
       at: { x: 18, y: 6 },

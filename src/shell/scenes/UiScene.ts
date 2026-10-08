@@ -1,7 +1,15 @@
 import { GALDR_DEFS } from '@content/galdr';
 import { RING_NAMES } from '@content/gear';
 import * as Phaser from 'phaser';
-import { FONT_HEIGHT, LINE_HEIGHT, layoutText, textWidth } from '@art/font';
+import {
+  FONT_HEIGHT,
+  LINE_HEIGHT,
+  type FontSize,
+  fontHeight,
+  layoutText,
+  lineHeight,
+  textWidth,
+} from '@art/font';
 import { UI } from '@content/i18n/ui';
 import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
@@ -10,6 +18,9 @@ import type { DungeonId, ItemId } from '@content/ids';
 import { t, type L10n, type Lang } from '@core/i18n/t';
 import { CONTINUE_DELAY } from '@core/sim/systems/death';
 import { condCtx } from '@core/sim/systems/story';
+import { ACHIEVEMENT_DEFS } from '@content/achievements';
+import type { AchievementId } from '@content/ids';
+import { progressLine } from '@shell/ui/progressText';
 import { questLog } from '@core/story/quests';
 import { peekDungeon } from '@core/state/dungeons';
 import { dungeonMap, overworldMap, verseMarks, beaconMarks } from '@core/world/mapModel';
@@ -17,7 +28,7 @@ import { VERSES } from '@content/verses';
 import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
-import { FONT_KEY } from '@shell/gfx/font';
+import { FONT_KEY, fontKey } from '@shell/gfx/font';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import type { Settings } from '@shell/platform/settings';
 import type { SettingsMenuState } from '@shell/ui/settingsMenu';
@@ -41,6 +52,8 @@ export interface UiLink {
   readonly sfx: (id: 'sfx_talk') => void;
   /** The key bound to an action now, as the HUD labels it (K, L, I… or the player's own). */
   readonly keyLabel: (action: 'item1' | 'item2' | 'galdr') => string;
+  /** The text-size setting: dialogue, its choices and story cards are drawn at it. */
+  readonly textSize: () => FontSize;
   /** The open pause menu and what its items page lists, or null in play. */
   readonly menu: () => {
     readonly state: MenuState;
@@ -49,6 +62,9 @@ export interface UiLink {
     readonly settings: { readonly state: SettingsMenuState; readonly values: Settings } | null;
   } | null;
   /** The save-slot picker a hof or mead hall opened, with the slots' summaries; null when closed. */
+  /** Achievements this browser holds, and the one whose toast is up (null when none). */
+  readonly achievements: () => ReadonlySet<AchievementId>;
+  readonly toast: () => AchievementId | null;
   readonly picker: () => {
     readonly state: PickerState;
     readonly slots: Readonly<Record<'s1' | 's2' | 's3', SaveSummary | null>>;
@@ -93,6 +109,14 @@ const PAPER = 0xf2ead8;
 const DIM = 0x9c9486;
 const BOX = { x: 20, y: GAME_H - 84, w: GAME_W - 40, h: 76 };
 const TEXT_W = BOX.w - 24;
+/** A story card's line width at each text size. */
+const CARD_W: Readonly<Record<FontSize, number>> = { normal: 360, large: 480, larger: 560 };
+
+/** Draws a text object with the font at `size` (a no-op when it already is). */
+function sizeText(o: Phaser.GameObjects.BitmapText, size: FontSize): Phaser.GameObjects.BitmapText {
+  const key = fontKey(size);
+  return o.font === key ? o : o.setFont(key, fontHeight(size));
+}
 const MAX_HEARTS_PER_ROW = 10;
 /** Characters between two talk blips. */
 const BLIP_EVERY = 3;
@@ -101,16 +125,16 @@ const BLIP_EVERY = 3;
  * Centres the first `count` characters of a block by padding each line with spaces. BitmapText's own
  * centring puts lines on fractional pixels, which garbles pixel glyphs.
  */
-function centred(full: string, count: number): string {
+function centred(full: string, count: number, size: FontSize = 'normal'): string {
   const lines = full.split('\n');
-  const widest = Math.max(...lines.map((l) => textWidth(l)));
-  const space = textWidth('  ') - textWidth(' ');
+  const widest = Math.max(...lines.map((l) => textWidth(l, size)));
+  const space = textWidth('  ', size) - textWidth(' ', size);
   let left = count;
   return lines
     .map((line) => {
       const take = Math.max(0, Math.min(line.length, left));
       left -= line.length + 1;
-      return ' '.repeat(Math.round((widest - textWidth(line)) / 2 / space)) + line.slice(0, take);
+      return ' '.repeat(Math.round((widest - textWidth(line, size)) / 2 / space)) + line.slice(0, take);
     })
     .join('\n');
 }
@@ -147,6 +171,8 @@ export class UiScene extends Phaser.Scene {
   /** The second column of the settings menu. */
   private menuValues!: Phaser.GameObjects.BitmapText;
   private menuIcons: Phaser.GameObjects.Image[] = [];
+  private toastBox!: Phaser.GameObjects.Graphics;
+  private toastText!: Phaser.GameObjects.BitmapText;
   private fallen!: Phaser.GameObjects.Rectangle;
   private fallenTitle!: Phaser.GameObjects.BitmapText;
   private fallenPrompt!: Phaser.GameObjects.BitmapText;
@@ -218,6 +244,8 @@ export class UiScene extends Phaser.Scene {
     this.menuHint = this.text(0, 0, '', DIM);
     this.menuValues = this.text(0, 0, '', GOLD);
     this.menuIcons = [];
+    this.toastBox = this.add.graphics();
+    this.toastText = this.text(0, 0, '', GOLD);
   }
 
   override update(): void {
@@ -230,6 +258,27 @@ export class UiScene extends Phaser.Scene {
     this.drawStory(link.sim.storyUi());
     this.drawGameOver();
     this.drawMenu();
+    this.drawToast();
+  }
+
+  /** A newly earned achievement, in a small panel at the top centre. */
+  private drawToast(): void {
+    this.toastBox.clear();
+    const id = this.link.toast();
+    const def = id === null ? undefined : ACHIEVEMENT_DEFS.find((a) => a.id === id);
+    if (def === undefined) {
+      this.toastText.setText('');
+      return;
+    }
+    const line = t(UI.ach_toast, this.link.lang(), { detail: t(def.name, this.link.lang()) });
+    const w = textWidth(line) + 24;
+    const x = Math.round((GAME_W - w) / 2);
+    this.toastBox
+      .fillStyle(INK, 0.92)
+      .fillRect(x, 36, w, 20)
+      .lineStyle(1, GOLD, 1)
+      .strokeRect(x + 0.5, 36.5, w - 1, 19);
+    this.toastText.setText(line).setPosition(x + 12, 41);
   }
 
   /** The pause menu over everything: tab labels, then the page for the open tab. */
@@ -444,7 +493,10 @@ export class UiScene extends Phaser.Scene {
       ...layoutText(t(q.text, lang), MENU.w - 64).map((l) => `   ${l}`),
       '',
     ]);
-    this.menuBody.setText(lines.slice(0, 22).join('\n')).setPosition(MENU.x + 24, top);
+    this.menuBody.setText(lines.slice(0, 21).join('\n')).setPosition(MENU.x + 24, top);
+    this.menuValues
+      .setText(progressLine(condCtx(sim), this.link.achievements(), lang))
+      .setPosition(MENU.x + 24, MENU.y + MENU.h - 32);
   }
 
   /** After the fall: the screen dims and, a moment later, the way to rise again. */
@@ -641,6 +693,8 @@ export class UiScene extends Phaser.Scene {
     this.card.setVisible(false);
     this.cardText.setText('');
     this.breath.clear();
+    for (const o of [this.name, this.body, this.choices, this.cardText]) sizeText(o, 'normal');
+    this.body.setPosition(BOX.x + 12, BOX.y + 10);
     if (ui === null) {
       this.lastShown = '';
       return;
@@ -666,7 +720,7 @@ export class UiScene extends Phaser.Scene {
     }
     if (ui.k === 'credits') {
       this.lastShown = '';
-      const roll = creditsRoll(lang, ui.t, ui.of, GAME_H, LINE_HEIGHT);
+      const roll = creditsRoll(lang, ui.t, ui.of, GAME_H, LINE_HEIGHT, ui.roll);
       const full = roll.lines.join('\n');
       const widest = Math.max(...roll.lines.map((l) => textWidth(l)));
       this.card.setVisible(true);
@@ -685,38 +739,47 @@ export class UiScene extends Phaser.Scene {
       this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
       return;
     }
-    const full = layoutText(t(ui.text, lang), ui.k === 'card' ? 360 : TEXT_W).join('\n');
+    const size = this.link.textSize();
+    const lh = lineHeight(size);
+    const full = layoutText(t(ui.text, lang), ui.k === 'card' ? CARD_W[size] : TEXT_W, size).join('\n');
     const count = Math.floor(ui.shown * full.length);
     const shown = full.slice(0, count);
     this.blip(full, count);
     if (ui.k === 'card') {
       this.card.setVisible(true);
-      this.cardText.setText(centred(full, count));
+      sizeText(this.cardText, size).setText(centred(full, count, size));
       const lines = full.split('\n');
-      const w = Math.max(...lines.map((l) => textWidth(l)));
-      this.cardText.setPosition(
-        Math.round((GAME_W - w) / 2),
-        Math.round((GAME_H - lines.length * LINE_HEIGHT) / 2),
-      );
+      const w = Math.max(...lines.map((l) => textWidth(l, size)));
+      this.cardText.setPosition(Math.round((GAME_W - w) / 2), Math.round((GAME_H - lines.length * lh) / 2));
       return;
     }
+    // The box keeps its bottom edge and grows upward to fit the text at the chosen size.
+    const h = Math.max(BOX.h, full.split('\n').length * lh + 18);
+    const top = BOX.y + BOX.h - h;
     const who = this.speaker(ui.who);
     // The speaker sits in a tab on the box's top edge, so the name reads on any background. The tab is
     // drawn first so the box's top stroke lands on the tab's bottom stroke and the two read as one outline.
     if (who !== '') {
-      this.panel(BOX.x + 4, BOX.y - 17, textWidth(who) + 16, 18);
-      this.name.setText(who);
+      const fh = fontHeight(size);
+      this.panel(BOX.x + 4, top - fh - 6, textWidth(who, size) + 16, fh + 7);
+      sizeText(this.name, size)
+        .setPosition(BOX.x + 12, top - fh - 3)
+        .setText(who);
     }
-    this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
-    this.body.setText(shown);
+    this.panel(BOX.x, top, BOX.w, h);
+    sizeText(this.body, size)
+      .setPosition(BOX.x + 12, top + 10)
+      .setText(shown);
     if (ui.choices.length > 0) {
       const lines = ui.choices.map((c, i) => `${i === ui.cursor ? '>' : ' '} ${t(c, lang)}`);
-      const h = lines.length * LINE_HEIGHT + 12;
-      const w = 180;
+      const ch = lines.length * lh + 12;
+      const w = Math.max(180, ...lines.map((l) => textWidth(l, size) + 16));
       const x = BOX.x + BOX.w - w - 8;
-      const y = BOX.y - h - 4;
-      this.panel(x, y, w, h);
-      this.choices.setPosition(x + 8, y + 6).setText(lines.join('\n'));
+      const y = top - ch - 4;
+      this.panel(x, y, w, ch);
+      sizeText(this.choices, size)
+        .setPosition(x + 8, y + 6)
+        .setText(lines.join('\n'));
     }
   }
 

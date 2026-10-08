@@ -14,7 +14,15 @@ export function onGlaze(rt: SimRt): boolean {
   const id = terrain.cells[ty * terrain.cols + tx];
   if (id !== undefined && rt.db.terrain[id].glaze === true) return true;
   const rime = rimeFloor(rt);
-  return rime !== null && ty >= rime;
+  if (rime !== null && ty >= rime) return true;
+  // The wreck of a rime pillar Hrímnir pulled down (M10b): the 3×3 tiles round where it fell.
+  for (const a of rt.actors)
+    if (a.kind === 'enemy' && mem(a, 'glaze') === 1) {
+      const px = Math.floor(a.pos.x / TILE);
+      const py = Math.floor((a.pos.y - 1) / TILE);
+      if (Math.abs(tx - px) <= 1 && Math.abs(ty - py) <= 1) return true;
+    }
+  return false;
 }
 
 /**

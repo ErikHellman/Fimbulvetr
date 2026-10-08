@@ -13,10 +13,18 @@ import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { bindingsOf } from '@shell/input/remap';
 import { importMessageKey, pickSaveFile } from '@shell/platform/exportImport';
+import { loadAchievements } from '@shell/platform/achievements';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
 import type { SaveSummary, SlotId } from '@shell/platform/saveStore';
 import { GAME_H, GAME_W } from '@shell/scale';
 import type { PlayData } from '@shell/services';
+import {
+  ACH_ROWS,
+  achievementLines,
+  openAchievements,
+  stepAchievements,
+  type AchievementsPage,
+} from '@shell/ui/achievementsPage';
 import { openIntro, stepIntro, type IntroState } from '@shell/ui/intro';
 import { INTRO_LEFT, introColumn, introLines } from '@shell/ui/introText';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
@@ -45,6 +53,7 @@ const ROW_LABEL = {
   import: UI.title_import,
   export: UI.title_export,
   settings: UI.menu_settings,
+  achievements: UI.title_achievements,
 } as const satisfies Record<TitleRow, unknown>;
 
 const EMPTY: Record<SlotId, SaveSummary | null> = {
@@ -57,7 +66,7 @@ const EMPTY: Record<SlotId, SaveSummary | null> = {
 
 /**
  * The title screen: "press any key" (which also lets the browser play sound), then Continue, New game,
- * Load (three slots and the backup autosave), Import, Export and Settings. A new game first shows the
+ * Load (three slots and the backup autosave), Import, Export, Settings and Achievements. A new game first shows the
  * introduction (the basic controls) until the player ticks "don't show this again". Dev queries that name a
  * screen or preset skip the title screen.
  */
@@ -65,6 +74,9 @@ export class TitleScene extends Phaser.Scene {
   private services!: PlayData;
   private state: TitleState = openTitle();
   private settingsMenu: SettingsMenuState | null = null;
+  private achievements: AchievementsPage | null = null;
+  /** The achievements page's columns: locked ones dim and earned ones gold, left then right. */
+  private achText: Phaser.GameObjects.BitmapText[] = [];
   /** The introduction, open between New game and the longhouse. */
   private intro: IntroState | null = null;
   private slots: Record<SlotId, SaveSummary | null> = EMPTY;
@@ -89,6 +101,7 @@ export class TitleScene extends Phaser.Scene {
     this.services = data;
     this.state = openTitle();
     this.settingsMenu = null;
+    this.achievements = null;
     this.intro = null;
     this.busy = false;
     this.message = '';
@@ -105,15 +118,13 @@ export class TitleScene extends Phaser.Scene {
     this.snow(data);
     this.title = this.add.bitmapText(0, 58, FONT_KEY, GAME_TITLE.toUpperCase(), FONT_HEIGHT).setScale(3);
     this.title.setTint(PAPER).setX(Math.round((GAME_W - textWidth(GAME_TITLE.toUpperCase()) * 3) / 2));
-    const tag = t(UI.title_demo, data.settings.lang).toUpperCase();
-    const right = this.title.x + textWidth(GAME_TITLE.toUpperCase()) * 3;
-    this.text(right - textWidth(tag), 88, GOLD).setText(tag);
     const version = versionLabel(__APP_VERSION__, __BUILD_ID__);
     this.text(GAME_W - textWidth(version) - 4, GAME_H - 14, DIM).setText(version);
     this.subtitle = this.text(0, 104, DIM);
     this.body = this.text(0, 150, PAPER);
     this.values = this.text(0, 150, GOLD);
     this.hint = this.text(0, GAME_H - 30, DIM);
+    this.achText = [DIM, GOLD, DIM, GOLD].map((c) => this.text(0, 130, c));
     void this.refreshSlots();
     document.body.dataset.title = 'press';
   }
@@ -164,7 +175,11 @@ export class TitleScene extends Phaser.Scene {
     const frame = this.latch.consume();
     if (!this.busy) {
       if (this.settingsMenu !== null) this.stepSettings(frame, fresh);
-      else if (this.intro !== null) this.stepIntro(frame);
+      else if (this.achievements !== null) {
+        const r = stepAchievements(this.achievements, frame);
+        this.achievements = r.state;
+        if (r.moved) this.audio.play('sfx_menu_move');
+      } else if (this.intro !== null) this.stepIntro(frame);
       else {
         const anyKey = fresh !== null || (pad?.buttons.size ?? 0) > 0 || frame.pressed !== 0;
         const r = stepTitle(this.state, frame, this.info(), anyKey);
@@ -253,6 +268,9 @@ export class TitleScene extends Phaser.Scene {
         case 'settings':
           this.settingsMenu = openSettings();
           break;
+        case 'achievements':
+          this.achievements = openAchievements();
+          break;
       }
     } finally {
       this.busy = false;
@@ -269,6 +287,12 @@ export class TitleScene extends Phaser.Scene {
     const lang = this.services.settings.lang;
     this.subtitle.setText(t(UI.title_subtitle, lang)).setX(this.centre(t(UI.title_subtitle, lang)));
     this.values.setText('');
+    for (const a of this.achText) a.setText('');
+    if (this.achievements !== null) {
+      document.body.dataset.title = 'achievements';
+      this.drawAchievements(this.achievements);
+      return;
+    }
     if (this.settingsMenu !== null) {
       document.body.dataset.title = 'settings';
       const { labels, values, hint } = settingsLines(this.settingsMenu, this.services.settings, lang);
@@ -320,6 +344,24 @@ export class TitleScene extends Phaser.Scene {
     const bottom = this.message === '' ? hint : this.message;
     this.hint.setText(bottom).setX(this.centre(bottom));
     this.body.setY(this.state.page === 'load' ? 140 : 150 + (this.state.page === 'press' ? LINE_HEIGHT : 0));
+  }
+
+  /** Two columns of twelve, the earned ones in gold, and the chosen one's hint underneath. */
+  private drawAchievements(page: AchievementsPage): void {
+    const lang = this.services.settings.lang;
+    const lines = achievementLines(page, loadAchievements(browserStorage()), lang);
+    this.subtitle.setText(lines.heading).setX(this.centre(lines.heading));
+    const columns = [lines.left, lines.right];
+    columns.forEach((rows, c) => {
+      const x = c === 0 ? 96 : 336;
+      const pick = (gold: boolean): string =>
+        rows.map((r, i) => ((lines.earned[c * ACH_ROWS + i] ?? false) === gold ? r : '')).join('\n');
+      this.achText[c * 2]?.setText(pick(false)).setPosition(x, 130);
+      this.achText[c * 2 + 1]?.setText(pick(true)).setPosition(x, 130);
+    });
+    this.body.setText(lines.hint).setPosition(this.centre(lines.hint), 130 + (ACH_ROWS + 1) * LINE_HEIGHT);
+    const keys = t(UI.ach_hint, lang);
+    this.hint.setText(keys).setX(this.centre(keys));
   }
 
   private centre(text: string): number {

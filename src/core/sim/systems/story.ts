@@ -37,6 +37,7 @@ import {
   MAX_INSTANT_STEPS,
   newStoryRun,
   type ActorRef,
+  type CreditsRoll,
   type Step,
   type StoryRun,
 } from '../../story/script';
@@ -99,8 +100,8 @@ export type StoryUi =
   | { readonly k: 'warps'; readonly rows: readonly RegionId[]; readonly cursor: number }
   /** The Rime King's breath rolls over the screen, north to south: `t` ticks of `of`. */
   | { readonly k: 'breath'; readonly t: number; readonly of: number }
-  /** The credits are rolling: `t` ticks of `of`. */
-  | { readonly k: 'credits'; readonly t: number; readonly of: number }
+  /** The credits are rolling: `t` ticks of `of`, the demo's or the game's last (`roll`). */
+  | { readonly k: 'credits'; readonly t: number; readonly of: number; readonly roll: CreditsRoll }
   | null;
 
 /** How long the breath of the Rime King holds the stage, in ticks. */
@@ -375,7 +376,7 @@ function stepFarvegr(rt: SimRt, run: StoryRun, input: InputFrame): boolean {
 /** The fish that bite here and now: the season of this region, the part of the day. */
 function bitingNow(rt: SimRt): FishDef[] {
   const c = rt.state.clock;
-  const season = seasonAt(c, rt.db.screens[rt.screen.id].region, rt.db.clock);
+  const season = seasonAt(c, rt.db.screens[rt.screen.id].region, rt.db.clock, rt.state.flags);
   const phase = phaseOf(c.minute);
   return Object.values(rt.db.fish).filter(
     (f) => f.seasons.includes(season) && (f.phases === undefined || f.phases.includes(phase)),
@@ -460,7 +461,7 @@ export function storyUi(rt: SimRt): StoryUi {
       result: f.result,
     };
   }
-  if (step.k === 'credits') return { k: 'credits', t: run.t, of: CREDITS_TICKS };
+  if (step.k === 'credits') return { k: 'credits', t: run.t, of: CREDITS_TICKS, roll: step.roll ?? 'demo' };
   if (step.k === 'breath') return { k: 'breath', t: run.t, of: BREATH_TICKS };
   if (step.k === 'farvegr' && run.warps !== undefined)
     return { k: 'warps', rows: [...rt.state.world.warps], cursor: run.warps.cursor };

@@ -7,6 +7,12 @@ export const hrfCairn: ScreenDef = {
     "The top of the world: a cairn on the last firn before the sky, where the whole valley shows on a clear day. Embla's third letter leads here; she left the last seiðr vessel under its stones.",
   cold: true,
   things: [
+    /** A bauta-stone with one of the fallen huscarls' names (`q_record`, M11a). */
+    {
+      k: 'use',
+      at: { x: 24, y: 9 },
+      script: 'bauta_hrf',
+    },
     { k: 'use', at: { x: 28, y: 10 }, script: 'hrf_letter3' },
     { k: 'enemy', id: 'isvargr', at: { x: 20, y: 6 } },
   ],
@@ -25,7 +31,7 @@ export const hrfCairn: ScreenDef = {
     '▒∴∴∴∴∴∴∴∴∴∴∴∴K∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴▒',
     '▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒▒▒▒▒▒▒▒∴▒',
     '▒∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',
-    '∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',
+    '∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴M∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',
     '∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴i∴∴∴∴∴∴∴∴∴∴▒',
     '∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴K∴∴∴▒',
     '∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴▒',

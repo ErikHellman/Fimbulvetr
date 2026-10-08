@@ -99,6 +99,13 @@ const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
 export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   halvar: npc('halvar', [
     { when: raidNight, screen: 'ask_gate', at: { x: 18, y: 8 }, facing: 'n' },
+    /** After the fourth thane (M10a): up at Útgarðr's gate, to speak the binding-words, and there until the King is dead. */
+    {
+      when: all(flag('st_thane_hrimgerdr'), not(flag('st_hrimnir_dead'))),
+      screen: 'hrf_utgard',
+      at: { x: 23, y: 9 },
+      facing: 'w',
+    },
     /** Up again once the longhouse has its roof (farm stage 1): he works the yard by day. */
     {
       when: all(afterRaid, atLeast('q_farm', 1), not(evening)),
@@ -131,6 +138,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
         { x: 16, y: 11 },
       ],
     },
+    /** Home at the farm once it is all over (M10b). */
+    { when: flag('st_game_done'), screen: 'ask_farmyard', at: { x: 17, y: 10 }, facing: 's' },
     /** At the Refuge on Holmr once the pass is open (M7a): waiting on the shore until Ask first lands, then
      *  by the war table by day and at the hearth in the evening. */
     {
@@ -194,7 +203,16 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: up, screen: 'ask_village', at: { x: 34, y: 14 }, facing: 'w' },
   ]),
   /** The seiðmaðr who leads the raid. Only seen in cutscenes. */
-  kolbeinn: npc('kolbeinn', [{ when: raidNight, screen: 'ask_gate', at: { x: 20, y: 6 }, facing: 's' }]),
+  kolbeinn: npc('kolbeinn', [
+    { when: raidNight, screen: 'ask_gate', at: { x: 20, y: 6 }, facing: 's' },
+    /** Beaten in his hall (M10a): on his knees until Ask spares him or kills him. */
+    {
+      when: all(flag('st_kolbeinn_beaten'), not(flag('st_kolbeinn_spared')), not(flag('st_kolbeinn_slain'))),
+      screen: 'd8_r13',
+      at: { x: 20, y: 6 },
+      facing: 's',
+    },
+  ]),
   /** Myrkviðr. Önundr sleeps in his hut; the others keep to their fires all night. */
   onundr: npc('onundr', [
     { when: evening, screen: 'myr_int_hut', at: { x: 19, y: 12 }, facing: 's' },

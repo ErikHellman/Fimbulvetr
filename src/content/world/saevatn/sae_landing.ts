@@ -6,6 +6,12 @@ export const saeLanding: ScreenDef = {
   purpose:
     "Bárðr's far landing: a jetty out of the reeds onto a sandy spit under a rock knoll. The ferry puts in here, and in winter the ice starts here.",
   things: [
+    /** A bauta-stone with one of the fallen huscarls' names (`q_record`, M11a). */
+    {
+      k: 'use',
+      at: { x: 32, y: 10 },
+      script: 'bauta_sae',
+    },
     {
       k: 'use',
       at: { x: 15, y: 9 },
@@ -50,7 +56,7 @@ export const saeLanding: ScreenDef = {
     '#~~~~~~~~~~~~~~~~~~~~~~~ynnn...B...#####',
     '#~~~~~~~~~~~~~~~~~~~~~~~ynnn.....K.#####',
     '#~~~~~~~~~~~~~~~~~~~~~~~ynnn......B#####',
-    '#~~~~~~~~~~~~~~~JJJJJJJJJnnn.......#####',
+    '#~~~~~~~~~~~~~~~JJJJJJJJJnnn....M..#####',
     '#~~~~~~~~~~~~~~~~~~~~~~~ynnn.......#####',
     '#~~~~~~~~~~~~~~~~~~~~~~~ynnn......K#####',
     '#~~~~~~~~~~~~~~~~~~~~~~~ynnn.......#####',

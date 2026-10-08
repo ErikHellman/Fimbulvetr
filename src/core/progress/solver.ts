@@ -977,13 +977,18 @@ function gather(w: World, node: Node): boolean {
         }
         case 'enemy': {
           const e = w.db.enemies[t.id];
-          if (
-            e.boss === undefined ||
-            e.boss.mini === true ||
-            !evalCond(t.when, ctx) ||
-            !bossAlive(w, state, id)
-          )
+          if (e.boss?.mini === true) {
+            // A mini-boss in a reached room is beaten with what it needs; its death's flags hold for good
+            // (Kolbeinn beaten opens the way on, M10a).
+            if (!evalCond(t.when, ctx) || !(e.needs ?? []).every((item) => has(state, item))) return;
+            for (const eff of t.onDeath ?? [])
+              if (eff.k === 'set' && state.flags[eff.flag] !== eff.value) {
+                state.flags[eff.flag] = eff.value;
+                changed = true;
+              }
             return;
+          }
+          if (e.boss === undefined || !evalCond(t.when, ctx) || !bossAlive(w, state, id)) return;
           if (!(e.needs ?? []).every((item) => has(state, item))) return;
           for (const eff of t.onDeath ?? []) if (eff.k === 'set') state.flags[eff.flag] = eff.value;
           if (def.dungeon !== undefined) dungeonOf(state, def.dungeon).bossDead = true;

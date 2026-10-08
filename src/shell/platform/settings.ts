@@ -1,3 +1,4 @@
+import { FONT_SIZES, type FontSize } from '@art/font';
 import { ACTIONS, type Action } from '@core/input/actions';
 import { LANGS, type Lang } from '@core/i18n/t';
 import type { Scaling } from '@shell/scale';
@@ -10,7 +11,8 @@ export interface Settings {
   flash: boolean;
   holdShield: boolean;
   longDay: boolean;
-  textSize: 1 | 2 | 3;
+  /** Dialogue, its choices and story cards; menus and the HUD stay at the normal size. */
+  textSize: FontSize;
   /** Pulls reds and greens apart in the world's colours. */
   colourBlind: boolean;
   /** Shows the controls page before a new game; its "don't show this again" box turns it off. */
@@ -29,7 +31,7 @@ export const DEFAULT_SETTINGS: Settings = {
   flash: true,
   holdShield: false,
   longDay: false,
-  textSize: 2,
+  textSize: 'normal',
   colourBlind: false,
   showIntro: true,
   keys: {},
@@ -69,8 +71,8 @@ export function parseSettings(raw: string | null, fallbackLang: Lang): Settings 
   const volume =
     typeof d['volume'] === 'number' && d['volume'] >= 0 && d['volume'] <= 1 ? d['volume'] : base.volume;
   const scaling = d['scaling'] === 'integer' || d['scaling'] === 'fit' ? d['scaling'] : base.scaling;
-  const textSize =
-    d['textSize'] === 1 || d['textSize'] === 2 || d['textSize'] === 3 ? d['textSize'] : base.textSize;
+  // Before M11b it was a number that no menu set, so a stored number falls back to normal.
+  const textSize = FONT_SIZES.find((f) => f === d['textSize']) ?? base.textSize;
   return {
     lang,
     volume,

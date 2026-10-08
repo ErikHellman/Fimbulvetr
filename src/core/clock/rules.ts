@@ -1,3 +1,4 @@
+import type { FlagId } from '@content/flags';
 import type { RegionId } from '@content/ids';
 import type { Season, WeatherKind } from './types';
 
@@ -14,8 +15,10 @@ export interface ClockRules {
   readonly twilight: number;
   /** Weather weights (percent) per season. */
   readonly weather: Readonly<Record<Season, Readonly<Partial<Record<WeatherKind, number>>>>>;
-  /** Regions whose season never follows the calendar. */
+  /** Regions whose season never follows the calendar (until `thaw`). */
   readonly fixedSeason: Readonly<Partial<Record<RegionId, Season>>>;
+  /** Once `flag` is set, these regions drop their fixed season and follow the calendar (M10b). */
+  readonly thaw?: { readonly flag: FlagId; readonly regions: readonly RegionId[] };
   /** Regions with weather tables of their own, per season (otherwise `weather`). */
   readonly regionWeather?: Readonly<
     Partial<Record<RegionId, Readonly<Record<Season, Readonly<Partial<Record<WeatherKind, number>>>>>>>

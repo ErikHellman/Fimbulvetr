@@ -7,6 +7,9 @@ import { all, day, eve, evening, eveningDue, flag, not, raid } from './util';
  */
 export const EMBLA: DialogueDef = {
   entry: [
+    { when: all(flag('st_hrimnir_dead'), not(flag('st_game_done'))), node: 'shore' },
+    { when: all(flag('st_game_done'), flag('st_end_go')), node: 'after_go' },
+    { when: flag('st_game_done'), node: 'after_stay' },
     { when: all(raid, not(flag('st_embla_found'))), node: 'found' },
     { when: all(flag('st_embla_found'), { k: 'item', id: 'trade_comb' }), node: 'comb' },
     { when: all(flag('st_embla_found'), { k: 'flag', id: 'q_letters', lt: 1 }), node: 'letter1' },
@@ -17,6 +20,11 @@ export const EMBLA: DialogueDef = {
     {
       when: all(flag('st_embla_found'), flag('st_hrf_reached'), { k: 'flag', id: 'q_letters', eq: 2 }),
       node: 'letter3',
+    },
+    { when: all(flag('st_embla_found'), flag('st_halvar_confessed')), node: 'r_halvar' },
+    {
+      when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr'), not(flag('st_halvar_confessed'))),
+      node: 'r_north',
     },
     { when: all(flag('st_embla_found'), flag('st_thane_hrimgerdr')), node: 'r_rime' },
     { when: all(flag('st_embla_found'), evening), node: 'r_eve' },
@@ -31,6 +39,54 @@ export const EMBLA: DialogueDef = {
     { when: day(3), node: 'd3' },
   ],
   nodes: {
+    shore: {
+      text: {
+        en: 'I said I would sail south when this was over. It is over. Ask, the boat holds two, and I can split my own wood now. Come with me?',
+        sv: 'Jag sa att jag skulle segla söderut när det här var över. Nu är det över. Ask, båten rymmer två, och jag kan klyva min egen ved nu. Följer du med mig?',
+      },
+      choices: [
+        { text: { en: 'Askdalr needs me.', sv: 'Askdalr behöver mig.' }, next: 'stay' },
+        { text: { en: 'I will come.', sv: 'Jag följer med.' }, next: 'go' },
+      ],
+    },
+    stay: {
+      text: {
+        en: 'I thought you would say that. Then I will stay too, one more summer. Somebody has to laugh at you chasing the sheep.',
+        sv: 'Jag trodde väl att du skulle säga så. Då stannar jag också, en sommar till. Någon måste ju skratta åt dig när du jagar fåren.',
+      },
+      do: [{ k: 'set', flag: 'st_end_stay', value: true }],
+    },
+    go: {
+      text: {
+        en: 'Truly? Then finish what you must here, say your goodbyes, and meet me on the shore. The wind will wait for us. I asked it.',
+        sv: 'På riktigt? Gör då klart det du måste här, säg adjö, och möt mig på stranden. Vinden väntar på oss. Jag har frågat den.',
+      },
+      do: [{ k: 'set', flag: 'st_end_go', value: true }],
+    },
+    after_stay: {
+      text: {
+        en: 'The whole valley is green. I keep waiting for the cold to come back, and it never does.',
+        sv: 'Hela dalen är grön. Jag väntar hela tiden på att kylan ska komma tillbaka, och det gör den aldrig.',
+      },
+    },
+    after_go: {
+      text: {
+        en: 'The boat is ready whenever you are. There is no hurry. For once in our lives, there is no hurry.',
+        sv: 'Båten är redo när du är det. Det är ingen brådska. För en gångs skull i våra liv är det ingen brådska.',
+      },
+    },
+    r_north: {
+      text: {
+        en: 'A boat came over from the shore at dawn with my father in it, of all people. He asked where Útgarðr was, and went up the mountain without his breakfast. Go after him, Ask.',
+        sv: 'En båt kom över från stranden i gryningen med min far i, av alla människor. Han frågade var Útgarðr låg, och gick upp på berget utan att äta frukost. Gå efter honom, Ask.',
+      },
+    },
+    r_halvar: {
+      text: {
+        en: 'So he told you. He was there, at the binding, and he never said a word, all those years. I am angry with him, and I will be angry later. When I go up there, it will be to finish it.',
+        sv: 'Så han berättade. Han var där, vid bindningen, och han sa aldrig ett ord, i alla år. Jag är arg på honom, och jag tänker vara arg sen. När jag går upp dit blir det för att göra slut på det.',
+      },
+    },
     r_rime: {
       text: {
         en: 'All four. I felt the oath go slack, like a rope cut in the dark. Ask, the King was bound with our blood, and it is our blood that loosed him. Kolbeinn knew that from the start.',

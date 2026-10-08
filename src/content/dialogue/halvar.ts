@@ -10,9 +10,19 @@ const [ROOF, FOLD] = FARM_COST;
 export const HALVAR: DialogueDef = {
   entry: [
     { when: raidNight, node: 'raid' },
+    { when: all(flag('st_thane_hrimgerdr'), not(flag('st_utgard_open'))), node: 'confess' },
+    { when: all(flag('st_utgard_open'), not(flag('st_hrimnir_dead'))), node: 'gate' },
     { when: all(afterRaid, not(flag('st_seax_given'))), node: 'wounded' },
     { when: all(afterRaid, not(flag('st_legend_told'))), node: 'go_gyda' },
     { when: all(flag('st_home_winter'), { k: 'item', id: 'mail_clasp' }), node: 'clasp' },
+    /** After the ending (M10b), once the farm stands: the spring feast (M11a), then spring itself. */
+    { when: all(flag('st_game_done'), flag('q_feast_done')), node: 'feast_after' },
+    {
+      when: all(flag('st_game_done'), flag('q_feast_mead'), flag('q_feast_fish'), flag('q_feast_cask')),
+      node: 'feast_ready',
+    },
+    { when: all(flag('st_game_done'), flag('q_feast_asked')), node: 'feast_some' },
+    { when: all(flag('st_game_done'), atLeast('q_farm', 2)), node: 'spring' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_hrimgerdr')), node: 'rime' },
     { when: all(atLeast('q_farm', 2), flag('st_hrf_reached')), node: 'hrf' },
     { when: all(atLeast('q_farm', 2), flag('st_thane_ivaldi')), node: 'ivaldi' },
@@ -37,6 +47,82 @@ export const HALVAR: DialogueDef = {
     { when: day(3), node: 'chore3' },
   ],
   nodes: {
+    spring: {
+      text: {
+        en: 'Spring, and nobody has to bleed to keep it. Go on, the chores can wait a day. I never thought I would hear myself say that.',
+        sv: 'Vår, och ingen behöver blöda för att hålla den. Gå nu, sysslorna kan vänta en dag. Jag trodde aldrig att jag skulle höra mig själv säga det.',
+      },
+      next: 'feast_ask',
+    },
+    feast_ask: {
+      text: {
+        en: 'No. One chore. Everyone is home, and Askdalr has not feasted since before the winters grew teeth. Bring me mead from Sigrún, a fish from Kári at the fen, and a cask of the dwarves’ ale from Dvalinn, and we will eat at my table in the longhouse.',
+        sv: 'Nej. En syssla. Alla är hemma, och Askdalr har inte hållit gille sedan innan vintrarna fick tänder. Hämta mjöd från Sigrún, en fisk från Kári vid kärret och en kagge av dvärgarnas öl från Dvalinn, så äter vi vid mitt bord i långhuset.',
+      },
+      do: [{ k: 'set', flag: 'q_feast_asked', value: true }],
+    },
+    feast_some: {
+      text: {
+        en: 'Mead from Sigrún, a fish from Kári, and the dwarves’ ale from Dvalinn. Then the longhouse table.',
+        sv: 'Mjöd från Sigrún, en fisk från Kári och dvärgarnas öl från Dvalinn. Sedan bordet i långhuset.',
+      },
+    },
+    feast_ready: {
+      text: {
+        en: 'All of it, and the whole valley talking about it already. Go and sit at the table in the longhouse, lad. Nobody eats until you do.',
+        sv: 'Alltihop, och hela dalen pratar redan om det. Gå och sätt dig vid bordet i långhuset, pojk. Ingen äter förrän du gör det.',
+      },
+    },
+    feast_after: {
+      text: {
+        en: 'My head still hurts from that feast. Worth it. Every drop.',
+        sv: 'Huvudet värker fortfarande efter det gillet. Värt det. Varenda droppe.',
+      },
+    },
+    confess: {
+      text: {
+        en: 'Lad. Sit a moment. No, stand, it is too cold to sit. I came up because there is a thing I should have told you at the gate, the morning after the raid, and I told you about a seax instead.',
+        sv: 'Pojk. Sätt dig en stund. Nej, stå, det är för kallt att sitta. Jag kom upp för att det finns en sak jag borde ha sagt dig vid grinden, morgonen efter räden, och i stället berättade jag om en sax.',
+      },
+      next: 'confess2',
+    },
+    confess2: {
+      text: {
+        en: 'I was a huscarl once, of the old jarl. Thirty winters back we came up this mountain, forty of us and a goði, and we found him here. Hrímnir. Asleep, and so big I took him for the mountain.',
+        sv: 'Jag var huskarl en gång, hos den gamle jarlen. För trettio vintrar sedan kom vi upp på det här berget, fyrtio man och en gode, och vi fann honom här. Hrímnir. Sovande, och så stor att jag tog honom för berget.',
+      },
+      next: 'confess3',
+    },
+    confess3: {
+      text: {
+        en: 'We could have killed him. The goði said so. But killing a jötunn costs blood, and we had wives and fields. So we bound him instead, on our own blood, and on the blood of every child we would ever have.',
+        sv: 'Vi kunde ha dödat honom. Goden sa det. Men att döda en jätte kostar blod, och vi hade hustrur och åkrar. Så vi band honom i stället, med vårt eget blod, och med blodet från varje barn vi någonsin skulle få.',
+      },
+      next: 'confess4',
+    },
+    confess4: {
+      text: {
+        en: 'Embla’s blood. Ása’s, Bjarni’s, all of theirs. We chose the easy thing, and you have been paying for it all year. I am sorry, lad. That is all an old man has.',
+        sv: 'Emblas blod. Ásas, Bjarnis, allas. Vi valde det lätta, och du har fått betala för det hela året. Förlåt mig, pojk. Det är allt en gammal man har.',
+      },
+      next: 'words',
+    },
+    words: {
+      text: {
+        en: 'But I still know the words we shut this gate with. Stand back. ... There. Finish what we would not. And come back down, all of you.',
+        sv: 'Men jag kan fortfarande orden vi stängde den här porten med. Stig undan. ... Så. Gör färdigt det vi inte ville. Och kom ner igen, allihop.',
+      },
+      do: [
+        { k: 'set', flag: 'st_halvar_confessed', value: true },
+        { k: 'set', flag: 'st_utgard_open', value: true },
+      ],
+    },
+    gate: {
+      text: {
+        en: 'I will keep the gate, lad. Nothing comes out of it behind you. Go on.',
+        sv: 'Jag håller porten, pojk. Inget kommer ut ur den bakom dig. Gå nu.',
+      },
+    },
     rime: {
       text: {
         en: 'Ása at her loom and Bjarni at his jetty, and every one of them home. I count heads at supper now, lad, like a fool counting sheep. They are all there.',

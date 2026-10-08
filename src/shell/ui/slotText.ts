@@ -25,16 +25,23 @@ export function slotName(slot: SlotId, lang: Lang): string {
   return t(UI.slot_name, lang, { detail: slot.slice(1) });
 }
 
-/** One line about a saved game: the day and season, the region, hearts and play time. */
+/** The othala rune ("home") marks a finished game. */
+const DONE_RUNE = 'ᛟ';
+
+/**
+ * One line about a saved game: the day and season, the region, hearts and play time, after the othala
+ * rune when the game is finished.
+ */
 export function summaryLine(s: SaveSummary | null, db: ContentDb, lang: Lang): string {
   if (s === null) return t(UI.slot_empty, lang);
   const screen = db.screens[s.screen as ScreenId] as ContentDb['screens'][ScreenId] | undefined;
   const place = screen === undefined ? '?' : t(REGION_NAMES[screen.region], lang);
-  return t(UI.slot_summary, lang, {
+  const line = t(UI.slot_summary, lang, {
     day: s.day,
     season: t(SEASON[s.season], lang),
     place,
     hearts: Math.floor(s.hearts),
     time: playTime(s.playTicks),
   });
+  return s.done === true ? `${DONE_RUNE} ${line}` : line;
 }

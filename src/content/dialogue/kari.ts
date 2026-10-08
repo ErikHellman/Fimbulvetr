@@ -5,6 +5,7 @@ import { all, atLeast, evening, flag, not } from './util';
 export const KARI: DialogueDef = {
   entry: [
     { when: not(flag('n_kari_met')), node: 'meet' },
+    { when: all(flag('q_feast_asked'), not(flag('q_feast_fish'))), node: 'feast_fish' },
     { when: all(flag('q_fish_gamli'), not(flag('q_fisher_done'))), node: 'gamli' },
     { when: { k: 'item', id: 'trade_yarn' }, node: 'yarn' },
     { when: flag('q_sealskin_done'), node: 'skin' },
@@ -16,6 +17,13 @@ export const KARI: DialogueDef = {
     { node: 'day' },
   ],
   nodes: {
+    feast_fish: {
+      text: {
+        en: 'For Halvar’s table? Then he shall have the fattest burbot in the fen, and I shall have a seat near the mead. Tell him I will bring it myself.',
+        sv: 'Till Halvars bord? Då ska han få den fetaste laken i kärret, och jag ska få en plats nära mjödet. Säg att jag kommer med den själv.',
+      },
+      do: [{ k: 'set', flag: 'q_feast_fish', value: true }],
+    },
     skin: {
       text: {
         en: "You swim the lake in a seal's skin now? My father would have called you mad. Then he would have asked where the burbot lie.",

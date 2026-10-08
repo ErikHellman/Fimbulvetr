@@ -1,3 +1,4 @@
+import { thawed } from '../../clock/clock';
 import type { SimRt } from '../rt';
 
 /** How much heat Ask can bear before burning: longer in the ember byrnie. */
@@ -41,7 +42,12 @@ export function stepHeat(rt: SimRt): void {
 export function stepCold(rt: SimRt): void {
   const h = rt.db.tuning.hero;
   const now = rt.coldTicks ?? 0;
-  if (rt.db.screens[rt.screen.id].cold !== true || rt.db.tuning.armor[rt.state.inv.armor].warm === true) {
+  const def = rt.db.screens[rt.screen.id];
+  if (
+    def.cold !== true ||
+    thawed(def.region, rt.db.clock, rt.state.flags) ||
+    rt.db.tuning.armor[rt.state.inv.armor].warm === true
+  ) {
     if (now === 0) return;
     const left = Math.max(0, now - 4);
     rt.coldTicks = left > 0 ? left : undefined;

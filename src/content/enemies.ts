@@ -1200,4 +1200,134 @@ export const ENEMY_DEFS = {
       },
     },
   },
+  /**
+   * Jötunvörðr, the frost-giant warden of Útgarðr's master key (D8's mini-boss, M10a): frozen hard, every
+   * blow turns off him until Eldr thaws him; he raises a knee (the tell) and stomps a ring of shock.
+   */
+  jotunvordr: {
+    id: 'jotunvordr',
+    art: 'enemy_jotunvordr',
+    hp: 16,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -50, w: 28, h: 50 },
+    behaviour: 'jotunvordr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    guard: true,
+    cracks: 'fire',
+    boss: { name: { en: 'Jötunvörðr', sv: 'Jötunvörðr' }, mini: true },
+    touch: { amount: 2, knock: 5, tags: 0 },
+    attacks: {
+      stomp: {
+        from: 0,
+        to: 6,
+        boxes: around({ x: -44, y: -30, w: 88, h: 50 }),
+        amount: 4,
+        knock: 7,
+        tags: HEAVY,
+      },
+    },
+    drops: { heart: 1, silver: 0, none: 0 },
+  },
+  /**
+   * Kolbeinn in his hall (D8, M10a): a duel won by the parry. His staff turns blows from the front; a parry
+   * staggers him open; from half health his rime bolt (sent back by the mirror) makes him reel; at a quarter he
+   * calls two draugr. Beaten, he kneels, and Ask spares or kills him.
+   */
+  kolbeinn_boss: {
+    id: 'kolbeinn_boss',
+    art: 'enemy_kolbeinn',
+    hp: 16,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -8, y: -28, w: 16, h: 28 },
+    behaviour: 'kolbeinn',
+    knockResist: 0.7,
+    immortal: false,
+    solid: true,
+    shield: true,
+    struckBy: REFLECT,
+    parryStun: 70,
+    boss: { name: { en: 'Kolbeinn', sv: 'Kolbeinn' }, mini: true },
+    attacks: {
+      strike: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -26, w: 24, h: 24 },
+          w: { x: -24, y: -26, w: 24, h: 24 },
+          s: { x: -12, y: -12, w: 24, h: 24 },
+          n: { x: -12, y: -38, w: 24, h: 26 },
+        },
+        amount: 3,
+        knock: 5,
+        tags: 0,
+      },
+    },
+    drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /**
+   * Hrímnir the Rime King (D8's boss, M10b): every blow turns until his struck hand or his own breath off the
+   * mirror bares his heart-rune; the binding's ring is the fight's clock (see hrimnir.ts and binding.ts).
+   */
+  hrimnir: {
+    id: 'hrimnir',
+    art: 'enemy_hrimnir',
+    hp: 24,
+    body: { x: -20, y: -12, w: 40, h: 12 },
+    hurt: { x: -22, y: -70, w: 44, h: 70 },
+    behaviour: 'hrimnir',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    needs: ['mirror'],
+    boss: { name: { en: 'Hrímnir, the Rime King', sv: 'Hrímnir, Rimkungen' } },
+    struckBy: REFLECT,
+    touch: { amount: 3, knock: 6, tags: 0 },
+    drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /** Hrímnir's hand sweeping across a row of his hall: a blow on it stuns him (M10b). */
+  hrimnir_hand: {
+    id: 'hrimnir_hand',
+    art: 'enemy_hrimnir_hand',
+    hp: 1,
+    body: { x: -10, y: -8, w: 20, h: 8 },
+    hurt: { x: -14, y: -22, w: 28, h: 22 },
+    behaviour: 'hrimnir_hand',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      sweep: {
+        from: 0,
+        to: 999,
+        boxes: around({ x: -14, y: -20, w: 28, h: 20 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+  },
+  /** A rime pillar Hrímnir pulls down (M10b): its shadow, the fall, and its wreck lying as glaze. */
+  rime_pillar: {
+    id: 'rime_pillar',
+    art: 'enemy_rime_pillar',
+    hp: 1,
+    body: { x: -6, y: -6, w: 12, h: 6 },
+    hurt: { x: -7, y: -10, w: 14, h: 10 },
+    behaviour: 'rime_pillar',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      fall: {
+        from: 6,
+        to: 9,
+        boxes: around({ x: -18, y: -24, w: 36, h: 28 }),
+        amount: 4,
+        knock: 4,
+        tags: PIERCE_SHIELD,
+      },
+    },
+  },
 } as const satisfies Record<EnemyId, EnemyDef>;
