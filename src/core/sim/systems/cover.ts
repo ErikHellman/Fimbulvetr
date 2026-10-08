@@ -19,7 +19,7 @@ export function coverFor(rt: SimRt, id: ScreenId): CoverGrid {
     rt.db.coverLegend,
     rt.db.coverOrder,
     rt.db.cover,
-    seasonAt(c, def.region, rt.db.clock),
+    seasonAt(c, def.region, rt.db.clock, rt.state.flags),
     c.epoch,
     rt.state.world.cover[id],
     {

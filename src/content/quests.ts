@@ -857,6 +857,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Under rösets översta sten låg en bit av ett hjärta, insvept i näver.',
         },
       },
+      {
+        when: atLeast('q_letters', 3),
+        text: {
+          en: 'Embla’s third letter: the cairn at the top of the world, on Hrímfjöll’s last firn past the frozen tarn.',
+          sv: 'Emblas tredje brev: röset på världens tak, på Hrímfjölls sista firn bortom den frusna tjärnen.',
+        },
+      },
+      {
+        when: flag('st_letter3_found'),
+        text: {
+          en: 'Between the cairn’s stones lay the last seiðr vessel. Embla has no more letters to write: the rest she will say to Ask’s face.',
+          sv: 'Mellan rösets stenar låg det sista seiðkärlet. Embla har inga fler brev att skriva: resten säger hon till Ask ansikte mot ansikte.',
+        },
+      },
     ],
   },
   q_loom: {
@@ -968,6 +982,88 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_rime: {
+    id: 'q_rime',
+    name: { en: 'The Rime Tower', sv: 'Rimtornet' },
+    stages: [
+      {
+        when: flag('st_hrf_reached'),
+        text: {
+          en: 'In the ember byrnie Ask has crossed the frost line onto Hrímfjöll. A tower of ice stands over the glacier: Hrímturn, where the last thane keeps her oath.',
+          sv: 'I glödbrynjan har Ask tagit sig över frostgränsen upp på Hrímfjöll. Ett torn av is reser sig över glaciären: Hrímturn, där den sista hövdingen håller sin ed.',
+        },
+      },
+      {
+        when: flag('st_d7_entered'),
+        text: {
+          en: 'Inside Hrímturn the floors are glass and the light comes in shafts through the ice.',
+          sv: 'Inne i Hrímturn är golven av glas och ljuset faller in i strålar genom isen.',
+        },
+      },
+      {
+        when: flag('st_d7_svellr'),
+        text: {
+          en: 'Svellr the glacier construct lies shattered, and the ice mirror is Ask’s. It turns any beam the way Ask faces.',
+          sv: 'Glaciärvarelsen Svellr ligger krossad, och isspegeln är Asks. Den vänder varje stråle åt det håll Ask står vänd.',
+        },
+      },
+      {
+        when: flag('st_thane_hrimgerdr'),
+        text: {
+          en: 'Four thanes down. Útgarðr’s gate stands open, and the Rime King is waking.',
+          sv: 'Fyra hövdingar nere. Útgarðrs port står öppen, och Rimkungen håller på att vakna.',
+        },
+      },
+    ],
+  },
+  q_king: {
+    id: 'q_king',
+    name: { en: 'The Rime King', sv: 'Rimkungen' },
+    stages: [
+      {
+        when: flag('st_halvar_confessed'),
+        text: {
+          en: 'Halvar was there when the Rime King was bound, and he spoke the binding-words at Útgarðr’s gate. It stands open.',
+          sv: 'Halvar var där när Rimkungen bands, och han talade bindningsorden vid Útgarðrs port. Den står öppen.',
+        },
+      },
+      {
+        when: flag('st_d8_entered'),
+        text: {
+          en: 'Inside Útgarðr, the giants’ stronghold. Each of its three wings ends at a seal; the master key waits behind all three.',
+          sv: 'Inne i Útgarðr, jättarnas borg. Var och en av dess tre flyglar slutar vid ett sigill; huvudnyckeln väntar bakom alla tre.',
+        },
+      },
+      {
+        when: all(flag('st_d8_seal_w'), flag('st_d8_seal_e'), flag('st_d8_seal_n')),
+        text: {
+          en: 'All three seals burn, and the rime door in the seal hall has melted.',
+          sv: 'Alla tre sigillen brinner, och rimdörren i sigillsalen har smält.',
+        },
+      },
+      {
+        when: flag('st_d8_warden'),
+        text: {
+          en: 'Jötunvörðr has fallen, and the master key opens the keep. Kolbeinn is in there.',
+          sv: 'Jötunvörðr har fallit, och huvudnyckeln öppnar borgen. Kolbeinn finns där inne.',
+        },
+      },
+      {
+        when: flag('st_kolbeinn_beaten'),
+        text: {
+          en: 'Kolbeinn is beaten. Past his hall lies the binding hall, where the Rime King is waking.',
+          sv: 'Kolbeinn är besegrad. Bortom hans sal ligger bindningssalen, där Rimkungen håller på att vakna.',
+        },
+      },
+      {
+        when: flag('st_hrimnir_dead'),
+        text: {
+          en: 'The Rime King is bound for good, by his own name. The winter is over.',
+          sv: 'Rimkungen är bunden för gott, med sitt eget namn. Vintern är över.',
+        },
+      },
+    ],
+  },
   q_holmr: {
     id: 'q_holmr',
     name: { en: 'The island', sv: 'Ön' },
@@ -1070,4 +1166,87 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_record: {
+    id: 'q_record',
+    name: { en: 'The rune-record', sv: 'Runkrönikan' },
+    stages: [
+      {
+        when: flag('q_record_asked'),
+        text: {
+          en: 'Forty huscarls went up the mountain at the first binding; the hof’s record has only thirty-six names. The last four are cut on bauta-stones: by the Myrkviðr road, in Haugar’s stone circle, at Bárðr’s far landing on Sævatn, and by the cairn at the top of Hrímfjöll. Gyða wants them read.',
+          sv: 'Fyrtio huskarlar gick upp på berget vid den första bindningen; hovets krönika har bara trettiosex namn. De sista fyra är ristade på bautastenar: vid vägen genom Myrkviðr, i Haugars stencirkel, vid Bárðrs bortre brygga på Sævatn och vid röset högst upp på Hrímfjöll. Gyða vill att de blir lästa.',
+        },
+      },
+      {
+        when: all(flag('q_record_asked'), atLeast('q_record', 4)),
+        text: {
+          en: 'All four names read. Bring them to Gyða.',
+          sv: 'Alla fyra namnen lästa. Ta dem till Gyða.',
+        },
+      },
+      {
+        when: flag('q_record_done'),
+        text: {
+          en: 'Gyða cut the last four names into the hof’s record. Forty names, and none forgotten.',
+          sv: 'Gyða ristade in de sista fyra namnen i hovets krönika. Fyrtio namn, och inget glömt.',
+        },
+      },
+    ],
+  },
+  q_feast: {
+    id: 'q_feast',
+    name: { en: 'The spring feast', sv: 'Vårgillet' },
+    stages: [
+      {
+        when: flag('q_feast_asked'),
+        text: {
+          en: 'Askdalr will feast for the homecoming. Halvar wants mead from Sigrún, a fish from Kári at the fen, and a cask of the dwarves’ ale from Dvalinn.',
+          sv: 'Askdalr ska hålla gille för hemkomsten. Halvar vill ha mjöd från Sigrún, en fisk från Kári vid kärret och en kagge av dvärgarnas öl från Dvalinn.',
+        },
+      },
+      {
+        when: all(flag('q_feast_mead'), flag('q_feast_fish'), flag('q_feast_cask')),
+        text: {
+          en: 'Everything is brought. Sit at Halvar’s table in the longhouse.',
+          sv: 'Allt är hämtat. Sätt dig vid Halvars bord i långhuset.',
+        },
+      },
+      {
+        when: flag('q_feast_done'),
+        text: {
+          en: 'Askdalr feasted at Halvar’s table, and the dwarves’ ale went round twice.',
+          sv: 'Askdalr höll gille vid Halvars bord, och dvärgarnas öl gick runt två gånger.',
+        },
+      },
+    ],
+  },
 };
+
+/** The side quests (M11: "every side quest" and the progress footer). The rest of QUEST_DEFS is the main line. */
+export const SIDE_QUESTS: readonly QuestId[] = [
+  'q_volva',
+  'q_huldra',
+  'q_fisher',
+  'q_vargar',
+  'q_eldr',
+  'q_huscarl',
+  'q_farm',
+  'q_trade',
+  'q_herd',
+  'q_pages',
+  'q_trolls',
+  'q_steinn',
+  'q_barrow_ring',
+  'q_crates',
+  'q_honey',
+  'q_amber',
+  'q_burbot',
+  'q_ljos',
+  'q_sealskin',
+  'q_letters',
+  'q_loom',
+  'q_foreman',
+  'q_axes',
+  'q_record',
+  'q_feast',
+];

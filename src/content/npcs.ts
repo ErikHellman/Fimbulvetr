@@ -72,6 +72,7 @@ export const NPC_NAMES: Readonly<Record<NpcId, L10n>> = {
   sindri: { en: 'Sindri', sv: 'Sindri' },
   nyr: { en: 'Nýr', sv: 'Nýr' },
   nali: { en: 'Náli', sv: 'Náli' },
+  ormr: { en: 'Ormr', sv: 'Ormr' },
 };
 
 /** Villagers are out and about except at night, until the raid takes them. */
@@ -82,7 +83,7 @@ const wet: Cond = { k: 'weather', is: ['rain', 'storm'] };
 const night: Cond = { k: 'phase', is: 'night' };
 
 /** A captive freed from Helgrind is home by day; one still held sits in a cell there. */
-type Captive = 'ulf' | 'tofa' | 'oddr' | 'hallbera' | 'thorkell' | 'rannveig';
+type Captive = 'ulf' | 'tofa' | 'oddr' | 'hallbera' | 'thorkell' | 'rannveig' | 'asa' | 'bjarni';
 const freed = (who: Captive): Cond =>
   all(flag(`st_freed_${who}`), { k: 'not', c: { k: 'phase', is: 'night' } });
 const held = (who: Captive): Cond => all(afterRaid, not(flag(`st_freed_${who}`)));
@@ -98,6 +99,13 @@ const npc = (id: NpcId, places: NpcDef['places']): NpcDef => ({
 export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
   halvar: npc('halvar', [
     { when: raidNight, screen: 'ask_gate', at: { x: 18, y: 8 }, facing: 'n' },
+    /** After the fourth thane (M10a): up at Útgarðr's gate, to speak the binding-words, and there until the King is dead. */
+    {
+      when: all(flag('st_thane_hrimgerdr'), not(flag('st_hrimnir_dead'))),
+      screen: 'hrf_utgard',
+      at: { x: 23, y: 9 },
+      facing: 'w',
+    },
     /** Up again once the longhouse has its roof (farm stage 1): he works the yard by day. */
     {
       when: all(afterRaid, atLeast('q_farm', 1), not(evening)),
@@ -130,6 +138,8 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
         { x: 16, y: 11 },
       ],
     },
+    /** Home at the farm once it is all over (M10b). */
+    { when: flag('st_game_done'), screen: 'ask_farmyard', at: { x: 17, y: 10 }, facing: 's' },
     /** At the Refuge on Holmr once the pass is open (M7a): waiting on the shore until Ask first lands, then
      *  by the war table by day and at the hearth in the evening. */
     {
@@ -147,8 +157,17 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: raidNight, screen: 'ask_gate', at: { x: 24, y: 9 }, facing: 'w' },
     { screen: 'ask_gate', at: { x: 20, y: 5 }, facing: 's' },
   ]),
-  asa: npc('asa', [{ when: up, screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' }]),
-  bjarni: npc('bjarni', [{ when: up, screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' }]),
+  /** Taken in the raid to cells in Hrímturn (M9b); home by day once Hrímgerðr falls. */
+  asa: npc('asa', [
+    { when: freed('asa'), screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' },
+    { when: held('asa'), screen: 'd7_r19', at: { x: 27, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_village', at: { x: 8, y: 14 }, facing: 's' },
+  ]),
+  bjarni: npc('bjarni', [
+    { when: freed('bjarni'), screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' },
+    { when: held('bjarni'), screen: 'd7_r18', at: { x: 27, y: 10 }, facing: 'w' },
+    { when: up, screen: 'ask_brook', at: { x: 24, y: 4 }, facing: 'e' },
+  ]),
   /** Taken in the raid to a cell in Helgrind; home to the pasture by day once Náströnd falls. */
   ulf: npc('ulf', [
     { when: freed('ulf'), screen: 'ask_pasture', at: { x: 15, y: 4 }, facing: 's' },
@@ -184,7 +203,16 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: up, screen: 'ask_village', at: { x: 34, y: 14 }, facing: 'w' },
   ]),
   /** The seiðmaðr who leads the raid. Only seen in cutscenes. */
-  kolbeinn: npc('kolbeinn', [{ when: raidNight, screen: 'ask_gate', at: { x: 20, y: 6 }, facing: 's' }]),
+  kolbeinn: npc('kolbeinn', [
+    { when: raidNight, screen: 'ask_gate', at: { x: 20, y: 6 }, facing: 's' },
+    /** Beaten in his hall (M10a): on his knees until Ask spares him or kills him. */
+    {
+      when: all(flag('st_kolbeinn_beaten'), not(flag('st_kolbeinn_spared')), not(flag('st_kolbeinn_slain'))),
+      screen: 'd8_r13',
+      at: { x: 20, y: 6 },
+      facing: 's',
+    },
+  ]),
   /** Myrkviðr. Önundr sleeps in his hut; the others keep to their fires all night. */
   onundr: npc('onundr', [
     { when: evening, screen: 'myr_int_hut', at: { x: 19, y: 12 }, facing: 's' },
@@ -314,4 +342,6 @@ export const NPC_DEFS: Readonly<Partial<Record<NpcId, NpcDef>>> = {
     { when: atLeast('q_foreman', 4), screen: 'dvg_camp', at: { x: 13, y: 13 }, facing: 'n' },
     { screen: 'dvg_int_mine2', at: { x: 12, y: 8 }, facing: 'n' },
   ]),
+  /** Ormr the beacon-keeper (M9a), by his hearth under the beacon. */
+  ormr: npc('ormr', [{ screen: 'hrf_int_hut', at: { x: 18, y: 9 }, facing: 's' }]),
 };

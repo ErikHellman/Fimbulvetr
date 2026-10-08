@@ -1,4 +1,5 @@
 import type { RegionId } from '@content/ids';
+import type { Flags } from '../state/flags';
 import type { ClockRules } from './rules';
 import { MINUTES_PER_DAY, SEASONS, type ClockEvent, type ClockState, type Season } from './types';
 
@@ -89,6 +90,19 @@ export function daylight(c: ClockState, rules: ClockRules): number {
   return Math.min(rising, falling);
 }
 
-export function seasonAt(c: ClockState, region: RegionId, rules: ClockRules): Season {
+/** Whether `region` has thawed (M10b): its `thaw` flag is set, so its fixed season and frost are gone. */
+export function thawed(region: RegionId, rules: ClockRules, flags: Readonly<Flags> | undefined): boolean {
+  const t = rules.thaw;
+  return t !== undefined && flags?.[t.flag] === true && t.regions.includes(region);
+}
+
+/** The season in `region`: its fixed season, unless the world's `flags` say it has thawed. */
+export function seasonAt(
+  c: ClockState,
+  region: RegionId,
+  rules: ClockRules,
+  flags?: Readonly<Flags>,
+): Season {
+  if (thawed(region, rules, flags)) return c.season;
   return rules.fixedSeason[region] ?? c.season;
 }

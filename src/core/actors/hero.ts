@@ -27,6 +27,7 @@ export type HeroMode =
   | 'cast'
   | 'chain'
   | 'hammer'
+  | 'mirror'
   | 'swim'
   | 'dive'
   | 'dying';
@@ -400,6 +401,29 @@ const dying: HeroDef = {
   },
 };
 
+/**
+ * The ice mirror (M9b), raised while its item key is held (`mem.mirrorKey`: 1 for K, 2 for L): Ask stands
+ * still behind it and turns with the stick. Its front blocks like the shield; beams and rime bolts that
+ * reach it leave the way Ask faces (see systems/beams.ts and projectiles.ts).
+ */
+const mirror: HeroDef = {
+  enter(e) {
+    still(e);
+    e.mem['shielding'] = 1;
+    setAnim(e, 'shield');
+  },
+  tick(e, c) {
+    still(e);
+    if (c.wet || !isHeld(c.input, mem(e, 'mirrorKey') === 2 ? 'item2' : 'item1')) return 'move';
+    const m = moveVector(c.input);
+    if (m.x !== 0 || m.y !== 0) e.facing = dirFromVec(m, e.facing);
+    return undefined;
+  },
+  exit(e) {
+    e.mem['shielding'] = 0;
+  },
+};
+
 export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   move,
   attack,
@@ -418,6 +442,7 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   cast,
   chain,
   hammer,
+  mirror,
   swim,
   dive,
   dying,

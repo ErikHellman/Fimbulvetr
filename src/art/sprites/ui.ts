@@ -191,6 +191,8 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
   ],
   /** The dwarf hammer: a squat iron head on a short haft. */
   hammer: ['.LLLLLL.', 'LllllllL', 'LLLLLLLL', '...ww...', '...ww...', '...wW...', '...wW...', '...WW...'],
+  /** The ice mirror: a round pane of clear rime in a rim of steel, a glint across it, on a short grip. */
+  mirror: ['.LLLLL..', 'LlkkllL.', 'LkllkkL.', 'LklkkkL.', 'LlkkkKL.', '.LLLLL..', '...ww...', '...WW...'],
   /** A Skjálfti rune-stave: a short ash stave with ember runes cut down it. */
   stave_skjalfti: [
     '......w.',

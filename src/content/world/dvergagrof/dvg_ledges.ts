@@ -4,8 +4,12 @@ export const dvgLedges: ScreenDef = {
   id: 'dvg_ledges',
   region: 'dvergagrof',
   purpose:
-    'Cliff ledges under the frost line. The high road north to Hrímfjöll starts here, and the killing frost on it turns back anyone not wrapped in an ember byrnie (M9). Rime ravens nest on the ledges.',
+    'Cliff ledges under the frost line. The high road north to Hrímfjöll starts here (M9), and the killing frost on it turns back anyone not wrapped in an ember byrnie. Rime ravens nest on the ledges.',
   things: [
+    /** A miners' store cut into the north-west rock (M11a), fenced with a dwarf stake the hammer drives down. */
+    { k: 'crack', id: 'dvg_k_ledges', at: { x: 3, y: 3 }, w: 1, h: 1, art: 'stake' },
+    { k: 'piece', id: 'hp_dvg_store', at: { x: 4, y: 1 } },
+
     {
       k: 'sign',
       at: { x: 18, y: 4 },
@@ -24,10 +28,10 @@ export const dvgLedges: ScreenDef = {
     { x: 18, y: 14 },
   ],
   map: [
-    '########################################',
-    '########################################',
-    '########################################',
-    '########################################',
+    '#########################·,·############',
+    '##····###################·,·############',
+    '##····###################·,·############',
+    '###·#####################·,·############',
     '#·················M······,·············#',
     '#························,·············#',
     '#·····K··················,··············',

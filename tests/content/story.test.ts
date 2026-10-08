@@ -46,7 +46,16 @@ const CONTENT = {
  * is entered and Nykr killed in M7b (`q_holmr` names both).
  */
 // Set by content still to come: Ívaldi's Forge (M8b).
-const SET_LATER = new Set(['st_rime_open', 'st_d5_entered', 'st_thane_nykr']);
+// Set in a later part: Hrímturn's beats (M9b) and Útgarðr's gate (M10).
+const SET_LATER = new Set([
+  'st_rime_open',
+  'st_d5_entered',
+  'st_thane_nykr',
+  'st_d7_entered',
+  'st_d7_svellr',
+  'st_thane_hrimgerdr',
+  'st_utgard_open',
+]);
 
 describe('story content', () => {
   it('never reads a flag that nothing sets', () => {
@@ -56,6 +65,8 @@ describe('story content', () => {
       if (o['k'] === 'flag' && typeof o['id'] === 'string') read.add(o['id']);
       if ((o['k'] === 'set' || o['k'] === 'add') && typeof o['flag'] === 'string') set.add(o['flag']);
       if (o['k'] === 'pen' && typeof o['flag'] === 'string') set.add(o['flag']);
+      // A crystal eye sets its flag when a beam lights it.
+      if (o['k'] === 'eye' && typeof o['flag'] === 'string') set.add(o['flag']);
       // A latch sets its flag when struck.
       if (o['k'] === 'switch' && typeof o['set'] === 'string') set.add(o['set']);
       // Gates that fire melts or wind tears set their flag when it happens.
@@ -117,6 +128,8 @@ describe('story content', () => {
         expect(text.trim(), JSON.stringify(o)).not.toBe('');
         expect(unknownChars(text), text).toEqual([]);
         expect(layoutText(text, BOX_W).length, text).toBeLessThanOrEqual(MAX_LINES);
+        // The larger text size grows the box upward; seven lines still leave the top of the screen free.
+        expect(layoutText(text, BOX_W, 'larger').length, text).toBeLessThanOrEqual(7);
         expect(
           textWidth(text.split(' ').reduce((a, b) => (a.length > b.length ? a : b), '')),
           text,

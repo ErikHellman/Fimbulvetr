@@ -114,6 +114,10 @@ const FOUND: Partial<Record<ItemId, L10n>> = {
     en: 'You found the dwarf hammer! Bring it down with its item key, one step ahead. It drives stakes flat, breaks weak floors and drifts, and cracks iron plate the sword glances off.',
     sv: 'Du hittade dvärghammaren! Slå med den med dess föremålsknapp, ett steg framför dig. Den slår ner pålar, krossar svaga golv och drivor och spräcker järnplåt som svärdet glider av.',
   },
+  mirror: {
+    en: 'You found the ice mirror! Hold its item key to raise it: Ask stands behind it and turns with the stick. Light and rime bolts that strike its face leave the way Ask faces.',
+    sv: 'Du hittade isspegeln! Håll in dess föremålsknapp för att lyfta den: Ask står bakom den och vänder sig med spaken. Ljus och rimpilar som träffar dess yta far vidare åt det håll Ask vänder sig.',
+  },
   stave_skjalfti: {
     en: 'You got a Skjálfti rune-stave! Ready it in an item slot: it sings Skjálfti once, for no seiðr. The ground shakes, foes stagger and weak floors give.',
     sv: 'Du fick en Skjálfti-runstav! Lägg den i en föremålsplats: den sjunger Skjálfti en gång, utan seiðr. Marken skakar, fiender vacklar och svaga golv ger vika.',

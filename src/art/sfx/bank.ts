@@ -738,4 +738,44 @@ export const SFX_BANK = {
     release: 0.3,
     volume: 0.3,
   },
+  /** The killing frost biting: a thin, cold whine. */
+  sfx_frost: {
+    wave: 'sine',
+    freq: 1800,
+    freqEnd: 1200,
+    attack: 0.02,
+    sustain: 0.1,
+    release: 0.25,
+    volume: 0.2,
+  },
+  /** A slide starting on glaze: a short scrape. */
+  sfx_slide: {
+    wave: 'noise',
+    freq: 2400,
+    freqEnd: 1400,
+    attack: 0.01,
+    sustain: 0.08,
+    release: 0.12,
+    volume: 0.15,
+  },
+  /** Glass ringing: a crystal eye lit, a prism turned, a giantess struck. */
+  sfx_glass: {
+    wave: 'triangle',
+    freq: 1760,
+    freqEnd: 2200,
+    attack: 0.005,
+    sustain: 0.1,
+    release: 0.4,
+    volume: 0.3,
+  },
+  /** A bolt turned off the ice mirror. */
+  sfx_mirror: {
+    wave: 'square',
+    freq: 900,
+    freqEnd: 1600,
+    attack: 0.005,
+    sustain: 0.04,
+    release: 0.12,
+    volume: 0.25,
+  },
 } as const satisfies Record<SfxId, SynthParams>;

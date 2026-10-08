@@ -82,8 +82,6 @@ export const UI = {
   gear_seidr: { en: 'Seiðr: {n} of {max}', sv: 'Seiðr: {n} av {max}' },
   gear_horns: { en: 'Mead horns: {n} ({full} full)', sv: 'Mjödhorn: {n} ({full} fulla)' },
   gear_purse: { en: 'Purse: holds {n} silver', sv: 'Pung: rymmer {n} silver' },
-  /** The tag under the title while the game is a demo (M5). */
-  title_demo: { en: 'Demo', sv: 'Demo' },
   title_subtitle: { en: 'The great winter is coming', sv: 'Den stora vintern kommer' },
   title_press: { en: 'Press any key', sv: 'Tryck på valfri tangent' },
   title_continue: { en: 'Continue', sv: 'Fortsätt' },
@@ -94,6 +92,14 @@ export const UI = {
   title_confirm_new: {
     en: 'A new game replaces the autosave; your saved slots stay. Enter: begin   Esc: back',
     sv: 'Ett nytt spel ersätter autosparningen; dina sparplatser finns kvar. Enter: börja   Esc: tillbaka',
+  },
+  title_achievements: { en: 'Achievements', sv: 'Prestationer' },
+  ach_heading: { en: 'Achievements: {n} of {of}', sv: 'Prestationer: {n} av {of}' },
+  ach_hint: { en: '↑↓←→: choose   Esc: back', sv: '↑↓←→: välj   Esc: tillbaka' },
+  ach_toast: { en: 'Achievement: {detail}', sv: 'Prestation: {detail}' },
+  progress_line: {
+    en: 'Heart pieces {pieces}/{piecesOf} · Side quests {side}/{sideOf} · Achievements {ach}/{achOf}',
+    sv: 'Hjärtbitar {pieces}/{piecesOf} · Sidouppdrag {side}/{sideOf} · Prestationer {ach}/{achOf}',
   },
   title_hint: { en: '↑↓: choose   Enter: take', sv: '↑↓: välj   Enter: ta' },
   title_load_hint: {
@@ -137,6 +143,10 @@ export const UI = {
   set_scaling: { en: 'Picture', sv: 'Bild' },
   set_scaling_integer: { en: 'Sharp pixels', sv: 'Skarpa pixlar' },
   set_scaling_fit: { en: 'Fill the window', sv: 'Fyll fönstret' },
+  set_text_size: { en: 'Text size', sv: 'Textstorlek' },
+  set_text_normal: { en: 'Normal', sv: 'Normal' },
+  set_text_large: { en: 'Large', sv: 'Stor' },
+  set_text_larger: { en: 'Larger', sv: 'Större' },
   set_shake: { en: 'Screen shake', sv: 'Skakningar' },
   set_flash: { en: 'Lightning flashes', sv: 'Blixtsken' },
   set_hold_shield: { en: 'Shield stays up on a tap', sv: 'Skölden hålls uppe med ett tryck' },

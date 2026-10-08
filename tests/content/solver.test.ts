@@ -327,7 +327,9 @@ describe('the progression solver after the pass opens (the Fimbulvetr)', () => {
         !id.startsWith('test_') &&
         id !== 'ref_int_hall' &&
         id !== 'sae_int_well' &&
-        (id === 'dvg_chasm' || !id.startsWith('dvg_')),
+        (id === 'dvg_chasm' || !id.startsWith('dvg_')) &&
+        // Hrímfjöll lies past Dvergagröf and the killing frost (M9a, its own proofs).
+        !id.startsWith('hrf_'),
     );
     for (const id of lowland) expect(r.screens, id).toContain(id);
     expect(r.scripts).toEqual(

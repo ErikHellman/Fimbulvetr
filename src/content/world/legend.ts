@@ -102,6 +102,16 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '→': 'belt_e',
   '↓': 'belt_s',
   '←': 'belt_w',
+  /** Hrímfjöll and Hrímturn (M9): firn, glaze, rime cliffs, and the tower's floor and walls. */
+  '∴': 'firn',
+  '◇': 'glaze',
+  '▒': 'rime',
+  '▫': 'tower_floor',
+  '▪': 'tower_wall',
+  '▧': 'clear_ice',
+  /** Útgarðr (M10a): the giants' floor and walls. */
+  '□': 'giant_floor',
+  '▣': 'giant_wall',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

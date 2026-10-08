@@ -9,6 +9,8 @@ import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { coverSpeed } from './cover';
 import { critterDef } from './critters';
+import { endSlide, slideDir, startSlide } from './glaze';
+import { gustPush } from './weather';
 
 const KNOCK_EPSILON = 0.1;
 
@@ -32,10 +34,14 @@ export function moveAll(rt: SimRt): void {
     .filter((b) => !overlaps(b, me));
   // Aboard a moving raft, Ask goes where the raft goes (see `stepRafts`).
   if (mem(rt.hero, 'raft') !== 1) {
+    startSlide(rt);
+    const before = { ...rt.hero.pos };
     const push = currentPush(rt);
-    const belt = rt.hero.fsm.s === 'swim' || rt.hero.fsm.s === 'dive' ? null : beltPush(rt, rt.hero);
+    const swimming = rt.hero.fsm.s === 'swim' || rt.hero.fsm.s === 'dive';
+    const belt = swimming ? null : (beltPush(rt, rt.hero) ?? (slideDir(rt) === null ? gustPush(rt) : null));
     rt.hero.vel = { x: rt.hero.vel.x + push.x, y: rt.hero.vel.y + push.y };
     moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles, false, belt);
+    endSlide(rt, before);
   }
   const walls = gridSolidAt(rt.screen.collision, () => true);
   const { cols, rows } = rt.screen.collision;

@@ -124,6 +124,16 @@ export const ENEMIES = [
   'glod',
   'belgr',
   'ivaldi',
+  'isvargr',
+  'frostvaettr',
+  'svellr',
+  'hrimgerdr',
+  'icicle',
+  'jotunvordr',
+  'kolbeinn_boss',
+  'hrimnir',
+  'hrimnir_hand',
+  'rime_pillar',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -202,6 +212,10 @@ export const SFX = [
   'sfx_quake',
   'sfx_sizzle',
   'sfx_bellows',
+  'sfx_frost',
+  'sfx_slide',
+  'sfx_glass',
+  'sfx_mirror',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -268,6 +282,8 @@ export const NPCS = [
   'sindri',
   'nyr',
   'nali',
+  // Hrímfjöll
+  'ormr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -306,6 +322,10 @@ export const QUESTS = [
   'q_loom',
   'q_foreman',
   'q_forge',
+  'q_rime',
+  'q_king',
+  'q_record',
+  'q_feast',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -423,6 +443,30 @@ export const SCRIPTS = [
   'd6_cell_rannveig',
   'shop_rannveig',
   'd6_cistern',
+  'hrf_arrive',
+  'hrf_turned_back',
+  'hrf_letter3',
+  'hrf_sealed',
+  'd7_enter',
+  'd7_kolbeinn',
+  'd7_gate_out',
+  'd7_cell_asa',
+  'd7_cell_bjarni',
+  'd7_basin',
+  'd8_enter',
+  'd8_basin',
+  'd8_kolbeinn',
+  'd8_kolbeinn_yield',
+  // The binding hall and the ending (M10b)
+  'd8_embla',
+  'd8_ending',
+  'end_home',
+  'end_shore',
+  'bauta_myr',
+  'bauta_hau',
+  'bauta_sae',
+  'bauta_hrf',
+  'end_feast',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
@@ -474,3 +518,35 @@ export const COVERS = [
   'crust',
 ] as const;
 export type CoverId = (typeof COVERS)[number];
+
+/**
+ * Achievements (M11). The browser stores earned ids across save slots, so this list is append-only like
+ * every persisted id.
+ */
+export const ACHIEVEMENTS = [
+  'ach_raid',
+  'ach_stone1',
+  'ach_stones',
+  'ach_thane1',
+  'ach_thanes',
+  'ach_embla',
+  'ach_king',
+  'ach_spared',
+  'ach_slain',
+  'ach_stay',
+  'ach_go',
+  'ach_captives',
+  'ach_letters',
+  'ach_trade',
+  'ach_farm',
+  'ach_loom',
+  'ach_gamli',
+  'ach_galdr',
+  'ach_warps',
+  'ach_pieces',
+  'ach_side',
+  'ach_silver',
+  'ach_record',
+  'ach_feast',
+] as const;
+export type AchievementId = (typeof ACHIEVEMENTS)[number];

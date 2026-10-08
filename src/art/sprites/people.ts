@@ -554,6 +554,17 @@ export const LOOKS: Readonly<Record<NpcId, Look>> = {
     bottom: '#3a2f28',
     child: true,
   },
+  /** Hrímfjöll (M9a). The beacon-keeper: old, white-bearded, wrapped in a grey fur cloak. */
+  ormr: {
+    skin: '#d8b49a',
+    hair: '#e8e8e8',
+    hairStyle: 'short',
+    beard: '#f0f0f0',
+    top: '#7a7a80',
+    legs: 'pants',
+    bottom: '#4a4a52',
+    scarf: '#5a4a3a',
+  },
   /** A seiðmaðr: pale, black-bearded, hooded, in a long dark robe. */
   kolbeinn: {
     skin: '#d8c8b8',

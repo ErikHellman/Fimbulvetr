@@ -18,12 +18,14 @@ export const heroTile = (sim: Sim): readonly [number, number] => [
 ];
 
 /**
- * Tiles that block walking: solid terrain, anything solid standing on the tile, and burning tiles. With the
- * seal-skin, open deep water is no block: the walker swims it.
+ * Tiles that block walking: solid terrain, glaze (Ask would slide off it; see the M9 routes' `iceTo`),
+ * anything solid standing on the tile, and burning tiles. With the seal-skin, open deep water is no block:
+ * the walker swims it.
  */
 function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   const g = sim.screen.collision;
   const swims = (sim.state.inv.items.sealskin ?? 0) > 0;
+  const terrain = sim.terrainOf(sim.screen.id).cells;
   const occupied = new Set<string>();
   for (const a of sim.actors)
     if (a.kind === 'fixture' && a.def === 'fire' && a.mem['on'] === 1)
@@ -41,6 +43,8 @@ function blocked(sim: Sim): (tx: number, ty: number) => boolean {
     const f = g.flags[ty * g.cols + tx] ?? 0;
     const water = swims && (f & DEEP) !== 0 && (f & LOW) !== 0;
     if ((f & SOLID) !== 0 && !water) return true;
+    const t = terrain[ty * SCREEN_COLS + tx];
+    if (t !== undefined && sim.db.terrain[t].glaze === true) return true;
     return occupied.has(`${String(tx)},${String(ty)}`);
   };
 }

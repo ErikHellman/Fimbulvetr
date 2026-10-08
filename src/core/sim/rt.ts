@@ -12,6 +12,7 @@ import type { CoverGrid } from '../world/cover';
 import type { TerrainGrid } from '../world/textmap';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
+import type { BeamSeg } from './systems/beams';
 
 /** `over`: the hero has fallen; the game waits for Continue. */
 export type Mode = 'play' | 'transition' | 'story' | 'over';
@@ -98,8 +99,15 @@ export interface SimRt {
   /** Heat on Ask from hot rooms, in ticks, and ticks spent burning at full heat (undefined at 0). */
   heatTicks?: number;
   burnTicks?: number;
+  /** Cold on Ask from the killing frost, in ticks, and ticks spent freezing at full cold (undefined at 0). */
+  coldTicks?: number;
+  freezeTicks?: number;
+  /** Ticks Ask has stood outside the binding's ring in Hrímnir's hall (M10b; undefined when inside or none). */
+  bindTicks?: number;
   /** Ís crust on lava (tile index → ticks left), on this screen only (undefined when none). */
   crust?: Map<number, number>;
+  /** The beams of light shining on this screen this tick (M9b), for the view; undefined when none. */
+  beamSegs?: readonly BeamSeg[];
   /** An escort under way (undefined when none). */
   escort?: Escort;
   emit(event: SimEvent): void;

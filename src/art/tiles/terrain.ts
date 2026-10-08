@@ -652,7 +652,96 @@ const DVERGAGROF = {
   belt_w: belt('w'),
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** Hrímfjöll's firn, glaze and rime cliffs, and Hrímturn's frosted glass (M9). */
+const HRIMFJOLL = {
+  firn: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#e4ecf2');
+      p.speckle('#c8d6e2', 0.18);
+      p.speckle('#ffffff', 0.08);
+      p.rect(nextInt(p.rng, 0, 10), nextInt(p.rng, 2, 13), 5, 1, '#d2dee8');
+    },
+  },
+  glaze: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      p.fill('#9cc8e4');
+      p.speckle('#b8dcf0', 0.12);
+      // Long glints across the ice, so a slide reads before it starts.
+      p.rect(1 + v.variant * 4, 3, 7, 1, '#e8f6ff');
+      p.rect(8 - v.variant * 3, 10, 6, 1, '#d4ecfa');
+      p.rect(0, 15, 16, 1, '#86b4d4');
+    },
+  },
+  rime: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#5e7e9c');
+      p.speckle('#7898b6', 0.25);
+      p.speckle('#c8dcec', 0.05);
+      p.rect(0, 12, 16, 4, '#46627e');
+    },
+  },
+  tower_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#b4c8da', '#90a8c0', v.variant);
+      p.speckle('#e0eef8', 0.06);
+    },
+  },
+  tower_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#3e5672');
+      p.speckle('#567090', 0.25);
+      p.rect(0, 12, 16, 4, '#2c3e56');
+      p.rect(3, 2, 1, 8, '#8eaecc');
+    },
+  },
+  clear_ice: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill('#c4e4f6');
+      p.speckle('#e8f6ff', 0.15);
+      p.rect(2, 2, 1, 10, '#ffffff');
+      p.rect(4, 1, 1, 5, '#f0faff');
+      p.rect(0, 13, 16, 3, '#8cb8d6');
+    },
+  },
+  giant_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      // One great flag per tile pair: a seam every other tile, so the floor reads as giant-sized.
+      p.fill('#8a96a4');
+      p.speckle('#9ca8b4', 0.2);
+      p.speckle('#d8e4ee', 0.04);
+      if (v.variant === 0) p.rect(0, 15, 16, 1, '#6a7684');
+      else p.rect(15, 0, 1, 16, '#6a7684');
+    },
+  },
+  giant_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#4a5462');
+      p.speckle('#5e6a7a', 0.25);
+      p.rect(0, 7, 16, 1, '#343c48');
+      p.rect(0, 12, 16, 4, '#2e3540');
+      p.rect(1, 1, 6, 1, '#b8d0e4');
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...HRIMFJOLL,
   ...DVERGAGROF,
   ...SOKKVA_HOF,
   ...SAEVATN,

@@ -78,6 +78,8 @@ export interface FimbulHook {
   slots(): (string | null)[];
   /** The boss bar: its name in English, health and phase; null when no boss is on screen. */
   boss(): { name: string; hp: number; maxHp: number; phase: number } | null;
+  /** The binding's ring in Hrímnir's hall (M10b), in screen px, or null. */
+  ring(): { x: number; y: number; r: number } | null;
   /** While Ask fishes: the phase, the line's tension, how far out the fish is, and how it ended. */
   fish(): {
     phase: string;
@@ -150,6 +152,10 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
         result: ui.result,
         surging: ui.surging,
       };
+    },
+    ring: () => {
+      const r = bridge().sim.ring();
+      return r === null ? null : { ...r };
     },
     boss: () => {
       const b = bridge().sim.boss();

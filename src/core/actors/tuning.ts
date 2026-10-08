@@ -52,6 +52,15 @@ export interface HeroTuning {
   readonly heat: number;
   readonly heatEmber: number;
   readonly heatBurn: number;
+  /**
+   * The killing frost (M9): ticks Ask bears a cold screen before freezing, and the hp each second takes
+   * once full. The ember byrnie keeps it out.
+   */
+  readonly cold: number;
+  readonly coldBurn: number;
+  /** A slide on glaze (M9), px a tick; and a blizzard's push on Ask along the wind. */
+  readonly slide: number;
+  readonly gust: number;
   /** A conveyor belt's push on anyone walking it, px a tick. */
   readonly belt: number;
   /** The dwarf hammer (M8b): how long a blow takes, the tick it lands, and what it deals a foe. */
@@ -192,7 +201,8 @@ export interface Tuning {
   readonly eldr: EldrTuning;
   readonly is: IsTuning;
   /** Share of each blow an armour takes off (rounded; a blow always deals at least 1). */
-  readonly armor: Readonly<Record<ArmorId, { readonly reduce: number }>>;
+  /** Each armour's damage reduction; `warm` keeps Hrímfjöll's killing frost out (M9). */
+  readonly armor: Readonly<Record<ArmorId, { readonly reduce: number; readonly warm?: boolean }>>;
   /** Typewriter speed, characters per second. */
   readonly textCps: number;
   readonly sword: SwordTuning;

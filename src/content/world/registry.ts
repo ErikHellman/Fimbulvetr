@@ -189,6 +189,89 @@ import { d6R25 } from './forge/d6_r25';
 import { d6R26 } from './forge/d6_r26';
 import { d6R27 } from './forge/d6_r27';
 import { d6R28 } from './forge/d6_r28';
+import { hrfRoad } from './hrimfjoll/hrf_road';
+import { hrfIcefall } from './hrimfjoll/hrf_icefall';
+import { hrfGlacier } from './hrimfjoll/hrf_glacier';
+import { hrfCrevasse } from './hrimfjoll/hrf_crevasse';
+import { hrfBeacon } from './hrimfjoll/hrf_beacon';
+import { hrfSaddle } from './hrimfjoll/hrf_saddle';
+import { hrfTarn } from './hrimfjoll/hrf_tarn';
+import { hrfTowerfoot } from './hrimfjoll/hrf_towerfoot';
+import { d7R01 } from './hrimturn/d7_r01';
+import { d7R02 } from './hrimturn/d7_r02';
+import { d7R03 } from './hrimturn/d7_r03';
+import { d7R04 } from './hrimturn/d7_r04';
+import { d7R05 } from './hrimturn/d7_r05';
+import { d7R06 } from './hrimturn/d7_r06';
+import { d7R07 } from './hrimturn/d7_r07';
+import { d7R08 } from './hrimturn/d7_r08';
+import { d7R09 } from './hrimturn/d7_r09';
+import { d7R10 } from './hrimturn/d7_r10';
+import { d7R11 } from './hrimturn/d7_r11';
+import { d7R12 } from './hrimturn/d7_r12';
+import { d7R13 } from './hrimturn/d7_r13';
+import { d7R14 } from './hrimturn/d7_r14';
+import { d7R15 } from './hrimturn/d7_r15';
+import { d7R16 } from './hrimturn/d7_r16';
+import { d7R17 } from './hrimturn/d7_r17';
+import { d7R18 } from './hrimturn/d7_r18';
+import { d7R19 } from './hrimturn/d7_r19';
+import { d7R20 } from './hrimturn/d7_r20';
+import { d7R21 } from './hrimturn/d7_r21';
+import { d7R22 } from './hrimturn/d7_r22';
+import { d7R23 } from './hrimturn/d7_r23';
+import { d7R24 } from './hrimturn/d7_r24';
+import { d7R25 } from './hrimturn/d7_r25';
+import { d7R26 } from './hrimturn/d7_r26';
+import { d7R27 } from './hrimturn/d7_r27';
+import { d7R28 } from './hrimturn/d7_r28';
+import { d7R29 } from './hrimturn/d7_r29';
+import { d7R30 } from './hrimturn/d7_r30';
+import { d7R31 } from './hrimturn/d7_r31';
+import { d7R32 } from './hrimturn/d7_r32';
+import { d8R01 } from './utgard/d8_r01';
+import { d8R02 } from './utgard/d8_r02';
+import { d8R03 } from './utgard/d8_r03';
+import { d8R04 } from './utgard/d8_r04';
+import { d8R05 } from './utgard/d8_r05';
+import { d8R06 } from './utgard/d8_r06';
+import { d8R07 } from './utgard/d8_r07';
+import { d8R08 } from './utgard/d8_r08';
+import { d8R09 } from './utgard/d8_r09';
+import { d8R10 } from './utgard/d8_r10';
+import { d8R11 } from './utgard/d8_r11';
+import { d8R12 } from './utgard/d8_r12';
+import { d8R13 } from './utgard/d8_r13';
+import { d8R14 } from './utgard/d8_r14';
+import { d8R15 } from './utgard/d8_r15';
+import { d8R16 } from './utgard/d8_r16';
+import { d8R17 } from './utgard/d8_r17';
+import { d8R18 } from './utgard/d8_r18';
+import { d8R19 } from './utgard/d8_r19';
+import { d8R20 } from './utgard/d8_r20';
+import { d8R21 } from './utgard/d8_r21';
+import { d8R22 } from './utgard/d8_r22';
+import { d8R23 } from './utgard/d8_r23';
+import { d8R24 } from './utgard/d8_r24';
+import { d8R25 } from './utgard/d8_r25';
+import { d8R26 } from './utgard/d8_r26';
+import { d8R27 } from './utgard/d8_r27';
+import { d8R28 } from './utgard/d8_r28';
+import { d8R29 } from './utgard/d8_r29';
+import { d8R30 } from './utgard/d8_r30';
+import { d8R31 } from './utgard/d8_r31';
+import { d8R32 } from './utgard/d8_r32';
+import { d8R33 } from './utgard/d8_r33';
+import { d8R34 } from './utgard/d8_r34';
+import { d8R35 } from './utgard/d8_r35';
+import { d8R36 } from './utgard/d8_r36';
+import { d8R37 } from './utgard/d8_r37';
+import { d8R38 } from './utgard/d8_r38';
+import { d8R39 } from './utgard/d8_r39';
+import { d8R40 } from './utgard/d8_r40';
+import { hrfCairn } from './hrimfjoll/hrf_cairn';
+import { hrfUtgard } from './hrimfjoll/hrf_utgard';
+import { hrfIntHut } from './hrimfjoll/hrf_int_hut';
 
 import { d3R01 } from './konungshaugr/d3_r01';
 import { d3R02 } from './konungshaugr/d3_r02';
@@ -457,4 +540,87 @@ export const SCREENS: Readonly<Record<ScreenId, ScreenDef>> = {
   d6_r26: d6R26,
   d6_r27: d6R27,
   d6_r28: d6R28,
+  hrf_road: hrfRoad,
+  hrf_icefall: hrfIcefall,
+  hrf_glacier: hrfGlacier,
+  hrf_crevasse: hrfCrevasse,
+  hrf_beacon: hrfBeacon,
+  hrf_saddle: hrfSaddle,
+  hrf_tarn: hrfTarn,
+  hrf_towerfoot: hrfTowerfoot,
+  hrf_cairn: hrfCairn,
+  hrf_utgard: hrfUtgard,
+  hrf_int_hut: hrfIntHut,
+  d7_r01: d7R01,
+  d7_r02: d7R02,
+  d7_r03: d7R03,
+  d7_r04: d7R04,
+  d7_r05: d7R05,
+  d7_r06: d7R06,
+  d7_r07: d7R07,
+  d7_r08: d7R08,
+  d7_r09: d7R09,
+  d7_r10: d7R10,
+  d7_r11: d7R11,
+  d7_r12: d7R12,
+  d7_r13: d7R13,
+  d7_r14: d7R14,
+  d7_r15: d7R15,
+  d7_r16: d7R16,
+  d7_r17: d7R17,
+  d7_r18: d7R18,
+  d7_r19: d7R19,
+  d7_r20: d7R20,
+  d7_r21: d7R21,
+  d7_r22: d7R22,
+  d7_r23: d7R23,
+  d7_r24: d7R24,
+  d7_r25: d7R25,
+  d7_r26: d7R26,
+  d7_r27: d7R27,
+  d7_r28: d7R28,
+  d7_r29: d7R29,
+  d7_r30: d7R30,
+  d7_r31: d7R31,
+  d7_r32: d7R32,
+  d8_r01: d8R01,
+  d8_r02: d8R02,
+  d8_r03: d8R03,
+  d8_r04: d8R04,
+  d8_r05: d8R05,
+  d8_r06: d8R06,
+  d8_r07: d8R07,
+  d8_r08: d8R08,
+  d8_r09: d8R09,
+  d8_r10: d8R10,
+  d8_r11: d8R11,
+  d8_r12: d8R12,
+  d8_r13: d8R13,
+  d8_r14: d8R14,
+  d8_r15: d8R15,
+  d8_r16: d8R16,
+  d8_r17: d8R17,
+  d8_r18: d8R18,
+  d8_r19: d8R19,
+  d8_r20: d8R20,
+  d8_r21: d8R21,
+  d8_r22: d8R22,
+  d8_r23: d8R23,
+  d8_r24: d8R24,
+  d8_r25: d8R25,
+  d8_r26: d8R26,
+  d8_r27: d8R27,
+  d8_r28: d8R28,
+  d8_r29: d8R29,
+  d8_r30: d8R30,
+  d8_r31: d8R31,
+  d8_r32: d8R32,
+  d8_r33: d8R33,
+  d8_r34: d8R34,
+  d8_r35: d8R35,
+  d8_r36: d8R36,
+  d8_r37: d8R37,
+  d8_r38: d8R38,
+  d8_r39: d8R39,
+  d8_r40: d8R40,
 };

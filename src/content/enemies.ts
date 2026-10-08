@@ -1,6 +1,6 @@
 import type { AttackWindow, EnemyDef } from '@core/actors/enemies/defs';
 import type { Box } from '@core/math/box';
-import { ARROW, HAMMER, HEAVY, PIERCE_SHIELD } from '@core/combat/hit';
+import { ARROW, HAMMER, HEAVY, PIERCE_SHIELD, REFLECT } from '@core/combat/hit';
 import type { EnemyId } from './ids';
 
 /** The same box for every facing (a body slam). */
@@ -1083,5 +1083,251 @@ export const ENEMY_DEFS = {
       },
     },
     drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /** An ice wolf of Hrímfjöll (M9): the wolf's stalk, crouch (400 ms) and lunge, harder and hardier; fire bites it twice as hard. */
+  isvargr: {
+    id: 'isvargr',
+    art: 'enemy_isvargr',
+    hp: 10,
+    body: { x: -7, y: -8, w: 14, h: 8 },
+    hurt: { x: -10, y: -16, w: 20, h: 16 },
+    behaviour: 'vargr',
+    knockResist: 0.2,
+    immortal: false,
+    solid: false,
+    weak: ['fire'],
+    touch: { amount: 2, knock: 2, tags: 0 },
+    attacks: {
+      lunge: {
+        from: 0,
+        to: 13,
+        boxes: around({ x: -9, y: -14, w: 18, h: 14 }),
+        amount: 3,
+        knock: 4,
+        tags: 0,
+      },
+    },
+    stunnable: 120,
+    drops: { heart: 2, silver: 3, arrows: 1, none: 4 },
+  },
+  /**
+   * A frost wisp (M9): drifts to line up with Ask on a row or column, glows (400 ms) and looses a rime bolt
+   * straight along it. Fire puts it out at a touch; the ice mirror sends its bolt back (M9b).
+   */
+  frostvaettr: {
+    id: 'frostvaettr',
+    art: 'enemy_frostvaettr',
+    hp: 3,
+    body: { x: -4, y: -4, w: 8, h: 4 },
+    hurt: { x: -7, y: -20, w: 14, h: 14 },
+    behaviour: 'frostvaettr',
+    knockResist: 0,
+    immortal: false,
+    solid: false,
+    flies: true,
+    glow: 32,
+    weak: ['fire'],
+    stunnable: 90,
+    drops: { heart: 1, silver: 1, seidr: 2, none: 3 },
+  },
+  /**
+   * Svellr, the glacier construct (D7's mini-boss, M9b): it scrapes the floor squared up on Ask, charges
+   * straight across the hall and stuns itself on the wall, cracked open to the sword. It guards the mirror.
+   */
+  svellr: {
+    id: 'svellr',
+    art: 'enemy_svellr',
+    hp: 14,
+    body: { x: -14, y: -10, w: 28, h: 10 },
+    hurt: { x: -16, y: -36, w: 32, h: 36 },
+    behaviour: 'svellr',
+    knockResist: 1,
+    immortal: false,
+    solid: false,
+    boss: { name: { en: 'Svellr', sv: 'Svellr' }, mini: true },
+    touch: { amount: 2, knock: 4, tags: 0 },
+    attacks: {
+      charge: {
+        from: 0,
+        to: 150,
+        boxes: around({ x: -16, y: -24, w: 32, h: 24 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+    drops: { heart: 1, silver: 0, none: 0 },
+  },
+  /**
+   * Thane Hrímgerðr, the Glass (D7's boss, M9b): she casts rime bolts along rows and columns; every blow
+   * turns off her, but her own bolt sent back by the ice mirror makes her kneel, open to the sword.
+   */
+  hrimgerdr: {
+    id: 'hrimgerdr',
+    art: 'enemy_hrimgerdr',
+    hp: 18,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -52, w: 28, h: 52 },
+    behaviour: 'hrimgerdr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    needs: ['mirror'],
+    boss: { name: { en: 'Hrímgerðr', sv: 'Hrímgerðr' } },
+    struckBy: REFLECT,
+    touch: { amount: 2, knock: 5, tags: 0 },
+    drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /** An icicle from Hrímgerðr's roof (M9b): its shadow grows where Ask stood, then it falls. */
+  icicle: {
+    id: 'icicle',
+    art: 'enemy_icicle',
+    hp: 1,
+    body: { x: -6, y: -6, w: 12, h: 6 },
+    hurt: { x: -7, y: -10, w: 14, h: 10 },
+    behaviour: 'icicle',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      fall: {
+        from: 6,
+        to: 9,
+        boxes: around({ x: -9, y: -12, w: 18, h: 12 }),
+        amount: 3,
+        knock: 3,
+        tags: PIERCE_SHIELD,
+      },
+    },
+  },
+  /**
+   * Jötunvörðr, the frost-giant warden of Útgarðr's master key (D8's mini-boss, M10a): frozen hard, every
+   * blow turns off him until Eldr thaws him; he raises a knee (the tell) and stomps a ring of shock.
+   */
+  jotunvordr: {
+    id: 'jotunvordr',
+    art: 'enemy_jotunvordr',
+    hp: 16,
+    body: { x: -12, y: -10, w: 24, h: 10 },
+    hurt: { x: -14, y: -50, w: 28, h: 50 },
+    behaviour: 'jotunvordr',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    guard: true,
+    cracks: 'fire',
+    boss: { name: { en: 'Jötunvörðr', sv: 'Jötunvörðr' }, mini: true },
+    touch: { amount: 2, knock: 5, tags: 0 },
+    attacks: {
+      stomp: {
+        from: 0,
+        to: 6,
+        boxes: around({ x: -44, y: -30, w: 88, h: 50 }),
+        amount: 4,
+        knock: 7,
+        tags: HEAVY,
+      },
+    },
+    drops: { heart: 1, silver: 0, none: 0 },
+  },
+  /**
+   * Kolbeinn in his hall (D8, M10a): a duel won by the parry. His staff turns blows from the front; a parry
+   * staggers him open; from half health his rime bolt (sent back by the mirror) makes him reel; at a quarter he
+   * calls two draugr. Beaten, he kneels, and Ask spares or kills him.
+   */
+  kolbeinn_boss: {
+    id: 'kolbeinn_boss',
+    art: 'enemy_kolbeinn',
+    hp: 16,
+    body: { x: -6, y: -8, w: 12, h: 8 },
+    hurt: { x: -8, y: -28, w: 16, h: 28 },
+    behaviour: 'kolbeinn',
+    knockResist: 0.7,
+    immortal: false,
+    solid: true,
+    shield: true,
+    struckBy: REFLECT,
+    parryStun: 70,
+    boss: { name: { en: 'Kolbeinn', sv: 'Kolbeinn' }, mini: true },
+    attacks: {
+      strike: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -26, w: 24, h: 24 },
+          w: { x: -24, y: -26, w: 24, h: 24 },
+          s: { x: -12, y: -12, w: 24, h: 24 },
+          n: { x: -12, y: -38, w: 24, h: 26 },
+        },
+        amount: 3,
+        knock: 5,
+        tags: 0,
+      },
+    },
+    drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /**
+   * Hrímnir the Rime King (D8's boss, M10b): every blow turns until his struck hand or his own breath off the
+   * mirror bares his heart-rune; the binding's ring is the fight's clock (see hrimnir.ts and binding.ts).
+   */
+  hrimnir: {
+    id: 'hrimnir',
+    art: 'enemy_hrimnir',
+    hp: 24,
+    body: { x: -20, y: -12, w: 40, h: 12 },
+    hurt: { x: -22, y: -70, w: 44, h: 70 },
+    behaviour: 'hrimnir',
+    knockResist: 1,
+    immortal: false,
+    solid: true,
+    needs: ['mirror'],
+    boss: { name: { en: 'Hrímnir, the Rime King', sv: 'Hrímnir, Rimkungen' } },
+    struckBy: REFLECT,
+    touch: { amount: 3, knock: 6, tags: 0 },
+    drops: { heart: 0, silver: 0, none: 1 },
+  },
+  /** Hrímnir's hand sweeping across a row of his hall: a blow on it stuns him (M10b). */
+  hrimnir_hand: {
+    id: 'hrimnir_hand',
+    art: 'enemy_hrimnir_hand',
+    hp: 1,
+    body: { x: -10, y: -8, w: 20, h: 8 },
+    hurt: { x: -14, y: -22, w: 28, h: 22 },
+    behaviour: 'hrimnir_hand',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      sweep: {
+        from: 0,
+        to: 999,
+        boxes: around({ x: -14, y: -20, w: 28, h: 20 }),
+        amount: 4,
+        knock: 6,
+        tags: HEAVY,
+      },
+    },
+  },
+  /** A rime pillar Hrímnir pulls down (M10b): its shadow, the fall, and its wreck lying as glaze. */
+  rime_pillar: {
+    id: 'rime_pillar',
+    art: 'enemy_rime_pillar',
+    hp: 1,
+    body: { x: -6, y: -6, w: 12, h: 6 },
+    hurt: { x: -7, y: -10, w: 14, h: 10 },
+    behaviour: 'rime_pillar',
+    knockResist: 1,
+    immortal: true,
+    solid: false,
+    attacks: {
+      fall: {
+        from: 6,
+        to: 9,
+        boxes: around({ x: -18, y: -24, w: 36, h: 28 }),
+        amount: 4,
+        knock: 4,
+        tags: PIERCE_SHIELD,
+      },
+    },
   },
 } as const satisfies Record<EnemyId, EnemyDef>;

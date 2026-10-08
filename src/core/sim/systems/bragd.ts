@@ -7,6 +7,7 @@ import { LOW, SOLID } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { damageActor } from './combat';
+import { glassUnder, lightEye, turnPrism } from './beams';
 
 /** Bragð's beam: px per tick, its reach in px (14 tiles), and its box around its ground point. */
 export const BRAGD = { speed: 4, range: 14 * TILE, z: 10 } as const;
@@ -55,6 +56,14 @@ export function stepBragd(rt: SimRt, e: Entity): void {
   };
   const d = DIR_VEC[e.facing];
   const next = { x: e.pos.x + d.x * BRAGD.speed, y: e.pos.y + d.y * BRAGD.speed };
+  // A crystal eye it reaches is lit; a prism it strikes turns (M9b). Either way the beam is spent.
+  const glass = glassUnder(rt, at(e.body, next));
+  if (glass !== undefined) {
+    if (glass.def === 'eye') lightEye(rt, glass);
+    else turnPrism(rt, glass);
+    gone();
+    return;
+  }
   if ((e.fsm.t + 1) * BRAGD.speed > BRAGD.range || wallAt(rt, next.x, next.y - 3)) {
     gone();
     return;

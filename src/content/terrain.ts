@@ -98,6 +98,17 @@ export const TERRAIN_IDS = [
   'belt_e',
   'belt_s',
   'belt_w',
+  /** Hrímfjöll and Hrímturn (M9): firn, glaze, rime cliffs, and the tower's glass floor and walls. */
+  'firn',
+  'glaze',
+  'rime',
+  'tower_floor',
+  'tower_wall',
+  /** Hrímturn (M9b): a wall of clear ice that light shines through. */
+  'clear_ice',
+  /** Útgarðr (M10a): the giants' floor of great grey flags, and walls of blocks a giant could lift. */
+  'giant_floor',
+  'giant_wall',
 ] as const;
 export type TerrainId = (typeof TERRAIN_IDS)[number];
 
@@ -266,4 +277,18 @@ export const TERRAIN = {
   belt_e: { solid: false, belt: 'e' },
   belt_s: { solid: false, belt: 's' },
   belt_w: { solid: false, belt: 'w' },
+  /** Hrímfjöll's wind-packed snow: firm going, no drifts on it. */
+  firn: { solid: false },
+  /** Glacier ice: a step onto it slides Ask on until a wall or the ice's edge. */
+  glaze: { solid: false, glaze: true },
+  /** Cliffs of blue rime. */
+  rime: { solid: true },
+  /** Hrímturn: a floor of frosted glass, and walls of rime-glass. */
+  tower_floor: { solid: false },
+  tower_wall: { solid: true },
+  /** Clear ice: a wall to walkers and shots, but a beam of light shines through it. */
+  clear_ice: { solid: true, clear: true },
+  /** Útgarðr: flags the size of a farmhouse door, and walls of rime-bound blocks. */
+  giant_floor: { solid: false },
+  giant_wall: { solid: true },
 } as const satisfies Record<TerrainId, TerrainDef>;
