@@ -37,6 +37,8 @@ export const ITEM_NAMES = {
   trade_hook: { en: 'Gamli’s bone hook', sv: 'Gamles benkrok' },
   trade_comb: { en: 'Walrus-ivory comb', sv: 'Kam av valrossben' },
   trade_needle: { en: 'Sail-needle', sv: 'Segelnål' },
+  trade_lens: { en: 'Dwarf-glass lens', sv: 'Lins av dvärgglas' },
+  stave_skjalfti: { en: 'Skjálfti rune-stave', sv: 'Skjálfti-runstav' },
   rune_leaf: { en: 'Torn rune-leaf', sv: 'Rivet runblad' },
   mail_clasp: { en: 'Ring-mail clasp', sv: 'Brynjespänne' },
   grave_ring: { en: 'Grave-ring', sv: 'Gravring' },
@@ -68,6 +70,7 @@ const MAX: Partial<Record<ItemId, number>> = {
   rune_leaf: 4,
   amber: 3,
   stave_is: 3,
+  stave_skjalfti: 3,
   wisp_ember: 3,
   ore: 99,
   norn_thread: 3,
@@ -106,6 +109,18 @@ const FOUND: Partial<Record<ItemId, L10n>> = {
   bomb_bag: {
     en: 'You found a larger bomb bag! It holds ten more bombs.',
     sv: 'Du hittade en större bombpåse! Den rymmer tio bomber till.',
+  },
+  hammer: {
+    en: 'You found the dwarf hammer! Bring it down with its item key, one step ahead. It drives stakes flat, breaks weak floors and drifts, and cracks iron plate the sword glances off.',
+    sv: 'Du hittade dvärghammaren! Slå med den med dess föremålsknapp, ett steg framför dig. Den slår ner pålar, krossar svaga golv och drivor och spräcker järnplåt som svärdet glider av.',
+  },
+  mirror: {
+    en: 'You found the ice mirror! Hold its item key to raise it: Ask stands behind it and turns with the stick. Light and rime bolts that strike its face leave the way Ask faces.',
+    sv: 'Du hittade isspegeln! Håll in dess föremålsknapp för att lyfta den: Ask står bakom den och vänder sig med spaken. Ljus och rimpilar som träffar dess yta far vidare åt det håll Ask vänder sig.',
+  },
+  stave_skjalfti: {
+    en: 'You got a Skjálfti rune-stave! Ready it in an item slot: it sings Skjálfti once, for no seiðr. The ground shakes, foes stagger and weak floors give.',
+    sv: 'Du fick en Skjálfti-runstav! Lägg den i en föremålsplats: den sjunger Skjálfti en gång, utan seiðr. Marken skakar, fiender vacklar och svaga golv ger vika.',
   },
   grapple: {
     en: 'You found the grapple chain! Fire it with its item key, the way you face. It hooks iron posts and pulls you across pits and water, drags light foes and far things to you, and catches on shields.',
@@ -149,7 +164,7 @@ const HEAL: Partial<Record<ItemId, number>> = { flatbread: 6, cheese: 6, mead_re
 /** Green and blue mead fill the seiðr bar. */
 const SEIDR: Partial<Record<ItemId, number>> = { mead_green: 30, mead_blue: 30 };
 /** What each rune-stave sings. */
-const STAVE: Partial<Record<ItemId, GaldrId>> = { stave_is: 'is' };
+const STAVE: Partial<Record<ItemId, GaldrId>> = { stave_is: 'is', stave_skjalfti: 'skjalfti' };
 const IN_HORN: ReadonlySet<ItemId> = new Set(['mead_red', 'mead_green', 'mead_blue']);
 
 export const ITEM_DEFS = Object.fromEntries(

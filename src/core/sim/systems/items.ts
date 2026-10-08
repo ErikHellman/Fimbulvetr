@@ -6,9 +6,13 @@ import { lightBrazier } from './fixtures';
 import { shootArrow, throwBoomerang } from './projectiles';
 import { placeBomb } from './bombs';
 import { fireGrapple } from './grapple';
+import { swingHammer } from './hammer';
 import { singStave } from './galdr';
 import { probeBox } from './story';
 import { owns } from '../../items/defs';
+import { changeState } from '../../actors/fsm';
+import { HERO_MACHINE } from '../../actors/hero';
+import { heroCtx } from './hero';
 
 /** What an item does when its slot button is pressed in play; returns whether it was used. */
 export type ItemUse = (rt: SimRt, input: InputFrame) => boolean;
@@ -20,7 +24,18 @@ const USES: Partial<Record<ItemId, ItemUse>> = {
   bombs: (rt) => placeBomb(rt),
   bow: (rt, input) => shootArrow(rt, input),
   grapple: fireGrapple,
+  hammer: swingHammer,
+  mirror: raiseMirror,
 };
+
+/** The ice mirror (M9b): raised from the slot whose key was pressed, and held up while that key is held. */
+function raiseMirror(rt: SimRt, input: InputFrame): boolean {
+  if ((rt.state.inv.items.mirror ?? 0) < 1) return false;
+  rt.hero.mem['mirrorKey'] = wasPressed(input, 'item1') ? 1 : 2;
+  changeState(HERO_MACHINE, rt.hero, 'mirror', heroCtx(rt, input));
+  rt.emit({ t: 'sfx', id: 'sfx_mirror' });
+  return true;
+}
 
 /** Item slot buttons in play: K uses slot 0, L slot 1. Only a hero standing free can use an item. */
 export function useItems(rt: SimRt, input: InputFrame): void {

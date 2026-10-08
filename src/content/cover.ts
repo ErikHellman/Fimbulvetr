@@ -12,6 +12,7 @@ const GROUND: readonly TerrainId[] = [
   'heath',
   'flagstone',
   'mire',
+  'scree',
 ];
 
 export const COVER_DEFS = {
@@ -61,6 +62,17 @@ export const COVER_DEFS = {
     cut: false,
     walk: true,
     melts: true,
+  },
+  /**
+   * Ís laid on lava (M8): a black crust Ask can cross, for a while. It never grows; the song places it, a
+   * timer on the runtime cools it away (see systems/is.ts), and it is never saved.
+   */
+  crust: {
+    id: 'crust',
+    seasons: ['spring', 'summer', 'autumn', 'winter'],
+    slow: 1,
+    cut: false,
+    walk: true,
   },
 } as const satisfies Record<CoverId, CoverDef>;
 

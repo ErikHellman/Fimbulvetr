@@ -7,6 +7,7 @@ import { castBragd } from './bragd';
 import { castEldr } from './eldr';
 import { castIs } from './is';
 import { castLjos } from './ljos';
+import { castSkjalfti } from './skjalfti';
 import { castVindr } from './vindr';
 import { heroCtx } from './hero';
 import { startStory } from './story';
@@ -55,6 +56,10 @@ const SONGS: Partial<Record<GaldrId, Song>> = {
   },
   vindr: (rt) => {
     castVindr(rt);
+    return 'pay';
+  },
+  skjalfti: (rt) => {
+    castSkjalfti(rt);
     return 'pay';
   },
 };

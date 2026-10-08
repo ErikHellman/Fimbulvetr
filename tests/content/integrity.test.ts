@@ -279,7 +279,16 @@ describe('warp stones', () => {
       expect(walkable(id)(t.arrive.x, t.arrive.y), `${id} arrival`).toBe(true);
       expect(walkable(id)(t.at.x, t.at.y), `${id} stone on walkable ground`).toBe(true);
     }
-    expect([...seen].sort()).toEqual(['askdalr', 'haugar', 'myrkvidr', 'myrland', 'niflmyrr', 'saevatn']);
+    expect([...seen].sort()).toEqual([
+      'askdalr',
+      'dvergagrof',
+      'haugar',
+      'hrimfjoll',
+      'myrkvidr',
+      'myrland',
+      'niflmyrr',
+      'saevatn',
+    ]);
   });
 });
 

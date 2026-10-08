@@ -463,6 +463,20 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'Långhuset och fållan står igen, och Hildr har sin hjord i hagen över vintern. Resten får vänta på malm.',
         },
       },
+      {
+        when: all(flag('st_freed_thorkell'), atLeast('q_farm', 2)),
+        text: {
+          en: 'Þorkell is home from Ívaldi’s Forge, and handy with iron now. For 10 lumps of black ore he will build the farm a goat-house.',
+          sv: 'Þorkell är hemma från Ívaldis smedja, och händig med järn nu. För 10 klumpar svart malm bygger han ett gethus åt gården.',
+        },
+      },
+      {
+        when: atLeast('q_farm', 3),
+        text: {
+          en: 'Goats on the farm again, in Þorkell’s iron-shod goat-house. Halvar grumbles about them, happily.',
+          sv: 'Getter på gården igen, i Þorkells järnskodda gethus. Halvar muttrar om dem, förnöjt.',
+        },
+      },
     ],
   },
   q_trade: {
@@ -509,6 +523,13 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         text: {
           en: 'Embla gave her sail-needle for the comb: for a dwarf who mends bellows and swears at them.',
           sv: 'Embla gav sin segelnål för kammen: till en dvärg som lagar blåsbälgar och svär åt dem.',
+        },
+      },
+      {
+        when: atLeast('q_trade', 6),
+        text: {
+          en: 'Sindri mended his bellows with the needle and gave a lens of dwarf-glass: for whoever watches the frost on the high road.',
+          sv: 'Sindri lagade sin blåsbälg med nålen och gav en lins av dvärgglas: åt den som vaktar frosten på höga vägen.',
         },
       },
       {
@@ -822,6 +843,34 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
           sv: 'I den kluvna tallen låg en snidad ask med ett seiðkärl. Embla kommer att skriva igen.',
         },
       },
+      {
+        when: atLeast('q_letters', 2),
+        text: {
+          en: 'Embla’s second letter: under the top stone of the cairn by Haugar’s tarn, where we hid from Halvar.',
+          sv: 'Emblas andra brev: under översta stenen på röset vid Haugars tjärn, där vi gömde oss för Halvar.',
+        },
+      },
+      {
+        when: flag('st_letter2_found'),
+        text: {
+          en: 'Under the cairn’s top stone lay a piece of a heart, wrapped in birch bark.',
+          sv: 'Under rösets översta sten låg en bit av ett hjärta, insvept i näver.',
+        },
+      },
+      {
+        when: atLeast('q_letters', 3),
+        text: {
+          en: 'Embla’s third letter: the cairn at the top of the world, on Hrímfjöll’s last firn past the frozen tarn.',
+          sv: 'Emblas tredje brev: röset på världens tak, på Hrímfjölls sista firn bortom den frusna tjärnen.',
+        },
+      },
+      {
+        when: flag('st_letter3_found'),
+        text: {
+          en: 'Between the cairn’s stones lay the last seiðr vessel. Embla has no more letters to write: the rest she will say to Ask’s face.',
+          sv: 'Mellan rösets stenar låg det sista seiðkärlet. Embla har inga fler brev att skriva: resten säger hon till Ask ansikte mot ansikte.',
+        },
+      },
     ],
   },
   q_loom: {
@@ -847,6 +896,170 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
         text: {
           en: 'The Norns wove the threads into a seiðr vessel. At any hof, after a prayer, Ask may now ask the year to turn to another season.',
           sv: 'Nornorna vävde trådarna till ett seiðkärl. Vid vilket hov som helst kan Ask nu, efter en bön, be året vända sig till en annan årstid.',
+        },
+      },
+    ],
+  },
+  q_foreman: {
+    id: 'q_foreman',
+    name: { en: 'The foreman’s crew', sv: 'Förmannens lag' },
+    stages: [
+      {
+        when: atLeast('q_foreman', 1),
+        text: {
+          en: 'Dvalinn’s crew is trapped behind a cave-in at Dvergagröf’s mine mouth. Something that breaks rock would clear it.',
+          sv: 'Dvalinns lag sitter fast bakom ett ras vid Dvergagröfs gruvmynning. Något som spränger sten skulle rensa det.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 2),
+        text: {
+          en: 'The cave-in is cleared. Dvalinn should hear the way into the old workings is open.',
+          sv: 'Raset är bortsprängt. Dvalinn borde få höra att vägen in i de gamla gångarna är öppen.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 3),
+        text: {
+          en: 'Hekla waits at the mine mouth. Take her through the old workings to the lamp-room, and keep the foes off her.',
+          sv: 'Hekla väntar vid gruvmynningen. Led henne genom de gamla gångarna till lampsalen, och håll fienderna borta från henne.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 4),
+        text: {
+          en: 'The crew is out of the lamp-room. Dvalinn is waiting at the camp.',
+          sv: 'Laget är ute ur lampsalen. Dvalinn väntar i lägret.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 5),
+        text: {
+          en: 'Dvalinn opened the cart road from the mine mouth to Uppvík’s smiths.',
+          sv: 'Dvalinn öppnade kärrvägen från gruvmynningen till smederna i Uppvík.',
+        },
+      },
+    ],
+  },
+  q_forge: {
+    id: 'q_forge',
+    name: { en: 'The forge under the mountain', sv: 'Smedjan under berget' },
+    stages: [
+      {
+        when: flag('st_dvg_reached'),
+        text: {
+          en: 'Over the chasm east of Haugar’s tarn lies Dvergagröf, and deep in the mountain something beats iron.',
+          sv: 'Över klyftan öster om Haugars tjärn ligger Dvergagröf, och djupt inne i berget slår något på järn.',
+        },
+      },
+      {
+        when: atLeast('q_foreman', 1),
+        text: {
+          en: 'Dvalinn the foreman says Ívaldi’s forge has eaten all the dwarves’ powder. Its great door is east of the mine mouth.',
+          sv: 'Förmannen Dvalinn säger att Ívaldis smedja har ätit upp allt dvärgarnas krut. Dess stora port ligger öster om gruvmynningen.',
+        },
+      },
+      {
+        when: flag('st_d6_entered'),
+        text: {
+          en: 'Inside Ívaldi’s Forge the air shakes with heat, and the floors run like rivers.',
+          sv: 'Inne i Ívaldis smedja dallrar luften av hetta, och golven rinner som floder.',
+        },
+      },
+      {
+        when: flag('st_d6_belgr'),
+        text: {
+          en: 'Belgr the bellows lies broken, and the dwarf hammer is Ask’s. Somewhere above, Ívaldi beats his anvil.',
+          sv: 'Blåsbälgen Belgr ligger krossad, och dvärghammaren är Asks. Någonstans ovanför slår Ívaldi på sitt städ.',
+        },
+      },
+      {
+        when: flag('st_thane_ivaldi'),
+        text: {
+          en: 'Thane Ívaldi, the Anvil, is broken. Þorkell and Rannveig are free. Kolbeinn says one thane is left, in the ice.',
+          sv: 'Hövding Ívaldi, Städet, är krossad. Þorkell och Rannveig är fria. Kolbeinn säger att en hövding är kvar, i isen.',
+        },
+      },
+    ],
+  },
+  q_rime: {
+    id: 'q_rime',
+    name: { en: 'The Rime Tower', sv: 'Rimtornet' },
+    stages: [
+      {
+        when: flag('st_hrf_reached'),
+        text: {
+          en: 'In the ember byrnie Ask has crossed the frost line onto Hrímfjöll. A tower of ice stands over the glacier: Hrímturn, where the last thane keeps her oath.',
+          sv: 'I glödbrynjan har Ask tagit sig över frostgränsen upp på Hrímfjöll. Ett torn av is reser sig över glaciären: Hrímturn, där den sista hövdingen håller sin ed.',
+        },
+      },
+      {
+        when: flag('st_d7_entered'),
+        text: {
+          en: 'Inside Hrímturn the floors are glass and the light comes in shafts through the ice.',
+          sv: 'Inne i Hrímturn är golven av glas och ljuset faller in i strålar genom isen.',
+        },
+      },
+      {
+        when: flag('st_d7_svellr'),
+        text: {
+          en: 'Svellr the glacier construct lies shattered, and the ice mirror is Ask’s. It turns any beam the way Ask faces.',
+          sv: 'Glaciärvarelsen Svellr ligger krossad, och isspegeln är Asks. Den vänder varje stråle åt det håll Ask står vänd.',
+        },
+      },
+      {
+        when: flag('st_thane_hrimgerdr'),
+        text: {
+          en: 'Four thanes down. Útgarðr’s gate stands open, and the Rime King is waking.',
+          sv: 'Fyra hövdingar nere. Útgarðrs port står öppen, och Rimkungen håller på att vakna.',
+        },
+      },
+    ],
+  },
+  q_king: {
+    id: 'q_king',
+    name: { en: 'The Rime King', sv: 'Rimkungen' },
+    stages: [
+      {
+        when: flag('st_halvar_confessed'),
+        text: {
+          en: 'Halvar was there when the Rime King was bound, and he spoke the binding-words at Útgarðr’s gate. It stands open.',
+          sv: 'Halvar var där när Rimkungen bands, och han talade bindningsorden vid Útgarðrs port. Den står öppen.',
+        },
+      },
+      {
+        when: flag('st_d8_entered'),
+        text: {
+          en: 'Inside Útgarðr, the giants’ stronghold. Each of its three wings ends at a seal; the master key waits behind all three.',
+          sv: 'Inne i Útgarðr, jättarnas borg. Var och en av dess tre flyglar slutar vid ett sigill; huvudnyckeln väntar bakom alla tre.',
+        },
+      },
+      {
+        when: all(flag('st_d8_seal_w'), flag('st_d8_seal_e'), flag('st_d8_seal_n')),
+        text: {
+          en: 'All three seals burn, and the rime door in the seal hall has melted.',
+          sv: 'Alla tre sigillen brinner, och rimdörren i sigillsalen har smält.',
+        },
+      },
+      {
+        when: flag('st_d8_warden'),
+        text: {
+          en: 'Jötunvörðr has fallen, and the master key opens the keep. Kolbeinn is in there.',
+          sv: 'Jötunvörðr har fallit, och huvudnyckeln öppnar borgen. Kolbeinn finns där inne.',
+        },
+      },
+      {
+        when: flag('st_kolbeinn_beaten'),
+        text: {
+          en: 'Kolbeinn is beaten. Past his hall lies the binding hall, where the Rime King is waking.',
+          sv: 'Kolbeinn är besegrad. Bortom hans sal ligger bindningssalen, där Rimkungen håller på att vakna.',
+        },
+      },
+      {
+        when: flag('st_hrimnir_dead'),
+        text: {
+          en: 'The Rime King is bound for good, by his own name. The winter is over.',
+          sv: 'Rimkungen är bunden för gott, med sitt eget namn. Vintern är över.',
         },
       },
     ],
@@ -953,4 +1166,87 @@ export const QUEST_DEFS: Readonly<Partial<Record<QuestId, QuestDef>>> = {
       },
     ],
   },
+  q_record: {
+    id: 'q_record',
+    name: { en: 'The rune-record', sv: 'Runkrönikan' },
+    stages: [
+      {
+        when: flag('q_record_asked'),
+        text: {
+          en: 'Forty huscarls went up the mountain at the first binding; the hof’s record has only thirty-six names. The last four are cut on bauta-stones: by the Myrkviðr road, in Haugar’s stone circle, at Bárðr’s far landing on Sævatn, and by the cairn at the top of Hrímfjöll. Gyða wants them read.',
+          sv: 'Fyrtio huskarlar gick upp på berget vid den första bindningen; hovets krönika har bara trettiosex namn. De sista fyra är ristade på bautastenar: vid vägen genom Myrkviðr, i Haugars stencirkel, vid Bárðrs bortre brygga på Sævatn och vid röset högst upp på Hrímfjöll. Gyða vill att de blir lästa.',
+        },
+      },
+      {
+        when: all(flag('q_record_asked'), atLeast('q_record', 4)),
+        text: {
+          en: 'All four names read. Bring them to Gyða.',
+          sv: 'Alla fyra namnen lästa. Ta dem till Gyða.',
+        },
+      },
+      {
+        when: flag('q_record_done'),
+        text: {
+          en: 'Gyða cut the last four names into the hof’s record. Forty names, and none forgotten.',
+          sv: 'Gyða ristade in de sista fyra namnen i hovets krönika. Fyrtio namn, och inget glömt.',
+        },
+      },
+    ],
+  },
+  q_feast: {
+    id: 'q_feast',
+    name: { en: 'The spring feast', sv: 'Vårgillet' },
+    stages: [
+      {
+        when: flag('q_feast_asked'),
+        text: {
+          en: 'Askdalr will feast for the homecoming. Halvar wants mead from Sigrún, a fish from Kári at the fen, and a cask of the dwarves’ ale from Dvalinn.',
+          sv: 'Askdalr ska hålla gille för hemkomsten. Halvar vill ha mjöd från Sigrún, en fisk från Kári vid kärret och en kagge av dvärgarnas öl från Dvalinn.',
+        },
+      },
+      {
+        when: all(flag('q_feast_mead'), flag('q_feast_fish'), flag('q_feast_cask')),
+        text: {
+          en: 'Everything is brought. Sit at Halvar’s table in the longhouse.',
+          sv: 'Allt är hämtat. Sätt dig vid Halvars bord i långhuset.',
+        },
+      },
+      {
+        when: flag('q_feast_done'),
+        text: {
+          en: 'Askdalr feasted at Halvar’s table, and the dwarves’ ale went round twice.',
+          sv: 'Askdalr höll gille vid Halvars bord, och dvärgarnas öl gick runt två gånger.',
+        },
+      },
+    ],
+  },
 };
+
+/** The side quests (M11: "every side quest" and the progress footer). The rest of QUEST_DEFS is the main line. */
+export const SIDE_QUESTS: readonly QuestId[] = [
+  'q_volva',
+  'q_huldra',
+  'q_fisher',
+  'q_vargar',
+  'q_eldr',
+  'q_huscarl',
+  'q_farm',
+  'q_trade',
+  'q_herd',
+  'q_pages',
+  'q_trolls',
+  'q_steinn',
+  'q_barrow_ring',
+  'q_crates',
+  'q_honey',
+  'q_amber',
+  'q_burbot',
+  'q_ljos',
+  'q_sealskin',
+  'q_letters',
+  'q_loom',
+  'q_foreman',
+  'q_axes',
+  'q_record',
+  'q_feast',
+];

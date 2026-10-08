@@ -19,7 +19,7 @@ export function coverFor(rt: SimRt, id: ScreenId): CoverGrid {
     rt.db.coverLegend,
     rt.db.coverOrder,
     rt.db.cover,
-    seasonAt(c, def.region, rt.db.clock),
+    seasonAt(c, def.region, rt.db.clock, rt.state.flags),
     c.epoch,
     rt.state.world.cover[id],
     {
@@ -125,6 +125,14 @@ export function blastCover(rt: SimRt, box: Box): void {
     cutBox(rt.screen.cover, box, (k) =>
       kindIs(rt, k, (id) => rt.db.cover[id].cut !== false || rt.db.cover[id].blasts === true),
     ),
+  );
+}
+
+/** The hammer's blow (M8b) breaks drifts and anything else only a blast tears up, nothing it would cut. */
+export function hammerCover(rt: SimRt, box: Box): void {
+  saveCut(
+    rt,
+    cutBox(rt.screen.cover, box, (k) => kindIs(rt, k, (id) => rt.db.cover[id].blasts === true)),
   );
 }
 

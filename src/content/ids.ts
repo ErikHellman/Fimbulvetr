@@ -49,13 +49,14 @@ export const TRADE_ITEMS = [
   'trade_hook',
   'trade_comb',
   'trade_needle',
+  'trade_lens',
 ] as const;
 /** Lore found and handed over: the torn leaves of Gyða's rune-record (`q_pages`), Steinn's clasp (`q_steinn`), the stolen grave-ring (`q_barrow_ring`). */
 export const LORE_ITEMS = ['rune_leaf', 'mail_clasp', 'grave_ring'] as const;
 /** Goods fetched for someone: wild honey (`q_honey`), amber (`q_amber`). */
 export const FETCH_ITEMS = ['honey', 'amber'] as const;
 /** Rune-staves: each sings its galdr once, from an item slot, for no seiðr. */
-export const STAVES = ['stave_is'] as const;
+export const STAVES = ['stave_is', 'stave_skjalfti'] as const;
 /** Counted goods that pay where silver does not: ore, for Hreggviðr at the Refuge (M7a). */
 export const MATERIALS = ['ore'] as const;
 export const ITEMS = [
@@ -119,6 +120,20 @@ export const ENEMIES = [
   'hronn',
   'hronn_grate',
   'nykr',
+  'jarnvordr',
+  'glod',
+  'belgr',
+  'ivaldi',
+  'isvargr',
+  'frostvaettr',
+  'svellr',
+  'hrimgerdr',
+  'icicle',
+  'jotunvordr',
+  'kolbeinn_boss',
+  'hrimnir',
+  'hrimnir_hand',
+  'rime_pillar',
 ] as const;
 export type EnemyId = (typeof ENEMIES)[number];
 
@@ -193,6 +208,14 @@ export const SFX = [
   'sfx_chain',
   'sfx_dive',
   'sfx_gust',
+  'sfx_hammer',
+  'sfx_quake',
+  'sfx_sizzle',
+  'sfx_bellows',
+  'sfx_frost',
+  'sfx_slide',
+  'sfx_glass',
+  'sfx_mirror',
 ] as const;
 export type SfxId = (typeof SFX)[number];
 
@@ -253,6 +276,14 @@ export const NPCS = [
   'urdr',
   'verdandi',
   'skuld',
+  // Dvergagröf
+  'dvalinn',
+  'hekla',
+  'sindri',
+  'nyr',
+  'nali',
+  // Hrímfjöll
+  'ormr',
 ] as const;
 export type NpcId = (typeof NPCS)[number];
 
@@ -289,6 +320,12 @@ export const QUESTS = [
   'q_holmr',
   'q_letters',
   'q_loom',
+  'q_foreman',
+  'q_forge',
+  'q_rime',
+  'q_king',
+  'q_record',
+  'q_feast',
 ] as const;
 export type QuestId = (typeof QUESTS)[number];
 
@@ -303,6 +340,8 @@ export const SHOPS = [
   'vala',
   'hreggvidr',
   'hallbera',
+  'sindri',
+  'rannveig',
 ] as const;
 export type ShopId = (typeof SHOPS)[number];
 
@@ -391,6 +430,43 @@ export const SCRIPTS = [
   'shop_hreggvidr',
   'war_table',
   'letter1_box',
+  'dvg_arrive',
+  'shop_sindri',
+  'dvg_mine_open',
+  'escort_lost',
+  'escort_done',
+  'letter2_cairn',
+  'd6_enter',
+  'd6_kolbeinn',
+  'd6_gate_out',
+  'd6_cell_thorkell',
+  'd6_cell_rannveig',
+  'shop_rannveig',
+  'd6_cistern',
+  'hrf_arrive',
+  'hrf_turned_back',
+  'hrf_letter3',
+  'hrf_sealed',
+  'd7_enter',
+  'd7_kolbeinn',
+  'd7_gate_out',
+  'd7_cell_asa',
+  'd7_cell_bjarni',
+  'd7_basin',
+  'd8_enter',
+  'd8_basin',
+  'd8_kolbeinn',
+  'd8_kolbeinn_yield',
+  // The binding hall and the ending (M10b)
+  'd8_embla',
+  'd8_ending',
+  'end_home',
+  'end_shore',
+  'bauta_myr',
+  'bauta_hau',
+  'bauta_sae',
+  'bauta_hrf',
+  'end_feast',
 ] as const;
 export type ScriptId = (typeof SCRIPTS)[number];
 
@@ -430,5 +506,47 @@ export type CritterId = (typeof CRITTERS)[number];
  * Ground cover layered over terrain. Tall grass, leaves and drifts are drawn on the map; snow, mud and ice
  * grow from the terrain beneath by season (see CoverDef.grows).
  */
-export const COVERS = ['tall_grass', 'leaves', 'snow', 'drift', 'mud', 'ice', 'flood', 'is_ice'] as const;
+export const COVERS = [
+  'tall_grass',
+  'leaves',
+  'snow',
+  'drift',
+  'mud',
+  'ice',
+  'flood',
+  'is_ice',
+  'crust',
+] as const;
 export type CoverId = (typeof COVERS)[number];
+
+/**
+ * Achievements (M11). The browser stores earned ids across save slots, so this list is append-only like
+ * every persisted id.
+ */
+export const ACHIEVEMENTS = [
+  'ach_raid',
+  'ach_stone1',
+  'ach_stones',
+  'ach_thane1',
+  'ach_thanes',
+  'ach_embla',
+  'ach_king',
+  'ach_spared',
+  'ach_slain',
+  'ach_stay',
+  'ach_go',
+  'ach_captives',
+  'ach_letters',
+  'ach_trade',
+  'ach_farm',
+  'ach_loom',
+  'ach_gamli',
+  'ach_galdr',
+  'ach_warps',
+  'ach_pieces',
+  'ach_side',
+  'ach_silver',
+  'ach_record',
+  'ach_feast',
+] as const;
+export type AchievementId = (typeof ACHIEVEMENTS)[number];

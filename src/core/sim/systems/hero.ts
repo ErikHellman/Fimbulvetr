@@ -34,6 +34,7 @@ export function placeHero(rt: SimRt, p: Vec): void {
   h.prev = { ...p };
   h.vel = { x: 0, y: 0 };
   h.knock = { x: 0, y: 0 };
+  if (h.mem['slide'] !== undefined) h.mem['slide'] = 0;
   changeState(HERO_MACHINE, h, 'move', heroCtx(rt, EMPTY_FRAME));
 }
 

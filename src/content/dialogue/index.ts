@@ -37,6 +37,11 @@ import { KARI } from './kari';
 import { BARDR, BARDR_FERRY } from './bardr';
 import { VALA } from './vala';
 import { HREGGVIDR } from './hreggvidr';
+import { DVALINN } from './dvalinn';
+import { HEKLA } from './hekla';
+import { NALI, NYR } from './miners';
+import { ORMR } from './ormr';
+import { SINDRI } from './sindri';
 import { THURIDR } from './thuridr';
 import { LJOTR } from './ljotr';
 import { AUDR } from './audr';
@@ -97,6 +102,12 @@ export const DIALOGUE: Readonly<Partial<Record<DialogueId, DialogueDef>>> = {
   hrafn: HRAFN,
   vala: VALA,
   hreggvidr: HREGGVIDR,
+  dvalinn: DVALINN,
+  hekla: HEKLA,
+  sindri: SINDRI,
+  nyr: NYR,
+  nali: NALI,
+  ormr: ORMR,
   thingstone: THINGSTONE,
   bardr_ferry: BARDR_FERRY,
   urdr: URDR,

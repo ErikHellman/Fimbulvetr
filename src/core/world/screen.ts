@@ -207,7 +207,11 @@ export type Thing =
       readonly at: TilePos;
       readonly w: number;
       readonly h: number;
-      readonly art: 'wall' | 'rock';
+      /**
+       * `wall` and `rock` open to a blast; `floor` (a weak floor over a way down) only to the hammer or
+       * Skjálfti, and `stake` (a dwarf stake across the way) only to the hammer (M8b).
+       */
+      readonly art: 'wall' | 'rock' | 'floor' | 'stake';
     }
   /**
    * A mill wheel: struck (sword, boomerang or blast) it sets the screen's water level to `level`, unless
@@ -223,6 +227,19 @@ export type Thing =
   | { readonly k: 'seal'; readonly at: TilePos; readonly lit: Cond }
   /** A grapple post: a solid iron-bound pillar the grapple chain hooks, pulling Ask to the tile before it. */
   | { readonly k: 'post'; readonly at: TilePos }
+  /**
+   * A window of rime-light (M9b): while `when` holds, a beam shines from it `dir` across the room, turned
+   * by prisms and Ask's raised mirror, through clear ice, until something solid stops it. Solid.
+   */
+  | { readonly k: 'beam'; readonly at: TilePos; readonly dir: Dir4; readonly when?: Cond }
+  /**
+   * A glass prism (M9b): it turns a beam a quarter, `/` (east to north, south to west) or `\` (east to
+   * south, north to west). With `turns`, a sword blow or a Bragð beam swaps the two until Ask leaves the room.
+   * Solid.
+   */
+  | { readonly k: 'prism'; readonly at: TilePos; readonly turn: '/' | '\\'; readonly turns?: true }
+  /** A crystal eye (M9b): the first beam (or Bragð beam) to reach it sets `flag` for good. Solid. */
+  | { readonly k: 'eye'; readonly at: TilePos; readonly flag: FlagId }
   /**
    * A raft, 2×2 tiles, resting at `at` (its top-left tile) and plying a straight line through each stop of
    * `path` and back again. Resting, it is footing; Ask aboard as it sets off rides along. Never saved.
@@ -322,6 +339,12 @@ export interface ScreenDef {
   readonly spawns?: readonly TilePos[];
   /** The flag holding this screen's water level, for terrains that `rise` (see world/water.ts). */
   readonly water?: FlagId;
+  /** A forge room or vent field (M8): heat builds on Ask while Ask is here (see systems/heat.ts). */
+  readonly hot?: true;
+  /** Under Hrímfjöll's killing frost (M9): cold builds on Ask here unless Ask wears the ember byrnie. */
+  readonly cold?: true;
+  /** A lever's flag that turns every conveyor belt on the screen the other way while it is set. */
+  readonly belts?: { readonly flag: FlagId };
 }
 
 /** A grid of screens: the overworld, or one floor of a dungeon. */

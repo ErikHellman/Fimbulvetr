@@ -1,0 +1,57 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d7R30: ScreenDef = {
+  id: 'd7_r30',
+  region: 'hrimfjoll',
+  dungeon: 'd7',
+  purpose:
+    'The first light: a window of rime-light (3, 15) shines east across the hall onto a glass prism (16, 15) that sends it south into the floor. A sword blow turns the prism, the beam climbs north through the clear ice to the crystal eye in its niche (16, 2), and the bars on the north stair lift.',
+  things: [
+    { k: 'beam', at: { x: 3, y: 15 }, dir: 'e' },
+    { k: 'prism', at: { x: 16, y: 15 }, turn: '\\', turns: true },
+    { k: 'eye', at: { x: 16, y: 2 }, flag: 'st_d7_eye_r30' },
+    {
+      k: 'gate',
+      at: { x: 19, y: 1 },
+      w: 2,
+      h: 1,
+      art: 'bars',
+      closed: { k: 'not', c: { k: 'flag', id: 'st_d7_eye_r30' } },
+    },
+    {
+      k: 'sign',
+      at: { x: 24, y: 2 },
+      text: {
+        en: 'A crystal eye in the wall, dark, behind a pane of clear ice. The floor is scored where light once fell.',
+        sv: 'Ett kristallöga i väggen, mörkt, bakom en ruta av klar is. Golvet är repat där ljus en gång föll.',
+      },
+    },
+    { k: 'enemy', id: 'frostvaettr', at: { x: 30, y: 6 } },
+    { k: 'prop', id: 'pot', at: { x: 36, y: 18 } },
+    { k: 'prop', id: 'pot', at: { x: 36, y: 3 } },
+  ],
+  map: [
+    '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▫▫▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
+    '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▫▫▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▪▫▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▪▧▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫',
+    '▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▫▪▪',
+    '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
+    '▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪▪',
+  ],
+};

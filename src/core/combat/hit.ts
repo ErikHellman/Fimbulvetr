@@ -15,6 +15,10 @@ export const STUN = 8;
 export const PIERCE = 16;
 /** An arrow (a crown's gem is only broken by one). */
 export const ARROW = 32;
+/** The dwarf hammer's blow (M8b): only it breaks Ívaldi's plates. */
+export const HAMMER = 64;
+/** A rime bolt sent back by the ice mirror (M9b): only it brings Hrímgerðr to her knees. */
+export const REFLECT = 128;
 
 /** One damage path for swords, arrows, galdr, fire spread and traps. */
 export interface HitData {

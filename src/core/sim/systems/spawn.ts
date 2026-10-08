@@ -84,7 +84,7 @@ function spawnRolled(rt: SimRt, heroAt: Vec): void {
   const free = (p: TilePos): boolean =>
     ((g.flags[p.y * g.cols + p.x] ?? SOLID) & SOLID) === 0 &&
     Math.max(Math.abs(p.x - hx), Math.abs(p.y - hy)) > SPAWN_CLEARANCE;
-  const season = seasonAt(c, def.region, rt.db.clock);
+  const season = seasonAt(c, def.region, rt.db.clock, rt.state.flags);
   // Foes Ask has no way to beat yet (a mud-crab before bombs) are left out of the draw.
   const beatable = (e: SpawnEntry): boolean =>
     (rt.db.enemies[e.id].needs ?? []).every((item) => owns(rt.state.inv.items, item));
@@ -170,6 +170,9 @@ function spawnThings(rt: SimRt): Entity[] {
       case 'warp':
       case 'seal':
       case 'post':
+      case 'beam':
+      case 'prism':
+      case 'eye':
       case 'scenery':
         spawnFixtures(rt, thing, index, out);
         break;

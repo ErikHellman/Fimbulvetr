@@ -7,11 +7,11 @@ import type { SlotId } from '@shell/platform/saveStore';
  * replaces an autosave.
  */
 
-/** The corner line under the demo tag: the version, and the build it came from (none in dev). */
+/** The corner line: the version, and the build it came from (none in dev). */
 export const versionLabel = (version: string, build: string): string =>
   build === 'dev' ? `v${version}` : `v${version} (${build})`;
 
-export type TitleRow = 'continue' | 'new' | 'load' | 'import' | 'export' | 'settings';
+export type TitleRow = 'continue' | 'new' | 'load' | 'import' | 'export' | 'settings' | 'achievements';
 /** Rows of the load page: the manual slots, the backup autosave, then back. */
 export const LOAD_ROWS = ['s1', 's2', 's3', 'auto_prev', 'back'] as const satisfies readonly (
   SlotId | 'back'
@@ -33,7 +33,8 @@ export type TitleAction =
   | { readonly k: 'load'; readonly slot: SlotId }
   | { readonly k: 'import' }
   | { readonly k: 'export' }
-  | { readonly k: 'settings' };
+  | { readonly k: 'settings' }
+  | { readonly k: 'achievements' };
 
 export interface TitleStep {
   readonly state: TitleState;
@@ -57,6 +58,7 @@ export function titleRows(info: TitleInfo): TitleRow[] {
     'import',
     ...(f.auto ? (['export'] as const) : []),
     'settings',
+    'achievements',
   ];
 }
 
@@ -99,6 +101,7 @@ export function stepTitle(state: TitleState, frame: InputFrame, info: TitleInfo,
     case 'import':
     case 'export':
     case 'settings':
+    case 'achievements':
       return go(state, { k: row });
     case 'new':
       return info.filled.auto ? go({ page: 'confirmNew', cursor: 0 }) : go(state, { k: 'new' });

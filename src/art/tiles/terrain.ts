@@ -574,7 +574,175 @@ const SOKKVA_HOF = {
   },
 } as const satisfies Partial<Record<TerrainId, TerrainArt>>;
 
+/** A conveyor belt: dark slats crossing the way it runs, sliding along one px a frame. */
+function belt(dir: Dir4): TerrainArt {
+  const across = dir === 'e' || dir === 'w';
+  const sign = dir === 'e' || dir === 's' ? 1 : -1;
+  return {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: 120,
+    paint: (p, v) => {
+      p.fill('#3a3634');
+      for (let k = 0; k < 4; k++) {
+        const a = (((k * 4 + sign * v.frame) % 16) + 16) % 16;
+        if (across) p.rect(a, 1, 1, 14, '#5c5652');
+        else p.rect(1, a, 14, 1, '#5c5652');
+      }
+      // The rails along both edges.
+      if (across) {
+        p.rect(0, 0, 16, 1, '#1c1a1a');
+        p.rect(0, 15, 16, 1, '#1c1a1a');
+      } else {
+        p.rect(0, 0, 1, 16, '#1c1a1a');
+        p.rect(15, 0, 1, 16, '#1c1a1a');
+      }
+    },
+  };
+}
+
+/** Dvergagröf's scree and Ívaldi's Forge: basalt, iron flags, lava and the belts. */
+const DVERGAGROF = {
+  scree: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#7a7672');
+      p.speckle('#5e5a56', 0.2);
+      p.speckle('#9a9690', 0.08);
+      for (let i = 0; i < 3; i++) p.rect(nextInt(p.rng, 0, 13), nextInt(p.rng, 0, 14), 3, 2, '#68645f');
+    },
+  },
+  forge_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#4a4442', '#2c2826', v.variant);
+    },
+  },
+  forge_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#262224');
+      p.speckle('#3a3436', 0.25);
+      p.rect(0, 12, 16, 4, '#18161a');
+    },
+  },
+  lava: {
+    autotile: false,
+    variants: 1,
+    frames: 4,
+    frameMs: 200,
+    paint: (p, v) => {
+      p.fill('#c4421a');
+      p.speckle('#e0702a', 0.2);
+      for (let k = 0; k < 3; k++) {
+        const x = (nextInt(p.rng, 0, 15) + v.frame * 2) % 16;
+        const y = nextInt(p.rng, 1, 14);
+        p.rect(x, y, Math.min(3, 16 - x), 1, '#f8c04a');
+      }
+      p.speckle('#7a2410', 0.06);
+    },
+  },
+  belt_n: belt('n'),
+  belt_e: belt('e'),
+  belt_s: belt('s'),
+  belt_w: belt('w'),
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
+/** Hrímfjöll's firn, glaze and rime cliffs, and Hrímturn's frosted glass (M9). */
+const HRIMFJOLL = {
+  firn: {
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill('#e4ecf2');
+      p.speckle('#c8d6e2', 0.18);
+      p.speckle('#ffffff', 0.08);
+      p.rect(nextInt(p.rng, 0, 10), nextInt(p.rng, 2, 13), 5, 1, '#d2dee8');
+    },
+  },
+  glaze: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      p.fill('#9cc8e4');
+      p.speckle('#b8dcf0', 0.12);
+      // Long glints across the ice, so a slide reads before it starts.
+      p.rect(1 + v.variant * 4, 3, 7, 1, '#e8f6ff');
+      p.rect(8 - v.variant * 3, 10, 6, 1, '#d4ecfa');
+      p.rect(0, 15, 16, 1, '#86b4d4');
+    },
+  },
+  rime: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#5e7e9c');
+      p.speckle('#7898b6', 0.25);
+      p.speckle('#c8dcec', 0.05);
+      p.rect(0, 12, 16, 4, '#46627e');
+    },
+  },
+  tower_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      flags(p, '#b4c8da', '#90a8c0', v.variant);
+      p.speckle('#e0eef8', 0.06);
+    },
+  },
+  tower_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#3e5672');
+      p.speckle('#567090', 0.25);
+      p.rect(0, 12, 16, 4, '#2c3e56');
+      p.rect(3, 2, 1, 8, '#8eaecc');
+    },
+  },
+  clear_ice: {
+    autotile: false,
+    variants: 1,
+    paint: (p) => {
+      p.fill('#c4e4f6');
+      p.speckle('#e8f6ff', 0.15);
+      p.rect(2, 2, 1, 10, '#ffffff');
+      p.rect(4, 1, 1, 5, '#f0faff');
+      p.rect(0, 13, 16, 3, '#8cb8d6');
+    },
+  },
+  giant_floor: {
+    autotile: false,
+    variants: 2,
+    paint: (p, v) => {
+      // One great flag per tile pair: a seam every other tile, so the floor reads as giant-sized.
+      p.fill('#8a96a4');
+      p.speckle('#9ca8b4', 0.2);
+      p.speckle('#d8e4ee', 0.04);
+      if (v.variant === 0) p.rect(0, 15, 16, 1, '#6a7684');
+      else p.rect(15, 0, 1, 16, '#6a7684');
+    },
+  },
+  giant_wall: {
+    autotile: false,
+    variants: 2,
+    paint: (p) => {
+      p.fill('#4a5462');
+      p.speckle('#5e6a7a', 0.25);
+      p.rect(0, 7, 16, 1, '#343c48');
+      p.rect(0, 12, 16, 4, '#2e3540');
+      p.rect(1, 1, 6, 1, '#b8d0e4');
+    },
+  },
+} as const satisfies Partial<Record<TerrainId, TerrainArt>>;
+
 export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
+  ...HRIMFJOLL,
+  ...DVERGAGROF,
   ...SOKKVA_HOF,
   ...SAEVATN,
   ...NIFLMYRR,

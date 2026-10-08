@@ -2,13 +2,15 @@ import type { EnemyId } from '@content/ids';
 import type { EnemyDef } from '../../actors/enemies/defs';
 import { mem, type Entity } from '../../actors/entity';
 import { at, overlaps, type Box } from '../../math/box';
-import { DIR_VEC, type Dir4 } from '../../math/dir';
+import { DIR_VEC, opposite, type Dir4 } from '../../math/dir';
 import { length, scale, type Vec } from '../../math/vec';
 import { DEEP, gridSolidAt, LOW, moveBox, speedAt, UNDER, type SolidAt } from '../../world/collision';
 import { TILE } from '../../world/dims';
 import type { SimRt } from '../rt';
 import { coverSpeed } from './cover';
 import { critterDef } from './critters';
+import { endSlide, slideDir, startSlide } from './glaze';
+import { gustPush } from './weather';
 
 const KNOCK_EPSILON = 0.1;
 
@@ -16,7 +18,8 @@ export const enemyDef = (rt: SimRt, e: Entity): EnemyDef => rt.db.enemies[e.def 
 
 /** Whether an actor blocks the hero like a wall. */
 export function blocksHero(rt: SimRt, e: Entity): boolean {
-  if (e.kind === 'npc') return true;
+  // Someone Ask is escorting never gets in Ask's way.
+  if (e.kind === 'npc') return mem(e, 'escort') !== 1;
   if (e.kind === 'prop') return mem(e, 'carried') === 0 && mem(e, 'thrown') === 0;
   if (e.kind === 'critter') return critterDef(rt, e).solid;
   return e.kind === 'enemy' && enemyDef(rt, e).solid;
@@ -31,9 +34,14 @@ export function moveAll(rt: SimRt): void {
     .filter((b) => !overlaps(b, me));
   // Aboard a moving raft, Ask goes where the raft goes (see `stepRafts`).
   if (mem(rt.hero, 'raft') !== 1) {
+    startSlide(rt);
+    const before = { ...rt.hero.pos };
     const push = currentPush(rt);
+    const swimming = rt.hero.fsm.s === 'swim' || rt.hero.fsm.s === 'dive';
+    const belt = swimming ? null : (beltPush(rt, rt.hero) ?? (slideDir(rt) === null ? gustPush(rt) : null));
     rt.hero.vel = { x: rt.hero.vel.x + push.x, y: rt.hero.vel.y + push.y };
-    moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles);
+    moveEntity(rt, rt.hero, heroSolidAt(rt), obstacles, false, belt);
+    endSlide(rt, before);
   }
   const walls = gridSolidAt(rt.screen.collision, () => true);
   const { cols, rows } = rt.screen.collision;
@@ -44,7 +52,15 @@ export function moveAll(rt: SimRt): void {
   for (const e of rt.actors) {
     const def = e.kind === 'enemy' ? enemyDef(rt, e) : undefined;
     const flies = def?.flies === true;
-    moveEntity(rt, e, flies ? sky : def?.swims === true ? swims : walls, e.kind === 'npc' ? hero : [], flies);
+    const belt = e.kind === 'enemy' && !flies ? beltPush(rt, e) : null;
+    moveEntity(
+      rt,
+      e,
+      flies ? sky : def?.swims === true ? swims : walls,
+      e.kind === 'npc' && mem(e, 'escort') !== 1 ? hero : [],
+      flies,
+      belt,
+    );
   }
 }
 
@@ -67,12 +83,19 @@ export function shove(rt: SimRt, e: Entity, dx: number, dy: number): void {
   e.pos = { x: e.pos.x + (r.x - box.x), y: e.pos.y + (r.y - box.y) };
 }
 
-function moveEntity(rt: SimRt, e: Entity, solidAt: SolidAt, obstacles: readonly Box[], flies = false): void {
+function moveEntity(
+  rt: SimRt,
+  e: Entity,
+  solidAt: SolidAt,
+  obstacles: readonly Box[],
+  flies = false,
+  belt: Vec | null = null,
+): void {
   const f = flies
     ? 1
     : speedAt(rt.screen.collision, e.pos.x, e.pos.y - 1) * coverSpeed(rt, e, e.pos.x, e.pos.y);
-  const dx = e.vel.x * f + e.knock.x;
-  const dy = e.vel.y * f + e.knock.y;
+  const dx = e.vel.x * f + e.knock.x + (belt?.x ?? 0);
+  const dy = e.vel.y * f + e.knock.y + (belt?.y ?? 0);
   if (dx !== 0 || dy !== 0) {
     const box = at(e.body, e.pos);
     const r = moveBox(box, dx, dy, solidAt, obstacles);
@@ -123,6 +146,23 @@ export function underArch(rt: SimRt): boolean {
 export function wet(rt: SimRt): boolean {
   if (!swimmer(rt)) return false;
   return openWater(rt, Math.floor(rt.hero.pos.x / TILE), Math.floor((rt.hero.pos.y - 1) / TILE), true);
+}
+
+/**
+ * The push of a conveyor belt under someone's feet (M8), or null off the belts. A lever's flag
+ * (`ScreenDef.belts`) turns every belt on the screen the other way.
+ */
+export function beltPush(rt: SimRt, e: Entity): Vec | null {
+  const { terrain } = rt.screen;
+  const tx = Math.floor(e.pos.x / TILE);
+  const ty = Math.floor((e.pos.y - 1) / TILE);
+  if (tx < 0 || ty < 0 || tx >= terrain.cols || ty >= terrain.rows) return null;
+  const id = terrain.cells[ty * terrain.cols + tx];
+  const dir = id === undefined ? undefined : rt.db.terrain[id].belt;
+  if (dir === undefined) return null;
+  const lever = rt.db.screens[rt.screen.id].belts;
+  const back = lever !== undefined && rt.state.flags[lever.flag] === true;
+  return scale(DIR_VEC[back ? opposite(dir) : dir], rt.db.tuning.hero.belt);
 }
 
 /** The push of the current under a swimmer's feet (a diver passes under a surge). */

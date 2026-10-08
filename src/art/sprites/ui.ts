@@ -189,6 +189,32 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'sw......',
     'w.......',
   ],
+  /** The dwarf hammer: a squat iron head on a short haft. */
+  hammer: ['.LLLLLL.', 'LllllllL', 'LLLLLLLL', '...ww...', '...ww...', '...wW...', '...wW...', '...WW...'],
+  /** The ice mirror: a round pane of clear rime in a rim of steel, a glint across it, on a short grip. */
+  mirror: ['.LLLLL..', 'LlkkllL.', 'LkllkkL.', 'LklkkkL.', 'LlkkkKL.', '.LLLLL..', '...ww...', '...WW...'],
+  /** A Skjálfti rune-stave: a short ash stave with ember runes cut down it. */
+  stave_skjalfti: [
+    '......w.',
+    '.....wy.',
+    '....wW..',
+    '...yw...',
+    '..wW....',
+    '.yw.....',
+    'wW......',
+    'w.......',
+  ],
+  /** A round lens of dwarf-glass in a brass rim, light caught in it. */
+  trade_lens: [
+    '..bbbb..',
+    '.bkkkkb.',
+    'bkklkkkb',
+    'bklkkkkb',
+    'bkkkkkKb',
+    'bkkkkKKb',
+    '.bKKKKb.',
+    '..bbbb..',
+  ],
   /** A lump of black ore, glints of metal in it. */
   ore: ['........', '..LLL...', '.LeLlL..', 'LeLLLeL.', 'LLlLeLL.', '.LeLLL..', '..LLL...', '........'],
   /** A round iron bomb, its fuse spitting sparks. */

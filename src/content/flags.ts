@@ -235,6 +235,11 @@ export const FLAGS = {
   w_verse_deadwood: { t: 'bool' },
   w_verse_cairns: { t: 'bool' },
   w_verse_gjoll: { t: 'bool' },
+  /** Bragi's later verses (M11a): the gully's sinkhole, the miners' store, the slag pool, the saddle's tarn-eye. */
+  w_verse_sinkhole: { t: 'bool' },
+  w_verse_store: { t: 'bool' },
+  w_verse_slag: { t: 'bool' },
+  w_verse_thaw: { t: 'bool' },
   /** Into Helgrind (D4, M6b); Garmr dead (its shutters open); Náströnd dead; Kolbeinn's word after. */
   st_d4_entered: { t: 'bool' },
   st_d4_garmr: { t: 'bool' },
@@ -293,6 +298,100 @@ export const FLAGS = {
   w_myr_web: { t: 'bool' },
   q_loom_asked: { t: 'bool' },
   st_loom_woven: { t: 'bool' },
+  /** Ívaldi's Forge's belt lever (M8b): set, the north belts run the other way. */
+  w_d6_belts: { t: 'bool' },
+  /** Dvergagröf reached over the chasm (M8a). */
+  st_dvg_reached: { t: 'bool' },
+  /**
+   * Dvalinn's chain (M8a, `q_foreman`): 1 asked, 2 the cave-in cleared, 3 Hekla goes with Ask, 4 the crew
+   * out of the lamp-room, 5 the cart road open.
+   */
+  q_foreman: { t: 'int', max: 5 },
+  /** Embla's second letter followed to the cairn on Haugar's tarn (M8a). */
+  st_letter2_found: { t: 'bool' },
+  /** Ívaldi's Forge (D6) entered, and Belgr its mini-boss broken (M8b): his iron heart lets Sindri forge the dwarf blade. */
+  st_d6_entered: { t: 'bool' },
+  st_d6_belgr: { t: 'bool' },
+  /** Thane Ívaldi dead (M8b): Þorkell and Rannveig freed, and Kolbeinn's word heard in his hall. */
+  st_d6_boss_dead: { t: 'bool' },
+  st_d6_kolbeinn: { t: 'bool' },
+  st_thane_ivaldi: { t: 'bool' },
+  st_freed_thorkell: { t: 'bool' },
+  st_freed_rannveig: { t: 'bool' },
+  /** Hrímfjöll reached over the frost line (M9a). */
+  st_hrf_reached: { t: 'bool' },
+  /** Ormr's beacon lit again with Sindri's lens (M9a, trading step 7): he gave the beacon arm-ring. */
+  st_beacon_lit: { t: 'bool' },
+  /** The beacon arm-ring owned (M9a): it marks the heart pieces still out on the map. */
+  w_ring_beacon: { t: 'bool' },
+  /** Embla's third letter followed to the cairn at the top of the world (M9a): the last seiðr vessel. */
+  st_letter3_found: { t: 'bool' },
+  /** Hrímturn (D7) entered, and Svellr its mini-boss broken over the ice mirror (M9b). */
+  st_d7_entered: { t: 'bool' },
+  st_d7_svellr: { t: 'bool' },
+  /** Thane Hrímgerðr dead (M9b): Ása and Bjarni freed, and Kolbeinn's word heard in her hall. */
+  st_d7_boss_dead: { t: 'bool' },
+  st_d7_kolbeinn: { t: 'bool' },
+  st_thane_hrimgerdr: { t: 'bool' },
+  st_freed_asa: { t: 'bool' },
+  st_freed_bjarni: { t: 'bool' },
+  /** Útgarðr's gate in the ice open (M10). */
+  st_utgard_open: { t: 'bool' },
+  /** Hrímturn's crystal eyes (M9b), each lit for good by a beam: they lift the bars they keep. */
+  st_d7_eye_r30: { t: 'bool' },
+  st_d7_eye_r23: { t: 'bool' },
+  st_d7_eye_r24: { t: 'bool' },
+  st_d7_eye_r15: { t: 'bool' },
+  st_d7_eye_r11: { t: 'bool' },
+  st_d7_eye_r17: { t: 'bool' },
+  /** Halvar's confession at Útgarðr's gate (M10a): he was at the binding, and his binding-words opened it. */
+  st_halvar_confessed: { t: 'bool' },
+  /** Útgarðr (D8) entered (M10a). */
+  st_d8_entered: { t: 'bool' },
+  /** Útgarðr's three seal-stones, one at the end of each wing (M10a): all three open the master key's vault. */
+  st_d8_seal_w: { t: 'bool' },
+  st_d8_seal_e: { t: 'bool' },
+  st_d8_seal_n: { t: 'bool' },
+  /** Útgarðr's puzzles (M10a): the rime gate in the west wing melted with Eldr, and three crystal eyes lit. */
+  st_d8_melt_r17: { t: 'bool' },
+  st_d8_eye_r07: { t: 'bool' },
+  st_d8_eye_r03: { t: 'bool' },
+  st_d8_eye_r05: { t: 'bool' },
+  /** The web over the east wing's door torn away with Vindr (M10a), and Kolbeinn met in his hall. */
+  st_d8_web_r15: { t: 'bool' },
+  st_d8_kolbeinn_met: { t: 'bool' },
+  /** Jötunvörðr, the warden of the master key, broken (M10a). */
+  st_d8_warden: { t: 'bool' },
+  /** Kolbeinn beaten in his hall (M10a), and then spared or slain: the choice changes one ending scene. */
+  st_kolbeinn_beaten: { t: 'bool' },
+  st_kolbeinn_spared: { t: 'bool' },
+  st_kolbeinn_slain: { t: 'bool' },
+  /** Embla come to the binding hall to hold the binding open (M10b). */
+  st_d8_embla: { t: 'bool' },
+  /** Hrímnir the Rime King dead (M10b): the binding closed for good, and spring on the mountains. */
+  st_hrimnir_dead: { t: 'bool' },
+  /** The closing shot Ask chose on the shore (M10b): stay in Askdalr, or sail south with Embla. */
+  st_end_stay: { t: 'bool' },
+  st_end_go: { t: 'bool' },
+  /** The ending and its credits seen (M10b): the world after, and the title screen's rune. */
+  st_game_done: { t: 'bool' },
+  /**
+   * The rune-record (M11a): Gyða asked for the names of the huscarls who fell at the first binding; each
+   * bauta-stone read once (`q_record` counts them); the names cut into the hof's record.
+   */
+  q_record_asked: { t: 'bool' },
+  q_record: { t: 'int', max: 4 },
+  st_bauta_myr: { t: 'bool' },
+  st_bauta_hau: { t: 'bool' },
+  st_bauta_sae: { t: 'bool' },
+  st_bauta_hrf: { t: 'bool' },
+  q_record_done: { t: 'bool' },
+  /** The spring feast (M11a, after the ending): Halvar asked, the mead, the fish and the cask brought, the feast held. */
+  q_feast_asked: { t: 'bool' },
+  q_feast_mead: { t: 'bool' },
+  q_feast_fish: { t: 'bool' },
+  q_feast_cask: { t: 'bool' },
+  q_feast_done: { t: 'bool' },
 } as const satisfies Record<string, FlagSpec>;
 
 export type FlagId = keyof typeof FLAGS;

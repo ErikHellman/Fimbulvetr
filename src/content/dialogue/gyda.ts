@@ -1,5 +1,5 @@
 import type { DialogueDef } from '@core/story/dialogue';
-import { afterRaid, all, daily, flag, not } from './util';
+import { afterRaid, all, atLeast, daily, flag, not } from './util';
 
 /** Gyða before the raid: one thought a day. */
 const FARM_DAYS: DialogueDef = daily(
@@ -31,9 +31,17 @@ const FARM_DAYS: DialogueDef = daily(
 /** Gyða, the goði, keeps the rune-records in the hof. The morning after the raid she tells the legend. */
 export const GYDA: DialogueDef = {
   entry: [
+    { when: flag('q_record_done'), node: 'record_done' },
+    { when: all(flag('q_record_asked'), atLeast('q_record', 4)), node: 'record_give' },
+    { when: flag('q_record_asked'), node: 'record_some' },
+    { when: flag('st_halvar_confessed'), node: 'halvar' },
     { when: flag('q_pages_done'), node: 'pages_done' },
     { when: { k: 'item', id: 'rune_leaf', gte: 4 }, node: 'pages' },
     { when: { k: 'item', id: 'rune_leaf' }, node: 'pages_some' },
+    { when: flag('st_thane_hrimgerdr'), node: 'thanes4' },
+    { when: flag('st_hrf_reached'), node: 'hrf' },
+    { when: flag('st_thane_ivaldi'), node: 'ivaldi' },
+    { when: flag('st_dvg_reached'), node: 'dvg' },
     { when: flag('st_embla_found'), node: 'embla' },
     { when: flag('st_rime_open'), node: 'rime' },
     { when: flag('st_blood_told'), node: 'leaves' },
@@ -46,6 +54,67 @@ export const GYDA: DialogueDef = {
     ...FARM_DAYS.entry,
   ],
   nodes: {
+    halvar: {
+      text: {
+        en: 'Halvar’s name is in the record, child, among the forty who went up with the old goði. I always wondered why he would never read it. I will cut a line under it now: HE WENT BACK.',
+        sv: 'Halvars namn står i krönikan, barn, bland de fyrtio som gick upp med den gamle goden. Jag har alltid undrat varför han aldrig ville läsa den. Nu ristar jag en rad under det: HAN GICK TILLBAKA.',
+      },
+      next: 'record_ask',
+    },
+    record_ask: {
+      text: {
+        en: 'Forty went up, child, and the record has only thirty-six names. The last four were cut on bauta-stones where their kin lived: by the Myrkviðr road, in Haugar’s stone circle, at Bárðr’s far landing, and by the cairn at the top of Hrímfjöll. Read them for me, and I will cut them in.',
+        sv: 'Fyrtio gick upp, barn, och krönikan har bara trettiosex namn. De sista fyra ristades på bautastenar där deras fränder bodde: vid vägen genom Myrkviðr, i Haugars stencirkel, vid Bárðrs bortre brygga och vid röset högst upp på Hrímfjöll. Läs dem åt mig, så ristar jag in dem.',
+      },
+      do: [{ k: 'set', flag: 'q_record_asked', value: true }],
+    },
+    record_some: {
+      text: {
+        en: 'Four stones, child: the Myrkviðr road, Haugar’s circle, Bárðr’s far landing and the cairn on Hrímfjöll. I will not cut a rune until I have every name.',
+        sv: 'Fyra stenar, barn: vägen genom Myrkviðr, Haugars cirkel, Bárðrs bortre brygga och röset på Hrímfjöll. Jag ristar inte en enda runa förrän jag har varje namn.',
+      },
+    },
+    record_give: {
+      text: {
+        en: 'Arnfinnr. Sæmundr. Þorvaldr. Gunnarr. There. Forty names, and none forgotten. Take this, child; it has lain in the hof’s chest since before I was born, waiting for someone who earned it.',
+        sv: 'Arnfinnr. Sæmundr. Þorvaldr. Gunnarr. Så. Fyrtio namn, och inget glömt. Ta det här, barn; det har legat i hovets kista sedan innan jag föddes och väntat på någon som förtjänar det.',
+      },
+      do: [
+        { k: 'set', flag: 'q_record_done', value: true },
+        { k: 'piece', id: 'hp_record' },
+        { k: 'sfx', id: 'sfx_itemget' },
+      ],
+    },
+    record_done: {
+      text: {
+        en: 'Halvar came by and read the record, child. All forty names, out loud, and he did not stop once.',
+        sv: 'Halvar kom förbi och läste krönikan, barn. Alla fyrtio namnen, högt, och han stannade inte en enda gång.',
+      },
+    },
+    thanes4: {
+      text: {
+        en: 'Four thanes, four oaths broken. The record has nothing after that but the King’s name, and under it, cut deep: HE WAKES. Whatever Kolbeinn wants at Útgarðr, child, he wants it awake.',
+        sv: 'Fyra hövdingar, fyra brutna eder. Krönikan har inget efter det utom Kungens namn, och under det, djupt ristat: HAN VAKNAR. Vad Kolbeinn än vill vid Útgarðr, barn, så vill han ha det vaket.',
+      },
+    },
+    hrf: {
+      text: {
+        en: 'Hrímgerðr, the record calls the last one: a giantess of glass who turns the light itself into a blade. The runes beside her name are scratched out, as if the carver was afraid. Turn her light back on her, child.',
+        sv: 'Hrímgerðr kallar krönikan den sista: en jättekvinna av glas som gör själva ljuset till en klinga. Runorna bredvid hennes namn är bortskrapade, som om ristaren var rädd. Vänd hennes ljus mot henne, barn.',
+      },
+    },
+    ivaldi: {
+      text: {
+        en: 'Three thanes fallen: Náströnd at Helgrind, Nykr under the lake, and now Ívaldi in his forge. The record says the fourth sits in the ice under Hrímfjöll, nearest the Rime King. Go warm, child.',
+        sv: 'Tre hövdingar fallna: Náströnd vid Helgrind, Nykr under sjön, och nu Ívaldi i sin smedja. Krönikan säger att den fjärde sitter i isen under Hrímfjöll, närmast Rimkungen. Gå varmt klädd, barn.',
+      },
+    },
+    dvg: {
+      text: {
+        en: 'Ívaldi. The old songs call him the best smith who ever lived, and the proudest. If the Rime King has his oath, he has his forge too. Mind the heat, child.',
+        sv: 'Ívaldi. De gamla sångerna kallar honom den bäste smed som någonsin levat, och den stoltaste. Om Rimkungen har hans ed har han hans ässja också. Akta dig för hettan, barn.',
+      },
+    },
     embla: {
       text: {
         en: 'I lit a candle for Embla every night since the raid. Last night I lit two, one for her and one for the lake that hid her.',

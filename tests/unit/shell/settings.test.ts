@@ -49,8 +49,14 @@ describe('settings', () => {
       volume: DEFAULT_SETTINGS.volume,
       scaling: 'fit',
       shake: true,
-      textSize: 3,
+      textSize: 'normal',
     });
+  });
+
+  it('reads the text size as a word; an old number falls back to normal', () => {
+    expect(parseSettings(JSON.stringify({ textSize: 'larger' }), 'en').textSize).toBe('larger');
+    expect(parseSettings(JSON.stringify({ textSize: 2 }), 'en').textSize).toBe('normal');
+    expect(DEFAULT_SETTINGS.textSize).toBe('normal');
   });
 
   it('round-trips through storage', () => {
