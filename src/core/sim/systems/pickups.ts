@@ -44,7 +44,10 @@ export function createPiece(
 export function herbGrows(rt: SimRt, herb: Extract<Thing, { k: 'herb' }>): boolean {
   const c = rt.state.clock;
   const region = rt.db.screens[rt.screen.id].region;
-  return seasonAt(c, region, rt.db.clock) === herb.season && rt.state.world.vars[herb.id] !== c.epoch + 1;
+  return (
+    seasonAt(c, region, rt.db.clock, rt.state.flags) === herb.season &&
+    rt.state.world.vars[herb.id] !== c.epoch + 1
+  );
 }
 
 /** A heart container lying in a room, waiting to be taken. */

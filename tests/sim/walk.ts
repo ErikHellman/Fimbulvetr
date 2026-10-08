@@ -18,12 +18,14 @@ export const heroTile = (sim: Sim): readonly [number, number] => [
 ];
 
 /**
- * Tiles that block walking: solid terrain, anything solid standing on the tile, and burning tiles. With the
- * seal-skin, open deep water is no block: the walker swims it.
+ * Tiles that block walking: solid terrain, glaze (Ask would slide off it; see the M9 routes' `iceTo`),
+ * anything solid standing on the tile, and burning tiles. With the seal-skin, open deep water is no block:
+ * the walker swims it.
  */
 function blocked(sim: Sim): (tx: number, ty: number) => boolean {
   const g = sim.screen.collision;
   const swims = (sim.state.inv.items.sealskin ?? 0) > 0;
+  const terrain = sim.terrainOf(sim.screen.id).cells;
   const occupied = new Set<string>();
   for (const a of sim.actors)
     if (a.kind === 'fixture' && a.def === 'fire' && a.mem['on'] === 1)
@@ -41,6 +43,8 @@ function blocked(sim: Sim): (tx: number, ty: number) => boolean {
     const f = g.flags[ty * g.cols + tx] ?? 0;
     const water = swims && (f & DEEP) !== 0 && (f & LOW) !== 0;
     if ((f & SOLID) !== 0 && !water) return true;
+    const t = terrain[ty * SCREEN_COLS + tx];
+    if (t !== undefined && sim.db.terrain[t].glaze === true) return true;
     return occupied.has(`${String(tx)},${String(ty)}`);
   };
 }
@@ -191,15 +195,26 @@ const UNTOUCHABLE = new Set(['rise', 'buried', 'retract', 'circle', 'fade']);
  * The nearest live enemy worth fighting and its distance in px, or null. Raid trolls and whole shells
  * (armoured), the immortal (bulbs, spikes) and bosses (fought by hand) are left alone.
  */
+/** Whether an actor stands in deep water. */
+function inWater(sim: Sim, e: Sim['actors'][number]): boolean {
+  const g = sim.screen.collision;
+  const tx = Math.floor(e.pos.x / TILE);
+  const ty = Math.floor((e.pos.y - 1) / TILE);
+  const f = g.flags[ty * g.cols + tx] ?? 0;
+  return (f & DEEP) !== 0 && (f & SOLID) !== 0;
+}
+
 function nearestFoe(sim: Sim): { e: Sim['actors'][number]; d: number } | null {
   let best: { e: Sim['actors'][number]; d: number } | null = null;
   for (const e of sim.actors) {
     if (e.kind !== 'enemy') continue;
     const def = sim.db.enemies[e.def as EnemyId];
-    // Water-worms are left in their pools: the walker passes them by. Armour is left alone until a bomb
-    // has cracked it (a mud-crab's shell).
+    // Water-worms are left in their pools, and swimmers in the water: the walker passes them by (the
+    // drowned are fought once they climb out). Armour is left alone until a bomb has cracked it (a
+    // mud-crab's shell).
     const armoured = def.guard === true && e.mem['cracked'] !== 1;
-    if (armoured || def.immortal || def.boss !== undefined || def.swims === true) continue;
+    if (armoured || def.immortal || def.boss !== undefined) continue;
+    if (def.swims === true && (e.def !== 'drowned' || inWater(sim, e))) continue;
     if (UNTOUCHABLE.has(e.fsm.s)) continue;
     const d = Math.sqrt((e.pos.x - sim.hero.pos.x) ** 2 + (e.pos.y - sim.hero.pos.y) ** 2);
     if (best === null || d < best.d) best = { e, d };

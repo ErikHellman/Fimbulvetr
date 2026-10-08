@@ -142,4 +142,48 @@ export const SPAWN_TABLES: Readonly<Partial<Record<RegionId, SpawnTable>>> = {
       spring: [{ id: 'marbendill', weight: 1, time: 'night' }],
     },
   },
+  /** Dvergagröf: iron wardens walk their old beats by day and night; ember sprites drift out after dark. */
+  dvergagrof: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'glod', weight: 2, time: 'night' },
+      ],
+      autumn: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'glod', weight: 2, time: 'night' },
+      ],
+      winter: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'rime_raven', weight: 1, time: 'night' },
+      ],
+      spring: [
+        { id: 'jarnvordr', weight: 2 },
+        { id: 'glod', weight: 2, time: 'night' },
+      ],
+    },
+  },
+  /** Hrímfjöll (M9a): ice wolves by day and night, frost wisps after dark; always winter up here. */
+  hrimfjoll: {
+    count: { summer: 2, autumn: 2, winter: 2, spring: 2 },
+    entries: {
+      summer: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      autumn: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      winter: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+      spring: [
+        { id: 'isvargr', weight: 2 },
+        { id: 'frostvaettr', weight: 2, time: 'night' },
+      ],
+    },
+  },
 };

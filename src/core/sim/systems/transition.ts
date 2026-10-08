@@ -12,6 +12,7 @@ import type { SimRt, Transition } from '../rt';
 import { forfeitDuels } from './combat';
 import { heroCtx, placeHero } from './hero';
 import { spawnActors } from './spawn';
+import { placeFollower } from './escort';
 
 export const TRANSITION_TICKS = 30;
 export const FADE_TICKS = 36;
@@ -60,6 +61,8 @@ export function enterScreen(
     ? rt.actors.find((a) => a.kind === 'prop' && a.id === carrying && mem(a, 'carried') === 1)
     : undefined;
   rt.screen = rt.load(id);
+  // Ís crust on lava cools away when Ask leaves.
+  rt.crust = undefined;
   rt.actors = spawnActors(rt, heroAt);
   if (carried !== undefined) {
     carried.mem['thing'] = -1;
@@ -67,6 +70,8 @@ export function enterScreen(
     rt.actors.push(carried);
   }
   placeHero(rt, heroAt);
+  // Whoever Ask is escorting comes along, onto every screen.
+  placeFollower(rt, heroAt);
   if (carried !== undefined) changeState(HERO_MACHINE, rt.hero, 'carry', heroCtx(rt, EMPTY_FRAME));
   rt.hero.facing = facing;
   rt.entry = { x: heroAt.x, y: heroAt.y, facing };
@@ -103,13 +108,17 @@ export function checkEdges(rt: SimRt): void {
   rt.emit({ t: 'screenTransition', from, to, dir });
 }
 
-/** The door the hero is walking into, if any: feet on its tile while facing its direction. */
+/**
+ * The door the hero is walking into, if any: feet on its tile while facing its direction. A dive door
+ * takes only a diver, whichever way Ask faces.
+ */
 export function doorAt(rt: SimRt): DoorThing | null {
   const tx = Math.floor(rt.hero.pos.x / TILE);
   const ty = Math.floor((rt.hero.pos.y - 1) / TILE);
+  const diving = rt.hero.fsm.s === 'dive';
   for (const thing of rt.db.screens[rt.screen.id].things) {
-    if (thing.k === 'door' && thing.at.x === tx && thing.at.y === ty && thing.dir === rt.hero.facing)
-      return thing;
+    if (thing.k !== 'door' || thing.at.x !== tx || thing.at.y !== ty) continue;
+    if (thing.dive === true ? diving : thing.dir === rt.hero.facing) return thing;
   }
   return null;
 }

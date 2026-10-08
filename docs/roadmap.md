@@ -143,4 +143,68 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Embla's first letter, new lowland lines, solver proofs, route, e2e, v1-m7a fixture, docs
     - [ ] User playtest and Swedish proofread
   - [ ] M7b Sökkva Hof (D5) — Part 2
-- [ ] M8 Dvergagröf + D6 · [ ] M9 Hrímfjöll + D7 · [ ] M10 Útgarðr + ending · [ ] M11 Completion + ship
+    - [x] Vindr: the gust, fans and sails; flooded rooms, sunken arches and the drowned
+    - [x] Sökkva Hof's 24 rooms, Hrönn and Nykr; Oddr and Hallbera home
+    - [x] The Norns' loom, the three threads and turning the season at a hof
+    - [x] Solver proofs, route, e2e, v1-m7b fixture, docs
+    - [ ] User playtest and Swedish proofread
+- [ ] M8 Dvergagröf + D6 — brief: `docs/briefs/m8.md`, plan: `docs/superpowers/plans/2026-10-05-m8.md`
+  - [ ] M8a Dvergagröf — Part 1
+    - [x] Heat, conveyor belts, lava and the Ís crust
+    - [x] Dvergagröf's 10 screens, the iron warden and the ember sprite, the mines and the smithy
+    - [x] The escort: Hekla through the old workings; Dvalinn's chain and the cart road to Uppvík
+    - [x] Sindri's forge for ore; trading step 6; Embla's second letter and the tarn's cairn
+    - [x] Solver proofs, route, e2e, v1-m8a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M8b Ívaldi's Forge (D6) — Part 2
+    - [x] The hammer (stakes, weak floors, drifts, plate) and Skjálfti with its stave
+    - [x] Ívaldi's Forge's 28 rooms, Belgr and Thane Ívaldi's three phases
+    - [x] Þorkell and Rannveig home: Rannveig's door, farm stage 3 (the goat-house), Kolbeinn's word
+    - [x] The scree's stakes, Hreggviðr's stave, new lines for Ívaldi's fall
+    - [x] Solver proofs, route, e2e, v1-m8b fixture, docs
+    - [ ] User playtest and Swedish proofread
+- [ ] M9 Hrímfjöll + D7
+  - [ ] M9a Hrímfjöll — Part 1
+    - [x] The killing frost, glaze sliding and blizzards
+    - [x] Ten cold screens and Ormr's hut; the ice wolf and the frost wisp
+    - [x] Ormr and trading step 7 (the beacon lit, the beacon ring); the warp stone
+    - [x] Embla's third letter and the cairn's seiðr vessel
+    - [x] Solver proofs, route, e2e, v1-m9a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M9b Hrímturn (D7) — Part 2
+    - [x] Light beams: windows, prisms and crystal eyes; Bragð lights an eye
+    - [x] The ice mirror: beams and rime bolts sent the way Ask faces
+    - [x] Hrímturn's 32 rooms, Svellr and Thane Hrímgerðr's three phases
+    - [x] Ása and Bjarni home, Kolbeinn's word, new lines for Hrímgerðr's fall
+    - [x] Solver proofs, route, e2e, v1-m9b fixture, docs
+    - [ ] User playtest and Swedish proofread
+- [ ] M10 Útgarðr + ending
+  - [ ] M10a Útgarðr (D8) — Part 1
+    - [x] The room-template library; Halvar's confession opens the gate
+    - [x] Útgarðr's 40 rooms: three wings, three seals, four keys, the master key
+    - [x] Jötunvörðr (thawed by Eldr) and Kolbeinn's duel, spared or slain
+    - [x] Solver proofs, route, e2e, v1-m10a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M10b The Rime King and the ending — Part 2
+    - [x] Embla's ring of binding and Hrímnir's three phases (hand, breath, pillars)
+    - [x] Spring on the mountain (`ClockRules.thaw`)
+    - [x] The ending: the valley, the farm, Kolbeinn's end, stay or go, the final credits
+    - [x] The world after: spring at the farm, post-game lines, the Rime King quest
+    - [x] Route, e2e, v1-m10b fixture, docs
+    - [x] Title-screen rune for a finished save (moved to M11 by the cut line; done in M11b)
+    - [ ] User playtest and Swedish proofread
+- [ ] M11 Completion + ship
+  - [ ] M11a Completion — Part 1
+    - [x] Piece and warp-stone conditions; 24 achievements, kept in the browser, with a toast
+    - [x] The title menu's Achievements page and the quest page's progress footer
+    - [x] The rune-record (`q_record`): four bauta-stones and Gyða's record
+    - [x] The spring feast (`q_feast`): mead, a burbot and a cask, then Halvar's table
+    - [x] Seven heart pieces placed (36 in all), four new verses from Bragi; solver proofs
+    - [x] Route, e2e, v1-m11a fixture, docs
+    - [ ] User playtest and Swedish proofread
+  - [ ] M11b Ship — Part 2
+    - [x] Drawn font sizes and the text-size setting
+    - [x] Title-screen rune for a finished save
+    - [x] Safari audit and fixes; the sim benchmark
+    - [x] Version 1.0.0, README, route, e2e, v1-m11b fixture, docs
+    - [ ] User playtest and Swedish proofread

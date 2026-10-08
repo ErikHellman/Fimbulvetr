@@ -69,6 +69,25 @@ export function verseMarks(verses: readonly VerseDef[], state: GameState): Scree
 }
 
 /**
+ * The screens the beacon arm-ring marks (M9): each overworld screen with a heart piece still lying out on
+ * it or in a house entered from it. Dungeon rooms are left to the compass.
+ */
+export function beaconMarks(
+  layout: WorldLayout,
+  screens: Readonly<Record<ScreenId, ScreenDef>>,
+  state: GameState,
+): ScreenId[] {
+  const out = new Set<ScreenId>();
+  for (const def of Object.values(screens)) {
+    if (def.dungeon !== undefined) continue;
+    if (!def.things.some((t) => t.k === 'piece' && !state.world.pieces.includes(t.id))) continue;
+    const grid = gridScreenOf(layout, screens, def.id);
+    if (grid !== null) out.add(grid);
+  }
+  return [...out];
+}
+
+/**
  * The overworld as the pause menu shows it: every grid screen, which were visited, where the hero is, and
  * the screens `marks` points at (the skald's verses).
  */

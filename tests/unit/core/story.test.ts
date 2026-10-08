@@ -33,6 +33,18 @@ describe('evalCond', () => {
     expect(check({ k: 'flag', id: 'st_farm_day', lt: 2 })).toBe(false);
   });
 
+  it('counts heart pieces found and warp stones lit', () => {
+    const c = ctx();
+    expect(evalCond({ k: 'pieces', gte: 0 }, c)).toBe(true);
+    expect(evalCond({ k: 'pieces', gte: 1 }, c)).toBe(false);
+    c.state.world.pieces.push('hp_ask_village', 'hp_myl_fisher');
+    expect(evalCond({ k: 'pieces', gte: 2 }, c)).toBe(true);
+    expect(evalCond({ k: 'pieces', gte: 3 }, c)).toBe(false);
+    expect(evalCond({ k: 'warps', gte: 1 }, c)).toBe(false);
+    c.state.world.warps.push('askdalr');
+    expect(evalCond({ k: 'warps', gte: 1 }, c)).toBe(true);
+  });
+
   it('reads items, silver, season, weapon and the part of the day', () => {
     const c = ctx();
     c.state.inv.items.flatbread = 2;

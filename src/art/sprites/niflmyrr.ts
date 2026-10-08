@@ -57,7 +57,7 @@ function swirl(phase: number): Raster {
 }
 
 /** A person sunk to `sink` rows in the mist, with a mist ring where it rises. */
-function sunk(look: Look, side: Side, sink: number, eyes: string): Raster {
+export function sunk(look: Look, side: Side, sink: number, eyes: string): Raster {
   const r = drawPerson(look, side, 0, { sink, eyes, arms: 'up' });
   ellipse(r, 16, 28, 10, 2.2, () => [200, 210, 214, 120]);
   return r;

@@ -78,7 +78,7 @@ const PLANK_DARK = hex('#3a2c1e');
 const ROPE = hex('#a89a72');
 
 /** A raft of black-tarred planks lashed across two logs, 2×2 tiles, with a pixel of clear margin. */
-function raft(): Raster {
+export function raft(): Raster {
   const r = createRaster(34, 34);
   rect(r, 2, 4, 30, 27, PLANK_DARK);
   for (let i = 0; i < 6; i++) {

@@ -1,0 +1,41 @@
+import type { ScreenDef } from '@core/world/screen';
+
+export const d5R12: ScreenDef = {
+  id: 'd5_r12',
+  region: 'saevatn',
+  dungeon: 'd5',
+  water: 'w_d5_level',
+  purpose:
+    'Behind lock C: the lake runs through the hof here, too fast to swim. A sailing raft waits at the east bank; a Vindr gust fills its sail and it crosses to the west bank, and back.',
+  things: [
+    { k: 'lock', id: 'd5_lock_c', at: { x: 39, y: 10 }, w: 1, h: 2 },
+    { k: 'raft', at: { x: 26, y: 10 }, path: [{ x: 12, y: 10 }], sail: true },
+    { k: 'prop', id: 'pot', at: { x: 35, y: 3 } },
+    { k: 'prop', id: 'pot', at: { x: 35, y: 18 } },
+    { k: 'prop', id: 'pot', at: { x: 4, y: 3 } },
+  ],
+  map: [
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '777777777777vvvvvvvvvvvvvvvv777777777777',
+    '777777777777vvvvvvvvvvvvvvvv777777777777',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '887777777777vvvvvvvvvvvvvvvv777777777788',
+    '8888888888888888888888888888888888888888',
+    '8888888888888888888888888888888888888888',
+  ],
+};

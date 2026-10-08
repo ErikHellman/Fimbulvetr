@@ -8,6 +8,22 @@ export const askIntLonghouse: ScreenDef = {
   indoor: true,
   things: [
     { k: 'use', at: { x: 10, y: 6 }, h: 2, script: 'sleep' },
+    /** Halvar's table: the spring feast (M11a) once the mead, the fish and the ale are all brought. */
+    {
+      k: 'use',
+      at: { x: 26, y: 15 },
+      w: 2,
+      script: 'end_feast',
+      when: {
+        k: 'all',
+        of: [
+          { k: 'flag', id: 'q_feast_mead' },
+          { k: 'flag', id: 'q_feast_fish' },
+          { k: 'flag', id: 'q_feast_cask' },
+          { k: 'not', c: { k: 'flag', id: 'q_feast_done' } },
+        ],
+      },
+    },
     {
       k: 'trigger',
       at: { x: 16, y: 16 },

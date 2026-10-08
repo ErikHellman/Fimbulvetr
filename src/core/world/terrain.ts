@@ -27,10 +27,20 @@ export interface TerrainDef {
   readonly rise?: TerrainRise;
   /** Deep water a swimmer crosses (with the seal-skin): `buildCollision` marks it `DEEP`. */
   readonly swim?: boolean;
+  /** A sunken arch over deep water (M7b): a wall to a swimmer, passed under by a diver. */
+  readonly under?: boolean;
   /** A current that pushes a swimmer this way. */
   readonly current?: Dir4;
   /** A surge: it pushes harder than anyone swims, and passes over a diver. */
   readonly strong?: boolean;
+  /** A conveyor belt (M8): it carries anyone walking on it this way. */
+  readonly belt?: Dir4;
+  /** Molten rock (M8): no footing; Ís crusts it over for a while (see systems/is.ts). */
+  readonly lava?: boolean;
+  /** Glacier ice (M9): a step onto it slides on until a wall or the ice's edge (see systems/glaze.ts). */
+  readonly glaze?: boolean;
+  /** Clear ice (M9b): solid, but a beam of light shines through it (see systems/beams.ts). */
+  readonly clear?: boolean;
 }
 
 /** How a terrain answers the water level: flooded from level `floods` up, or afloat from `floats` up. */

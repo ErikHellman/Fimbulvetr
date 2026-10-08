@@ -81,6 +81,17 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     'wWY.....',
     'W.......',
   ],
+  /** A Norn-thread: a hank of shining thread wound on a little spindle. */
+  norn_thread: [
+    '...w....',
+    '..sus...',
+    '.suSus..',
+    '.sSuSs..',
+    '.suSus..',
+    '..sus...',
+    '...w....',
+    '...w.uu.',
+  ],
   fen_moss: ['........', '..v..v..', '.vVvvVv.', 'vvVvvvVv', 'VvvVvVvv', '.vVvvvV.', '..VvvV..', '........'],
   /** A torn leaf of parchment, a rune scratched on it. */
   rune_leaf: ['.sssss..', '.sSssss.', 'ssuSsss.', 'ssuussSs', 'sSsusss.', '.ssuSss.', '.sssss..', '..s.s...'],
@@ -177,6 +188,32 @@ const ICONS: Readonly<Partial<Record<ItemId, readonly string[]>>> = {
     '.sw.....',
     'sw......',
     'w.......',
+  ],
+  /** The dwarf hammer: a squat iron head on a short haft. */
+  hammer: ['.LLLLLL.', 'LllllllL', 'LLLLLLLL', '...ww...', '...ww...', '...wW...', '...wW...', '...WW...'],
+  /** The ice mirror: a round pane of clear rime in a rim of steel, a glint across it, on a short grip. */
+  mirror: ['.LLLLL..', 'LlkkllL.', 'LkllkkL.', 'LklkkkL.', 'LlkkkKL.', '.LLLLL..', '...ww...', '...WW...'],
+  /** A Skjálfti rune-stave: a short ash stave with ember runes cut down it. */
+  stave_skjalfti: [
+    '......w.',
+    '.....wy.',
+    '....wW..',
+    '...yw...',
+    '..wW....',
+    '.yw.....',
+    'wW......',
+    'w.......',
+  ],
+  /** A round lens of dwarf-glass in a brass rim, light caught in it. */
+  trade_lens: [
+    '..bbbb..',
+    '.bkkkkb.',
+    'bkklkkkb',
+    'bklkkkkb',
+    'bkkkkkKb',
+    'bkkkkKKb',
+    '.bKKKKb.',
+    '..bbbb..',
   ],
   /** A lump of black ore, glints of metal in it. */
   ore: ['........', '..LLL...', '.LeLlL..', 'LeLLLeL.', 'LLlLeLL.', '.LeLLL..', '..LLL...', '........'],
@@ -389,6 +426,17 @@ const GEAR_ICONS: Readonly<Record<string, readonly string[]>> = {
     '..bbbb..',
     '.y..y.y.',
     'y...y..y',
+  ],
+  /** Vindr: three curling streaks of wind. */
+  galdr_vindr: [
+    '........',
+    'lllll.L.',
+    '.....ll.',
+    '.LLLLLL.',
+    '.......L',
+    'lllll.L.',
+    '.....l..',
+    '........',
   ],
   /** Ís: a six-armed frost star. */
   galdr_is: ['...k....', '.k.k.k..', '..kkk...', 'kkk.kkk.', '..kkk...', '.k.k.k..', '...k....', '........'],

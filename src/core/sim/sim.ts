@@ -18,6 +18,8 @@ import { buy } from '../story/shop';
 import { buildCollision } from '../world/collision';
 import {
   FIRE_RADIUS,
+  BLIZZARD_RADIUS,
+  BLIZZARD_THICK,
   FOG_RADIUS,
   FOG_ROOM_RADIUS,
   LANTERN_FOG_RADIUS,
@@ -35,7 +37,8 @@ import { parseTextMap, type TerrainGrid } from '../world/textmap';
 import type { Command } from './commands';
 import type { ContentDb } from './db';
 import type { SimEvent } from './events';
-import type { Entry, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
+import type { Entry, Escort, LoadedScreen, Mode, SimRt, Transition, Trial } from './rt';
+import { stepEscort } from './systems/escort';
 import { takeSunkChest } from './systems/chests';
 import { tickWorldClock } from './systems/clock';
 import { killEnemy, resolveAttacks, resolveSword } from './systems/combat';
@@ -51,6 +54,7 @@ import { eat, equip, useItems } from './systems/items';
 import { castGaldr } from './systems/galdr';
 import { collectPickups } from './systems/pickups';
 import { stepBombs } from './systems/bombs';
+import { stepHammer } from './systems/hammer';
 import { loadLevel, refreshWater } from './systems/water';
 import { stepProjectiles } from './systems/projectiles';
 import { stepRiders } from './systems/mara';
@@ -63,9 +67,14 @@ import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from '
 import { tickTimers } from './systems/timers';
 import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
+import { heatMax, stepCold, stepHeat } from './systems/heat';
+import { stepBeams, type BeamSeg } from './systems/beams';
+import { rimeFloor } from './systems/glaze';
+import { ringOf, stepBinding, type Ring } from './systems/binding';
+import { stepCrust } from './systems/is';
 import { petrifyAtDawn } from './systems/trolls';
 import { fireKey, fireLights, stepFire } from './systems/fire';
-import { misty, outdoors, skyOf, windOf } from './systems/weather';
+import { blizzard, misty, outdoors, skyOf, windOf } from './systems/weather';
 import {
   checkDoors,
   checkEdges,
@@ -115,6 +124,13 @@ export class Sim implements SimRt {
   god?: boolean;
   weatherOverride?: WeatherKind;
   sand?: Trial;
+  heatTicks?: number;
+  burnTicks?: number;
+  coldTicks?: number;
+  freezeTicks?: number;
+  crust?: Map<number, number>;
+  beamSegs?: readonly BeamSeg[];
+  escort?: Escort;
   tick = 0;
   readonly rolled: boolean;
   private events: SimEvent[] = [];
@@ -239,8 +255,10 @@ export class Sim implements SimRt {
       misty: misty(this),
       fogRoom,
     });
-    // Ljós burns the fog away while it lasts.
-    if (amount === 0 || ljosBurns(this)) return { amount: 0, r: 0 };
+    // Ljós burns the fog away while it lasts (a blizzard's veil too).
+    if (ljosBurns(this)) return { amount: 0, r: 0 };
+    if (amount === 0)
+      return blizzard(this) ? { amount: BLIZZARD_THICK, r: BLIZZARD_RADIUS } : { amount: 0, r: 0 };
     const lantern = (this.state.inv.items.lantern ?? 0) > 0;
     if (fogRoom) return { amount, r: lantern ? LANTERN_RADIUS : FOG_ROOM_RADIUS };
     return { amount, r: lantern ? LANTERN_FOG_RADIUS : FOG_RADIUS };
@@ -262,6 +280,41 @@ export class Sim implements SimRt {
   }
 
   /** The boss on this screen, for its health bar: the first live enemy whose def names it; else null. */
+  /** Heat on Ask for the HUD's bar (M8), or null while there is none. */
+  heat(): { readonly now: number; readonly max: number } | null {
+    return this.heatTicks === undefined ? null : { now: this.heatTicks, max: heatMax(this) };
+  }
+
+  /** Whether a blizzard blows over the current screen (M9): the view draws its white veil. */
+  blizzard(): boolean {
+    return blizzard(this);
+  }
+
+  /** The row from which Hrímgerðr has glazed her hall's floor (M9b), for the view's rime; null if none. */
+  rimeFloor(): number | null {
+    return rimeFloor(this);
+  }
+
+  /** The ring of binding in Hrímnir's hall (M10b), in screen px, for the view; null when none burns. */
+  ring(): Ring | null {
+    return ringOf(this);
+  }
+
+  /** The killing frost on Ask (M9), for the HUD's frost bar; null when Ask is warm. */
+  cold(): { readonly now: number; readonly max: number } | null {
+    return this.coldTicks === undefined ? null : { now: this.coldTicks, max: this.db.tuning.hero.cold };
+  }
+
+  /** The beams of light shining on this screen (M9b), in screen pixels, for the view. */
+  beams(): readonly BeamSeg[] {
+    return this.beamSegs ?? [];
+  }
+
+  /** The escorted NPC's health for the HUD (M8), or null while nobody walks with Ask. */
+  escortHp(): { readonly hp: number; readonly max: number } | null {
+    return this.escort === undefined ? null : { hp: this.escort.hp, max: this.escort.max };
+  }
+
   boss(): BossView | null {
     for (const e of this.actors) {
       if (e.kind !== 'enemy') continue;
@@ -336,6 +389,12 @@ export class Sim implements SimRt {
         god: this.god,
         weatherOverride: this.weatherOverride,
         sand: this.sand,
+        heat: this.heatTicks,
+        burn: this.burnTicks,
+        cold: this.coldTicks,
+        freeze: this.freezeTicks,
+        crust: this.crust === undefined ? undefined : [...this.crust],
+        escort: this.escort,
         fire: fireKey(this),
         nextId: this.nextId,
         entities: this.entities,
@@ -406,6 +465,7 @@ export class Sim implements SimRt {
     runCritters(this, ctx);
     scheduleNpcs(this);
     stepNpcs(this);
+    stepEscort(this);
     moveAll(this);
     bumpLocks(this, input);
     pushBlocks(this, input);
@@ -415,13 +475,19 @@ export class Sim implements SimRt {
     settleCritters(this);
     stepProps(this, input);
     stepBombs(this);
+    stepHammer(this);
     resolveSword(this);
     swordProps(this);
     swordSwitches(this);
+    stepBeams(this);
     cutCover(this);
     resolveAttacks(this);
     fixtureHazards(this);
     stepFire(this);
+    stepHeat(this);
+    stepCold(this);
+    stepBinding(this);
+    stepCrust(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);

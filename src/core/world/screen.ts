@@ -31,6 +31,8 @@ export interface DoorThing {
   readonly to: ScreenId;
   readonly arrive: TilePos;
   readonly facing: Dir4;
+  /** Under deep water (M7b, Sökkva Hof's spire): a ripple marks it, and only a dive over it goes through. */
+  readonly dive?: true;
 }
 
 /**
@@ -179,7 +181,14 @@ export type Thing =
    * the strike also sets that flag, and the switch is lit whenever the flag holds (a latch, for good). An
    * `eye` (carved in stone) opens only to an arrow; anything else clinks off it.
    */
-  | { readonly k: 'switch'; readonly at: TilePos; readonly set?: FlagId; readonly eye?: true }
+  | {
+      readonly k: 'switch';
+      readonly at: TilePos;
+      readonly set?: FlagId;
+      readonly eye?: true;
+      /** A wind fan (M7b): only a Vindr gust spins it; no blade, shot or blast does. */
+      readonly fan?: true;
+    }
   /** A drawbridge over water or a gap: its tiles are walkable while `down` holds. */
   | {
       readonly k: 'bridge';
@@ -198,7 +207,11 @@ export type Thing =
       readonly at: TilePos;
       readonly w: number;
       readonly h: number;
-      readonly art: 'wall' | 'rock';
+      /**
+       * `wall` and `rock` open to a blast; `floor` (a weak floor over a way down) only to the hammer or
+       * Skjálfti, and `stake` (a dwarf stake across the way) only to the hammer (M8b).
+       */
+      readonly art: 'wall' | 'rock' | 'floor' | 'stake';
     }
   /**
    * A mill wheel: struck (sword, boomerang or blast) it sets the screen's water level to `level`, unless
@@ -215,10 +228,29 @@ export type Thing =
   /** A grapple post: a solid iron-bound pillar the grapple chain hooks, pulling Ask to the tile before it. */
   | { readonly k: 'post'; readonly at: TilePos }
   /**
+   * A window of rime-light (M9b): while `when` holds, a beam shines from it `dir` across the room, turned
+   * by prisms and Ask's raised mirror, through clear ice, until something solid stops it. Solid.
+   */
+  | { readonly k: 'beam'; readonly at: TilePos; readonly dir: Dir4; readonly when?: Cond }
+  /**
+   * A glass prism (M9b): it turns a beam a quarter, `/` (east to north, south to west) or `\` (east to
+   * south, north to west). With `turns`, a sword blow or a Bragð beam swaps the two until Ask leaves the room.
+   * Solid.
+   */
+  | { readonly k: 'prism'; readonly at: TilePos; readonly turn: '/' | '\\'; readonly turns?: true }
+  /** A crystal eye (M9b): the first beam (or Bragð beam) to reach it sets `flag` for good. Solid. */
+  | { readonly k: 'eye'; readonly at: TilePos; readonly flag: FlagId }
+  /**
    * A raft, 2×2 tiles, resting at `at` (its top-left tile) and plying a straight line through each stop of
    * `path` and back again. Resting, it is footing; Ask aboard as it sets off rides along. Never saved.
    */
-  | { readonly k: 'raft'; readonly at: TilePos; readonly path: readonly TilePos[] }
+  | {
+      readonly k: 'raft';
+      readonly at: TilePos;
+      readonly path: readonly TilePos[];
+      /** A sail (M7b): the raft never leaves a stop until a Vindr gust fills it. */
+      readonly sail?: true;
+    }
   /** A brazier: lit from the lantern in an item slot; `lit` ones burn from the start. */
   | { readonly k: 'brazier'; readonly at: TilePos; readonly lit?: boolean }
   /** A piece of heart, collected once ever (`id` is saved in `world.pieces`). */
@@ -246,6 +278,8 @@ export type Thing =
       readonly closed: Cond;
       /** Ice that fire melts: an Eldr bolt reaching a closed tile sets this flag (the rime across the gorge). */
       readonly melts?: FlagId;
+      /** A web that wind tears away: a Vindr gust reaching a closed tile sets this flag (M7b). */
+      readonly blows?: FlagId;
     }
   /**
    * Scenery drawn over the map, tile by tile, when `shown` holds as the screen is entered (raid ruins
@@ -275,15 +309,15 @@ export type Thing =
 
 /**
  * Scenery that comes and goes with the story: what the raid left (scorched roofs, a burned fold, boarded
- * doors), Hildr's wattle hurdles on the heath, and the wild bees' hive in the pines.
+ * doors), Hildr's wattle hurdles on the heath, the wild bees' hive in the pines, and Oddr's skiff.
  */
-export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive';
+export type SceneryArt = 'scorch' | 'rubble' | 'boards' | 'hurdle' | 'hive' | 'skiff';
 
 /**
  * A gate's look: `slab` is a barrow's stone door, `rime` the Rime King's ice across the pass, `bars` a
- * captive's cell in Helgrind.
+ * captive's cell in Helgrind, `web` a spider's web across the way in Myrkviðr.
  */
-export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime' | 'bars';
+export type GateArt = 'palisade' | 'fire' | 'logs' | 'slab' | 'rime' | 'bars' | 'web';
 
 export interface ScreenDef {
   readonly id: ScreenId;
@@ -305,6 +339,12 @@ export interface ScreenDef {
   readonly spawns?: readonly TilePos[];
   /** The flag holding this screen's water level, for terrains that `rise` (see world/water.ts). */
   readonly water?: FlagId;
+  /** A forge room or vent field (M8): heat builds on Ask while Ask is here (see systems/heat.ts). */
+  readonly hot?: true;
+  /** Under Hrímfjöll's killing frost (M9): cold builds on Ask here unless Ask wears the ember byrnie. */
+  readonly cold?: true;
+  /** A lever's flag that turns every conveyor belt on the screen the other way while it is set. */
+  readonly belts?: { readonly flag: FlagId };
 }
 
 /** A grid of screens: the overworld, or one floor of a dungeon. */

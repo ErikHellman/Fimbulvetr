@@ -25,7 +25,17 @@ import { HELHOUND_MACHINE } from './helhound';
 import { GARMR_MACHINE } from './garmr';
 import { MARBENDILL_MACHINE } from './marbendill';
 import { NYKR_FOAL_MACHINE } from './nykr_foal';
+import { GRATE_MACHINE, HRONN_MACHINE } from './hronn';
+import { NYKR_MACHINE } from './nykr';
 import { NASTROND_MACHINE, TOWER_SHIELD_MACHINE } from './nastrond';
+import { BELGR_MACHINE } from './belgr';
+import { IVALDI_MACHINE } from './ivaldi';
+import { FROSTVAETTR_MACHINE } from './frost';
+import { SVELLR_MACHINE } from './svellr';
+import { JOTUNVORDR_MACHINE } from './jotunvordr';
+import { KOLBEINN_MACHINE } from './kolbeinn';
+import { HAND_MACHINE, HRIMNIR_MACHINE, PILLAR_MACHINE } from './hrimnir';
+import { HRIMGERDR_MACHINE, ICICLE_MACHINE } from './hrimgerdr';
 
 const MACHINES = {
   dummy: DUMMY_MACHINE,
@@ -56,6 +66,20 @@ const MACHINES = {
   tower_shield: TOWER_SHIELD_MACHINE,
   marbendill: MARBENDILL_MACHINE,
   nykr_foal: NYKR_FOAL_MACHINE,
+  hronn: HRONN_MACHINE,
+  hronn_grate: GRATE_MACHINE,
+  nykr: NYKR_MACHINE,
+  belgr: BELGR_MACHINE,
+  ivaldi: IVALDI_MACHINE,
+  frostvaettr: FROSTVAETTR_MACHINE,
+  svellr: SVELLR_MACHINE,
+  hrimgerdr: HRIMGERDR_MACHINE,
+  icicle: ICICLE_MACHINE,
+  jotunvordr: JOTUNVORDR_MACHINE,
+  kolbeinn: KOLBEINN_MACHINE,
+  hrimnir: HRIMNIR_MACHINE,
+  hrimnir_hand: HAND_MACHINE,
+  rime_pillar: PILLAR_MACHINE,
 };
 
 export type BehaviourId = keyof typeof MACHINES;
@@ -93,6 +117,20 @@ const START: Readonly<Record<BehaviourId, string>> = {
   tower_shield: 'lie',
   marbendill: 'rise',
   nykr_foal: 'circle',
+  hronn: 'wake',
+  hronn_grate: 'grate',
+  nykr: 'rise',
+  belgr: 'idle',
+  ivaldi: 'throne',
+  frostvaettr: 'hover',
+  svellr: 'idle',
+  hrimgerdr: 'idle',
+  icicle: 'shadow',
+  jotunvordr: 'idle',
+  kolbeinn: 'stand',
+  hrimnir: 'idle',
+  hrimnir_hand: 'shadow',
+  rime_pillar: 'shadow',
 };
 
 export function createEnemy(id: number, def: EnemyDef, pos: Vec): Entity {

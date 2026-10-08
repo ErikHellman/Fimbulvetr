@@ -30,7 +30,8 @@ export function placeNpcs(rt: SimRt, guard = false): void {
   const keep: Entity[] = [];
   const present = new Set<string>();
   for (const a of rt.actors) {
-    if (a.kind !== 'npc') {
+    // An escorted NPC walks with Ask, whatever her places say.
+    if (a.kind !== 'npc' || mem(a, 'escort') === 1) {
       keep.push(a);
       continue;
     }
@@ -42,7 +43,7 @@ export function placeNpcs(rt: SimRt, guard = false): void {
     }
   }
   for (const def of Object.values(rt.db.npcs)) {
-    if (present.has(def.id)) continue;
+    if (present.has(def.id) || rt.escort?.npc === def.id) continue;
     const place = placeOf(rt, def);
     if (place?.place.screen !== rt.screen.id) continue;
     if (guard && overlaps(hero, at(NPC_BODY, tileFeet(place.place.at)))) continue;
@@ -59,7 +60,7 @@ export function scheduleNpcs(rt: SimRt): void {
 /** Patrols: walk to the next point, pause, repeat. Talking NPCs stand still. */
 export function stepNpcs(rt: SimRt): void {
   for (const e of rt.actors) {
-    if (e.kind !== 'npc') continue;
+    if (e.kind !== 'npc' || mem(e, 'escort') === 1) continue;
     e.vel = { x: 0, y: 0 };
     const def = rt.db.npcs[e.def as NpcId];
     const patrol = def?.places[mem(e, 'place')]?.patrol ?? [];

@@ -50,6 +50,13 @@ describe('settings menu', () => {
     expect(intro.settings.showIntro).toBe(false);
   });
 
+  it('steps the text size through normal, large and larger, and round again', () => {
+    const at = down(rowOf('textSize'));
+    expect(run(DEFAULT_SETTINGS, ...at, ['right']).settings.textSize).toBe('large');
+    expect(run(DEFAULT_SETTINGS, ...at, ['right'], ['confirm']).settings.textSize).toBe('larger');
+    expect(run(DEFAULT_SETTINGS, ...at, ['left']).settings.textSize).toBe('larger');
+  });
+
   it('closes with cancel or on the back row, and wraps the cursor', () => {
     expect(run(DEFAULT_SETTINGS, ['cancel']).state).toBeNull();
     expect(run(DEFAULT_SETTINGS, ['up'], ['confirm']).state).toBeNull();

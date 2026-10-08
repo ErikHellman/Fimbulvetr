@@ -26,6 +26,8 @@ export type HeroMode =
   | 'shoot'
   | 'cast'
   | 'chain'
+  | 'hammer'
+  | 'mirror'
   | 'swim'
   | 'dive'
   | 'dying';
@@ -42,6 +44,8 @@ export interface HeroCtx {
   readonly rollCooldown: number;
   /** Ask's feet are on open deep water, with the seal-skin to swim it. */
   readonly wet: boolean;
+  /** Ask's feet are under a sunken arch: a dive goes on until Ask is out from under it. */
+  readonly under: boolean;
   /** The offset that hops the hero over a ledge in `dir`, or null when there is none to hop. */
   ledgeHop(dir: Dir4): { dx: number; dy: number } | null;
   emit(event: SimEvent): void;
@@ -227,7 +231,7 @@ const dive: HeroDef = {
   },
   tick(e, c) {
     steer(e, c, c.tuning.hero.swimSpeed, true);
-    if (e.fsm.t < c.tuning.hero.diveTicks - 1) return undefined;
+    if (e.fsm.t < c.tuning.hero.diveTicks - 1 || c.under) return undefined;
     return c.wet ? 'swim' : 'move';
   },
   exit(e, c) {
@@ -354,6 +358,20 @@ const cast: HeroDef = {
   },
 };
 
+/** The dwarf hammer (M8b): raised overhead, then brought down; the blow itself is `stepHammer`'s. */
+const hammer: HeroDef = {
+  enter(e) {
+    still(e);
+    setAnim(e, 'lift');
+  },
+  tick(e, c) {
+    still(e);
+    const h = c.tuning.hero;
+    if (e.fsm.t === h.hammerHit - 2) setAnim(e, 'throw');
+    return e.fsm.t >= h.hammerTicks - 1 ? 'move' : undefined;
+  },
+};
+
 /**
  * The grapple chain is out (or pulling Ask along it): Ask stands still with the arm out. The chain's own
  * step ends it, back to `move`, when the head is caught or Ask lands.
@@ -383,6 +401,29 @@ const dying: HeroDef = {
   },
 };
 
+/**
+ * The ice mirror (M9b), raised while its item key is held (`mem.mirrorKey`: 1 for K, 2 for L): Ask stands
+ * still behind it and turns with the stick. Its front blocks like the shield; beams and rime bolts that
+ * reach it leave the way Ask faces (see systems/beams.ts and projectiles.ts).
+ */
+const mirror: HeroDef = {
+  enter(e) {
+    still(e);
+    e.mem['shielding'] = 1;
+    setAnim(e, 'shield');
+  },
+  tick(e, c) {
+    still(e);
+    if (c.wet || !isHeld(c.input, mem(e, 'mirrorKey') === 2 ? 'item2' : 'item1')) return 'move';
+    const m = moveVector(c.input);
+    if (m.x !== 0 || m.y !== 0) e.facing = dirFromVec(m, e.facing);
+    return undefined;
+  },
+  exit(e) {
+    e.mem['shielding'] = 0;
+  },
+};
+
 export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   move,
   attack,
@@ -400,6 +441,8 @@ export const HERO_MACHINE: Machine<HeroMode, HeroCtx> = {
   shoot,
   cast,
   chain,
+  hammer,
+  mirror,
   swim,
   dive,
   dying,

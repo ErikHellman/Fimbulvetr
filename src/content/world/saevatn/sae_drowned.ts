@@ -4,8 +4,17 @@ export const saeDrowned: ScreenDef = {
   id: 'sae_drowned',
   region: 'saevatn',
   purpose:
-    'The drowned village: roof ridges and wall-tops standing out of the lake round an islet, where a stone spire rises from the water. Sökkva Hof lies under it (M7b).',
+    'The drowned village: roof ridges and wall-tops standing out of the lake round an islet, where a stone spire rises from the water. Sökkva Hof lies under it: a dive at the ripple east of the islet (20, 9) goes down into it (in winter, once Eldr has melted a hole in the ice).',
   things: [
+    {
+      k: 'door',
+      at: { x: 20, y: 9 },
+      dir: 's',
+      to: 'd5_r01',
+      arrive: { x: 19, y: 13 },
+      facing: 'n',
+      dive: true,
+    },
     {
       k: 'sign',
       at: { x: 14, y: 9 },

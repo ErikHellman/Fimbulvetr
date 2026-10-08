@@ -19,7 +19,7 @@ export const DUNGEON_NAMES = {
   d2: { en: 'Sökkva Kvern', sv: 'Sökkva Kvern' },
   d3: { en: 'Konungshaugr', sv: 'Konungshaugr' },
   d4: { en: 'Helgrind', sv: 'Helgrind' },
-  d5: { en: 'The fifth hall', sv: 'Den femte salen' },
+  d5: { en: 'Sökkva Hof', sv: 'Sökkva Hov' },
   d6: { en: 'The sixth hall', sv: 'Den sjätte salen' },
   d7: { en: 'The seventh hall', sv: 'Den sjunde salen' },
   d8: { en: 'The eighth hall', sv: 'Den åttonde salen' },

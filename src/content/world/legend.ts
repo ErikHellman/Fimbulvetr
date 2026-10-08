@@ -90,6 +90,28 @@ export const LEGEND: Readonly<Record<string, TerrainId>> = {
   '}': 'surge_e',
   ']': 'surge_s',
   '{': 'surge_w',
+  '@': 'hof_floor',
+  '!': 'hof_floor_hi',
+  '(': 'arch',
+  /** Dvergagröf and Ívaldi's Forge (M8): scree, forge floor and wall, lava, and belts by the way they run. */
+  '·': 'scree',
+  '░': 'forge_floor',
+  '▓': 'forge_wall',
+  '≈': 'lava',
+  '↑': 'belt_n',
+  '→': 'belt_e',
+  '↓': 'belt_s',
+  '←': 'belt_w',
+  /** Hrímfjöll and Hrímturn (M9): firn, glaze, rime cliffs, and the tower's floor and walls. */
+  '∴': 'firn',
+  '◇': 'glaze',
+  '▒': 'rime',
+  '▫': 'tower_floor',
+  '▪': 'tower_wall',
+  '▧': 'clear_ice',
+  /** Útgarðr (M10a): the giants' floor and walls. */
+  '□': 'giant_floor',
+  '▣': 'giant_wall',
   /** Grass under tall grass cover (see COVER_LEGEND). */
   '"': 'grass',
   '%': 'grass',

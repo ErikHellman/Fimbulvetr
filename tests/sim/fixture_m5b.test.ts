@@ -34,6 +34,7 @@ describe('v1-m5b fixture', () => {
   });
 
   it('runs: Halvar works the rebuilt yard, and every M5b quest in the log is done', () => {
+    // The farm's stages 1–2 are done; it goes on in M8b once Þorkell is home (`q_farm` 3).
     if (!result.ok) throw new Error(result.error.detail);
     const sim = new Sim(DB, result.state);
     for (let i = 0; i < 120; i++) sim.step(frameOf([]));
@@ -41,8 +42,8 @@ describe('v1-m5b fixture', () => {
     expect(sim.actors.some((a) => a.kind === 'npc' && a.def === 'halvar')).toBe(true);
     expect(sim.actors.filter((a) => a.art === 'fix_scorch')).toHaveLength(0);
     const log = questLog(DB.quests, { state: sim.state, quests: DB.quests });
+    expect(log.find((q) => q.id === 'q_farm')?.text.en).toContain('must wait for ore');
     for (const id of [
-      'q_farm',
       'q_herd',
       'q_pages',
       'q_trolls',
