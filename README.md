@@ -4,7 +4,7 @@
 
 A top-down action-adventure in the mould of _A Link to the Past_, set in a Norse-myth world. It runs entirely in the browser.
 
-**[Play it in your browser](https://erikhellman.github.io/Fimbulvetr/)**, deployed on GitHub Pages.
+**[Play it in your browser](https://fimbulvetr.hellman.cloud/)**, deployed on GitHub Pages.
 
 [Ask](https://en.wikipedia.org/wiki/Ask_and_Embla), a farmhand, sets out to rescue [Embla](https://en.wikipedia.org/wiki/Ask_and_Embla), the farmer's daughter, and the villagers taken in a night raid. They were taken by the servants of [Hrímnir](https://en.wikipedia.org/wiki/Hr%C3%ADmnir), the Rime King, a [jötunn](https://en.wikipedia.org/wiki/J%C3%B6tunn) bound beneath the mountains whose binding is failing. Along the way the seasons turn, the weather rolls in and night brings out things that hunt. When the Rime King's breath finally pours over the lowlands, it brings the Fimbulvetr, the [great winter](https://en.wikipedia.org/wiki/Fimbulwinter).
 
