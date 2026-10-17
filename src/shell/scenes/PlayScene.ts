@@ -11,14 +11,15 @@ import { daylight, seasonAt } from '@core/clock/clock';
 import type { Entity } from '@core/actors/entity';
 import { InputLatch, wasPressed, type InputFrame } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
-import { add, lerp } from '@core/math/vec';
+import { add, lerp, type Vec } from '@core/math/vec';
 import type { SimEvent } from '@core/sim/events';
 import { advance, type Accumulator } from '@core/sim/loop';
 import { Sim } from '@core/sim/sim';
 import { newGame, type GameState } from '@core/state/gameState';
 import { NEW_GAME } from '@content/start';
 import { decorArt, decorPlacements } from '@core/world/decor';
-import { SCREEN_H, SCREEN_W } from '@core/world/dims';
+import { shadeMasks } from '@core/world/shade';
+import { SCREEN_H, SCREEN_W, TILE } from '@core/world/dims';
 import { AudioDirector } from '@shell/audio/sfx';
 import type { DevBridge, ViewStats } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
@@ -31,7 +32,9 @@ import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { menuItems, openMenu, ownedRings, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
 import { EntityViews } from '@shell/view/entityViews';
+import { CloudView } from '@shell/view/cloudView';
 import { DarknessView, FOG } from '@shell/view/darknessView';
+import { GlowView } from '@shell/view/glowView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
 import { bindingsOf, keyLabel } from '@shell/input/remap';
@@ -57,6 +60,11 @@ import { ScreenView } from '@shell/view/screenView';
 const INDOOR_LIGHT = 0.85;
 /** Dungeons: a fixed, cool cave light. */
 const CAVE_LIGHT = 0.8;
+/** The camera vignette: a wide, faint darkening of the playfield's corners. */
+const VIGNETTE_RADIUS = 0.7;
+const VIGNETTE_STRENGTH = 0.18;
+/** A lit window at night: a small warm glow and a little cut out of the dark. */
+const WINDOW_RADIUS = 14;
 /** Frames between achievement checks. */
 const ACH_CHECK_FRAMES = 30;
 
@@ -64,6 +72,8 @@ const ACH_CHECK_FRAMES = 30;
 interface Stage {
   readonly view: ScreenView;
   readonly ambient: AmbientView;
+  /** Window cells, in screen pixels: they glow at night. */
+  readonly windows: readonly Vec[];
 }
 
 /** Owns the Sim: steps it at 60 Hz, feeds it input, draws its state, plays its sounds, autosaves. */
@@ -77,6 +87,8 @@ export class PlayScene extends Phaser.Scene {
   private weather!: WeatherView;
   private darkness!: DarknessView;
   private fog!: DarknessView;
+  private glow!: GlowView;
+  private clouds!: CloudView;
   private fx!: FxView;
   private flames!: FireView;
   private ghostFloor!: GhostView;
@@ -147,6 +159,7 @@ export class PlayScene extends Phaser.Scene {
     cam.setViewport(0, LETTERBOX, SCREEN_W, SCREEN_H);
     cam.setRoundPixels(true);
     this.colour = cam.filters.internal.addColorMatrix();
+    cam.filters.external.addVignette(0.5, 0.5, VIGNETTE_RADIUS, VIGNETTE_STRENGTH);
     this.views = new EntityViews(this, data.assets.frames, ANIMS);
     this.fx = new FxView(this, data.assets.frames, ANIMS);
     this.flames = new FireView(this, data.assets.frames, ANIMS);
@@ -163,6 +176,8 @@ export class PlayScene extends Phaser.Scene {
     });
     this.darkness = new DarknessView(this, data.assets.frames);
     this.fog = new DarknessView(this, data.assets.frames, FOG);
+    this.glow = new GlowView(this, data.assets.frames);
+    this.clouds = new CloudView(this);
     this.fadeRect = this.add
       .rectangle(0, 0, SCREEN_W, SCREEN_H, 0x000000)
       .setOrigin(0, 0)
@@ -471,14 +486,22 @@ export class PlayScene extends Phaser.Scene {
   private drawSky(hero: { x: number; y: number; w: number; h: number } | null): void {
     const cam = this.cameras.main;
     const origin = this.sim.originOf(this.sim.screen.id);
-    const lights = this.sim
-      .lights()
-      .map((l) =>
-        l.hero === true && hero !== null
-          ? { x: hero.x + hero.w / 2 - cam.scrollX, y: hero.y + hero.h - 12 - cam.scrollY, r: l.r }
-          : { x: origin.x + l.x - cam.scrollX, y: origin.y + l.y - cam.scrollY, r: l.r },
-      );
-    this.darkness.draw(this.sim.darkness(), lights);
+    const lights = this.sim.lights().map((l) =>
+      l.hero === true && hero !== null
+        ? {
+            x: hero.x + hero.w / 2 - cam.scrollX,
+            y: hero.y + hero.h - 12 - cam.scrollY,
+            r: l.r,
+            hero: true,
+          }
+        : { x: origin.x + l.x - cam.scrollX, y: origin.y + l.y - cam.scrollY, r: l.r },
+    );
+    const darkness = this.sim.darkness();
+    if (darkness > 0)
+      for (const w of this.screens.get(this.sim.screen.id)?.windows ?? [])
+        lights.push({ x: origin.x + w.x - cam.scrollX, y: origin.y + w.y - cam.scrollY, r: WINDOW_RADIUS });
+    this.darkness.draw(darkness, lights);
+    this.glow.draw(darkness, lights, this.time.now);
     const fog = this.sim.fog();
     const clear =
       hero === null
@@ -486,11 +509,21 @@ export class PlayScene extends Phaser.Scene {
         : [{ x: hero.x + hero.w / 2 - cam.scrollX, y: hero.y + hero.h - 12 - cam.scrollY, r: fog.r }];
     this.fog.draw(fog.amount, [...clear, ...lights.filter((l) => l.r !== fog.r)]);
     const def = this.services.db.screens[this.sim.screen.id];
+    const wind = this.sim.wind();
     this.weather.update(
       {
         kind: this.sim.weather(),
         season: seasonAt(this.sim.state.clock, def.region, this.services.db.clock, this.sim.state.flags),
-        wind: this.sim.wind(),
+        wind,
+      },
+      this.time.now,
+    );
+    this.clouds.update(
+      {
+        daylight: daylight(this.sim.state.clock, this.services.db.clock),
+        weather: this.sim.weather(),
+        outdoors: def.indoor !== true && def.dungeon === undefined,
+        wind,
       },
       this.time.now,
     );
@@ -524,6 +557,7 @@ export class PlayScene extends Phaser.Scene {
       origin,
       indices: tileIndices(grid, tileset, salt),
       cover: this.coverTiles(id),
+      shade: shadeMasks(grid, terrain).map((m) => (m === 0 ? -1 : tileset.shade.start + m)),
       tileAnims: this.tileAnims,
       decor,
       frames,
@@ -537,7 +571,12 @@ export class PlayScene extends Phaser.Scene {
       anims: ANIMS,
       isWater: (t) => tileset.entries[t].group === 'water',
     });
-    this.screens.set(id, { view, ambient });
+    const windows: Vec[] = [];
+    grid.cells.forEach((t, i) => {
+      if (t === 'window')
+        windows.push({ x: ((i % grid.cols) + 0.5) * TILE, y: (Math.floor(i / grid.cols) + 0.5) * TILE });
+    });
+    this.screens.set(id, { view, ambient, windows });
   }
 
   private viewStats(): ViewStats {

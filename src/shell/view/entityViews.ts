@@ -11,11 +11,18 @@ import { bodyBounds, type Bounds } from './bounds';
  * anyone standing on them is drawn over them.
  */
 const FLAT: Readonly<Record<string, number>> = { bridge: TILE, raft: 2 * TILE };
+/** Who stands on the ground and so has a contact shadow (things lying on it, flying or thrown do not). */
+const GROUNDED: ReadonlySet<Entity['kind']> = new Set(['hero', 'enemy', 'npc', 'critter', 'prop']);
+/** The contact frame is 24 px wide; the shadow spans the hurt box plus a little. */
+const CONTACT_W = 24;
+const CONTACT_PAD = 6;
+const CONTACT_ALPHA = 0.6;
 
 /** Mirrors sim entities as sprites. Safe to call every frame: views are derived from state only. */
 export class EntityViews {
   private readonly sprites = new Map<number, Phaser.GameObjects.Sprite>();
   private readonly shadows = new Map<number, Phaser.GameObjects.Sprite>();
+  private readonly contacts = new Map<number, Phaser.GameObjects.Image>();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -63,6 +70,7 @@ export class EntityViews {
       sprite.setAlpha(blink ? 0.35 : fading ? 0.25 : 1);
       sprite.setVisible(e.mem['hidden'] !== 1);
       this.shadow(e, p);
+      this.contact(e, p, sprite.visible);
     }
     for (const [id, sprite] of this.sprites) {
       if (!seen.has(id)) {
@@ -76,6 +84,12 @@ export class EntityViews {
         this.shadows.delete(id);
       }
     }
+    for (const [id, contact] of this.contacts) {
+      if (!seen.has(id)) {
+        contact.destroy();
+        this.contacts.delete(id);
+      }
+    }
   }
 
   /** Where an entity's body is drawn (its hurt box at the sprite's feet), or null if it has no sprite yet. */
@@ -83,6 +97,30 @@ export class EntityViews {
     const s = this.sprites.get(e.id);
     if (s === undefined) return null;
     return bodyBounds(s.x, s.y, s.depth, e.hurt);
+  }
+
+  /** The soft shadow under anyone standing on the ground; it goes when they leave it or swim. */
+  private contact(e: Entity, p: Vec, visible: boolean): void {
+    const z = e.mem['z'] ?? 0;
+    const on = visible && GROUNDED.has(e.kind) && z <= 0.5 && e.anim !== 'swim' && e.anim !== 'dive';
+    let contact = this.contacts.get(e.id);
+    if (!on) {
+      contact?.setVisible(false);
+      return;
+    }
+    if (contact === undefined) {
+      const ref = this.frames.get('fx_contact_idle_s_0');
+      contact = this.scene.add
+        .image(0, 0, ref.key, ref.frame)
+        .setOrigin(ref.ox, ref.oy)
+        .setAlpha(CONTACT_ALPHA)
+        .setScale((e.hurt.w + CONTACT_PAD) / CONTACT_W, 1);
+      this.contacts.set(e.id, contact);
+    }
+    contact
+      .setVisible(true)
+      .setPosition(Math.round(p.x), Math.round(p.y))
+      .setDepth(p.y - 0.5);
   }
 
   /** A soft shadow on the ground under anything lifted off it (hops, carried and thrown things). */
