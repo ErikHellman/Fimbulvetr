@@ -146,8 +146,27 @@ function light(): Raster {
   for (let y = 0; y < size; y++)
     for (let x = 0; x < size; x++) {
       const d = Math.sqrt((x + 0.5 - c) ** 2 + (y + 0.5 - c) ** 2) / c;
-      const a = d < 0.62 ? 255 : d < 0.82 ? 170 : d < 1 ? 85 : 0;
+      // A solid core, then a smooth fall to nothing at the rim.
+      const t = d < 0.45 ? 1 : d >= 1 ? 0 : 1 - (d - 0.45) / 0.55;
+      const a = Math.round(t * t * (3 - 2 * t) * 255);
       if (a > 0) r.data.set([255, 255, 255, a], (y * size + x) * 4);
+    }
+  return r;
+}
+
+/** The contact shadow under anything standing on the ground: a soft ellipse, scaled by the shell. */
+function contact(): Raster {
+  const w = 24;
+  const h = 10;
+  const r = createRaster(w, h);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const dx = (x + 0.5 - w / 2) / (w / 2);
+      const dy = (y + 0.5 - h / 2) / (h / 2);
+      const d = Math.sqrt(dx * dx + dy * dy);
+      const t = d >= 1 ? 0 : 1 - d * d;
+      const a = Math.round(t * 110);
+      if (a > 0) r.data.set([10, 8, 24, a], (y * w + x) * 4);
     }
   return r;
 }
@@ -177,6 +196,7 @@ export function fxFrames(): SpriteFrame[] {
   });
   out.push({ name: 'fx_rain_idle_s_0', raster: raindrop(), ox: 3, oy: 7 });
   out.push({ name: 'fx_light_idle_s_0', raster: light(), ox: 64, oy: 64 });
+  out.push({ name: 'fx_contact_idle_s_0', raster: contact(), ox: 12, oy: 5 });
   out.push({ name: 'fx_drop_idle_s_0', raster: drop(), ox: 1, oy: 5 });
   for (let i = 0; i < 3; i++) out.push({ name: `fx_eldr_fly_s_${i}`, raster: eldr(i), ox: 7, oy: 12 });
   for (let i = 0; i < 3; i++) out.push({ name: `fx_is_fly_s_${i}`, raster: isBolt(i), ox: 7, oy: 12 });
@@ -196,6 +216,7 @@ export const FX_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>
   fx_smoke: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
   fx_rain: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_light: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
+  fx_contact: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_drop: { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } },
   fx_eldr: { fly: { frames: 3, fps: 14, loop: true, dirs: ['s'] } },
   fx_is: { fly: { frames: 3, fps: 14, loop: true, dirs: ['s'] } },

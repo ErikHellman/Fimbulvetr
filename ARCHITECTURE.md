@@ -9,9 +9,10 @@ keyboard/gamepad ─► InputMapper ─► InputLatch ──► Sim.step(frame) 
                                                         ▲                                   │
                         Commands (dev console, menus) ──┘          ┌────────────────────────┤
                                                                     ▼                        ▼
-       PlayScene: EntityViews / ScreenView (ground + cover + decor) / AmbientView (smoke, fish) / FxView (puffs)
-                  WeatherView (rain, snow, leaves, lightning) / DarknessView ×2 (fog; dark with lights cut out)
-                  ColorMatrix (season × light × weather, colour-blind aid) · AudioDirector · autosave
+       PlayScene: EntityViews (+ contact shadows) / ScreenView (ground + cover + shade + decor) / AmbientView / FxView
+                  CloudView (cloud shadows by day) / WeatherView (rain, snow, leaves, lightning)
+                  DarknessView ×2 (fog; dark with soft lights cut out) / GlowView (warm glow on every light)
+                  ColorMatrix (season × light × weather, colour-blind aid) + Vignette · AudioDirector · autosave
                   pause menu, settings menu and save-slot picker state · dev hook
        UiScene (untinted): HUD (keys, boss bar), text boxes, choices, cards, shop, slot picker, game over,
                            pause menu with settings ◄── sim.storyUi(), sim.boss()
@@ -115,6 +116,12 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
 - **`src/shell/scenes/BootScene.ts`** — packs generated frames into canvas textures, builds the tileset and renders the SFX.
 - **`src/shell/ui/*`** — menus as pure models, drawn by the scenes: `pauseMenu.ts` (tabs Items, Gear, Map, Quests, Game; `stepMenu` returns the next state and actions; `gearText.ts` lists weapon, armour, galdr, seiðr, horns, cloak and purse; `wareText.ts` names shop wares), `settingsMenu.ts` (+ `settingsText.ts`: language, volume, picture, shake, flashes, shield toggle, long days, colour-blind aid, the introduction toggle, and the controls page that rebinds keys through `shell/input/remap.ts`), `titleMenu.ts`, `intro.ts` (+ `introText.ts`: the controls page shown between New game and the longhouse, naming the player's own keys, with a "don't show this again" box that clears `showIntro`) and `slotPicker.ts` (+ `slotText.ts` for slot summaries). Settings changes apply at once (`PlayScene.applySettings`, `InputMapper.configure`, `Sim.setLongDay`) and are stored straight away.
 - **`src/shell/scenes/PlayScene.ts`** — owns the Sim, input, views, the camera ColorMatrix, audio, autosave triggers and the pause menu. The hero's sprite follows the weapon in hand (`heroArtFor`: `hero`, `hero_axe`, `hero_fork`). Each shown screen is a stage: a `ScreenView` (tile layers plus decor sprites, ticked from `sim.tick` and faded when they hide the hero) and an `AmbientView` (a smoke emitter per chimney, fish jumps in open water). A `FireView` draws a pooled flame on every burning cover tile. Once a galdr is known the HUD shows the galdr box by the K/L slots and the seiðr bar under the hearts.
+- **Presentation layer (G1, the graphics overhaul's first phase).** Everything here is drawn over the same sprites and tiles, so real art swapped in by frame name keeps it:
+  - *Contact shadows:* `EntityViews` puts a soft `fx_contact` ellipse under every hero, NPC, enemy, critter and prop standing on the ground (not swimming, lifted or thrown; those keep the lifted `fx_shadow`), and `ScreenView` one under every decor block, scaled to its footprint.
+  - *Shade overlay:* `core/world/shade.ts` gives each flat cell a mask of the raised neighbours north and west of it (the light stands high to the north-west); `art/tiles/shade.ts` paints the eight translucent band tiles at the end of the tileset, and `ScreenView` draws them on a third tile layer between the cover and the sprites.
+  - *Soft lights:* the `fx_light` frame falls off smoothly, so the dark erased around a lantern has no hard rim; `GlowView` adds an amber additive glow over every light, flickering on fires and stones, and each `window` cell glows at night as a small light of its own.
+  - *Cloud shadows:* `art/clouds.ts` makes a seeded, tiling value-noise texture; `CloudView` scrolls it over outdoor screens by day with the wind, faint under snow and rain, gone in fog and storms.
+  - *Vignette:* a faint camera-wide darkening of the playfield's corners (a Phaser 4 external filter).
 - **`src/shell/platform/*`**:
   - Settings in `localStorage['fimbulvetr.settings.v1']` (with `colourBlind`, `showIntro` and `keys`, the keyboard overrides). The intro choice lives here, not in a save, so it holds for every new game in the browser.
   - IndexedDB `fimbulvetr` (stores `saves`: auto, auto_prev, s1–s3; and `meta`).

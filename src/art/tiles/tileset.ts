@@ -5,6 +5,7 @@ import { BLOB_MASKS } from '@core/world/autotile';
 import { createPainter } from '../painter';
 import type { Raster } from '../raster';
 import { COVER_ART } from './cover';
+import { SHADE_TILES, paintShade } from './shade';
 import { WATER_ART } from './water';
 import { TERRAIN_ART } from './terrain';
 
@@ -40,6 +41,8 @@ export interface Tileset {
   readonly cover: Readonly<Record<CoverId, CoverEntry>>;
   /** The water level's overlay tiles (see waterIndices): a flooded sluice, and a race's floated planks. */
   readonly water: { readonly flooded: number; readonly afloat: number };
+  /** The shade overlay tiles: `start + mask` for each mask from core/world/shade. */
+  readonly shade: { readonly start: number };
 }
 
 /**
@@ -87,7 +90,13 @@ export function buildTileset(): Tileset {
   WATER_ART.afloat(afloat);
   const water = { flooded: tiles.length, afloat: tiles.length + 1 };
   tiles.push(flooded.r, afloat.r);
-  return { tiles, entries, cover, water };
+  const shade = { start: tiles.length };
+  for (let mask = 0; mask < SHADE_TILES; mask++) {
+    const p = createPainter(16, 16, hashInts(0x5ade, mask));
+    paintShade(p, mask);
+    tiles.push(p.r);
+  }
+  return { tiles, entries, cover, water, shade };
 }
 
 /** Every animated tile in the set: one entry per frame-0 tile of each multi-frame terrain. */

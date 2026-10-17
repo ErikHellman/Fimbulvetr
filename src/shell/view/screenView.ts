@@ -11,6 +11,10 @@ import { overlapsRect, type Bounds } from './bounds';
 
 /** How far decor fades when it stands between the camera and the hero. */
 const BEHIND_ALPHA = 0.6;
+/** The contact shadow frame is 24 px wide; a decor block's shadow spans its footprint plus a little. */
+const CONTACT_W = 24;
+const CONTACT_PAD = 6;
+const CONTACT_ALPHA = 0.55;
 
 export interface DecorItem extends DecorPlacement {
   readonly art: string;
@@ -20,6 +24,8 @@ export interface ScreenViewOptions {
   readonly origin: Vec;
   readonly indices: readonly number[];
   readonly cover: readonly number[];
+  /** The shade overlay per cell (-1 for none): where raised ground throws shade on flat ground. */
+  readonly shade: readonly number[];
   readonly tileAnims: readonly TileAnim[];
   readonly decor: readonly DecorItem[];
   readonly frames: FrameIndex;
@@ -54,7 +60,9 @@ export class ScreenView {
   private readonly tileset: Phaser.Tilemaps.Tileset;
   private readonly ground: Phaser.Tilemaps.TilemapLayer;
   private readonly cover: Phaser.Tilemaps.TilemapLayer;
+  private readonly shade: Phaser.Tilemaps.TilemapLayer;
   private readonly decor: DecorSprite[] = [];
+  private readonly shadows: Phaser.GameObjects.Image[] = [];
   private readonly animatedTiles: number;
   private readonly frames: FrameIndex;
   private readonly anims: AnimTable;
@@ -73,18 +81,33 @@ export class ScreenView {
     this.animatedTiles = animateTiles(tileset, o.tileAnims);
     const ground = this.map.createBlankLayer('ground', tileset, o.origin.x, o.origin.y);
     const coverLayer = this.map.createBlankLayer('cover', tileset, o.origin.x, o.origin.y);
-    if (ground === null || coverLayer === null) throw new Error('could not create the tile layers');
+    const shadeLayer = this.map.createBlankLayer('shade', tileset, o.origin.x, o.origin.y);
+    if (ground === null || coverLayer === null || shadeLayer === null)
+      throw new Error('could not create the tile layers');
     ground.putTilesAt(rowsOf(o.indices), 0, 0);
     ground.setDepth(-2);
     coverLayer.setDepth(-1);
+    shadeLayer.putTilesAt(rowsOf(o.shade), 0, 0);
+    shadeLayer.setDepth(-0.5);
     this.tileset = tileset;
     this.ground = ground;
     this.cover = coverLayer;
+    this.shade = shadeLayer;
     this.setCover(o.cover);
+    const contact = o.frames.get('fx_contact_idle_s_0');
     for (const item of o.decor) {
       const feet = add(o.origin, decorFeet(item));
       const frame = frameFor(o.anims, item.art, 'idle', 's', 0);
       const ref = o.frames.get(frame);
+      // A soft shadow on the ground under the block, just above the shade overlay.
+      this.shadows.push(
+        scene.add
+          .image(feet.x, feet.y, contact.key, contact.frame)
+          .setOrigin(contact.ox, contact.oy)
+          .setScale((item.w * TILE + CONTACT_PAD) / CONTACT_W, 1)
+          .setAlpha(CONTACT_ALPHA)
+          .setDepth(feet.y - 0.3),
+      );
       // A hair behind the row's entities, so whoever stands on the same row draws in front.
       const image = scene.add
         .image(feet.x, feet.y, ref.key, ref.frame)
@@ -151,10 +174,12 @@ export class ScreenView {
   setPaused(paused: boolean): void {
     this.ground.setTimerPaused(paused);
     this.cover.setTimerPaused(paused);
+    this.shade.setTimerPaused(paused);
   }
 
   destroy(): void {
     for (const d of this.decor) d.image.destroy();
+    for (const s of this.shadows) s.destroy();
     this.map.destroy();
   }
 }
