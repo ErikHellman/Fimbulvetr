@@ -4,6 +4,7 @@ import { ANIMS } from '@art/sprites';
 import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
 import { waterIndices } from '@art/tiles/waterIndices';
+import { fringeIndices } from '@art/tiles/fringeIndices';
 import { tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import type { ScreenId } from '@content/world/screens';
@@ -19,6 +20,7 @@ import { newGame, type GameState } from '@core/state/gameState';
 import { NEW_GAME } from '@content/start';
 import { decorArt, decorPlacements } from '@core/world/decor';
 import { shadeMasks } from '@core/world/shade';
+import { FRINGE_SPILL } from '@content/terrain';
 import { SCREEN_H, SCREEN_W, TILE } from '@core/world/dims';
 import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
@@ -564,6 +566,7 @@ export class PlayScene extends Phaser.Scene {
       indices: tileIndices(grid, tileset, salt),
       cover: this.coverTiles(id),
       shade: shadeMasks(grid, terrain).map((m) => (m === 0 ? -1 : tileset.shade.start + m)),
+      fringe: fringeIndices(grid, tileset, FRINGE_SPILL),
       tileAnims: this.tileAnims,
       decor,
       frames,

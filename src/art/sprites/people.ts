@@ -4,7 +4,7 @@ import type { AnimDef } from '../anims';
 import { ellipse, rect } from '../draw';
 import { outline } from '../outline';
 import { C } from '../palette';
-import { createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
+import { createRaster, flipX, hex, setPixel, type Raster, type Rgba } from '../raster';
 import { ARM_SWING_LEFT, ARM_SWING_RIGHT, ARM_SWING_SIDE } from './hero';
 import type { SpriteFrame } from './types';
 
@@ -589,30 +589,37 @@ export interface PersonPose {
   readonly sink?: number;
   /** Eye colour instead of ink (the dead have pale, glowing eyes). */
   readonly eyes?: string;
+  /** The idle breath: the body a pixel lower on the legs, the legs still. */
+  readonly breath?: boolean;
 }
 const INK = hex(C.ink);
 
-/** A darker shade of a colour for the cel shadow side. */
+/** A darker shade of a colour for the cel shadow side (or, with `f` above 1, its highlight). */
 function shade(colour: string, f = 0.72): Rgba {
   const [r, g, b] = hex(colour);
-  return [Math.round(r * f), Math.round(g * f), Math.round(b * f), 255];
+  const c = (v: number): number => Math.min(255, Math.round(v * f));
+  return [c(r), c(g), c(b), 255];
 }
 
 export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPose = {}): Raster {
   const r = createRaster(SIZE, SIZE);
   const arms = pose.arms ?? 'down';
   const drop = look.child === true ? 5 : 0;
-  const bob = phase === 1 || phase === 3 ? 1 : 0;
+  const bob = phase === 1 || phase === 3 || pose.breath === true ? 1 : 0;
   const b = drop + bob;
   const top = hex(look.top);
   const topS = shade(look.top);
+  const topL = shade(look.top, 1.22);
   const bottom = hex(look.bottom);
   const bottomS = shade(look.bottom);
   const skin = hex(look.skin);
   const skinS = shade(look.skin, 0.8);
+  const skinL = shade(look.skin, 1.1);
   const hair = hex(look.hair);
   const hairS = shade(look.hair);
+  const hairL = shade(look.hair, 1.18);
   const boot = hex(C.boot);
+  const bootL = hex(C.bootLight);
 
   // Legs or skirt, feet on row 29.
   const legTop = 24 + (look.child === true ? 2 : 0);
@@ -622,17 +629,21 @@ export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPo
     rect(r, 18 + sway, legTop - 2, 4, 30 - legTop, bottomS);
     rect(r, 12, 28, 3, 2, boot);
     rect(r, 17, 28, 3, 2, boot);
+    rect(r, 12, 28, 2, 1, bootL);
+    rect(r, 10 + sway, legTop - 2, 1, 30 - legTop, shade(look.bottom, 1.18));
   } else if (side === 'w') {
     const swing = [0, 1, 0, -1][phase] ?? 0;
     rect(r, 16 - swing, legTop, 3, 28 - legTop, bottomS);
     rect(r, 16 - swing, 28, 4, 2, boot);
     rect(r, 13 + swing, legTop, 3, 28 - legTop, bottom);
     rect(r, 12 + swing, 28, 4, 2, boot);
+    rect(r, 12 + swing, 28, 3, 1, bootL);
   } else {
     const liftL = phase === 1 ? 1 : 0;
     const liftR = phase === 3 ? 1 : 0;
     rect(r, 12, legTop, 3, 28 - legTop - liftL, bottom);
     rect(r, 11, 28 - liftL, 4, 2, boot);
+    rect(r, 11, 28 - liftL, 3, 1, bootL);
     rect(r, 17, legTop, 3, 28 - legTop - liftR, bottomS);
     rect(r, 17, 28 - liftR, 4, 2, boot);
   }
@@ -642,10 +653,12 @@ export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPo
   if (arms !== 'down') {
     rect(r, side === 'w' ? 11 : 10, b + 15, side === 'w' ? 10 : 12, torsoH, top);
     rect(r, side === 'w' ? 18 : 19, b + 15, 3, torsoH, topS);
+    rect(r, side === 'w' ? 11 : 10, b + 15, 1, torsoH - 3, topL);
   } else if (side === 'w') {
     const swing = ARM_SWING_SIDE[phase] ?? 0;
     rect(r, 11, b + 15, 10, torsoH, top);
     rect(r, 18, b + 15, 3, torsoH, topS);
+    rect(r, 11, b + 15, 1, torsoH - 3, topL);
     rect(r, 13 + swing, b + 16, 3, torsoH - 3, topS);
     rect(r, 13 + swing, b + 13 + torsoH, 3, 2, skin);
   } else {
@@ -653,6 +666,7 @@ export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPo
     const dr = ARM_SWING_RIGHT[phase] ?? 0;
     rect(r, 10, b + 15, 12, torsoH, top);
     rect(r, 19, b + 15, 3, torsoH, topS);
+    rect(r, 10, b + 15, 1, torsoH - 3, topL);
     rect(r, 8, b + 16 + dl, 2, torsoH - 3, top);
     rect(r, 8, b + 13 + torsoH + dl, 2, 2, skin);
     rect(r, 22, b + 16 + dr, 2, torsoH - 3, topS);
@@ -678,12 +692,22 @@ export function drawPerson(look: Look, side: Side, phase: number, pose: PersonPo
     if (cap) return dx > 3 ? capS : capH;
     return dx > 2.5 ? skinS : skin;
   });
+  // One highlight on the hair's (or kerchief's) upper-left curve, one on the lit cheek (rule 6).
+  const capL = scarf !== null && look.scarf !== undefined ? shade(look.scarf, 1.18) : hairL;
+  if (!bald) {
+    rect(r, 13, b + 3, 2, 1, capL);
+    setPixel(r, 12, b + 4, capL);
+  } else setPixel(r, 13, b + 4, skinL);
   const eye = pose.eyes === undefined ? INK : hex(pose.eyes);
   if (side === 's') {
     rect(r, 13, b + 9, 1, 2, eye);
     rect(r, 18, b + 9, 1, 2, eye);
+    setPixel(r, 12, b + 11, skinL);
   }
-  if (side === 'w') rect(r, 11, b + 9, 1, 2, eye);
+  if (side === 'w') {
+    rect(r, 11, b + 9, 1, 2, eye);
+    setPixel(r, 11, b + 11, skinL);
+  }
   if (look.beard !== undefined && side !== 'n') {
     const beard = hex(look.beard);
     if (side === 's') rect(r, 12, b + 12, 8, 4, beard);
@@ -764,6 +788,7 @@ export function peopleFrames(): SpriteFrame[] {
     };
     for (const side of ['s', 'n', 'w'] as const) {
       add('idle', side, 0, drawPerson(look, side, 0));
+      add('idle', side, 1, drawPerson(look, side, 0, { breath: true }));
       for (let i = 0; i < 4; i++) add('walk', side, i, drawPerson(look, side, i));
     }
   }
@@ -773,7 +798,7 @@ export function peopleFrames(): SpriteFrame[] {
 const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 
 const PERSON_ANIMS = {
-  idle: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  idle: { frames: 2, fps: 2, loop: true, dirs: ALL },
   walk: { frames: 4, fps: 6, loop: true, dirs: ALL },
 } satisfies Record<string, AnimDef>;
 

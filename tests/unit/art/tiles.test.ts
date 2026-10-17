@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { insideBlob, onBlobEdge } from '@art/tiles/blob';
 import { tileIndices } from '@art/tiles/indices';
+import { FRINGE_IDS } from '@art/tiles/fringe';
 import { SHADE_TILES } from '@art/tiles/shade';
 import { buildTileset, tileAnimations } from '@art/tiles/tileset';
 import { TERRAIN_IDS, type TerrainId } from '@content/terrain';
@@ -47,7 +48,9 @@ describe('tileset', () => {
       else expect(e.count).toBeGreaterThan(0);
     }
     const total = TERRAIN_IDS.reduce((n, id) => n + ts.entries[id].count * ts.entries[id].frames, 0);
-    expect(ts.tiles).toHaveLength(total + 2 * Object.keys(ts.cover).length + 2 + SHADE_TILES);
+    expect(ts.tiles).toHaveLength(
+      total + 2 * Object.keys(ts.cover).length + 2 + SHADE_TILES + FRINGE_IDS.length * 47,
+    );
     expect(ts.tiles.every((t) => t.w === 16 && t.h === 16)).toBe(true);
   });
 

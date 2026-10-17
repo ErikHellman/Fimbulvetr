@@ -90,6 +90,36 @@ export const UI_LINK = 'uiLink';
 
 const INK = 0x1b1522;
 const GOLD = 0xd9b34a;
+const GOLD_DIM = 0x8a7030;
+
+/**
+ * An ink panel with a gold rule, a dimmer inner rule and a small knot at each corner (the UI dressing of
+ * docs/art-style-guide.md, rule 8).
+ */
+export function drawPanel(g: Phaser.GameObjects.Graphics, x: number, y: number, w: number, h: number): void {
+  g.fillStyle(INK, 0.92).fillRect(x, y, w, h);
+  g.lineStyle(1, GOLD, 1).strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  if (w > 24 && h > 24) {
+    g.lineStyle(1, GOLD_DIM, 1).strokeRect(x + 2.5, y + 2.5, w - 5, h - 5);
+    g.fillStyle(GOLD, 1);
+    for (const [kx, ky] of [
+      [x + 2, y + 2],
+      [x + w - 3, y + 2],
+      [x + 2, y + h - 3],
+      [x + w - 3, y + h - 3],
+    ] as const) {
+      g.fillTriangle(kx + 0.5, ky - 2, kx + 3, ky + 0.5, kx + 0.5, ky + 3).fillTriangle(
+        kx + 0.5,
+        ky - 2,
+        kx + 0.5,
+        ky + 3,
+        kx - 2,
+        ky + 0.5,
+      );
+      g.fillStyle(INK, 1).fillRect(kx, ky, 1, 1).fillStyle(GOLD, 1);
+    }
+  }
+}
 /** The seiðr bar's blue. */
 const SEIDR = 0x7fd8e8;
 const RED = 0xe0433f;
@@ -873,11 +903,7 @@ export class UiScene extends Phaser.Scene {
   }
 
   private panel(x: number, y: number, w: number, h: number): void {
-    this.box
-      .fillStyle(INK, 0.92)
-      .fillRect(x, y, w, h)
-      .lineStyle(1, GOLD, 1)
-      .strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+    drawPanel(this.box, x, y, w, h);
   }
 
   /** A short blip every few revealed characters while text types out. */
