@@ -40,6 +40,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Exit route test, e2e, docs
     - [x] World polish: decor sprites, animated water, fish and smoke, doors, windows, chimneys, arm swing, nameplate — plan: `docs/superpowers/plans/2026-09-27-world-polish.md`
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M1b Raid + Myrkviðr road — plan: `docs/superpowers/plans/2026-09-27-m1b-m1c.md` (Part 1)
     - [x] Carry-overs: presets and walker, one damage and kill path
     - [x] Core: death and continue, enemy framework, vargr/draugr/troll, fire and gate fixtures, leaf cover, story weather and darkness, item slots, NPC schedules, map model
@@ -48,6 +52,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: the raid, the morning and the legend, Myrkviðr (9 screens and a hut), 4 NPCs and Kolbeinn
     - [x] Exit route test, e2e, v1-m1b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M1c Rótarhellir + Rótvættr — plan: `docs/superpowers/plans/2026-09-27-m1b-m1c.md` (Part 2)
     - [x] Carry-overs: `dungeonOf`, dungeon grids with sliding rooms
     - [x] Core: chests and heart containers, locks/shutters/switches/braziers, root blocks and vines, the boomerang, the root-biter, the boss framework, Rótvættr, the dungeon map model
@@ -56,6 +64,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: Rótarhellir (12 rooms), the cave mouth, the runestone and the ending
     - [x] Progression solver, exit route test, e2e, v1-m1c fixture, balance, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M2 Uppvík + turning world — brief: `docs/briefs/m2.md`, plan: `docs/superpowers/plans/2026-09-27-m2.md`
   - [ ] M2a Turning world
     - [x] Pinning, rolled sky and wind, fog and rain, snow/drift/mud/ice cover, wind on projectiles
@@ -65,6 +77,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Myrkviðr turns (spawn points, drifts, preset `turning`), exit tests, e2e, v1-m2a fixture, docs
     - [x] Title intro: the basic controls before a new game, with "don't show this again" and a settings toggle
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M2b Uppvík: the road north, the hub, economy, gear, galdr/seiðr/Eldr, fire, mead
     - [x] Seiðr, mead in horns and the purse; armour and the Uppvík sword; shops selling weapons, armour and galdr
     - [x] Fire spreading with the wind; galdr casting and Eldr (burns, melts, lights)
@@ -72,12 +88,20 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: the road north, Uppvík (4 screens, 5 interiors), 12 townsfolk, Hrafnkell's and Ketill's shops, the Eldr quest
     - [x] Exit route test, e2e, v1-m2b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M2c Deep Myrkviðr: fen, glade, troll wood, the völva, the huldra, the vargar hunt, +3 enemies
     - [x] The pack leader and the rime raven (flying), with art and sounds
     - [x] The fen, the völva's hut, the birch glade and the troll wood; seasonal herbs
     - [x] Heiðr and her brews, the huldra's bargain, the vargar hunt, trolls in the troll wood
     - [x] Overworld solver proofs (and brambles barring the bypass round the pine), exit route, e2e, v1-m2c fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M3 Mýrland + D2 — brief: `docs/briefs/m3.md`, plan: `docs/superpowers/plans/2026-09-30-m3.md`
   - [ ] M3a Mýrland
     - [x] Seasonal water: rapids, warm springs, shoals that flood in spring; the solver learns seasons; every seam tested in every season
@@ -86,6 +110,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: 10 screens and 2 interiors, Kári, Bárðr, Þuríðr, Ljótr, Auðr, `q_runestone_2` to the drowned mill, `q_fisher`
     - [x] Solver proofs in every season, route, e2e, v1-m3a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M3b Sökkva Kvern: water levels, bombs, cracks, the big lock, 16 rooms, Lindormr, Mýrland's bomb secrets
     - [x] Bombs as ammunition, the blast, cracks, the mud-crab
     - [x] Water levels (sluices, race planks, mill wheels), the big lock, the solver over water levels
@@ -94,6 +122,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: 16 rooms, the mill door, `q_runestone_2` to the second stone, the springs' cave and bomb bag, the peat's piece, bombs for sale
     - [x] Solver proofs over every water level, route, e2e, v1-m3b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M4 Haugar + D3 — brief: `docs/briefs/m4.md`, plan: `docs/superpowers/plans/2026-09-30-m4.md`
   - [ ] M4a Haugar
     - [x] Warp stones in every lowland region; the dash thrust and the parry; shielded foes and the barrow-wight; runestone scaling
@@ -101,6 +133,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: 10 screens and Styrr's cottage, Styrr, Hildr, Geirmundr, Hallsteinn, `q_runestone_3` to the open barrow, `q_huscarl`, the barrow-watch, the `haugar` spawn table
     - [x] Solver proofs in every season, route, e2e, v1-m4a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M4b Konungshaugr: bow, eye switches, ghost floors, grave-gold, the barrow-warden, the Haugbúi King, Farvegr
     - [x] The bow and arrows, eye switches, pits and the hidden floor, sleepers and grave-gold; mini-bosses, one table of enemy shots, the draugr archer and the barrow-warden
     - [x] The Haugbúi King; Farvegr and readying a galdr from the menu; the solver learns the bow
@@ -108,6 +144,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Content: Konungshaugr's 20 rooms, `q_runestone_3` to the third stone, Haugar's bow secrets (the great cairn's quiver, the watchtower's piece), arrows for sale
     - [x] Solver proofs, route, e2e, v1-m4b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M5 Act I finale (demo) — brief: `docs/briefs/m5.md`
   - [ ] M5a The pass — plan: `docs/superpowers/plans/2026-10-04-m5.md`
     - [x] Duels and Styrr's last duel; Bragð; Hlíf from Sölvi
@@ -115,12 +155,20 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Askdalr after the raid: ruins keyed on the farm, `q_fimbulvetr` and the homecoming, every Fimbulvetr line, Bárðr's frozen lake
     - [x] Solver proof in winter, route, e2e, v1-m5a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M5b The lowlands, after — same plan, Part 2
     - [x] Arm-rings, seiðr upgrades and timed trials
     - [x] The farm, stages 1–2; the trading chain, steps 1–3
     - [x] Ten side quests: the flock, the leaves, troll stones, the clasp, the grave-ring, the crates, wild honey, the axe range, amber, the burbot
     - [x] The demo: title tag and version, New Game to credits route, winter solver proof, e2e, v1-m5b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M6 Niflmýrr + D4 — brief: `docs/briefs/m6.md`, plan: `docs/superpowers/plans/2026-10-04-m6.md`
   - [ ] M6a Niflmýrr — Part 1
     - [x] Eldr melts the rime; the always-foggy region and its own sky
@@ -129,12 +177,20 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Rune-staves and Ís; Ljós and Heiðr's embers; the drowned path
     - [x] New lines after the rime, solver proofs, route, e2e, v1-m6a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M6b Helgrind (D4) — Part 2
     - [x] The grapple and posts; rafts; fog rooms
     - [x] Hel-hounds, Garmr and Thane Náströnd
     - [x] Helgrind's 22 rooms, Kolbeinn's word, Ulf and Tófa freed and home
     - [x] Solver proofs, route, e2e, v1-m6b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M7 Sævatn + Refuge + D5 — brief: `docs/briefs/m7.md`, plan: `docs/superpowers/plans/2026-10-04-m7.md`
   - [ ] M7a Sævatn and the Refuge — Part 1
     - [x] Swimming, diving, currents and sunk things; the seal-skin from Hrafn's three nights
@@ -142,12 +198,20 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] The Refuge: Embla found, Vala, Hreggviðr and ore, the war table, the shrine and warp stone; trading step 5
     - [x] Embla's first letter, new lowland lines, solver proofs, route, e2e, v1-m7a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M7b Sökkva Hof (D5) — Part 2
     - [x] Vindr: the gust, fans and sails; flooded rooms, sunken arches and the drowned
     - [x] Sökkva Hof's 24 rooms, Hrönn and Nykr; Oddr and Hallbera home
     - [x] The Norns' loom, the three threads and turning the season at a hof
     - [x] Solver proofs, route, e2e, v1-m7b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M8 Dvergagröf + D6 — brief: `docs/briefs/m8.md`, plan: `docs/superpowers/plans/2026-10-05-m8.md`
   - [ ] M8a Dvergagröf — Part 1
     - [x] Heat, conveyor belts, lava and the Ís crust
@@ -156,6 +220,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Sindri's forge for ore; trading step 6; Embla's second letter and the tarn's cairn
     - [x] Solver proofs, route, e2e, v1-m8a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M8b Ívaldi's Forge (D6) — Part 2
     - [x] The hammer (stakes, weak floors, drifts, plate) and Skjálfti with its stave
     - [x] Ívaldi's Forge's 28 rooms, Belgr and Thane Ívaldi's three phases
@@ -163,6 +231,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] The scree's stakes, Hreggviðr's stave, new lines for Ívaldi's fall
     - [x] Solver proofs, route, e2e, v1-m8b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M9 Hrímfjöll + D7
   - [ ] M9a Hrímfjöll — Part 1
     - [x] The killing frost, glaze sliding and blizzards
@@ -171,6 +243,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Embla's third letter and the cairn's seiðr vessel
     - [x] Solver proofs, route, e2e, v1-m9a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M9b Hrímturn (D7) — Part 2
     - [x] Light beams: windows, prisms and crystal eyes; Bragð lights an eye
     - [x] The ice mirror: beams and rime bolts sent the way Ask faces
@@ -178,6 +254,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Ása and Bjarni home, Kolbeinn's word, new lines for Hrímgerðr's fall
     - [x] Solver proofs, route, e2e, v1-m9b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M10 Útgarðr + ending
   - [ ] M10a Útgarðr (D8) — Part 1
     - [x] The room-template library; Halvar's confession opens the gate
@@ -185,6 +265,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Jötunvörðr (thawed by Eldr) and Kolbeinn's duel, spared or slain
     - [x] Solver proofs, route, e2e, v1-m10a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M10b The Rime King and the ending — Part 2
     - [x] Embla's ring of binding and Hrímnir's three phases (hand, breath, pillars)
     - [x] Spring on the mountain (`ClockRules.thaw`)
@@ -193,6 +277,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Route, e2e, v1-m10b fixture, docs
     - [x] Title-screen rune for a finished save (moved to M11 by the cut line; done in M11b)
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
 - [ ] M11 Completion + ship
   - [ ] M11a Completion — Part 1
     - [x] Piece and warp-stone conditions; 24 achievements, kept in the browser, with a toast
@@ -202,9 +290,17 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
     - [x] Seven heart pieces placed (36 in all), four new verses from Bragi; solver proofs
     - [x] Route, e2e, v1-m11a fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)
   - [ ] M11b Ship — Part 2
     - [x] Drawn font sizes and the text-size setting
     - [x] Title-screen rune for a finished save
     - [x] Safari audit and fixes; the sim benchmark
     - [x] Version 1.0.0, README, route, e2e, v1-m11b fixture, docs
     - [ ] User playtest and Swedish proofread
+- [ ] Music
+  - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
+  - [ ] Listen-through and tuning
+  - [ ] Real recordings under the same keys (see docs/music.md)

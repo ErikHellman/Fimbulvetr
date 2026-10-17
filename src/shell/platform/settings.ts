@@ -5,7 +5,9 @@ import type { Scaling } from '@shell/scale';
 
 export interface Settings {
   lang: Lang;
+  /** Master volume: sound effects play at it, music at it times `music`. */
   volume: number;
+  music: number;
   scaling: Scaling;
   shake: boolean;
   flash: boolean;
@@ -26,6 +28,7 @@ export const SETTINGS_KEY = 'fimbulvetr.settings.v1';
 export const DEFAULT_SETTINGS: Settings = {
   lang: 'en',
   volume: 0.7,
+  music: 0.6,
   scaling: 'integer',
   shake: true,
   flash: true,
@@ -70,12 +73,15 @@ export function parseSettings(raw: string | null, fallbackLang: Lang): Settings 
   const lang = LANGS.find((l) => l === d['lang']) ?? base.lang;
   const volume =
     typeof d['volume'] === 'number' && d['volume'] >= 0 && d['volume'] <= 1 ? d['volume'] : base.volume;
+  const music =
+    typeof d['music'] === 'number' && d['music'] >= 0 && d['music'] <= 1 ? d['music'] : base.music;
   const scaling = d['scaling'] === 'integer' || d['scaling'] === 'fit' ? d['scaling'] : base.scaling;
   // Before M11b it was a number that no menu set, so a stored number falls back to normal.
   const textSize = FONT_SIZES.find((f) => f === d['textSize']) ?? base.textSize;
   return {
     lang,
     volume,
+    music,
     scaling,
     shake: bool(d['shake'], base.shake),
     flash: bool(d['flash'], base.flash),

@@ -41,6 +41,14 @@ describe('settings menu', () => {
     expect(r.changes).toBe(3);
   });
 
+  it('steps the music level between 0 and 10', () => {
+    const at = down(rowOf('music'));
+    expect(run(DEFAULT_SETTINGS, ...at, ['right']).settings.music).toBeCloseTo(0.7);
+    const quiet = run({ ...DEFAULT_SETTINGS, music: 0.1 }, ...at, ['left'], ['left']);
+    expect(quiet.settings.music).toBe(0);
+    expect(quiet.settings.volume).toBe(DEFAULT_SETTINGS.volume);
+  });
+
   it('flips the on/off options with confirm or the arrows', () => {
     const r = run(DEFAULT_SETTINGS, ...down(rowOf('colourBlind')), ['confirm']);
     expect(r.settings.colourBlind).toBe(true);
