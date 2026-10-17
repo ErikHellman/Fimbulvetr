@@ -6,6 +6,7 @@ import { NEW_GAME } from '@content/start';
 import { InputLatch, wasPressed } from '@core/input/actions';
 import { t } from '@core/i18n/t';
 import { newGame, type GameState } from '@core/state/gameState';
+import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
 import { FONT_KEY } from '@shell/gfx/font';
 import { connectedPads, readPad } from '@shell/input/gamepad';
@@ -30,6 +31,7 @@ import { INTRO_LEFT, introColumn, introLines } from '@shell/ui/introText';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { settingsLines } from '@shell/ui/settingsText';
 import { slotName, summaryLine } from '@shell/ui/slotText';
+import type { MusicCue } from '@core/audio/music';
 import {
   LOAD_ROWS,
   openTitle,
@@ -46,6 +48,7 @@ const INK = 0x0b0a14;
 const PAPER = 0xf2ead8;
 const GOLD = 0xd9b34a;
 const DIM = 0x9c9486;
+const TITLE_MUSIC: MusicCue = { track: 'music_title', combat: false, night: false };
 const ROW_LABEL = {
   continue: UI.title_continue,
   new: UI.title_new,
@@ -84,6 +87,7 @@ export class TitleScene extends Phaser.Scene {
   private readonly keys = new KeyboardState();
   private mapper!: InputMapper;
   private audio!: AudioDirector;
+  private music: MusicPlayer | null = null;
   private lastCodes: ReadonlySet<string> = new Set();
   private title!: Phaser.GameObjects.BitmapText;
   private subtitle!: Phaser.GameObjects.BitmapText;
@@ -109,6 +113,7 @@ export class TitleScene extends Phaser.Scene {
       holdToggleShield: false,
     });
     this.audio = new AudioDirector(this, () => data.settings.volume, data.muted);
+    this.music = MusicPlayer.of(this);
     const detach = attachKeyboard(window, this.keys);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       detach();
@@ -167,6 +172,7 @@ export class TitleScene extends Phaser.Scene {
   }
 
   override update(): void {
+    this.music?.set(TITLE_MUSIC, musicLevel(this.services.settings, this.services.muted));
     const codes = this.keys.takeCodes();
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
