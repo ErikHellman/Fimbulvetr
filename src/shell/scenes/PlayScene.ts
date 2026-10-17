@@ -5,7 +5,7 @@ import { heroArtFor } from '@art/sprites/hero';
 import { coverIndices } from '@art/tiles/coverIndices';
 import { waterIndices } from '@art/tiles/waterIndices';
 import { fringeIndices } from '@art/tiles/fringeIndices';
-import { tileIndices } from '@art/tiles/indices';
+import { tileFlips, tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import type { ScreenId } from '@content/world/screens';
 import { daylight, seasonAt } from '@core/clock/clock';
@@ -317,6 +317,9 @@ export class PlayScene extends Phaser.Scene {
     };
   }
 
+  /** The hero's animation last frame: a roll beginning kicks up dust. */
+  private lastHeroAnim = '';
+
   private onEvent(ev: SimEvent): void {
     if (ev.t === 'killed') {
       const origin = this.sim.originOf(this.sim.screen.id);
@@ -329,6 +332,12 @@ export class PlayScene extends Phaser.Scene {
       this.fx.spark({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
+    } else if (ev.t === 'hit' && !ev.blocked && ev.dealt > 0) {
+      const target = this.sim.entities.find((e) => e.id === ev.target);
+      if (target !== undefined) {
+        const origin = this.sim.originOf(this.sim.screen.id);
+        this.fx.hit({ x: origin.x + target.pos.x, y: origin.y + target.pos.y - 10 }, this.sim.tick);
+      }
     } else if (ev.t === 'shake') {
       // `amount` is in pixels; Phaser's intensity is a share of the view.
       if (this.services.settings.shake) this.cameras.main.shake(240, ev.amount / this.scale.width);
@@ -453,6 +462,12 @@ export class PlayScene extends Phaser.Scene {
       this.cameras.main.setScroll(origin.x, origin.y);
       this.views.sync(this.sim.entities, (e) => add(origin, lerp(e.prev, e.pos, alpha)), this.artOf);
     }
+    const heroAnim = this.sim.hero.anim;
+    if (heroAnim === 'roll' && this.lastHeroAnim !== 'roll') {
+      const origin = this.sim.originOf(this.sim.screen.id);
+      this.fx.dust(add(origin, this.sim.hero.pos), this.sim.tick);
+    }
+    this.lastHeroAnim = heroAnim;
     this.fx.tick(this.sim.tick);
     this.flames.draw(this.sim.screen.cover, this.sim.originOf(this.sim.screen.id), this.sim.tick);
     this.ghostFloor.draw(this.sim.ghosts(), this.sim.originOf(this.sim.screen.id));
@@ -567,6 +582,7 @@ export class PlayScene extends Phaser.Scene {
       cover: this.coverTiles(id),
       shade: shadeMasks(grid, terrain).map((m) => (m === 0 ? -1 : tileset.shade.start + m)),
       fringe: fringeIndices(grid, tileset, FRINGE_SPILL),
+      flips: tileFlips(grid, tileset, salt),
       tileAnims: this.tileAnims,
       decor,
       frames,

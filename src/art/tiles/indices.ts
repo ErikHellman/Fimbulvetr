@@ -31,3 +31,30 @@ export function tileIndices(grid: TerrainGrid, tileset: Tileset, salt: number): 
   }
   return out;
 }
+
+/** Flip flag for ScreenView: bit 1 flips a tile left-right. */
+export const FLIP_X = 1;
+
+/**
+ * Per-cell flips that break up repetition on the one interior tile of each auto-tiled terrain (a lake, a
+ * cliff face): a stable hash mirrors about half the cells left-right. Only the edgeless interior may flip,
+ * since the lit rims of edge tiles would change sides, and tiles never flip top-bottom: that would move
+ * their light to the wrong side, and Phaser 4 draws a flipY'd tile from an extruded tileset black.
+ */
+export function tileFlips(grid: TerrainGrid, tileset: Tileset, salt: number): number[] {
+  const out: number[] = [];
+  for (let y = 0; y < grid.rows; y++) {
+    for (let x = 0; x < grid.cols; x++) {
+      const terrain = grid.cells[y * grid.cols + x];
+      if (terrain === undefined) throw new Error(`no terrain at ${x},${y}`);
+      const entry = tileset.entries[terrain];
+      if (!entry.autotile || groupMask(grid, tileset, x, y) !== 0xff) {
+        out.push(0);
+        continue;
+      }
+      const h = hashInts(x, y, salt, 0xf11b);
+      out.push(h & FLIP_X);
+    }
+  }
+  return out;
+}

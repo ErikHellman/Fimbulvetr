@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { insideBlob, onBlobEdge } from '@art/tiles/blob';
-import { tileIndices } from '@art/tiles/indices';
+import { FLIP_X, tileFlips, tileIndices } from '@art/tiles/indices';
 import { FRINGE_IDS } from '@art/tiles/fringe';
 import { SHADE_TILES } from '@art/tiles/shade';
 import { buildTileset, tileAnimations } from '@art/tiles/tileset';
@@ -185,5 +185,26 @@ describe('cover tiles', () => {
       expect(countOpaque(standing)).toBeLessThan(256);
       expect(countOpaque(cut)).toBeLessThan(countOpaque(standing));
     }
+  });
+});
+
+describe('tile flips', () => {
+  const ts = buildTileset();
+  it('flips only the interior tile of auto-tiled terrain, left-right only', () => {
+    const cells: TerrainId[] = [];
+    for (let i = 0; i < 25; i++) cells.push(i === 12 || i === 7 ? 'water' : i < 5 ? 'grass' : 'rock');
+    // Row 0 grass; rows 1-4 rock with two water cells. Rock at (2,3) is fully surrounded by rock.
+    const grid = { cols: 5, rows: 5, cells };
+    const flips = tileFlips(grid, ts, 3);
+    expect(flips.slice(0, 5).every((f) => f === 0)).toBe(true);
+    expect(flips[12]).toBe(0);
+    const interior = flips.filter((f, i) => f !== 0 && cells[i] === 'rock');
+    expect(interior.length).toBeGreaterThan(0);
+    const waterOnly: TerrainId[] = Array.from({ length: 25 }, () => 'water');
+    const wf = tileFlips({ cols: 5, rows: 5, cells: waterOnly }, ts, 3);
+    expect(wf.some((f) => (f & FLIP_X) !== 0)).toBe(true);
+    expect(flips.every((f) => (f & ~FLIP_X) === 0)).toBe(true);
+    expect(wf.every((f) => (f & ~FLIP_X) === 0)).toBe(true);
+    expect(tileFlips(grid, ts, 3)).toEqual(flips);
   });
 });

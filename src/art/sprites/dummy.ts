@@ -1,8 +1,8 @@
 import type { AnimDef } from '../anims';
 import { decodeGrid, type GridPalette } from '../grid';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
-import { blit, createRaster, getPixel, hex, setPixel, type Raster } from '../raster';
+import { blit, createRaster, getPixel, setPixel, type Raster } from '../raster';
 import type { SpriteFrame } from './types';
 
 const PAL: GridPalette = {
@@ -60,7 +60,7 @@ function wobble(src: Raster, dx: number): Raster {
 export function dummyFrames(): SpriteFrame[] {
   const base = createRaster(W, H);
   blit(base, decodeGrid(GRID, PAL), 2, 1);
-  const finish = (r: Raster): Raster => outline(r, hex(C.ink), 1);
+  const finish = (r: Raster): Raster => cel(r, 1);
   return [
     { name: 'prop_dummy_idle_s_0', raster: finish(base), ox: 10, oy: 25 },
     { name: 'prop_dummy_hurt_s_0', raster: finish(wobble(base, -1)), ox: 10, oy: 25 },

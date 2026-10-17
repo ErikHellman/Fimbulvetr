@@ -14,6 +14,9 @@ const WIND_TO_PX = 60 * 4;
 const MAX_DROPS = 220;
 const MAX_FLAKES = 260;
 const MAX_LEAVES = 60;
+const MAX_SPLASHES = 40;
+/** Splashes lie on the ground, under every sprite (RAIN_DEPTH is far above them). */
+const SPLASH_DEPTH = -0.45;
 
 export interface WeatherHost {
   /** Plays a sound unless muted. */
@@ -44,6 +47,7 @@ export class WeatherView {
   private readonly rain: Emitter;
   private readonly snow: Emitter;
   private readonly leaves: Emitter;
+  private readonly splashes: Emitter;
   private readonly flash: Phaser.GameObjects.Rectangle;
   private key = 'clear';
   private nextBolt = 0;
@@ -104,6 +108,20 @@ export class WeatherView {
         maxAliveParticles: MAX_LEAVES,
       },
     );
+    // Rain that lands: rings on the ground, widening and fading where drops strike.
+    this.splashes = this.emitter(
+      ...sameTexture(frames, ['fx_splash_idle_s_0', 'fx_splash_idle_s_1', 'fx_splash_idle_s_2']),
+      {
+        x: { min: 0, max: GAME_W },
+        y: { min: 0, max: PLAY_H },
+        lifespan: 360,
+        frequency: 24,
+        quantity: 1,
+        scale: { start: 0.6, end: 1.4 },
+        alpha: { start: 0.9, end: 0 },
+        maxAliveParticles: MAX_SPLASHES,
+      },
+    ).setDepth(SPLASH_DEPTH);
     this.flash = scene.add
       .rectangle(0, 0, GAME_W, PLAY_H, 0xe8f0ff)
       .setOrigin(0, 0)
@@ -176,13 +194,14 @@ export class WeatherView {
     set(this.rain, want.rain, 900);
     set(this.snow, want.snow, 6000);
     set(this.leaves, want.leaves, 1500);
+    set(this.splashes, want.storm || want.rain, 400);
     if (want.storm && was !== 'storm') this.nextBolt = now + 1500 + Math.random() * 2500;
   }
 
   /** The pause menu freezes the weather. */
   setPaused(paused: boolean): void {
     this.paused = paused;
-    for (const e of [this.storm, this.rain, this.snow, this.leaves]) e.active = !paused;
+    for (const e of [this.storm, this.rain, this.snow, this.leaves, this.splashes]) e.active = !paused;
   }
 
   /** Raindrops alive (storm or rain). */
@@ -199,7 +218,7 @@ export class WeatherView {
   }
 
   destroy(): void {
-    for (const e of [this.storm, this.rain, this.snow, this.leaves]) e.destroy();
+    for (const e of [this.storm, this.rain, this.snow, this.leaves, this.splashes]) e.destroy();
     this.flash.destroy();
   }
 }

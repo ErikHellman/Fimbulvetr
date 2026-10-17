@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, flipX, hex, type Raster } from '../raster';
 import type { SpriteFrame } from './types';
@@ -43,7 +43,7 @@ function bomb(pose: BombPose): Raster {
     rect(r, 10, 1, 2, 1, SPARK);
     rect(r, 11, 2, 1, 1, SPARK);
   } else rect(r, 10, 1, 1, 1, SPARK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A clay pot stoppered with wax and marked with a black band: bombs inside. */
@@ -54,7 +54,7 @@ function bombPot(): Raster {
   rect(r, 6, 1, 4, 1, IRON);
   rect(r, 2, 7, 12, 2, IRON_SHADE);
   rect(r, 7, 7, 2, 2, SPARK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Cracks, one tile each (18 px wide, feet 2 px above the bottom, like every fixture) ───────────────
@@ -101,7 +101,7 @@ function crackedRock(): Raster {
   ellipse(r, 9, 9.5, 7.5, 7, (x, y) => (x + y > 20 ? ROCK_SHADE : ROCK));
   ellipse(r, 6, 6, 2.5, 2, ROCK_LIGHT);
   split(r, 9, DARK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** Its rubble: a few stones left on the ground. */
@@ -110,7 +110,7 @@ function rubble(): Raster {
   ellipse(r, 5, 14, 2.5, 1.5, ROCK_SHADE);
   ellipse(r, 11, 14.5, 2, 1.5, ROCK);
   ellipse(r, 14, 12.5, 1.5, 1, ROCK_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Mud-crab: 32×24, its feet at (16, 21) ─────────────────────────────────────────────────────────────
@@ -154,7 +154,7 @@ function crab(side: 'front' | 'back' | 'side', pose: CrabPose): Raster {
     rect(r, 13, 8 + lift, 1, 1, EYE);
     rect(r, 18, 8 + lift, 1, 1, EYE);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A mill wheel on its axle, one tile: paddles upright when turned to the water's level, askew when not. */
@@ -179,7 +179,7 @@ function wheel(on: boolean): Raster {
   ellipse(r, 9, 13, 1.5, 1.5, IRON);
   rect(r, 7, 20, 4, 4, ROCK_SHADE);
   if (on) rect(r, 8, 12, 2, 2, SPARK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const DOOR_H = 26;
@@ -191,7 +191,7 @@ function bigLock(open: boolean): Raster {
   if (open) {
     rect(r, 1, DOOR_H - 7, 16, 4, WHEEL);
     rect(r, 1, DOOR_H - 4, 16, 1, WHEEL_SHADE);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   rect(r, 1, 3, 16, DOOR_H - 5, WHEEL_SHADE);
   for (const x of [4, 8, 12]) rect(r, x, 3, 2, DOOR_H - 5, WHEEL);
@@ -199,7 +199,7 @@ function bigLock(open: boolean): Raster {
   ellipse(r, 9, 9, 3, 3, IRON_SHADE);
   rect(r, 5, 11, 8, 7, GOLD);
   rect(r, 8, 13, 2, 3, INK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Lindormr: 48×48, its feet at (24, 44); and its mud mounds, 28×24, feet at (14, 21) ──────────────
@@ -226,12 +226,12 @@ function serpent(side: 'front' | 'back' | 'side', pose: WormPose): Raster {
   if (pose === 'hidden') {
     ellipse(r, 20, 40, 1.5, 1.5, MUD_LIGHT);
     ellipse(r, 27, 42, 1, 1, MUD_LIGHT);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   if (pose === 'ripple') {
     mudRing(r, 14);
     ellipse(r, 24, 42, 7, 1.5, MUD_LIGHT);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   const lying = pose === 'dazed' || pose === 'charge';
   if (pose === 'coil') {
@@ -274,7 +274,7 @@ function serpent(side: 'front' | 'back' | 'side', pose: WormPose): Raster {
       [hx + 5, hy - 5],
     ] as const)
       rect(r, x, y, 2, 2, SPARK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A mound of grey mud; bubbling while the serpent hides in it. */
@@ -286,7 +286,7 @@ function mound(bubble: number | null): Raster {
     ellipse(r, 10 + bubble * 5, 9 - bubble, 2, 2, MUD_LIGHT);
     rect(r, 16 - bubble * 3, 8 + bubble, 2, 2, MUD_LIGHT);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── The blast: 48×48, centred 30 px down (the bomb's feet), a flash that swells and breaks into smoke ──

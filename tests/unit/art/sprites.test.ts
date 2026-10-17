@@ -34,7 +34,7 @@ describe('sprites', () => {
 
   it('draws something in every frame, with the feet inside it', () => {
     // Weather particles are specks by nature: a snowflake is a few pixels.
-    const specks = ['fx_drop_', 'fx_snow_', 'fx_leaf_'];
+    const specks = ['fx_drop_', 'fx_snow_', 'fx_leaf_', 'fx_hit_', 'fx_dust_', 'fx_splash_'];
     for (const f of frames) {
       const min = specks.some((p) => f.name.startsWith(p)) ? 0 : 20;
       expect(countOpaque(f.raster), f.name).toBeGreaterThan(min);

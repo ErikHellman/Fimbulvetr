@@ -35,6 +35,16 @@ export class FxView {
     this.add('fx_spark', at, tick, 16);
   }
 
+  /** A blow landing on a foe, at its middle. */
+  hit(at: Vec, tick: number): void {
+    this.add('fx_hit', at, tick, 9);
+  }
+
+  /** Dust at the feet as a roll begins (drawn under the roller). */
+  dust(at: Vec, tick: number): void {
+    this.add('fx_dust', at, tick, 15, -1);
+  }
+
   tick(t: number): void {
     for (let i = this.bursts.length - 1; i >= 0; i--) {
       const b = this.bursts[i];
@@ -59,12 +69,12 @@ export class FxView {
     this.bursts.length = 0;
   }
 
-  private add(art: string, at: Vec, tick: number, life: number): void {
+  private add(art: string, at: Vec, tick: number, life: number, depthOffset = 1): void {
     const ref = this.frames.get(frameFor(this.anims, art, 'idle', 's', 0));
     const sprite = this.scene.add
       .sprite(Math.round(at.x), Math.round(at.y), ref.key, ref.frame)
       .setOrigin(ref.ox, ref.oy)
-      .setDepth(at.y + 1);
+      .setDepth(at.y + depthOffset);
     this.bursts.push({ sprite, art, born: tick, life });
   }
 }

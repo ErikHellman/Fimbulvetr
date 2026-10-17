@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, flipX, hex, type Raster } from '../raster';
 import type { Side } from './people';
@@ -9,7 +9,6 @@ import type { SpriteFrame } from './types';
 
 /** Mýrland's creatures: the water-worm in its pool, the bog-light over the fen, and the worm's spit. */
 
-const INK = hex(C.ink);
 const WATER = hex(C.water);
 const WATER_LIGHT = hex(C.waterLight);
 const WORM = hex('#4f6a3a');
@@ -58,7 +57,7 @@ function worm(side: Side, pose: WormPose): Raster {
     // The maw gapes on the tell and as it spits.
     if (pose !== 'sink') rect(r, hx - (side === 'w' ? 5 : 2), top + 4, 4, pose === 'rear' ? 3 : 2, MAW);
   }
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 // ── Bog-light: 24×32, a flame hanging over its reflection (the feet) at (12, 30) ─────────────────────
@@ -90,7 +89,7 @@ function spit(i: number): Raster {
   ellipse(r, 5, 10, 2.5, 1, MUD_SHADE);
   ellipse(r, 5, 3 + (i % 2), 3, 2.5 + (i % 2) * 0.5, MUD);
   rect(r, 4, 2 + (i % 2), 1, 1, hex(C.mudLight));
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function myrlandFrames(): SpriteFrame[] {

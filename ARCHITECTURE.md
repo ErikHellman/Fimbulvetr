@@ -129,6 +129,10 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   - *Characters:* `hero.ts` and `people.ts` add a hair and cheek highlight, a lit shoulder column, a buckle and two-tone boots, and a second idle frame a pixel lower (the breath, 2 fps). Frame names are unchanged; `idle` has two frames for the hero and every NPC.
   - *Decor:* `decor_tree_young`, `decor_tree_old` and `decor_pine_tall` join the tree and pine picks (`decorArt` hashes the choice per block).
   - *UI:* `drawPanel` (UiScene) draws every panel with a gold rule, a dim inner rule and a knot in each corner; the title gets a shadow copy, a gold tint and a rule with knotted ends.
+- **Creatures and effects (G3).**
+  - *Cel relight* (`art/cel.ts`): `relight` lightens every opaque pixel on a sprite's top or left silhouette edge and shades its bottom or right edge before the outline, so one light from the upper left falls on every creature, prop and pickup; `cel(r, width)` is relight plus outline, and every sprite module but the hero, people and decor (which carry their own highlights) finishes its frames with it.
+  - *Effects* (`art/sprites/fx.ts`, `FxView`): `fx_hit` flashes on a foe that takes damage (PlayScene finds the target among `sim.entities`), `fx_dust` puffs under the hero as a roll begins (drawn just below the roller), and `fx_splash` rings land on the ground under rain and storms (a `WeatherView` emitter at ground depth).
+  - *Tile flips* (`tileFlips` in `art/tiles/indices.ts`): the one edgeless interior tile of each auto-tiled terrain is mirrored left-right per cell by a position hash, so open water and cliff faces stop repeating; `ScreenView` sets `flipX` on those tiles.
 - **`src/shell/platform/*`**:
   - Settings in `localStorage['fimbulvetr.settings.v1']` (with `colourBlind`, `showIntro` and `keys`, the keyboard overrides). The intro choice lives here, not in a save, so it holds for every new game in the browser.
   - IndexedDB `fimbulvetr` (stores `saves`: auto, auto_prev, s1–s3; and `meta`).

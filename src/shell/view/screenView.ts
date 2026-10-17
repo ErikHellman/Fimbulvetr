@@ -1,5 +1,6 @@
 import type * as Phaser from 'phaser';
 import { frameFor, type AnimTable } from '@art/anims';
+import { FLIP_X } from '@art/tiles/indices';
 import type { TileAnim } from '@art/tiles/tileset';
 import { add, type Vec } from '@core/math/vec';
 import { decorFeet, type DecorPlacement } from '@core/world/decor';
@@ -28,6 +29,8 @@ export interface ScreenViewOptions {
   readonly shade: readonly number[];
   /** The fringe overlay per cell (-1 for none): soft ground spilling over harder ground next to it. */
   readonly fringe: readonly number[];
+  /** Per-cell flips on interior tiles (see tileFlips), 0 for none. */
+  readonly flips: readonly number[];
   readonly tileAnims: readonly TileAnim[];
   readonly decor: readonly DecorItem[];
   readonly frames: FrameIndex;
@@ -89,6 +92,11 @@ export class ScreenView {
     if (ground === null || coverLayer === null || shadeLayer === null || fringeLayer === null)
       throw new Error('could not create the tile layers');
     ground.putTilesAt(rowsOf(o.indices), 0, 0);
+    o.flips.forEach((f, i) => {
+      if (f === 0) return;
+      const tile = ground.getTileAt(i % SCREEN_COLS, Math.floor(i / SCREEN_COLS), true);
+      tile.flipX = (f & FLIP_X) !== 0;
+    });
     ground.setDepth(-2);
     fringeLayer.putTilesAt(rowsOf(o.fringe), 0, 0);
     fringeLayer.setDepth(-1.75);

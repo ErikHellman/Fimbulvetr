@@ -1,6 +1,6 @@
 import type { AnimDef } from '../anims';
 import { ellipse, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, hex, type Raster, type Rgba } from '../raster';
 import type { SpriteFrame } from './types';
@@ -77,7 +77,7 @@ function palisade(): Raster {
   }
   rect(r, 1, 13, 16, 2, WOOD_SHADE);
   rect(r, 1, 24, 16, 2, WOOD_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** The gate thrown open: its bar lying on the ground. */
@@ -87,7 +87,7 @@ function threshold(): Raster {
   rect(r, 1, STAKE_H - 4, 16, 1, WOOD_SHADE);
   rect(r, 3, STAKE_H - 6, 1, 2, WOOD_SHADE);
   rect(r, 14, STAKE_H - 6, 1, 2, WOOD_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A drawbridge tile let down: planks laid across the water, ends pinned with iron. */
@@ -125,7 +125,7 @@ function logPile(): Raster {
   log(1, LOG_H - 8, 16);
   log(3, LOG_H - 13, 12);
   log(5, LOG_H - 18, 8);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 function chips(): Raster {
@@ -173,7 +173,7 @@ function chest(open: boolean): Raster {
     rect(r, 12, base - 14, 2, 5, IRON);
     rect(r, 8, base - 10, 2, 3, GOLD);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const DOOR_H = 26;
@@ -188,7 +188,7 @@ function lockedDoor(): Raster {
   rect(r, 6, 11, 6, 6, GOLD);
   rect(r, 8, 12, 2, 2, INK);
   rect(r, 8, 14, 2, 2, INK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** Bars of old root, dropped across a doorway, or sunk back into the floor. */
@@ -203,7 +203,7 @@ function shutter(open: boolean): Raster {
     rect(r, 1, 8, 16, 2, ROOT_SHADE);
     rect(r, 1, DOOR_H - 9, 16, 2, ROOT_SHADE);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const POST_H = 26;
@@ -215,7 +215,7 @@ function switchStone(on: boolean): Raster {
   rect(r, 11, 10, 3, POST_H - 13, ROCK_SHADE);
   ellipse(r, 9, 8, 5, 5, on ? RUNE : ROCK_SHADE);
   ellipse(r, 8, 7, 2, 2, on ? hex('#e8fbff') : ROCK_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** An iron fire-bowl on three legs. */
@@ -229,7 +229,7 @@ function brazier(i: number | null): Raster {
   rect(r, 3, base - 9, 12, 2, hex('#3d4148'));
   if (i === null) {
     rect(r, 5, base - 10, 8, 1, ASH);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   [6, 9, 12].forEach((x, k) => {
     const h = 4 + ((i + k) % 3) * 2;
@@ -238,7 +238,7 @@ function brazier(i: number | null): Raster {
     rect(r, Math.round(cx), base - 12 - h, 1, 2, FLAME_TIP);
   });
   ellipse(r, 9, base - 10, 4, 2, EMBER_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A heart container: a full, bright heart that bobs in place. */
@@ -250,7 +250,7 @@ function heartContainer(bob: number): SpriteFrame {
   for (let k = 0; k < 7; k++) rect(r, 3 + k, y + 4 + k, 12 - 2 * k, 1, HEART);
   rect(r, 10, y + 6, 4, 3, HEART_SHADE);
   rect(r, 4, y + 2, 2, 2, HEART_LIGHT);
-  return { name: `pickup_heart_container_idle_s_${bob}`, raster: outline(r, INK, 1), ox: 9, oy: 16 };
+  return { name: `pickup_heart_container_idle_s_${bob}`, raster: cel(r, 1), ox: 9, oy: 16 };
 }
 
 export function fixtureFrames(): SpriteFrame[] {

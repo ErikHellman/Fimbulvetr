@@ -1,6 +1,6 @@
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { blit, createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { LOOKS, drawPerson } from './people';
@@ -61,7 +61,7 @@ function warden(side: 's' | 'n' | 'w', pose: WardenPose, phase: number): Raster 
     // Meltwater running off him.
     for (const x of [14, 20, 31, 37]) line(r, x, 30, x, 36 + (x % 3), THAW_LIGHT);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Kolbeinn: 40×40, his feet at (20, 35) ─────────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ function seidmadr(side: 's' | 'n' | 'w', pose: SeidmadrPose, phase: number): Ras
     line(r, 29, 33, 29, 10, STAFF);
     rect(r, 28, 8, 3, 3, tip);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Hrímnir, the Rime King: 76×84, his feet at (38, 80) ───────────────────────────────────────────────
@@ -144,7 +144,7 @@ function king(side: 's' | 'n' | 'w', pose: KingPose): Raster {
     line(r, 38, 50 + stoop, 44, 56 + stoop, rune);
     line(r, 38, 56 + stoop, 32, 62 + stoop, rune);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** His hand, 40×28: first only its shadow on the floor, then the hand itself sweeping; cracked when struck. */
@@ -162,7 +162,7 @@ function hand(pose: 'shadow' | 'sweep' | 'struck'): Raster {
     line(r, 12, 8, 20, 20, RUNE_LIT);
     line(r, 28, 8, 22, 20, RUNE_LIT);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A rime pillar, 36×52: its shadow, falling, then its wreck of glaze and shards. */
@@ -176,7 +176,7 @@ function pillar(pose: 'shadow' | 'fall' | 'fallen', phase: number): Raster {
     ellipse(r, 18, 46, 14, 2, SHADOW);
     rect(r, 12, 4 + phase * 10, 12, 30, KING);
     rect(r, 12, 4 + phase * 10, 3, 30, KING_LIGHT);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   ellipse(r, 18, 42, 15, 7, hex('#cfe8f8'));
   ellipse(r, 18, 41, 12, 5, KING_LIGHT);
@@ -186,7 +186,7 @@ function pillar(pose: 'shadow' | 'fall' | 'fallen', phase: number): Raster {
     [16, 44],
   ] as const)
     rect(r, x, y, 4, 3, KING);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function utgardFrames(): SpriteFrame[] {

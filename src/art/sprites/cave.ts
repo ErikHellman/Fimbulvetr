@@ -1,6 +1,6 @@
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, hex, type Raster } from '../raster';
 import type { SpriteFrame } from './types';
@@ -48,7 +48,7 @@ function rootBlock(): Raster {
   }
   rect(r, 6, 8, 3, 2, ROOT_LIGHT);
   rect(r, 3, h - 3, 12, 1, ROOT_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A curtain of vines hanging across a passage, strands swaying by a pixel. */
@@ -65,7 +65,7 @@ function vines(): Raster {
     }
     ellipse(r, x + 1, 3 + len - 1, 1.6, 1.6, VINE_LIGHT);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A thicket of brambles across a way: dark tangled canes with thorns and a few red berries. */
@@ -96,7 +96,7 @@ function bramble(): Raster {
     [5, 15],
   ] as const)
     rect(r, x, y, 2, 2, hex('#b0303a'));
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Root-biter: a root with a mouth, 28×32, feet at (14, 28) ──────────────────────────────────────────
@@ -114,7 +114,7 @@ function biter(rise: number, gape: boolean, lean = 0): Raster {
     ellipse(r, 14, ground - 2, 5, 3, ROOT);
     rect(r, 12, ground - 3, 4, 1, ROOT_LIGHT);
     rect(r, 15, ground - 2, 1, 1, EYE);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   const h = Math.round(20 * rise);
   const top = ground - h;
@@ -139,7 +139,7 @@ function biter(rise: number, gape: boolean, lean = 0): Raster {
   }
   rect(r, hx - 3, top + 1, 2, 1, ROOT_LIGHT);
   rect(r, hx + 2, top + 2, 1, 1, EYE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Rótvættr: a heart of roots, 56×52, feet at (28, 49) ────────────────────────────────────────────────
@@ -184,7 +184,7 @@ function rotvaettr(state: Heart, shake: number): Raster {
     [cx - 10, 34],
   ] as const)
     line(r, x, y, x + 5, y - 4, ROOT_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── A bulb on its stalk, 20×24, feet at (10, 21) ────────────────────────────────────────────────────────
@@ -198,7 +198,7 @@ function bulb(pulse: number): Raster {
   ellipse(r, 10, 8, g, g, AMBER_SHADE);
   ellipse(r, 10, 8, g - 1.5, g - 1.5, AMBER);
   ellipse(r, 9, 7, 1.8, 1.8, AMBER_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── A root spike, 20×32, feet at (10, 29) ───────────────────────────────────────────────────────────────
@@ -227,7 +227,7 @@ function spike(h: number): Raster {
     rect(r, 10 + Math.ceil(w / 2) - 1, base - y, 1, 1, ROOT_SHADE);
   }
   ellipse(r, 10, base, 6, 1.5, CRACK);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── The boomerang in flight, 14×14, drawn on its ground point ────────────────────────────────────────
@@ -246,7 +246,7 @@ function boomerang(turn: number): Raster {
   rect(r, x, y, w, h, WOOD);
   rect(r, x2, y2, w2, h2, WOOD);
   rect(r, x + w - 1, y + h - 1, 1, 1, WOOD_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function caveFrames(): SpriteFrame[] {

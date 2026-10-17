@@ -1,12 +1,11 @@
 import type { AnimDef } from '../anims';
 import { ellipse, rect } from '../draw';
 import { decodeGrid, type GridPalette } from '../grid';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { blit, createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import type { SpriteFrame } from './types';
 
-const INK = hex(C.ink);
 const W = hex(C.wool);
 const WS = hex(C.woolShade);
 const FACE = hex(C.sheepFace);
@@ -21,7 +20,7 @@ function sheepSide(phase: number): Raster {
   ellipse(r, 5, 8, 3, 3.5, FACE);
   rect(r, 4, 7, 1, 1, W);
   rect(r, 6, 4, 2, 2, FACE);
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 function sheepFront(back: boolean, phase: number): Raster {
@@ -36,7 +35,7 @@ function sheepFront(back: boolean, phase: number): Raster {
     rect(r, 7, 6, 2, 1, FACE);
     rect(r, 13, 6, 2, 1, FACE);
   }
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 const RAVEN = hex(C.raven);
@@ -59,7 +58,7 @@ function raven(pose: 0 | 1 | 2 | 3): Raster {
     rect(r, 10, 2, 3, 1, RAVEN_S);
   }
   if (pose === 3) rect(r, 9, 11, 7, 3, RAVEN_S);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const PROP_PAL: GridPalette = {
@@ -178,7 +177,7 @@ function propFrame(name: string, grid: readonly string[]): SpriteFrame {
   const g = decodeGrid(grid, PROP_PAL);
   const r = createRaster(g.w + 2, g.h + 2);
   blit(r, g, 1, 1);
-  return { name, raster: outline(r, INK, 1), ox: Math.floor(r.w / 2), oy: r.h - 1 };
+  return { name, raster: cel(r, 1), ox: Math.floor(r.w / 2), oy: r.h - 1 };
 }
 
 const HEART_PAL: GridPalette = { '.': null, h: C.heart, H: C.heartShade, l: C.heartLight, e: C.ink };
@@ -199,7 +198,7 @@ function heartFrames(): SpriteFrame[] {
     const g = decodeGrid(HEART_PIECE, HEART_PAL);
     const r = createRaster(g.w + 4, g.h + 4);
     blit(r, g, 2, 2);
-    const done = outline(r, INK, 1);
+    const done = cel(r, 1);
     if (i === 1) {
       const glint: Rgba = [255, 255, 255, 255];
       rect(done, 3, 3, 1, 1, glint);
@@ -224,13 +223,13 @@ function dropFrames(): SpriteFrame[] {
   const hg = decodeGrid(SMALL_HEART, HEART_PAL);
   const hr = createRaster(hg.w + 2, hg.h + 2);
   blit(hr, hg, 1, 1);
-  const hd = outline(hr, INK, 1);
+  const hd = cel(hr, 1);
   const heart = { name: 'pickup_heart_idle_s_0', raster: hd, ox: Math.floor(hd.w / 2), oy: hd.h - 1 };
   const coins = [0, 1].map((i) => {
     const g = decodeGrid(COIN, COIN_PAL);
     const r = createRaster(g.w + 2, g.h + 2);
     blit(r, g, 1, 1);
-    const done = outline(r, INK, 1);
+    const done = cel(r, 1);
     if (i === 1) rect(done, 3, 2, 1, 1, [255, 255, 255, 255]);
     return { name: `pickup_silver_idle_s_${i}`, raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
   });
@@ -238,7 +237,7 @@ function dropFrames(): SpriteFrame[] {
     const g = decodeGrid(JAR, JAR_PAL);
     const r = createRaster(g.w + 2, g.h + 3);
     blit(r, g, 1, 1 + i);
-    const done = outline(r, INK, 1);
+    const done = cel(r, 1);
     return { name: `pickup_seidr_idle_s_${i}`, raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
   });
   return [heart, ...coins, ...jars];
@@ -256,7 +255,7 @@ function fenMoss(): SpriteFrame {
     [6, 9],
   ] as const)
     rect(r, x, y, 1, 1, hex('#f4f2e8'));
-  const done = outline(r, INK, 1);
+  const done = cel(r, 1);
   return { name: 'pickup_herb_fen_moss_idle_s_0', raster: done, ox: Math.floor(done.w / 2), oy: done.h - 1 };
 }
 
