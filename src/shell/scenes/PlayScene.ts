@@ -20,7 +20,10 @@ import { NEW_GAME } from '@content/start';
 import { decorArt, decorPlacements } from '@core/world/decor';
 import { shadeMasks } from '@core/world/shade';
 import { SCREEN_H, SCREEN_W, TILE } from '@core/world/dims';
+import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
+import { MUSIC_RULES } from '@content/music';
+import { musicOf } from '@core/audio/music';
 import type { DevBridge, ViewStats } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
 import { connectedPads, readPad } from '@shell/input/gamepad';
@@ -83,6 +86,7 @@ export class PlayScene extends Phaser.Scene {
   private sim!: Sim;
   private mapper!: InputMapper;
   private audio!: AudioDirector;
+  private music: MusicPlayer | null = null;
   private views!: EntityViews;
   private weather!: WeatherView;
   private darkness!: DarknessView;
@@ -138,6 +142,7 @@ export class PlayScene extends Phaser.Scene {
       holdToggleShield: data.settings.holdShield,
     });
     this.audio = new AudioDirector(this, () => data.settings.volume, data.muted);
+    this.music = MusicPlayer.of(this);
 
     const detachKeys = attachKeyboard(window, this.keys);
     const flush = (): void => {
@@ -223,6 +228,7 @@ export class PlayScene extends Phaser.Scene {
   }
 
   override update(_time: number, delta: number): void {
+    this.music?.set(musicOf(this.sim, MUSIC_RULES), musicLevel(this.services.settings, this.services.muted));
     const codes = this.keys.takeCodes();
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);

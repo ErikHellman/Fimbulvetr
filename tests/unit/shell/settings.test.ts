@@ -53,6 +53,12 @@ describe('settings', () => {
     });
   });
 
+  it('keeps a music level from 0 to 1, and falls back outside it (older settings have none)', () => {
+    expect(parseSettings(JSON.stringify({ music: 0.3 }), 'en').music).toBe(0.3);
+    expect(parseSettings(JSON.stringify({ music: 3 }), 'en').music).toBe(DEFAULT_SETTINGS.music);
+    expect(parseSettings(JSON.stringify({ volume: 0.5 }), 'en').music).toBe(DEFAULT_SETTINGS.music);
+  });
+
   it('reads the text size as a word; an old number falls back to normal', () => {
     expect(parseSettings(JSON.stringify({ textSize: 'larger' }), 'en').textSize).toBe('larger');
     expect(parseSettings(JSON.stringify({ textSize: 2 }), 'en').textSize).toBe('normal');

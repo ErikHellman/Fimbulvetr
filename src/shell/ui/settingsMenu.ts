@@ -12,6 +12,7 @@ import { REMAPPABLE, rebind, type RemappableAction } from '@shell/input/remap';
 export const SETTING_ROWS = [
   'lang',
   'volume',
+  'music',
   'scaling',
   'textSize',
   'shake',
@@ -63,7 +64,8 @@ function nudge(s: Settings, row: SettingRow, dir: 1 | -1): Settings {
       return { ...s, lang: LANGS[(i + (dir === 1 ? 1 : LANGS.length - 1)) % LANGS.length] ?? s.lang };
     }
     case 'volume':
-      return { ...s, volume: Math.round(Math.min(1, Math.max(0, s.volume + dir * VOLUME_STEP)) * 10) / 10 };
+    case 'music':
+      return { ...s, [row]: Math.round(Math.min(1, Math.max(0, s[row] + dir * VOLUME_STEP)) * 10) / 10 };
     case 'scaling':
       return { ...s, scaling: s.scaling === 'integer' ? 'fit' : 'integer' };
     case 'textSize': {

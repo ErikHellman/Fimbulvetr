@@ -140,6 +140,7 @@ export const UI = {
   season_spring: { en: 'spring', sv: 'vår' },
   set_lang: { en: 'Language', sv: 'Språk' },
   set_volume: { en: 'Volume', sv: 'Volym' },
+  set_music: { en: 'Music', sv: 'Musik' },
   set_scaling: { en: 'Picture', sv: 'Bild' },
   set_scaling_integer: { en: 'Sharp pixels', sv: 'Skarpa pixlar' },
   set_scaling_fit: { en: 'Fill the window', sv: 'Fyll fönstret' },

@@ -15,6 +15,7 @@ const TEXT_SIZE_NAME = {
 const ROW_LABEL = {
   lang: UI.set_lang,
   volume: UI.set_volume,
+  music: UI.set_music,
   scaling: UI.set_scaling,
   textSize: UI.set_text_size,
   shake: UI.set_shake,
@@ -49,7 +50,8 @@ function value(row: SettingRow, s: Settings, lang: Lang): string {
     case 'lang':
       return LANG_NAME[s.lang];
     case 'volume':
-      return `${String(Math.round(s.volume * 10))}/10`;
+    case 'music':
+      return `${String(Math.round(s[row] * 10))}/10`;
     case 'scaling':
       return t(s.scaling === 'integer' ? UI.set_scaling_integer : UI.set_scaling_fit, lang);
     case 'textSize':
