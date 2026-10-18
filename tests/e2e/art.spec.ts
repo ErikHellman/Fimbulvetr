@@ -26,9 +26,13 @@ test('real art listed in atlases/manifest.json replaces frames and tiles by name
   expect(errors).toEqual([]);
 });
 
-test('without a manifest entry the placeholders stay', async ({ page }) => {
+test('the shipped manifest replaces the hero frames and no tiles', async ({ page }) => {
   const errors = collectErrors(page);
   await boot(page, 'nosave&preset=m0&screen=test_a&at=13,11');
-  expect(await page.evaluate(() => window.__fimbul?.artOverrides())).toEqual({ frames: [], tiles: [] });
+  const overrides = await page.evaluate(() => window.__fimbul?.artOverrides());
+  expect(overrides?.tiles).toEqual([]);
+  expect(overrides?.frames).toContain('hero_idle_s_0');
+  expect(overrides?.frames).toContain('hero_fork_attack1_e_2');
+  expect(await page.evaluate(() => window.__fimbul?.missingFrames())).toEqual([]);
   expect(errors).toEqual([]);
 });

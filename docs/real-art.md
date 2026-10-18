@@ -21,7 +21,7 @@ and tile with its name, with any real art already in place.
 
 - Paths are relative to `public/atlases/`; subfolders are fine, `..` and absolute paths are not.
 - `atlases` are sprite atlases, `tiles` are tile sheets, one per terrain. Either list may be left out.
-- The shipped manifest is empty. Add entries as art arrives; a partial set is fine at every step.
+- The shipped manifest lists the drawn hero atlas. Add entries as art arrives; a partial set is fine at every step.
 
 ## Sprite atlases
 
@@ -83,3 +83,18 @@ is the step to take before the atlases grow past a few megabytes.
 - [ ] Hero sheet (`hero`, `hero_axe`, `hero_fork`) and Embla.
 - [ ] The Askdalr tileset: grass, path, yard, field, water, rock, wood, roof, fence.
 - [ ] Per-region atlas loading and unloading.
+
+## Drawing art in the repo: `art-src/`
+
+The hero sheet is drawn in code, but not generated: `art-src/hero/parts.ts` and `props.ts` are hand-drawn
+pixel grids (one palette letter per pixel, `palette.ts` maps letters to colours), and `art-src/hero/build.ts`
+composes them into poses (legs, torso, arm, head, shield, weapon), outlines the result and emits the 25
+animations for the three weapon kits (`hero`, `hero_axe`, `hero_fork`). `art-src/lib` holds the tiny
+toolkit: PNG encoding, grid parsing, mirroring and rotation, shelf packing into an atlas, preview sheets.
+
+- `pnpm art:pack` rewrites `public/atlases/hero.png` and `hero.json`. Commit both with the source.
+- `pnpm art:pack --preview <dir>` also writes one contact sheet per animation (`hero_walk.png`) and the
+  placeholder's sheet beside it (`old_hero_walk.png`) for before/after review.
+- `art-src` is type-checked by `tsconfig.json` but is not part of the game bundle and may use Node.
+- To replace the drawn hero with painted art, drop a new atlas under the same frame names and point
+  the manifest at it; nothing in `art-src` is imported by the game.

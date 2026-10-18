@@ -1,1 +1,5 @@
-{ "version": 1, "atlases": [], "tiles": [] }
+{
+  "version": 1,
+  "atlases": [{ "key": "hero", "image": "hero.png", "data": "hero.json" }],
+  "tiles": []
+}

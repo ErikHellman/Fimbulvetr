@@ -312,5 +312,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
 - [x] G3 Creatures and effects — cel relight on every creature and prop, hit flash, roll dust, rain splashes, interior tile flips
 - [ ] G4 Real art (see `docs/real-art.md`)
   - [x] Atlas loader: `public/atlases/manifest.json` replaces frames and tiles by name
-  - [ ] Hero and Embla sheets, the Askdalr tileset (needs an artist)
+  - [x] Hero sheet drawn in-repo (`art-src/hero`, three kits, `pnpm art:pack`)
+  - [ ] Embla sheet and the Askdalr tileset
   - [ ] Per-region atlas loading
