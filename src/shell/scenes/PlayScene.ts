@@ -29,6 +29,7 @@ import { musicOf } from '@core/audio/music';
 import type { DevBridge, ViewStats } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
 import { connectedPads, readPad } from '@shell/input/gamepad';
+import { activePadStyle, padLabel, type PadStyle } from '@shell/input/padLabels';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { LETTERBOX } from '@shell/scale';
@@ -116,6 +117,8 @@ export class PlayScene extends Phaser.Scene {
   private settingsMenu: SettingsMenuState | null = null;
   /** The save-slot picker, while the sim's `save` step waits. */
   private picker: PickerState | null = null;
+  /** The kind of controller connected now, or null: prompts name its buttons while there is one. */
+  private pad: PadStyle | null = null;
   private pickerSlots: Record<'s1' | 's2' | 's3', SaveSummary | null> = { s1: null, s2: null, s3: null };
   private pickerResult: 'saved' | 'failed' | null = null;
   /** Keys held last frame, to find the one freshly pressed (for rebinding). */
@@ -204,7 +207,13 @@ export class PlayScene extends Phaser.Scene {
       sim: this.sim,
       frames: data.assets.frames,
       lang: () => data.settings.lang,
-      keyLabel: (action) => keyLabel(bindingsOf(data.settings.keys).kb[action][0] ?? ''),
+      pad: () => this.pad,
+      keyLabel: (action) => {
+        const button = bindingsOf(data.settings.keys).pad[action][0];
+        return this.pad !== null && button !== undefined
+          ? padLabel(button, this.pad, data.settings.lang)
+          : keyLabel(bindingsOf(data.settings.keys).kb[action][0] ?? '');
+      },
       sfx: (id) => {
         this.audio.play(id);
       },
@@ -235,7 +244,9 @@ export class PlayScene extends Phaser.Scene {
     const codes = this.keys.takeCodes();
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
-    this.mapper.sample(codes, readPad(connectedPads(navigator)));
+    const pads = connectedPads(navigator);
+    this.pad = activePadStyle(pads);
+    this.mapper.sample(codes, readPad(pads));
     if (this.picker === null && this.sim.storyUi()?.k === 'save') this.openPicker();
     if (this.picker !== null) {
       this.updatePicker(this.latch.consume());

@@ -3,6 +3,7 @@ import { t, type Lang } from '@core/i18n/t';
 import type { ContentDb } from '@core/sim/db';
 import type { StoryUi } from '@core/sim/systems/story';
 import { FISHING } from '@core/story/fishing';
+import { prompt, type PadStyle } from '@shell/input/padLabels';
 
 export type FishUi = Extract<NonNullable<StoryUi>, { k: 'fish' }>;
 
@@ -19,11 +20,11 @@ export interface FishPanel {
   readonly dist: number | null;
 }
 
-export function fishPanel(ui: FishUi, db: ContentDb, lang: Lang): FishPanel {
+export function fishPanel(ui: FishUi, db: ContentDb, lang: Lang, pad: PadStyle | null = null): FishPanel {
   const none = { tension: null, dist: null } as const;
   switch (ui.phase) {
     case 'idle':
-      return { text: t(UI.fish_idle, lang), ...none };
+      return { text: prompt(UI.fish_idle, UI.fish_idle_pad, pad, lang), ...none };
     case 'cast':
       return { text: t(UI.fish_cast, lang), ...none };
     case 'wait':
@@ -33,7 +34,7 @@ export function fishPanel(ui: FishUi, db: ContentDb, lang: Lang): FishPanel {
     case 'reel': {
       const max = FISHING.tensionMax;
       return {
-        text: t(ui.surging ? UI.fish_surge : UI.fish_reel, lang),
+        text: ui.surging ? t(UI.fish_surge, lang) : prompt(UI.fish_reel, UI.fish_reel_pad, pad, lang),
         tension: {
           at: Math.min(1, ui.tension / max),
           band: [ui.band[0] / max, ui.band[1] / max],
