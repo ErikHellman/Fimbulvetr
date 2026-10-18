@@ -42,12 +42,34 @@ test('the shipped manifest replaces the hero, villager and decor frames and the 
     'roof',
     'water',
     'ford',
+    'tree',
+    'ledge',
+    'wall',
+    'door',
+    'door_shut',
+    'window',
+    'chimney',
+    'floor',
+    'wall_int',
+    'jetty',
+    'pine',
+    'well',
+    'trough',
+    'stump',
+    'menhir',
+    'runestone',
+    'birch',
+    'boulder',
+    'bed',
+    'table',
+    'hearth',
   ]);
   expect(overrides?.frames).toContain('hero_idle_s_0');
   expect(overrides?.frames).toContain('hero_fork_attack1_e_2');
   expect(overrides?.frames).toContain('npc_embla_walk_e_3');
   expect(overrides?.frames).toContain('npc_halvar_idle_n_1');
   expect(overrides?.frames).toContain('decor_well_idle_s_3');
+  expect(overrides?.frames).toContain('decor_hearth_idle_s_3');
   expect(await page.evaluate(() => window.__fimbul?.missingFrames())).toEqual([]);
   expect(errors).toEqual([]);
 });

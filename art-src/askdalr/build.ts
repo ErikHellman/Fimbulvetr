@@ -2,6 +2,8 @@ import { outline } from '@art/outline';
 import { C } from '@art/palette';
 import { createRaster, getPixel, hex, setPixel, type Raster } from '@art/raster';
 import type { DrawnFrame } from '../lib/sprite';
+import { CHIMNEY, DOOR, DOOR_SHUT, FLOOR, JETTY, LEDGE, TREE_GROUND, WALL, WALL_INT, WINDOW } from './house';
+import { BED, HEARTH, TABLE, TROUGH } from './indoors';
 import {
   BIRCH,
   BOULDER,
@@ -119,6 +121,23 @@ export function askdalrSheets(): TileSheet[] {
     { terrain: 'roof', cells: blobCells(ROOF_ISLAND, ROOF_INNER) },
     { terrain: 'water', cells: framed(WATER_ISLAND, WATER_INNER) },
     { terrain: 'ford', cells: framed(FORD_ISLAND, FORD_INNER) },
+    { terrain: 'tree', cells: [TREE_GROUND] },
+    { terrain: 'ledge', cells: [LEDGE] },
+    { terrain: 'wall', cells: [WALL] },
+    { terrain: 'door', cells: [DOOR] },
+    { terrain: 'door_shut', cells: [DOOR_SHUT] },
+    { terrain: 'window', cells: [WINDOW] },
+    { terrain: 'chimney', cells: [CHIMNEY] },
+    { terrain: 'floor', cells: FLOOR },
+    { terrain: 'wall_int', cells: [WALL_INT] },
+    { terrain: 'jetty', cells: [JETTY] },
+    // The ground under standing things, so a drawn tree or bed stands on the drawn floor or grass.
+    ...(['pine'] as const).map((terrain) => ({ terrain, cells: [TREE_GROUND] })),
+    ...(['well', 'trough', 'stump', 'menhir', 'runestone', 'birch', 'boulder'] as const).map((terrain) => ({
+      terrain,
+      cells: [GRASS[0] ?? TREE_GROUND],
+    })),
+    ...(['bed', 'table', 'hearth'] as const).map((terrain) => ({ terrain, cells: [FLOOR[0] ?? WALL_INT] })),
   ];
 }
 
@@ -138,7 +157,7 @@ function standing(name: string, r: Raster): DrawnFrame {
   return { name, raster, pivot: { x: Math.floor(raster.w / 2) / raster.w, y: (raster.h - 1) / raster.h } };
 }
 
-/** Askdalr's drawn trees, stones and the well, under the placeholder decor names. */
+/** Askdalr's drawn trees, stones, the well and the house furnishings, under the placeholder decor names. */
 export function askdalrDecor(): DrawnFrame[] {
   const still: readonly (readonly [string, Raster])[] = [
     ['tree', TREE],
@@ -152,9 +171,13 @@ export function askdalrDecor(): DrawnFrame[] {
     ['stump', STUMP],
     ['menhir', MENHIR],
     ['runestone', RUNESTONE],
+    ['bed', BED],
+    ['table', TABLE],
   ];
   return [
     ...still.map(([id, r]) => standing(`decor_${id}_idle_s_0`, r)),
     ...WELL.map((r, f) => standing(`decor_well_idle_s_${String(f)}`, r)),
+    ...HEARTH.map((r, f) => standing(`decor_hearth_idle_s_${String(f)}`, r)),
+    ...TROUGH.map((r, f) => standing(`decor_trough_idle_s_${String(f)}`, r)),
   ];
 }

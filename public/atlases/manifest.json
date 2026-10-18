@@ -53,6 +53,90 @@
     {
       "terrain": "ford",
       "image": "askdalr/ford.png"
+    },
+    {
+      "terrain": "tree",
+      "image": "askdalr/tree.png"
+    },
+    {
+      "terrain": "ledge",
+      "image": "askdalr/ledge.png"
+    },
+    {
+      "terrain": "wall",
+      "image": "askdalr/wall.png"
+    },
+    {
+      "terrain": "door",
+      "image": "askdalr/door.png"
+    },
+    {
+      "terrain": "door_shut",
+      "image": "askdalr/door_shut.png"
+    },
+    {
+      "terrain": "window",
+      "image": "askdalr/window.png"
+    },
+    {
+      "terrain": "chimney",
+      "image": "askdalr/chimney.png"
+    },
+    {
+      "terrain": "floor",
+      "image": "askdalr/floor.png"
+    },
+    {
+      "terrain": "wall_int",
+      "image": "askdalr/wall_int.png"
+    },
+    {
+      "terrain": "jetty",
+      "image": "askdalr/jetty.png"
+    },
+    {
+      "terrain": "pine",
+      "image": "askdalr/pine.png"
+    },
+    {
+      "terrain": "well",
+      "image": "askdalr/well.png"
+    },
+    {
+      "terrain": "trough",
+      "image": "askdalr/trough.png"
+    },
+    {
+      "terrain": "stump",
+      "image": "askdalr/stump.png"
+    },
+    {
+      "terrain": "menhir",
+      "image": "askdalr/menhir.png"
+    },
+    {
+      "terrain": "runestone",
+      "image": "askdalr/runestone.png"
+    },
+    {
+      "terrain": "birch",
+      "image": "askdalr/birch.png"
+    },
+    {
+      "terrain": "boulder",
+      "image": "askdalr/boulder.png"
+    },
+    {
+      "terrain": "bed",
+      "image": "askdalr/bed.png"
+    },
+    {
+      "terrain": "table",
+      "image": "askdalr/table.png"
+    },
+    {
+      "terrain": "hearth",
+      "image": "askdalr/hearth.png"
     }
   ]
 }
