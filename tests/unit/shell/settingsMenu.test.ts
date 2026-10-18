@@ -18,6 +18,7 @@ function run(settings: Settings, ...inputs: Input[]) {
   let state: SettingsMenuState | null = openSettings();
   let s = settings;
   let changes = 0;
+  let fullscreen = 0;
   for (const i of inputs) {
     if (state === null) break;
     const r: SettingsStep = Array.isArray(i)
@@ -26,8 +27,9 @@ function run(settings: Settings, ...inputs: Input[]) {
     state = r.state;
     s = r.settings;
     if (r.changed) changes += 1;
+    if (r.fullscreen) fullscreen += 1;
   }
-  return { state, settings: s, changes };
+  return { state, settings: s, changes, fullscreen };
 }
 
 const down = (n: number): Action[][] => Array.from({ length: n }, () => ['down']);
@@ -89,5 +91,16 @@ describe('settings menu', () => {
     expect(r.settings.keys).toEqual({});
     const back = run(custom, ...toControls, ['cancel']);
     expect(back.state).toEqual({ page: 'main', cursor: rowOf('controls'), listening: null });
+  });
+
+  it('asks for full screen from its row without changing the settings', () => {
+    const at = down(rowOf('fullscreen'));
+    for (const press of [['confirm'], ['left'], ['right']] as Action[][]) {
+      const r = run(DEFAULT_SETTINGS, ...at, press);
+      expect(r.fullscreen).toBe(1);
+      expect(r.changes).toBe(0);
+      expect(r.settings).toEqual(DEFAULT_SETTINGS);
+    }
+    expect(run(DEFAULT_SETTINGS, ...at).fullscreen).toBe(0);
   });
 });

@@ -28,6 +28,7 @@ import {
 } from '@shell/ui/achievementsPage';
 import { openIntro, stepIntro, type IntroState } from '@shell/ui/intro';
 import { INTRO_LEFT, introColumn, introLines } from '@shell/ui/introText';
+import { currentFullscreen, requestFullscreenToggle } from '@shell/platform/fullscreen';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { settingsLines } from '@shell/ui/settingsText';
 import { slotName, summaryLine } from '@shell/ui/slotText';
@@ -245,6 +246,7 @@ export class TitleScene extends Phaser.Scene {
       document.documentElement.lang = this.services.settings.lang;
       if (scaling !== this.services.settings.scaling) window.dispatchEvent(new Event('resize'));
     }
+    if (r.fullscreen) requestFullscreenToggle(this.services.settings.lang);
     if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
   }
 
@@ -332,7 +334,12 @@ export class TitleScene extends Phaser.Scene {
     }
     if (this.settingsMenu !== null) {
       document.body.dataset.title = 'settings';
-      const { labels, values, hint } = settingsLines(this.settingsMenu, this.services.settings, lang);
+      const { labels, values, hint } = settingsLines(
+        this.settingsMenu,
+        this.services.settings,
+        lang,
+        currentFullscreen(),
+      );
       const left = 120;
       this.body.setText(labels.join('\n')).setPosition(left, 130);
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;

@@ -43,6 +43,7 @@ import { GlowView } from '@shell/view/glowView';
 import { FxView } from '@shell/view/fxView';
 import { WeatherView } from '@shell/view/weatherView';
 import { bindingsOf, keyLabel } from '@shell/input/remap';
+import { requestFullscreenToggle } from '@shell/platform/fullscreen';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
 import { ACHIEVEMENT_DEFS } from '@content/achievements';
@@ -439,6 +440,7 @@ export class PlayScene extends Phaser.Scene {
       // attachZoom re-reads the scaling setting on resize.
       if (scaling !== this.services.settings.scaling) window.dispatchEvent(new Event('resize'));
     }
+    if (r.fullscreen) requestFullscreenToggle(this.services.settings.lang);
     if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
     if (r.state === null) this.audio.play('sfx_talk');
   }

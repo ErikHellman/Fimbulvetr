@@ -1,5 +1,6 @@
 import { UI } from '@content/i18n/ui';
 import { t, type Lang } from '@core/i18n/t';
+import type { FullscreenState } from '@shell/platform/fullscreen';
 import type { Settings } from '@shell/platform/settings';
 import { bindingsOf, keyLabel, type RemappableAction } from '@shell/input/remap';
 import { CONTROL_ROWS, SETTING_ROWS, type SettingRow, type SettingsMenuState } from './settingsMenu';
@@ -17,6 +18,7 @@ const ROW_LABEL = {
   volume: UI.set_volume,
   music: UI.set_music,
   scaling: UI.set_scaling,
+  fullscreen: UI.set_fullscreen,
   textSize: UI.set_text_size,
   shake: UI.set_shake,
   flash: UI.set_flash,
@@ -44,7 +46,7 @@ export const ACTION_LABEL = {
   map: UI.act_map,
 } as const satisfies Record<RemappableAction, unknown>;
 
-function value(row: SettingRow, s: Settings, lang: Lang): string {
+function value(row: SettingRow, s: Settings, lang: Lang, fullscreen: FullscreenState): string {
   const onOff = (b: boolean): string => t(b ? UI.set_on : UI.set_off, lang);
   switch (row) {
     case 'lang':
@@ -54,6 +56,8 @@ function value(row: SettingRow, s: Settings, lang: Lang): string {
       return `${String(Math.round(s[row] * 10))}/10`;
     case 'scaling':
       return t(s.scaling === 'integer' ? UI.set_scaling_integer : UI.set_scaling_fit, lang);
+    case 'fullscreen':
+      return fullscreen === 'unsupported' ? t(UI.set_fullscreen_home, lang) : onOff(fullscreen === 'on');
     case 'textSize':
       return t(TEXT_SIZE_NAME[s.textSize], lang);
     case 'shake':
@@ -74,12 +78,13 @@ export function settingsLines(
   state: SettingsMenuState,
   s: Settings,
   lang: Lang,
+  fullscreen: FullscreenState = 'off',
 ): { labels: string[]; values: string[]; hint: string } {
   const mark = (i: number): string => (i === state.cursor ? '>' : ' ');
   if (state.page === 'main')
     return {
       labels: SETTING_ROWS.map((r, i) => `${mark(i)} ${t(ROW_LABEL[r], lang)}`),
-      values: SETTING_ROWS.map((r) => value(r, s, lang)),
+      values: SETTING_ROWS.map((r) => value(r, s, lang, fullscreen)),
       hint: t(UI.set_hint, lang),
     };
   const kb = bindingsOf(s.keys).kb;

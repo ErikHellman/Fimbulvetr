@@ -32,6 +32,7 @@ import { FONT_KEY, fontKey } from '@shell/gfx/font';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import type { Settings } from '@shell/platform/settings';
 import type { SettingsMenuState } from '@shell/ui/settingsMenu';
+import { currentFullscreen } from '@shell/platform/fullscreen';
 import { settingsLines } from '@shell/ui/settingsText';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
@@ -345,7 +346,12 @@ export class UiScene extends Phaser.Scene {
       .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
     const top = MENU.y + 36;
     if (view.settings !== null) {
-      const { labels, values, hint } = settingsLines(view.settings.state, view.settings.values, lang);
+      const { labels, values, hint } = settingsLines(
+        view.settings.state,
+        view.settings.values,
+        lang,
+        currentFullscreen(),
+      );
       this.menuBody.setText(labels.join('\n')).setPosition(MENU.x + 24, top);
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
       this.menuValues.setText(values.join('\n')).setPosition(MENU.x + 24 + column, top);
