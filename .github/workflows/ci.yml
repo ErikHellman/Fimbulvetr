@@ -1,13 +1,22 @@
 name: CI
 
+# Branches get CI through their pull request; main gets it on push. Pushing to a branch without a PR runs nothing.
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+# A new push to a PR cancels the run of the commit it replaces. Runs on main always finish.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  check:
+  static:
+    name: typecheck, lint, build
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -16,14 +25,70 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
+      - run: pnpm typecheck
+      - run: pnpm lint
       - run: pnpm build
       - run: pnpm budget
-      - run: pnpm exec playwright install --with-deps chromium webkit
-      - run: pnpm e2e
+
+  # The Sævatn solver proofs take minutes per season, so they get two runners of their own.
+  unit:
+    name: vitest (${{ matrix.part }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - part: saevatn summer, autumn
+            args: tests/content/solver_saevatn_summer.test.ts tests/content/solver_saevatn_autumn.test.ts
+          - part: saevatn winter, spring
+            args: tests/content/solver_saevatn_winter.test.ts tests/content/solver_saevatn_spring.test.ts
+          - part: rest
+            args: --exclude 'tests/content/solver_saevatn_*'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec vitest run ${{ matrix.args }}
+
+  e2e:
+    name: e2e (${{ matrix.browser }} ${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - run: pnpm e2e --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/4
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.browser }}-${{ matrix.shard }}
           path: playwright-report
           retention-days: 7
+
+  # The status branch protection requires. It passes only when every job above passed;
+  # without `always()` a failed job would leave it skipped, and a skipped required check counts as passing.
+  check:
+    needs: [static, unit, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: echo '${{ toJSON(needs) }}'
+      - if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1
