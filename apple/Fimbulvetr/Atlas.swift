@@ -55,7 +55,7 @@ final class Atlas {
         guard page < pages.count else { return nil }
         let texture = pages[page]
         let size = texture.size()
-        let (x, y, w, h, ox, oy) = (f[1], f[2], f[3], f[4], f[5], f[6])
+        let (x, y, w, h, ox, oy) = (CGFloat(f[1]), CGFloat(f[2]), CGFloat(f[3]), CGFloat(f[4]), CGFloat(f[5]), CGFloat(f[6]))
         // SpriteKit texture rects are unit-based and start at the bottom left.
         let rect = CGRect(x: x / size.width, y: 1 - (y + h) / size.height, width: w / size.width, height: h / size.height)
         let sub = SKTexture(rect: rect, in: texture)

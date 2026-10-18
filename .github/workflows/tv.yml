@@ -1,8 +1,8 @@
 name: TV apps
 
+# Manual only for now: switch the push and pull_request triggers back on once the Google Play and Apple
+# developer accounts are set up (Actions → TV apps → Run workflow builds a branch on demand).
 on:
-  push:
-  pull_request:
   workflow_dispatch:
 
 jobs:
