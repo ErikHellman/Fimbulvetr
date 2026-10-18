@@ -18,6 +18,7 @@ export const ASK_PAL: GridPalette = {
   W: C.water,
   w: C.waterShade,
   B: C.waterLight,
+  N: C.foam,
   D: C.dirt,
   d: C.dirtShade,
   E: C.dirtLight,
@@ -27,4 +28,30 @@ export const ASK_PAL: GridPalette = {
   O: C.woodLight,
   o: C.wood,
   q: C.woodShade,
+};
+
+/** Letters used in the decor grids. */
+export const DECOR_PAL: GridPalette = {
+  '.': null,
+  k: C.ink,
+  E: C.leaf,
+  D: C.leafShade,
+  L: C.leafLight,
+  r: C.trunk,
+  R: C.woodShade,
+  O: C.woodLight,
+  W: '#efece6',
+  w: '#c9c4bb',
+  s: C.rock,
+  S: C.rockShade,
+  l: C.rockLight,
+  m: '#4f7a3a',
+  n: '#8aa860',
+  T: C.turf,
+  t: C.turfShade,
+  Y: C.turfLight,
+  e: C.leafShade,
+  p: C.sack,
+  A: C.water,
+  B: C.waterLight,
 };

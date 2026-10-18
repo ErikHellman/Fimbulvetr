@@ -313,5 +313,7 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
 - [ ] G4 Real art (see `docs/real-art.md`)
   - [x] Atlas loader: `public/atlases/manifest.json` replaces frames and tiles by name
   - [x] Hero sheet drawn in-repo (`art-src/hero`, three kits, `pnpm art:pack`)
-  - [x] Embla sheet (`art-src/embla`) and the Askdalr tileset (`art-src/askdalr`: grass, path, yard, field, fence, rock, roof, water)
+  - [x] Embla sheet and the Askdalr tileset (`art-src/askdalr`: grass, path, yard, field, fence, rock, roof, water)
+  - [x] Every villager on the shared body (`art-src/people`), the Askdalr decor (`decor` atlas) and the ford
+  - [ ] Other regions' decor and tiles, enemies, fixtures, UI
   - [ ] Per-region atlas loading

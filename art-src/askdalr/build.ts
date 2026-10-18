@@ -1,9 +1,28 @@
-import { createRaster, getPixel, setPixel, type Raster } from '@art/raster';
+import { outline } from '@art/outline';
+import { C } from '@art/palette';
+import { createRaster, getPixel, hex, setPixel, type Raster } from '@art/raster';
+import type { DrawnFrame } from '../lib/sprite';
+import {
+  BIRCH,
+  BOULDER,
+  MENHIR,
+  PINE,
+  PINE_OLD,
+  PINE_TALL,
+  RUNESTONE,
+  STUMP,
+  TREE,
+  TREE_OLD,
+  TREE_YOUNG,
+  WELL,
+} from './decor';
 import { BLOB_MASKS, E, N, NE, NW, S, SE, SW, W } from '@core/world/autotile';
 import { TILE } from '@core/world/dims';
 import {
   FENCE,
   FIELD,
+  FORD_INNER,
+  FORD_ISLAND,
   GRASS,
   PATH,
   ROCK_INNER,
@@ -99,6 +118,7 @@ export function askdalrSheets(): TileSheet[] {
     { terrain: 'rock', cells: blobCells(ROCK_ISLAND, ROCK_INNER) },
     { terrain: 'roof', cells: blobCells(ROOF_ISLAND, ROOF_INNER) },
     { terrain: 'water', cells: framed(WATER_ISLAND, WATER_INNER) },
+    { terrain: 'ford', cells: framed(FORD_ISLAND, FORD_INNER) },
   ];
 }
 
@@ -110,4 +130,31 @@ export function sheetImage(cells: readonly Raster[], perRow = 12): Raster {
     copy(r, (i % perRow) * TILE, Math.floor(i / perRow) * TILE, c, 0, 0, TILE, TILE);
   });
   return r;
+}
+
+/** A decor frame stands on its bottom centre, outlined in ink like the placeholder decor. */
+function standing(name: string, r: Raster): DrawnFrame {
+  const raster = outline(r, hex(C.ink), 1);
+  return { name, raster, pivot: { x: Math.floor(raster.w / 2) / raster.w, y: (raster.h - 1) / raster.h } };
+}
+
+/** Askdalr's drawn trees, stones and the well, under the placeholder decor names. */
+export function askdalrDecor(): DrawnFrame[] {
+  const still: readonly (readonly [string, Raster])[] = [
+    ['tree', TREE],
+    ['tree_young', TREE_YOUNG],
+    ['tree_old', TREE_OLD],
+    ['pine', PINE],
+    ['pine_tall', PINE_TALL],
+    ['pine_old', PINE_OLD],
+    ['birch', BIRCH],
+    ['boulder', BOULDER],
+    ['stump', STUMP],
+    ['menhir', MENHIR],
+    ['runestone', RUNESTONE],
+  ];
+  return [
+    ...still.map(([id, r]) => standing(`decor_${id}_idle_s_0`, r)),
+    ...WELL.map((r, f) => standing(`decor_well_idle_s_${String(f)}`, r)),
+  ];
 }

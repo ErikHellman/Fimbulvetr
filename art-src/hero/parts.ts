@@ -1,3 +1,5 @@
+import type { GridPalette } from '@art/grid';
+import type { Raster } from '@art/raster';
 import { grid } from '../lib/sprite';
 import { HERO_PAL as P } from './palette';
 
@@ -6,10 +8,11 @@ import { HERO_PAL as P } from './palette';
  * legs (6 rows). Light from the top-left: lit tones on the left and top, shade on the right and under.
  * West is drawn; east is mirrored. North is the back of the same figure.
  */
-const g = (text: string) => grid(P, text);
 
-export const HEAD = {
-  s: g(`
+/** The drawings as text, so other figures (the villagers) can reuse Ask's body with their own palette. */
+
+export const HEAD_TEXT = {
+  s: `
     ....yhhhh....
     ..yyhhhhhhh..
     .yhhhhhhhhhg.
@@ -21,8 +24,8 @@ export const HEAD = {
     ..ffffffffd..
     ..ffffdfffd..
     ...dddddd....
-  `),
-  w: g(`
+  `,
+  w: `
     ....yhhhh....
     ..yyhhhhhhh..
     .yhhhhhhhhhg.
@@ -34,8 +37,8 @@ export const HEAD = {
     .fffffhhhgg..
     ..ddffhhgg...
     ...dddd......
-  `),
-  n: g(`
+  `,
+  n: `
     ....yhhhh....
     ..yyhhhhhhh..
     .yhhhhhhhhhg.
@@ -47,13 +50,13 @@ export const HEAD = {
     ..ghhhhhgg...
     ...dgggggd...
     ...dddddd....
-  `),
+  `,
 };
 
 /** Torsos by facing and arm swing: 0 arms down, 1 left hand forward, 2 right hand forward. */
-export const TORSO = {
+export const TORSO_TEXT = {
   s: [
-    g(`
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -63,8 +66,8 @@ export const TORSO = {
     .fvtttttttud.
     ..vtttttttu..
     ..uuuuuuuuu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -74,8 +77,8 @@ export const TORSO = {
     ..vtttttttud.
     ..vtttttttud.
     ..uuuuuuuuu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -85,8 +88,8 @@ export const TORSO = {
     .fvtttttttu..
     .fvtttttttu..
     ..uuuuuuuuu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     ..vttttttuu..
     ..vtttttttu..
@@ -96,10 +99,10 @@ export const TORSO = {
     ..vtttttttu..
     ..vtttttttu..
     ..uuuuuuuuu..
-  `),
+  `,
   ],
   w: [
-    g(`
+    `
     ...vtttttu...
     ..vvttttttu..
     ..vvttttttu..
@@ -109,8 +112,8 @@ export const TORSO = {
     ..fttttttuu..
     ...ttttttu...
     ...uuuuuu....
-  `),
-    g(`
+  `,
+    `
     ...vtttttu...
     ..vvttttttu..
     .vvvttttttu..
@@ -120,8 +123,8 @@ export const TORSO = {
     ...ttttttuu..
     ...ttttttu...
     ...uuuuuu....
-  `),
-    g(`
+  `,
+    `
     ...vtttttu...
     ..vvttttttu..
     ..vvttttttu..
@@ -131,8 +134,8 @@ export const TORSO = {
     ...tttttttf..
     ...ttttttu...
     ...uuuuuu....
-  `),
-    g(`
+  `,
+    `
     ...vtttttu...
     ...vtttttu...
     ...vtttttu...
@@ -142,10 +145,10 @@ export const TORSO = {
     ...vttttuu...
     ...ttttttu...
     ...uuuuuu....
-  `),
+  `,
   ],
   n: [
-    g(`
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -155,8 +158,8 @@ export const TORSO = {
     .fvtttttttud.
     ..vtttttttu..
     ..uuuuuuuuu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -166,8 +169,8 @@ export const TORSO = {
     .fvtttttttu..
     .fvtttttttu..
     ..uuuuuuuuu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -177,8 +180,8 @@ export const TORSO = {
     ..vtttttttud.
     ..vtttttttud.
     ..uuuuuuuuu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     ..vttttttuu..
     ..vtttttttu..
@@ -188,7 +191,7 @@ export const TORSO = {
     ..vtttttttu..
     ..vtttttttu..
     ..uuuuuuuuu..
-  `),
+  `,
   ],
 };
 
@@ -196,8 +199,8 @@ export const TORSO = {
  * Arms raised overhead (lifting, carrying, singing), 17 px wide so they clear the head: pasted at x - 2,
  * two rows above the head. Facing west only the near arm shows.
  */
-export const ARMS_UP = {
-  s: g(`
+export const ARMS_UP_TEXT = {
+  s: `
     lf.............fd
     ff.............dd
     vt.............tu
@@ -212,8 +215,8 @@ export const ARMS_UP = {
     vt.............tu
     vt.............tu
     vt.............tu
-  `),
-  w: g(`
+  `,
+  w: `
     ..lf.............
     ..ff.............
     ..vt.............
@@ -228,8 +231,8 @@ export const ARMS_UP = {
     ..vt.............
     ..vvt............
     ..vvt............
-  `),
-  n: g(`
+  `,
+  n: `
     fd.............dd
     dd.............dd
     tu.............tu
@@ -244,139 +247,167 @@ export const ARMS_UP = {
     tu.............tu
     tu.............tu
     tu.............tu
-  `),
+  `,
 };
 
 /** Arms thrust forward: hands low in front (south), the near arm reaching out (west), hands peeking over the shoulders (north). */
-export const ARMS_FWD = {
+export const ARMS_FWD_TEXT = {
   s: {
-    raster: g(`
+    raster: `
     ..lf....fd...
     ..ff....dd...
-  `),
+  `,
     dx: 0,
     dy: 18,
   },
   w: {
-    raster: g(`
+    raster: `
     lfvvtt.......
     ffuutt.......
-  `),
+  `,
     dx: -2,
     dy: 13,
   },
   n: {
-    raster: g(`
+    raster: `
     ..dd....dd...
     ..dd....dd...
-  `),
+  `,
     dx: 0,
     dy: 9,
   },
 };
 
 /** Legs by facing and walk phase: 0 standing, 1 left leg forward, 2 passing, 3 right leg forward. */
-export const LEGS = {
+export const LEGS_TEXT = {
   s: [
-    g(`
+    `
     ....pp.pp....
     ....pp.qq....
     ....qq.qq....
     ...ono.ono...
     ...ooo.ooo...
     ...ooo.ooo...
-  `),
-    g(`
+  `,
+    `
     ....pp.pp....
     ....pp.qq....
     ....qq.ono...
     ...ono.ooo...
     ...ooo.ooo...
     ...ooo.......
-  `),
-    g(`
+  `,
+    `
     ....pp.pp....
     ....pp.qq....
     ....qq.qq....
     ...ono.ono...
     ...ooo.ooo...
     ...ooo.ooo...
-  `),
-    g(`
+  `,
+    `
     ....pp.pp....
     ....pp.qq....
     ...ono.qq....
     ...ooo.ono...
     ...ooo.ooo...
     .......ooo...
-  `),
+  `,
   ],
   w: [
-    g(`
+    `
     ....ppqq.....
     ....ppqq.....
     ....ppqq.....
     ...nooqq.....
     ..nooo.oo....
     ..oooo.oo....
-  `),
-    g(`
+  `,
+    `
     ....ppqq.....
     ...pp..qq....
     ..ppp...qq...
     .noo.....qq..
     .ooo.....oo..
     .........oo..
-  `),
-    g(`
+  `,
+    `
     ....ppqq.....
     ....ppqq.....
     ....ppqq.....
     ...nooqq.....
     ..nooo.oo....
     ..oooo.oo....
-  `),
-    g(`
+  `,
+    `
     ....ppqq.....
     ....ppqq.....
     .....pqq.....
     ...noopqq....
     ..nooo.qq....
     .........oo..
-  `),
+  `,
   ],
   n: [
-    g(`
+    `
     ....pp.pp....
     ....pp.qq....
     ....qq.qq....
     ....oo.oo....
     ...ooo.ooo...
     ...ooo.ooo...
-  `),
-    g(`
+  `,
+    `
     ....pp.pp....
     ....pp.qq....
     ....oo.qq....
     ...ooo.oo....
     ...ooo.ooo...
     .......ooo...
-  `),
-    g(`
+  `,
+    `
     ....pp.pp....
     ....pp.qq....
     ....qq.qq....
     ....oo.oo....
     ...ooo.ooo...
     ...ooo.ooo...
-  `),
-    g(`
+  `,
+    `
     ....pp.pp....
     ....pp.qq....
     ....qq.oo....
     ....oo.ooo...
     ...ooo.ooo...
     ...ooo.......
-  `),
+  `,
   ],
 };
+
+type Grids<T> = {
+  [K in keyof T]: T[K] extends string
+    ? Raster
+    : T[K] extends readonly string[]
+      ? Raster[]
+      : T[K] extends { raster: string }
+        ? Omit<T[K], 'raster'> & { raster: Raster }
+        : never;
+};
+
+/** Renders a set of text grids with a palette. */
+export function render<T extends Record<string, unknown>>(texts: T, pal: GridPalette): Grids<T> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(texts)) {
+    if (typeof v === 'string') out[k] = grid(pal, v);
+    else if (Array.isArray(v)) out[k] = v.map((t) => grid(pal, t as string));
+    else if (typeof v === 'object' && v !== null && 'raster' in v)
+      out[k] = { ...v, raster: grid(pal, (v as { raster: string }).raster) };
+  }
+  return out as Grids<T>;
+}
+
+export const HEAD = render(HEAD_TEXT, P);
+export const TORSO = render(TORSO_TEXT, P);
+export const ARMS_UP = render(ARMS_UP_TEXT, P);
+export const ARMS_FWD = render(ARMS_FWD_TEXT, P);
+export const LEGS = render(LEGS_TEXT, P);
