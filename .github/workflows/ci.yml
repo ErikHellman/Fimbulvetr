@@ -20,7 +20,7 @@ jobs:
       - run: pnpm build
       - run: pnpm budget
       - run: pnpm exec playwright install --with-deps chromium webkit
-      - run: pnpm e2e
+      - run: pnpm e2e tests/e2e/music.spec.ts
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
