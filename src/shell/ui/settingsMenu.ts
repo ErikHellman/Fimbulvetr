@@ -14,6 +14,7 @@ export const SETTING_ROWS = [
   'volume',
   'music',
   'scaling',
+  'fullscreen',
   'textSize',
   'shake',
   'flash',
@@ -44,6 +45,8 @@ export interface SettingsStep {
   readonly changed: boolean;
   /** The cursor moved or a value changed (the caller plays a tick). */
   readonly moved: boolean;
+  /** The full screen row was pressed: the caller toggles it (full screen is the browser's, not a setting). */
+  readonly fullscreen: boolean;
 }
 
 export function openSettings(): SettingsMenuState {
@@ -80,6 +83,7 @@ function nudge(s: Settings, row: SettingRow, dir: 1 | -1): Settings {
     case 'colourBlind':
     case 'showIntro':
       return { ...s, [row]: !s[row] };
+    case 'fullscreen':
     case 'controls':
     case 'back':
       return s;
@@ -96,13 +100,19 @@ export function stepSettings(
   settings: Settings,
   code: string | null,
 ): SettingsStep {
-  const same = { state, settings, changed: false, moved: false };
+  const same = { state, settings, changed: false, moved: false, fullscreen: false };
   if (state.listening !== null) {
     if (code === null) return same;
     const listening = null;
     if (CANCEL_CODES.has(code)) return { ...same, state: { ...state, listening }, moved: true };
     const keys = rebind(settings.keys, state.listening, code);
-    return { state: { ...state, listening }, settings: { ...settings, keys }, changed: true, moved: true };
+    return {
+      ...same,
+      state: { ...state, listening },
+      settings: { ...settings, keys },
+      changed: true,
+      moved: true,
+    };
   }
   const rows = state.page === 'main' ? SETTING_ROWS.length : CONTROL_ROWS.length;
   if (any(frame, ['up', 'down'])) {
@@ -118,12 +128,13 @@ export function stepSettings(
     return { ...same, state: { page: 'controls', cursor: 0, listening: null }, moved: true };
   const dir = wasPressed(frame, 'left') ? -1 : wasPressed(frame, 'right') || confirm ? 1 : 0;
   if (dir === 0 || row === 'controls' || row === 'back') return same;
+  if (row === 'fullscreen') return { ...same, moved: true, fullscreen: true };
   const next = nudge(settings, row, dir);
-  return { state, settings: next, changed: true, moved: true };
+  return { ...same, settings: next, changed: true, moved: true };
 }
 
 function stepControls(state: SettingsMenuState, frame: InputFrame, settings: Settings): SettingsStep {
-  const same = { state, settings, changed: false, moved: false };
+  const same = { state, settings, changed: false, moved: false, fullscreen: false };
   const back = {
     ...same,
     state: { page: 'main', cursor: SETTING_ROWS.indexOf('controls'), listening: null } as const,
@@ -135,7 +146,7 @@ function stepControls(state: SettingsMenuState, frame: InputFrame, settings: Set
   if (row === 'back') return back;
   if (row === 'reset')
     return {
-      state,
+      ...same,
       settings: { ...settings, keys: { ...DEFAULT_SETTINGS.keys } },
       changed: true,
       moved: true,

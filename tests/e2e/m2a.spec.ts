@@ -70,7 +70,7 @@ test('settings change at once and survive a reload: colour-blind aid and a remap
   await tap(page, 'ArrowDown');
   await tap(page, 'Enter');
   // Down to the colour-blind aid and switch it on.
-  for (let i = 0; i < 9; i++) await tap(page, 'ArrowDown');
+  for (let i = 0; i < 10; i++) await tap(page, 'ArrowDown');
   await tap(page, 'Enter');
   // Past the introduction toggle to Controls…: the sword (fifth row) to U.
   await tap(page, 'ArrowDown');
@@ -94,6 +94,27 @@ test('settings change at once and survive a reload: colour-blind aid and a remap
     (await page.evaluate(() => localStorage.getItem('fimbulvetr.settings.v1'))) ?? '{}',
   );
   expect(stored).toMatchObject({ colourBlind: true, keys: { sword: ['KeyU'] } });
+  expect(errors).toEqual([]);
+});
+
+test('the full screen row and Alt+Enter enter and leave full screen', async ({ page, browserName }) => {
+  // Headless WebKit has no window to make full screen; the webkit-prefixed path is unit-tested.
+  test.skip(browserName === 'webkit', 'no headless fullscreen in WebKit');
+  const errors = collectErrors(page);
+  await boot(page, 'preset=myr&nosave');
+  const full = (): Promise<boolean> => page.evaluate(() => (document.fullscreenElement ?? null) !== null);
+  // Tab → the Game tab → Settings → down to Full screen.
+  await tap(page, 'Tab');
+  await tap(page, 'ArrowLeft');
+  await tap(page, 'ArrowDown');
+  await tap(page, 'Enter');
+  for (let i = 0; i < 4; i++) await tap(page, 'ArrowDown');
+  await tap(page, 'Enter');
+  await expect.poll(full).toBe(true);
+  await page.keyboard.press('Alt+Enter');
+  await expect.poll(full).toBe(false);
+  // Alt+Enter is not a confirm press: the menu is still on the full screen row.
+  await expect.poll(() => page.evaluate(() => window.__fimbul?.menu())).not.toBeNull();
   expect(errors).toEqual([]);
 });
 
