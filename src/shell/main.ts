@@ -17,6 +17,7 @@ import { openSaveStoreSafely } from '@shell/platform/saveStore';
 import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
 import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
+import { attachFullscreenHotkey } from '@shell/platform/fullscreen';
 import { BootScene } from '@shell/scenes/BootScene';
 import { PlayScene } from '@shell/scenes/PlayScene';
 import { TitleScene } from '@shell/scenes/TitleScene';
@@ -56,6 +57,7 @@ function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
   });
   game.canvas.setAttribute('aria-label', GAME_TITLE);
   attachZoom(game, () => services.settings.scaling);
+  attachFullscreenHotkey(window, () => services.settings.lang);
 }
 
 async function main(): Promise<void> {

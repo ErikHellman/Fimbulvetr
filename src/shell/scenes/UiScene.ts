@@ -32,6 +32,7 @@ import { FONT_KEY, fontKey } from '@shell/gfx/font';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import type { Settings } from '@shell/platform/settings';
 import type { SettingsMenuState } from '@shell/ui/settingsMenu';
+import { currentFullscreen } from '@shell/platform/fullscreen';
 import { settingsLines } from '@shell/ui/settingsText';
 import type { SaveSummary } from '@shell/platform/saveStore';
 import { PICK_ROWS, type PickerState } from '@shell/ui/slotPicker';
@@ -39,6 +40,7 @@ import { slotName, summaryLine } from '@shell/ui/slotText';
 import { wareName } from '@shell/ui/wareText';
 import { gearLines } from '@shell/ui/gearText';
 import { fishPanel, type FishUi } from '@shell/ui/fishText';
+import { prompt, type PadStyle } from '@shell/input/padLabels';
 import { warpLines } from '@shell/ui/warpText';
 import { creditsRoll } from '@shell/ui/creditsText';
 import { GAME_H, GAME_W } from '@shell/scale';
@@ -50,7 +52,9 @@ export interface UiLink {
   readonly lang: () => Lang;
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
-  /** The key bound to an action now, as the HUD labels it (K, L, I… or the player's own). */
+  /** The kind of controller connected now, or null; prompts name its buttons while there is one. */
+  readonly pad: () => PadStyle | null;
+  /** The key bound to an action now, as the HUD labels it (K, L, I… or the player's own, or a pad button). */
   readonly keyLabel: (action: 'item1' | 'item2' | 'galdr') => string;
   /** The text-size setting: dialogue, its choices and story cards are drawn at it. */
   readonly textSize: () => FontSize;
@@ -341,11 +345,21 @@ export class UiScene extends Phaser.Scene {
       x += textWidth(label) + 24;
     });
     this.menuHint
-      .setText(t(state.tab === 'items' ? UI.menu_items_hint : UI.menu_tabs_hint, lang))
+      .setText(
+        state.tab === 'items'
+          ? prompt(UI.menu_items_hint, UI.menu_items_hint_pad, this.link.pad(), lang)
+          : prompt(UI.menu_tabs_hint, UI.menu_tabs_hint_pad, this.link.pad(), lang),
+      )
       .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
     const top = MENU.y + 36;
     if (view.settings !== null) {
-      const { labels, values, hint } = settingsLines(view.settings.state, view.settings.values, lang);
+      const { labels, values, hint } = settingsLines(
+        view.settings.state,
+        view.settings.values,
+        lang,
+        currentFullscreen(),
+        this.link.pad(),
+      );
       this.menuBody.setText(labels.join('\n')).setPosition(MENU.x + 24, top);
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
       this.menuValues.setText(values.join('\n')).setPosition(MENU.x + 24 + column, top);
@@ -360,7 +374,11 @@ export class UiScene extends Phaser.Scene {
       const lines = SYSTEM_ROWS.map(
         (r, i) => `${i === state.cursor ? '>' : ' '} ${t(SYSTEM_LABEL[r], lang)}`,
       );
-      if (state.confirm) lines.push('', t(UI.menu_start_over_confirm, lang));
+      if (state.confirm)
+        lines.push(
+          '',
+          prompt(UI.menu_start_over_confirm, UI.menu_start_over_confirm_pad, this.link.pad(), lang),
+        );
       this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
     }
   }
@@ -542,16 +560,16 @@ export class UiScene extends Phaser.Scene {
     }
     const lang = this.link.lang();
     const title = t(UI.game_over, lang);
-    const prompt = t(UI.game_over_continue, lang);
-    const w = Math.max(textWidth(title), textWidth(prompt)) + 32;
+    const rise = prompt(UI.game_over_continue, UI.game_over_continue_pad, this.link.pad(), lang);
+    const w = Math.max(textWidth(title), textWidth(rise)) + 32;
     const x = Math.round((GAME_W - w) / 2);
     const y = 60;
     this.panel(x, y, w, 44);
     this.fallenTitle.setText(title).setPosition(Math.round((GAME_W - textWidth(title)) / 2), y + 8);
     const show = age >= CONTINUE_DELAY && Math.floor(age / 30) % 2 === 0;
     this.fallenPrompt
-      .setText(show ? prompt : '')
-      .setPosition(Math.round((GAME_W - textWidth(prompt)) / 2), y + 24);
+      .setText(show ? rise : '')
+      .setPosition(Math.round((GAME_W - textWidth(rise)) / 2), y + 24);
   }
 
   private text(x: number, y: number, value: string, colour: number): Phaser.GameObjects.BitmapText {
@@ -854,7 +872,7 @@ export class UiScene extends Phaser.Scene {
     const slot = PICK_ROWS[state.cursor] ?? 's1';
     const note =
       state.phase !== 'done'
-        ? t(UI.slot_pick_hint, lang)
+        ? prompt(UI.slot_pick_hint, UI.slot_pick_hint_pad, this.link.pad(), lang)
         : view.result === 'saved'
           ? t(UI.slot_saved, lang, { detail: slot.slice(1) })
           : t(UI.slot_failed, lang);
@@ -874,7 +892,7 @@ export class UiScene extends Phaser.Scene {
 
   /** Fishing: what to do now, and while reeling the line's tension against its safe band and how far out. */
   private drawFish(ui: FishUi, lang: Lang): void {
-    const p = fishPanel(ui, this.link.sim.db, lang);
+    const p = fishPanel(ui, this.link.sim.db, lang, this.link.pad());
     this.panel(BOX.x, BOX.y, BOX.w, BOX.h);
     this.body.setText(p.text);
     const x = BOX.x + 12;

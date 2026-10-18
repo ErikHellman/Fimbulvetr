@@ -1,4 +1,5 @@
 export interface GamepadLike {
+  readonly id?: string;
   readonly connected: boolean;
   readonly mapping: string;
   readonly buttons: readonly { readonly pressed: boolean; readonly value: number }[];
