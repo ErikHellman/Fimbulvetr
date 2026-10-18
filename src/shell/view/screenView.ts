@@ -1,5 +1,6 @@
 import type * as Phaser from 'phaser';
 import { frameFor, type AnimTable } from '@art/anims';
+import { FLIP_X } from '@art/tiles/indices';
 import type { TileAnim } from '@art/tiles/tileset';
 import { add, type Vec } from '@core/math/vec';
 import { decorFeet, type DecorPlacement } from '@core/world/decor';
@@ -26,6 +27,10 @@ export interface ScreenViewOptions {
   readonly cover: readonly number[];
   /** The shade overlay per cell (-1 for none): where raised ground throws shade on flat ground. */
   readonly shade: readonly number[];
+  /** The fringe overlay per cell (-1 for none): soft ground spilling over harder ground next to it. */
+  readonly fringe: readonly number[];
+  /** Per-cell flips on interior tiles (see tileFlips), 0 for none. */
+  readonly flips: readonly number[];
   readonly tileAnims: readonly TileAnim[];
   readonly decor: readonly DecorItem[];
   readonly frames: FrameIndex;
@@ -52,7 +57,7 @@ function rowsOf(indices: readonly number[]): number[][] {
 }
 
 /**
- * One screen as drawn: the ground layer (with animated water), a ground-cover layer above it, and one
+ * One screen as drawn: the ground layer (with animated water), the fringe and ground-cover layers above it, and one
  * y-sorted sprite per decor block (trees, the well, furniture).
  */
 export class ScreenView {
@@ -61,6 +66,7 @@ export class ScreenView {
   private readonly ground: Phaser.Tilemaps.TilemapLayer;
   private readonly cover: Phaser.Tilemaps.TilemapLayer;
   private readonly shade: Phaser.Tilemaps.TilemapLayer;
+  private readonly fringe: Phaser.Tilemaps.TilemapLayer;
   private readonly decor: DecorSprite[] = [];
   private readonly shadows: Phaser.GameObjects.Image[] = [];
   private readonly animatedTiles: number;
@@ -82,10 +88,18 @@ export class ScreenView {
     const ground = this.map.createBlankLayer('ground', tileset, o.origin.x, o.origin.y);
     const coverLayer = this.map.createBlankLayer('cover', tileset, o.origin.x, o.origin.y);
     const shadeLayer = this.map.createBlankLayer('shade', tileset, o.origin.x, o.origin.y);
-    if (ground === null || coverLayer === null || shadeLayer === null)
+    const fringeLayer = this.map.createBlankLayer('fringe', tileset, o.origin.x, o.origin.y);
+    if (ground === null || coverLayer === null || shadeLayer === null || fringeLayer === null)
       throw new Error('could not create the tile layers');
     ground.putTilesAt(rowsOf(o.indices), 0, 0);
+    o.flips.forEach((f, i) => {
+      if (f === 0) return;
+      const tile = ground.getTileAt(i % SCREEN_COLS, Math.floor(i / SCREEN_COLS), true);
+      tile.flipX = (f & FLIP_X) !== 0;
+    });
     ground.setDepth(-2);
+    fringeLayer.putTilesAt(rowsOf(o.fringe), 0, 0);
+    fringeLayer.setDepth(-1.75);
     coverLayer.setDepth(-1);
     shadeLayer.putTilesAt(rowsOf(o.shade), 0, 0);
     shadeLayer.setDepth(-0.5);
@@ -93,6 +107,7 @@ export class ScreenView {
     this.ground = ground;
     this.cover = coverLayer;
     this.shade = shadeLayer;
+    this.fringe = fringeLayer;
     this.setCover(o.cover);
     const contact = o.frames.get('fx_contact_idle_s_0');
     for (const item of o.decor) {
@@ -175,6 +190,7 @@ export class ScreenView {
     this.ground.setTimerPaused(paused);
     this.cover.setTimerPaused(paused);
     this.shade.setTimerPaused(paused);
+    this.fringe.setTimerPaused(paused);
   }
 
   destroy(): void {

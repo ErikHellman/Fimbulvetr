@@ -46,6 +46,7 @@ import {
 
 const INK = 0x0b0a14;
 const PAPER = 0xf2ead8;
+const TITLE_SHADOW = 0x4a2a2a;
 const GOLD = 0xd9b34a;
 const DIM = 0x9c9486;
 const TITLE_MUSIC: MusicCue = { track: 'music_title', combat: false, night: false };
@@ -121,8 +122,38 @@ export class TitleScene extends Phaser.Scene {
     });
     this.add.rectangle(0, 0, GAME_W, GAME_H, INK).setOrigin(0, 0);
     this.snow(data);
+    const titleX = Math.round((GAME_W - textWidth(GAME_TITLE.toUpperCase()) * 3) / 2);
+    // The runic cap: a dark offset copy under the title, the title in gold, and a rule with knotted ends.
+    this.add
+      .bitmapText(titleX + 3, 61, FONT_KEY, GAME_TITLE.toUpperCase(), FONT_HEIGHT)
+      .setScale(3)
+      .setTint(TITLE_SHADOW);
     this.title = this.add.bitmapText(0, 58, FONT_KEY, GAME_TITLE.toUpperCase(), FONT_HEIGHT).setScale(3);
-    this.title.setTint(PAPER).setX(Math.round((GAME_W - textWidth(GAME_TITLE.toUpperCase()) * 3) / 2));
+    this.title.setTint(GOLD).setX(titleX);
+    const ruleY = 58 + FONT_HEIGHT * 3 + 6;
+    this.add
+      .graphics()
+      .lineStyle(1, GOLD, 1)
+      .lineBetween(titleX + 6, ruleY + 0.5, titleX + textWidth(GAME_TITLE.toUpperCase()) * 3 - 6, ruleY + 0.5)
+      .fillStyle(GOLD, 1)
+      .fillTriangle(titleX, ruleY + 0.5, titleX + 3, ruleY - 2.5, titleX + 6, ruleY + 0.5)
+      .fillTriangle(titleX, ruleY + 0.5, titleX + 6, ruleY + 0.5, titleX + 3, ruleY + 3.5)
+      .fillTriangle(
+        GAME_W - titleX - 6,
+        ruleY + 0.5,
+        GAME_W - titleX - 3,
+        ruleY - 2.5,
+        GAME_W - titleX,
+        ruleY + 0.5,
+      )
+      .fillTriangle(
+        GAME_W - titleX - 6,
+        ruleY + 0.5,
+        GAME_W - titleX,
+        ruleY + 0.5,
+        GAME_W - titleX - 3,
+        ruleY + 3.5,
+      );
     const version = versionLabel(__APP_VERSION__, __BUILD_ID__);
     this.text(GAME_W - textWidth(version) - 4, GAME_H - 14, DIM).setText(version);
     this.subtitle = this.text(0, 104, DIM);

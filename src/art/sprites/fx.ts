@@ -15,6 +15,60 @@ const STEEL_SHADE = hex(C.steelShade);
 const SMOKE: Rgba = [190, 190, 200, 170];
 const SMOKE_LIGHT: Rgba = [216, 216, 224, 190];
 
+/** A blow landing: four pale ticks flung out from the point of impact, gone in three frames. */
+function hit(i: number): Raster {
+  const r = createRaster(16, 16);
+  const d = [2, 4, 6][i] ?? 6;
+  const len = [3, 2, 1][i] ?? 1;
+  const pale: Rgba = [255, 250, 230, [255, 230, 170][i] ?? 170];
+  for (const [dx, dy] of [
+    [1, -1],
+    [1, 1],
+    [-1, 1],
+    [-1, -1],
+  ] as const)
+    for (let k = 0; k < len; k++) rect(r, 8 + dx * (d + k), 8 + dy * (d + k), 1, 1, pale);
+  if (i === 0) rect(r, 7, 7, 2, 2, pale);
+  return r;
+}
+
+/** Dust kicked up at the feet by a roll: a low, widening puff of ground colour that thins out. */
+function dust(i: number): Raster {
+  const r = createRaster(20, 10);
+  const grow = [3, 5, 7][i] ?? 7;
+  const a = [200, 140, 80][i] ?? 80;
+  const earth: Rgba = [196, 176, 140, a];
+  const pale: Rgba = [224, 210, 182, a];
+  ellipse(r, 10 - grow * 0.7, 7, grow * 0.5, grow * 0.3, earth);
+  ellipse(r, 10 + grow * 0.7, 7, grow * 0.5, grow * 0.3, earth);
+  ellipse(r, 10, 6 - i, grow * 0.5, grow * 0.35, pale);
+  return r;
+}
+
+/** A raindrop's splash on the ground: a ring that widens and fades. */
+function splash(i: number): Raster {
+  const size = 9;
+  const r = createRaster(size, size);
+  const c = size / 2;
+  const rx = [1.8, 3, 4][i] ?? 4;
+  const a = [210, 150, 80][i] ?? 80;
+  const ring: Rgba = [232, 242, 250, a];
+  if (i === 0) {
+    // The strike itself: a small plus where the drop lands.
+    rect(r, 3, 4, 3, 1, ring);
+    rect(r, 4, 3, 1, 3, ring);
+    return r;
+  }
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      const dx = (x + 0.5 - c) / rx;
+      const dy = (y + 0.5 - c) / (rx * 0.5);
+      const d = dx * dx + dy * dy;
+      if (d <= 1 && d > 0.45) rect(r, x, y, 1, 1, ring);
+    }
+  return r;
+}
+
 /** Height of the fish above the surface per frame; null means it is still under. */
 const FISH_Y: ReadonlyArray<number | null> = [null, 12, 8, 5, 4, 6, 9, 13];
 
@@ -208,6 +262,9 @@ export function fxFrames(): SpriteFrame[] {
   out.push({ name: 'fx_float_nibble_s_0', raster: float(2), ox: 4, oy: 8 });
   out.push({ name: 'fx_float_nibble_s_1', raster: float(0), ox: 4, oy: 8 });
   out.push({ name: 'fx_float_bite_s_0', raster: float(4), ox: 4, oy: 8 });
+  for (let i = 0; i < 3; i++) out.push({ name: `fx_hit_idle_s_${i}`, raster: hit(i), ox: 8, oy: 8 });
+  for (let i = 0; i < 3; i++) out.push({ name: `fx_dust_idle_s_${i}`, raster: dust(i), ox: 10, oy: 8 });
+  for (let i = 0; i < 3; i++) out.push({ name: `fx_splash_idle_s_${i}`, raster: splash(i), ox: 4, oy: 4 });
   return out;
 }
 
@@ -222,6 +279,9 @@ export const FX_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>
   fx_is: { fly: { frames: 3, fps: 14, loop: true, dirs: ['s'] } },
   fx_snow: { idle: { frames: 2, fps: 1, loop: true, dirs: ['s'] } },
   fx_leaf: { idle: { frames: 3, fps: 1, loop: true, dirs: ['s'] } },
+  fx_hit: { idle: { frames: 3, fps: 20, loop: false, dirs: ['s'] } },
+  fx_dust: { idle: { frames: 3, fps: 12, loop: false, dirs: ['s'] } },
+  fx_splash: { idle: { frames: 3, fps: 12, loop: false, dirs: ['s'] } },
   fx_float: {
     idle: { frames: 2, fps: 2, loop: true, dirs: ['s'] },
     nibble: { frames: 2, fps: 12, loop: true, dirs: ['s'] },

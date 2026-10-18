@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, flipX, getPixel, hex, setPixel, type Raster, type Rgba } from '../raster';
 import type { SpriteFrame } from './types';
@@ -58,7 +58,7 @@ function warden(side: 's' | 'n' | 'w', pose: WardenPose, phase: number, sink = 0
     rect(r, 24, fistY, 6, 1, IRON_LIGHT);
   }
   if (pose === 'hurt') rect(r, 13, 15 + b, 6, 1, GLOW_HOT);
-  return outline(sunkBy(r, sink), INK, 1);
+  return cel(sunkBy(r, sink), 1);
 }
 
 /** Lowers a figure `sink` px into the ground: what goes below its feet (row 33) is gone. */
@@ -129,7 +129,7 @@ function stake(): Raster {
   rect(r, 10, 4, 3, 11, WOOD_SHADE);
   rect(r, 4, 2, 10, 3, IRON);
   rect(r, 4, 2, 10, 1, IRON_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** The stake driven flat: only its iron cap shows. */
@@ -137,7 +137,7 @@ function stakeDown(): Raster {
   const r = createRaster(18, 18);
   ellipse(r, 9, 14, 5, 2, IRON);
   ellipse(r, 9, 13.5, 3, 1, IRON_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Belgr, the bellows construct: 44×44, its feet at (22, 42) ───────────────────────────────────────
@@ -176,7 +176,7 @@ function belgr(side: 's' | 'n' | 'w', pose: BelgrPose, phase: number): Raster {
     if (pose === 'breathe') ellipse(r, cx, 30 + sag, open - 1.5, open - 2, FLAME_HOT);
   }
   if (pose === 'reel') for (const x of [12, 30]) line(r, x, 26, x + 3, 33, MAW);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Ívaldi, the Anvil: 40×50, his feet at (20, 48) ──────────────────────────────────────────────────
@@ -205,7 +205,7 @@ function ivaldi(side: 's' | 'n' | 'w', pose: IvaldiPose, phase: number, hot: boo
     rect(r, 3, 46, 33, 1, shade);
     rect(r, 6, 30, 20, 3, HAFT);
     rect(r, 3, 27, 8, 8, IRON_DARK);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   const b = pose === 'step' && phase % 2 === 1 ? 1 : 0;
   const open = pose === 'open' ? 1 : 0;
@@ -237,7 +237,7 @@ function ivaldi(side: 's' | 'n' | 'w', pose: IvaldiPose, phase: number, hot: boo
     rect(r, 31, 18, 3, 22, HAFT);
     rect(r, 27, 38, 10, 8, IRON_DARK);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function forgeFrames(): SpriteFrame[] {

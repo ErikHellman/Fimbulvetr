@@ -1,13 +1,11 @@
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
-import { C } from '../palette';
+import { cel } from '../cel';
 import { createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import type { SpriteFrame } from './types';
 
 /** Hrímturn (M9b): its windows of rime-light, glass prisms and crystal eyes; Svellr, Hrímgerðr and her icicles. */
 
-const INK = hex(C.ink);
 const FRAME = hex('#3e5672');
 const FRAME_LIGHT = hex('#6c8cac');
 const GLASS = hex('#b4dcf2');
@@ -28,7 +26,7 @@ function window(on: boolean): Raster {
     line(r, 4, 2, 6, 5, GLASS_LIGHT);
     line(r, 13, 2, 11, 5, GLASS_LIGHT);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A glass prism on a squat plinth, 18×24, its pane slanted `/` or `\`. */
@@ -41,7 +39,7 @@ function prism(slant: '/' | '\\'): Raster {
   for (let i = 0; i < 3; i++)
     line(r, x0 + (slant === '/' ? i : -i), 14, x1 + (slant === '/' ? i : -i), 3, GLASS);
   line(r, x0, 14, x1, 3, GLASS_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A crystal eye in a rime socket, 18×24: dark, or lit from within once a beam has reached it. */
@@ -57,7 +55,7 @@ function crystal(lit: boolean): Raster {
     rect(r, 1, 8, 2, 2, GLASS_LIGHT);
     rect(r, 15, 8, 2, 2, GLASS_LIGHT);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function towerFrames(): SpriteFrame[] {
@@ -105,7 +103,7 @@ function svellr(side: 's' | 'n' | 'w', pose: SvellrPose, phase: number): Raster 
     line(r, 14, 14, 20, 26, CRACK);
     line(r, 28, 15, 24, 27, CRACK);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── Hrímgerðr, the Glass: 40×62, her feet at (20, 60) ─────────────────────────────────────────────────
@@ -159,7 +157,7 @@ function hrimgerdr(side: 's' | 'n' | 'w', pose: GiantessPose, phase: number): Ra
     rect(r, 31, 6 + k, 2, 2, GLASS_LIGHT);
   }
   if (pose === 'kneel') line(r, 12, 40, 28, 40, RIME_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── An icicle: 24×44, its ground point at (12, 41) ─────────────────────────────────────────────────────
@@ -179,7 +177,7 @@ function icicle(pose: IciclePose, phase: number): Raster {
       const half = Math.max(0, 3 - Math.floor(i / 6));
       rect(r, 12 - half, y + i, half * 2 + 1, 1, i % 5 === 0 ? GLASS_LIGHT : GLASS);
     }
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   for (const [x, y] of [
     [6, 38],
@@ -189,7 +187,7 @@ function icicle(pose: IciclePose, phase: number): Raster {
     [8, 40],
   ] as const)
     rect(r, x, y, 2 + phase, 2, phase === 0 ? GLASS_LIGHT : GLASS);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function towerFoeFrames(): SpriteFrame[] {

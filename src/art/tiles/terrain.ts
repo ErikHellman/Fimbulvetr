@@ -3,7 +3,26 @@ import { nextFloat, nextInt } from '@core/math/rng';
 import type { Dir4 } from '@core/math/dir';
 import { C } from '../palette';
 import type { Painter } from '../painter';
+import { clip, clods, regionLit, ridges, tufts, type Tones } from '../texture';
 import { insideBlob, onBlobEdge } from './blob';
+
+/* Material tones (docs/art-style-guide.md, rule 2). */
+const GRASS: Tones = { base: C.grass, shade: C.grassShade, light: C.grassLight };
+const TURF: Tones = { base: C.turf, shade: C.turfShade, light: C.turfLight };
+const DIRT: Tones = { base: C.dirt, shade: C.dirtShade, light: C.dirtLight };
+const ROCK: Tones = { base: C.rock, shade: C.rockShade, light: C.rockLight };
+const WOOD: Tones = { base: C.wood, shade: C.woodShade, light: C.woodLight };
+const DARK_WOOD: Tones = { base: C.woodShade, shade: C.ink, light: C.wood };
+const FLOOR: Tones = { base: C.floor, shade: C.floorShade, light: C.floorLight };
+const CAVE: Tones = { base: C.caveFloorShade, shade: '#3e3630', light: C.caveFloorLight };
+const CAVE_WALL: Tones = { base: C.caveWall, shade: C.caveWallShade, light: C.caveWallLight };
+const MUD: Tones = { base: C.mud, shade: C.mudShade, light: C.mudLight };
+
+/** The interior of a blob region: inside it and off its edge ring. */
+const interior =
+  (mask: number, inset: number) =>
+  (x: number, y: number): boolean =>
+    insideBlob(mask, x, y, inset) && !onBlobEdge(mask, x, y, inset);
 
 export interface TerrainArt {
   readonly autotile: boolean;
@@ -22,26 +41,30 @@ export interface TerrainArt {
 
 function grass(p: Painter): void {
   p.fill(C.grass);
-  p.speckle(C.grassShade, 0.14);
-  p.speckle(C.grassLight, 0.05);
+  tufts(p, GRASS, 4, 0.6);
 }
 
-function region(
-  p: Painter,
-  mask: number,
-  inset: number,
-  fill: string,
-  edge: string,
-  speck: string,
-  density: number,
-): void {
+/**
+ * Dry-stone courses inside a blob: a joint every fourth row, uprights staggered per course, and a light
+ * pixel on each stone's upper-left corner (rule 5).
+ */
+function courses(p: Painter, mask: number, inset: number, t: Tones): void {
+  const inside = interior(mask, inset);
   for (let y = 0; y < 16; y++) {
+    const course = Math.floor(y / 4);
     for (let x = 0; x < 16; x++) {
-      if (!insideBlob(mask, x, y, inset)) continue;
-      if (onBlobEdge(mask, x, y, inset)) p.px(x, y, edge);
-      else p.px(x, y, nextFloat(p.rng) < density ? speck : fill);
+      if (!inside(x, y)) continue;
+      const upright = (x + course * 2) % 5 === 4;
+      if (y % 4 === 3 || upright) p.px(x, y, t.shade);
+      else if (y % 4 === 0 && (x + course * 2) % 5 === 0) p.px(x, y, t.light);
     }
   }
+}
+
+/** A raised blob of stone (rock, a wall, a cairn's foot): lit rim, courses inside, `edge` on the shaded side. */
+function stone(p: Painter, mask: number, inset: number, t: Tones, edge = t.shade): void {
+  regionLit(p, mask, inset, { ...t, shade: edge, relief: 'raised' });
+  courses(p, mask, inset, t);
 }
 
 /**
@@ -58,26 +81,28 @@ function flow(p: Painter, mask: number, frame: number, inset: number, colour: st
   }
 }
 
-/** A turf roof seen from above: ink edge, leaf-shade stripes every third row. */
+/**
+ * A turf roof seen from above: a lit ridge-side edge, an ink eave, thatch courses every fourth row and
+ * tufts of turf between them (rule 5).
+ */
 function roof(p: Painter, mask: number): void {
   grass(p);
-  region(p, mask, 0, C.turfShade, C.ink, C.turf, 0.12);
-  for (let y = 1; y < 16; y += 3)
-    for (let x = 0; x < 16; x++)
-      if (insideBlob(mask, x, y, 0) && !onBlobEdge(mask, x, y, 0) && (x + y) % 4 !== 0)
-        p.px(x, y, C.leafShade);
+  regionLit(p, mask, 0, { base: C.turfShade, shade: C.ink, light: C.turfLight, relief: 'raised' });
+  const inside = interior(mask, 0);
+  for (let y = 2; y < 16; y += 4)
+    for (let x = 0; x < 16; x++) if (inside(x, y) && (x + y) % 5 !== 0) p.px(x, y, C.leafShade);
+  tufts(clip(p, inside), { base: C.turf, shade: C.leafShade, light: C.turf }, 5, 0.5);
 }
 
-/** The ground under a decor sprite: grass with a denser shade speckle as its shadow. */
+/** The ground under a decor sprite: grass, a little darker where the thing stands. */
 function groundBase(p: Painter): void {
-  grass(p);
-  p.speckle(C.grassShade, 0.22);
+  p.fill(C.grass);
+  tufts(p, { base: C.grass, shade: C.grassShade, light: C.grass }, 3, 0.7);
 }
 
 /** The floor under indoor decor. */
 function floorBase(p: Painter): void {
   floor(p);
-  p.speckle(C.floorShade, 0.22);
 }
 
 /** Grass on top, a short earth bank below: reads as "you can drop down here". */
@@ -85,35 +110,48 @@ function ledge(p: Painter): void {
   grass(p);
   p.rect(0, 10, 16, 1, C.ink);
   p.rect(0, 11, 16, 5, C.dirtShade);
-  p.speckle(C.grassShade, 0.02);
-  for (let x = 1; x < 16; x += 4) p.px(x, 13, C.dirt);
+  clods(
+    clip(p, (_x, y) => y > 10),
+    { base: C.dirt, shade: C.dirtShade, light: C.dirtLight },
+    3,
+    3,
+  );
+  p.rect(0, 15, 16, 1, C.dirtShade);
 }
 
-/** Rótarhellir's floor: packed dark earth with grit. */
+/** Rótarhellir's floor: packed dark earth with grit and a few stones. */
 function caveFloor(p: Painter): void {
   p.fill(C.caveFloor);
-  p.speckle(C.caveFloorShade, 0.16);
-  p.speckle(C.caveFloorLight, 0.04);
+  clods(p, CAVE, 3, 3);
+  p.speckle(C.caveFloorShade, 0.05);
 }
 
-function planks(p: Painter, fill: string, line: string, vertical: boolean): void {
-  p.fill(fill);
-  p.speckle(line, 0.04);
-  for (let i = 3; i < 16; i += 4) {
-    if (vertical) p.rect(i, 0, 1, 16, line);
-    else p.rect(0, i, 16, 1, line);
+/** Boards four px wide: a lit edge on each board's top or left, a shade joint, and a knot now and then. */
+function planks(p: Painter, t: Tones, vertical: boolean): void {
+  p.fill(t.base);
+  for (let i = 0; i < 16; i += 4) {
+    if (vertical) {
+      p.rect(i, 0, 1, 16, t.light);
+      p.rect(i + 3, 0, 1, 16, t.shade);
+    } else {
+      p.rect(0, i, 16, 1, t.light);
+      p.rect(0, i + 3, 16, 1, t.shade);
+    }
   }
+  const kx = nextInt(p.rng, 1, 14);
+  const ky = nextInt(p.rng, 1, 14);
+  if (vertical) p.rect(kx - (kx % 4) + 1, ky, 2, 1, t.shade);
+  else p.rect(kx, ky - (ky % 4) + 1, 1, 2, t.shade);
 }
 
 function floor(p: Painter): void {
-  planks(p, C.floor, C.floorShade, false);
+  planks(p, FLOOR, false);
 }
 
 /** Fen ground: dark peat, tussocks and black water in the hollows. */
 function bog(p: Painter, variant: number): void {
   p.fill('#4a5236');
-  p.speckle('#3a4029', 0.18);
-  p.speckle('#6a7a44', 0.08);
+  tufts(p, { base: '#4a5236', shade: '#3a4029', light: '#6a7a44' }, 4, 0.6);
   const pools: ReadonlyArray<readonly [number, number, number]> = [
     [3, 4, 3],
     [10, 11, 4],
@@ -128,16 +166,15 @@ function bog(p: Painter, variant: number): void {
 /** The troll wood's moss: deep green, lumpy, with a few pale sprigs. */
 function moss(p: Painter): void {
   p.fill('#355a2c');
-  p.speckle('#26441f', 0.2);
-  p.speckle('#4f7a3a', 0.08);
-  p.speckle('#8aa860', 0.015);
+  tufts(p, { base: '#355a2c', shade: '#26441f', light: '#4f7a3a' }, 3, 0.55);
+  if (nextFloat(p.rng) < 0.5) p.px(nextInt(p.rng, 0, 16), nextInt(p.rng, 0, 16), '#8aa860');
 }
 
-/** Pale shore sand. */
+/** Pale shore sand: soft ridges and a pebble or two. */
 function sand(p: Painter): void {
   p.fill('#d6c48f');
-  p.speckle('#b8a36e', 0.12);
-  p.speckle('#eee0b0', 0.05);
+  ridges(p, { base: '#d6c48f', shade: '#b8a36e', light: '#eee0b0' }, 3, 7);
+  clods(p, { base: '#c4b07c', shade: '#a89560', light: '#efe3b6' }, 1, 2);
 }
 
 /** Terrain added for the deep wood (M2c): the fen, the glade and the troll wood. */
@@ -190,7 +227,14 @@ const MYRLAND_WATERS = {
     group: 'water',
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 3, C.waterShade, C.foam, C.water, 0.2);
+      regionLit(p, v.mask, 3, {
+        base: C.waterShade,
+        shade: C.water,
+        light: C.foam,
+        relief: 'sunken',
+        speck: C.water,
+        density: 0.2,
+      });
       flow(p, v.mask, v.frame, 3, C.foam);
       flow(p, v.mask, (v.frame + 2) % 4, 3, C.waterLight);
     },
@@ -203,7 +247,14 @@ const MYRLAND_WATERS = {
     group: 'water',
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 3, C.spring, C.springLight, C.springShade, 0.1);
+      regionLit(p, v.mask, 3, {
+        base: C.spring,
+        shade: C.springShade,
+        light: C.springLight,
+        relief: 'sunken',
+        speck: C.springShade,
+        density: 0.1,
+      });
       // Bubbles rising: one pixel per tile that climbs a row each frame.
       const bx = nextInt(p.rng, 5, 11);
       const by = 12 - v.frame * 2;
@@ -218,7 +269,14 @@ const MYRLAND_WATERS = {
     group: 'water',
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 2, C.waterLight, C.water, C.rock, 0.16);
+      regionLit(p, v.mask, 2, {
+        base: C.waterLight,
+        shade: C.water,
+        light: C.foam,
+        relief: 'sunken',
+        speck: C.rock,
+        density: 0.16,
+      });
       flow(p, v.mask, v.frame, 2, C.rockLight);
     },
   },
@@ -228,8 +286,7 @@ const MYRLAND_WATERS = {
     variants: 3,
     paint: (p, v) => {
       p.fill(C.mudShade);
-      p.speckle(C.mud, 0.18);
-      p.speckle('#2e231a', 0.1);
+      clods(p, { base: C.mud, shade: '#2e231a', light: C.mudLight }, 3, 3);
       p.rect(0, 4 + v.variant * 3, 16, 1, '#2e231a');
       p.rect(3 + v.variant * 4, 0, 1, 16, '#2e231a');
     },
@@ -258,12 +315,23 @@ const MYRLAND_WATERS = {
  * Sökkva Kvern's rising water, drawn as at the lowest level: dry sluice floors of wet flagstones, and race
  * channels with their planks lying on the bottom. The water and the floated planks are an overlay.
  */
-function flags(p: Painter, fill: string, joint: string, variant: number): void {
+/** Flagstones: two courses with staggered joints, a light pixel on each stone's upper-left corner. */
+function flags(p: Painter, fill: string, joint: string, variant: number, light?: string): void {
   p.fill(fill);
-  p.speckle(C.mudShade, 0.08);
-  p.rect(0, 7 + (variant % 2), 16, 1, joint);
-  p.rect(5 + variant * 3, 0, 1, 8, joint);
-  p.rect(11 - variant * 2, 8, 1, 8, joint);
+  const row = 7 + (variant % 2);
+  const ux0 = 5 + variant * 3;
+  const ux1 = 11 - variant * 2;
+  p.rect(0, row, 16, 1, joint);
+  p.rect(ux0, 0, 1, row, joint);
+  p.rect(ux1, row, 1, 16 - row, joint);
+  if (light !== undefined) {
+    p.px(ux0 + 1, 0, light);
+    p.px(0, row + 1, light);
+    p.px(ux1 + 1, row + 1, light);
+  }
+  const cx = nextInt(p.rng, 0, 14);
+  const cy = nextInt(p.rng, 0, 14);
+  p.rect(cx, cy, 2, 1, joint);
 }
 
 function channel(p: Painter, deep: boolean): void {
@@ -281,14 +349,14 @@ const MILL_WATERS = {
     autotile: false,
     variants: 2,
     paint: (p, v) => {
-      flags(p, C.rockShade, C.ink, v.variant);
+      flags(p, C.rockShade, C.ink, v.variant, C.rock);
     },
   },
   sluice_hi: {
     autotile: false,
     variants: 2,
     paint: (p, v) => {
-      flags(p, C.rock, C.rockShade, v.variant);
+      flags(p, C.rock, C.rockShade, v.variant, C.rockLight);
     },
   },
   race: {
@@ -310,7 +378,7 @@ const MILL_WATERS = {
     autotile: false,
     variants: 2,
     paint: (p, v) => {
-      planks(p, C.woodShade, C.ink, v.variant === 1);
+      planks(p, DARK_WOOD, v.variant === 1);
       p.speckle(C.mudShade, 0.06);
     },
   },
@@ -319,8 +387,8 @@ const MILL_WATERS = {
     autotile: true,
     variants: 0,
     paint: (p, v) => {
-      planks(p, C.woodShade, C.ink, false);
-      region(p, v.mask, 0, C.rockShade, C.ink, C.rock, 0.12);
+      planks(p, DARK_WOOD, false);
+      stone(p, v.mask, 0, { base: C.rockShade, shade: '#3f434a', light: C.rock }, C.ink);
     },
   },
   /** Grey silt: the millpond's bottom. */
@@ -329,8 +397,7 @@ const MILL_WATERS = {
     variants: 3,
     paint: (p, v) => {
       p.fill(C.mud);
-      p.speckle(C.mudShade, 0.2);
-      p.speckle(C.mudLight, 0.06);
+      ridges(p, MUD, 2, 6);
       p.rect(2 + v.variant * 4, 6 + v.variant * 3, 4, 1, C.mudShade);
     },
   },
@@ -339,9 +406,8 @@ const MILL_WATERS = {
 /** Heather: grass gone purple-brown, with sprigs of bloom. */
 function heath(p: Painter): void {
   p.fill('#6f6a44');
-  p.speckle('#57533a', 0.2);
-  p.speckle('#8a5a7a', 0.1);
-  p.speckle('#b07aa0', 0.03);
+  tufts(p, { base: '#6f6a44', shade: '#57533a', light: '#8a8560' }, 4, 0.5);
+  tufts(p, { base: '#6f6a44', shade: '#8a5a7a', light: '#b07aa0' }, 6, 0.6);
 }
 
 /** Terrain added for Haugar (M4a): heather, grave-hills, cairns, paving and dry-stone walls. */
@@ -359,7 +425,8 @@ const HAUGAR = {
     variants: 0,
     paint: (p, v) => {
       heath(p);
-      region(p, v.mask, 1, C.turf, C.turfShade, C.turfLight, 0.14);
+      regionLit(p, v.mask, 1, { ...TURF, relief: 'raised' });
+      tufts(clip(p, interior(v.mask, 1)), TURF, 4, 0.5);
     },
   },
   cairn: {
@@ -373,11 +440,7 @@ const HAUGAR = {
     autotile: false,
     variants: 3,
     paint: (p, v) => {
-      p.fill(C.rock);
-      p.speckle(C.rockLight, 0.06);
-      p.rect(0, 7 + (v.variant % 2), 16, 1, C.rockShade);
-      p.rect(5 + v.variant * 3, 0, 1, 8, C.rockShade);
-      p.rect((10 + v.variant * 4) % 16, 8, 1, 8, C.rockShade);
+      flags(p, C.rock, C.rockShade, v.variant, C.rockLight);
       p.speckle('#8a9a5a', 0.03);
     },
   },
@@ -386,7 +449,7 @@ const HAUGAR = {
     variants: 0,
     paint: (p, v) => {
       heath(p);
-      region(p, v.mask, 1, C.rockShade, C.ink, C.rock, 0.3);
+      stone(p, v.mask, 1, { base: C.rockShade, shade: '#44484f', light: C.rock }, C.ink);
     },
   },
   tent: {
@@ -400,18 +463,21 @@ const HAUGAR = {
 
 /** Konungshaugr's floor: grey flags with dark seams and grave-dust. */
 function cryptFloor(p: Painter, variant: number): void {
-  p.fill('#5a5550');
-  p.speckle('#4a4540', 0.16);
-  p.speckle('#6e6860', 0.06);
-  p.rect(0, 7 + (variant % 2), 16, 1, '#3a3632');
-  p.rect(4 + variant * 4, 0, 1, 8, '#3a3632');
-  p.rect((9 + variant * 5) % 16, 8, 1, 8, '#3a3632');
+  flags(p, '#5a5550', '#3a3632', variant, '#6e6860');
+  p.speckle('#4a4540', 0.04);
 }
 
 /** A pit: black depths inside a crumbling rim of floor. Ghost floor is drawn the same, joined to it. */
 function pit(p: Painter, mask: number): void {
   cryptFloor(p, 0);
-  region(p, mask, 2, '#0c0a0c', '#2a2522', '#141014', 0.2);
+  regionLit(p, mask, 2, {
+    base: '#0c0a0c',
+    shade: '#060506',
+    light: '#2a2522',
+    relief: 'sunken',
+    speck: '#141014',
+    density: 0.2,
+  });
 }
 
 /** Terrain added for Konungshaugr (M4b). */
@@ -428,7 +494,7 @@ const KONUNGSHAUGR = {
     variants: 0,
     paint: (p, v) => {
       cryptFloor(p, 1);
-      region(p, v.mask, 0, '#3a3230', C.ink, '#4e4440', 0.2);
+      stone(p, v.mask, 0, { base: '#3a3230', shade: '#2a2422', light: '#4e4440' }, C.ink);
     },
   },
   pit: {
@@ -452,9 +518,8 @@ const KONUNGSHAUGR = {
 /** Niflmýrr's grey sedge over sodden peat. */
 function mire(p: Painter): void {
   p.fill('#4e5a4c');
-  p.speckle('#3c463b', 0.2);
-  p.speckle('#6c7a64', 0.08);
-  p.speckle('#8e9a84', 0.02);
+  tufts(p, { base: '#4e5a4c', shade: '#3c463b', light: '#6c7a64' }, 4, 0.6);
+  if (nextFloat(p.rng) < 0.4) p.px(nextInt(p.rng, 0, 16), nextInt(p.rng, 0, 16), '#8e9a84');
 }
 
 /** Niflmýrr (M6a): the sedge mire, black pools that never freeze, and the ground under a dead tree. */
@@ -467,7 +532,14 @@ const BLACKWATER: TerrainArt = {
   group: 'water',
   paint: (p, v) => {
     mire(p);
-    region(p, v.mask, 3, '#1c2224', '#3a4642', '#283032', 0.12);
+    regionLit(p, v.mask, 3, {
+      base: '#1c2224',
+      shade: '#121618',
+      light: '#3a4642',
+      relief: 'sunken',
+      speck: '#283032',
+      density: 0.12,
+    });
     // A slow glint sliding across the still surface.
     const gx = (nextInt(p.rng, 2, 9) + v.frame * 2) % 16;
     const gy = nextInt(p.rng, 5, 11);
@@ -609,9 +681,7 @@ const DVERGAGROF = {
     variants: 4,
     paint: (p) => {
       p.fill('#7a7672');
-      p.speckle('#5e5a56', 0.2);
-      p.speckle('#9a9690', 0.08);
-      for (let i = 0; i < 3; i++) p.rect(nextInt(p.rng, 0, 13), nextInt(p.rng, 0, 14), 3, 2, '#68645f');
+      clods(p, { base: '#68645f', shade: '#54504c', light: '#9a9690' }, 5, 4);
     },
   },
   forge_floor: {
@@ -659,9 +729,7 @@ const HRIMFJOLL = {
     variants: 4,
     paint: (p) => {
       p.fill('#e4ecf2');
-      p.speckle('#c8d6e2', 0.18);
-      p.speckle('#ffffff', 0.08);
-      p.rect(nextInt(p.rng, 0, 10), nextInt(p.rng, 2, 13), 5, 1, '#d2dee8');
+      ridges(p, { base: '#e4ecf2', shade: '#c8d6e2', light: '#ffffff' }, 3, 7);
     },
   },
   glaze: {
@@ -758,12 +826,14 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       grass(p);
     },
   },
+  /** Worn earth: drawn whole, and the ground around it spills its own fringe over the edge (rule 4). */
   path: {
-    autotile: true,
-    variants: 0,
-    paint: (p, v) => {
-      grass(p);
-      region(p, v.mask, 2, C.dirt, C.dirtShade, C.dirtShade, 0.1);
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill(C.dirt);
+      clods(p, { base: C.dirtShade, shade: C.dirtShade, light: C.dirtLight }, 3, 3);
+      p.speckle(C.dirtShade, 0.03);
     },
   },
   water: {
@@ -774,7 +844,14 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     group: 'water',
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 3, C.water, C.waterLight, C.waterShade, 0.08);
+      regionLit(p, v.mask, 3, {
+        base: C.water,
+        shade: C.waterShade,
+        light: C.waterLight,
+        relief: 'sunken',
+        speck: C.waterShade,
+        density: 0.08,
+      });
       flow(p, v.mask, v.frame, 3, C.waterLight);
     },
   },
@@ -783,7 +860,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 0,
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 1, C.rock, C.rockShade, C.rockLight, 0.12);
+      stone(p, v.mask, 1, ROCK);
     },
   },
   tree: {
@@ -805,12 +882,15 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 1,
     paint: (p) => {
       grass(p);
-      p.rect(0, 5, 16, 2, C.wood);
+      p.rect(0, 5, 16, 1, C.woodLight);
+      p.rect(0, 6, 16, 1, C.wood);
       p.rect(0, 7, 16, 1, C.woodShade);
-      p.rect(0, 10, 16, 2, C.wood);
+      p.rect(0, 10, 16, 1, C.woodLight);
+      p.rect(0, 11, 16, 1, C.wood);
       p.rect(0, 12, 16, 1, C.woodShade);
       for (const x of [2, 11]) {
         p.rect(x, 2, 3, 13, C.wood);
+        p.rect(x, 3, 1, 12, C.woodLight);
         p.rect(x + 2, 2, 1, 13, C.woodShade);
         p.rect(x, 2, 3, 1, C.ink);
       }
@@ -830,11 +910,12 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     },
   },
   yard: {
-    autotile: true,
-    variants: 0,
-    paint: (p, v) => {
-      grass(p);
-      region(p, v.mask, 1, C.dirtShade, C.dirtShade, C.dirt, 0.12);
+    autotile: false,
+    variants: 4,
+    paint: (p) => {
+      p.fill(C.dirtShade);
+      clods(p, DIRT, 3, 2);
+      p.speckle('#7a5a38', 0.04);
     },
   },
   roof: {
@@ -849,16 +930,17 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.wood, C.woodShade, true);
+      planks(p, WOOD, true);
       p.rect(0, 0, 16, 2, C.ink);
-      p.rect(0, 14, 16, 2, C.woodShade);
+      p.rect(0, 2, 16, 1, C.woodLight);
+      p.rect(0, 13, 16, 3, C.woodShade);
     },
   },
   door: {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.wood, C.woodShade, true);
+      planks(p, WOOD, true);
       p.rect(0, 0, 16, 2, C.ink);
       p.rect(1, 2, 14, 1, C.woodShade);
       p.rect(2, 3, 12, 13, C.woodShade);
@@ -876,7 +958,8 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.woodShade, C.ink, true);
+      planks(p, DARK_WOOD, true);
+      p.rect(0, 0, 16, 1, C.wood);
       p.rect(0, 12, 16, 4, C.floorShade);
       p.rect(0, 12, 16, 1, C.ink);
     },
@@ -896,7 +979,14 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     group: 'water',
     paint: (p, v) => {
       grass(p);
-      region(p, v.mask, 2, C.waterLight, C.water, C.rockLight, 0.08);
+      regionLit(p, v.mask, 2, {
+        base: C.waterLight,
+        shade: C.water,
+        light: C.foam,
+        relief: 'sunken',
+        speck: C.rockLight,
+        density: 0.08,
+      });
       flow(p, v.mask, v.frame, 2, C.rockLight);
     },
   },
@@ -953,7 +1043,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.wood, C.woodShade, true);
+      planks(p, WOOD, true);
       p.rect(0, 0, 16, 2, C.ink);
       p.rect(1, 2, 14, 1, C.woodShade);
       p.rect(2, 3, 12, 13, C.ink);
@@ -968,9 +1058,10 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.wood, C.woodShade, true);
+      planks(p, WOOD, true);
       p.rect(0, 0, 16, 2, C.ink);
-      p.rect(0, 14, 16, 2, C.woodShade);
+      p.rect(0, 2, 16, 1, C.woodLight);
+      p.rect(0, 13, 16, 3, C.woodShade);
       p.rect(3, 3, 10, 10, C.ink);
       p.rect(4, 4, 8, 8, C.rockShade);
       p.rect(8, 4, 1, 8, C.wood);
@@ -997,7 +1088,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 1,
     group: 'water',
     paint: (p) => {
-      planks(p, C.wood, C.woodShade, false);
+      planks(p, WOOD, false);
       p.rect(0, 0, 16, 1, C.ink);
       p.rect(0, 15, 16, 1, C.ink);
       p.rect(1, 1, 2, 2, C.woodShade);
@@ -1009,7 +1100,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 1,
     paint: (p) => {
       groundBase(p);
-      p.speckle(C.dirtShade, 0.1);
+      clods(p, { base: C.dirtShade, shade: C.dirtShade, light: C.dirt }, 2, 2);
     },
   },
   log: {
@@ -1056,7 +1147,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 0,
     paint: (p, v) => {
       caveFloor(p);
-      region(p, v.mask, 0, C.caveWall, C.ink, C.caveWallLight, 0.1);
+      stone(p, v.mask, 0, CAVE_WALL, C.ink);
     },
   },
   sap: {
@@ -1066,7 +1157,14 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     frameMs: 260,
     paint: (p, v) => {
       caveFloor(p);
-      region(p, v.mask, 2, C.sap, C.sapShade, C.sapShade, 0.1);
+      regionLit(p, v.mask, 2, {
+        base: C.sap,
+        shade: C.sapShade,
+        light: C.sapLight,
+        relief: 'sunken',
+        speck: C.sapShade,
+        density: 0.1,
+      });
       // A bubble rises and pops over four frames at a spot the painter's rng picks per tile.
       const x = nextInt(p.rng, 5, 11);
       const y = nextInt(p.rng, 5, 11);
@@ -1081,7 +1179,14 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     variants: 0,
     paint: (p, v) => {
       caveFloor(p);
-      region(p, v.mask, 0, C.rootShade, C.ink, C.caveWall, 0.12);
+      regionLit(p, v.mask, 0, {
+        base: C.rootShade,
+        shade: C.ink,
+        light: C.root,
+        relief: 'raised',
+        speck: C.caveWall,
+        density: 0.12,
+      });
       for (let k = 0; k < 3; k++) {
         const x0 = nextInt(p.rng, 0, 16);
         for (let y = 0; y < 16; y++) {
@@ -1118,7 +1223,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 2,
     paint: (p, v) => {
-      planks(p, C.floor, C.floorShade, v.variant === 1);
+      planks(p, FLOOR, v.variant === 1);
       p.speckle(C.dirtShade, 0.03);
     },
   },
@@ -1129,6 +1234,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
       grass(p);
       for (const x of [0, 4, 8, 12]) {
         p.rect(x, 3, 4, 13, C.wood);
+        p.rect(x + 1, 4, 1, 11, C.woodLight);
         p.rect(x + 3, 3, 1, 13, C.woodShade);
         p.rect(x + 1, 1, 2, 2, C.wood);
         p.px(x + 1, 0, C.ink);
@@ -1149,7 +1255,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.floor, C.floorShade, false);
+      planks(p, FLOOR, false);
     },
   },
   thingstone: {
@@ -1163,7 +1269,7 @@ export const TERRAIN_ART: Readonly<Record<TerrainId, TerrainArt>> = {
     autotile: false,
     variants: 1,
     paint: (p) => {
-      planks(p, C.floor, C.floorShade, false);
+      planks(p, FLOOR, false);
       p.speckle(C.ink, 0.05);
     },
   },

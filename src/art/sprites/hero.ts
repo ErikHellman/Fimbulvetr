@@ -11,14 +11,18 @@ const P = {
   ink: hex(C.ink),
   skin: hex(C.skin),
   skinShade: hex(C.skinShade),
+  skinLight: hex(C.skinLight),
   hair: hex(C.hair),
   hairShade: hex(C.hairShade),
+  hairLight: hex(C.hairLight),
   tunic: hex(C.tunic),
   tunicShade: hex(C.tunicShade),
+  tunicLight: hex(C.tunicLight),
   belt: hex(C.belt),
   pants: hex(C.pants),
   pantsShade: hex(C.pantsShade),
   boot: hex(C.boot),
+  bootLight: hex(C.bootLight),
   steel: hex(C.steel),
   steelShade: hex(C.steelShade),
   grip: hex(C.wood),
@@ -69,12 +73,14 @@ function legs(r: Raster, o: number, side: Side, phase: number): void {
     rect(r, o + 16 - swing, o + 28, 4, 2, P.boot);
     rect(r, o + 13 + swing, o + 24, 3, 4, P.pants);
     rect(r, o + 12 + swing, o + 28, 4, 2, P.boot);
+    rect(r, o + 12 + swing, o + 28, 3, 1, P.bootLight);
     return;
   }
   const liftL = phase === 1 ? 1 : 0;
   const liftR = phase === 3 ? 1 : 0;
   rect(r, o + 12, o + 24, 3, 4 - liftL, P.pants);
   rect(r, o + 11, o + 28 - liftL, 4, 2, P.boot);
+  rect(r, o + 11, o + 28 - liftL, 3, 1, P.bootLight);
   rect(r, o + 17, o + 24, 3, 4 - liftR, P.pantsShade);
   rect(r, o + 17, o + 28 - liftR, 4, 2, P.boot);
 }
@@ -94,6 +100,7 @@ function torso(r: Raster, o: number, b: number, side: Side, phase: number, arms:
   if (side === 'w') {
     rect(r, o + 11, b + 15, 10, 9, P.tunic);
     rect(r, o + 18, b + 15, 3, 9, P.tunicShade);
+    rect(r, o + 11, b + 15, 1, 6, P.tunicLight);
     rect(r, o + 11, b + 21, 10, 1, P.belt);
     if (arms !== 'down') return;
     const swing = ARM_SWING_SIDE[phase] ?? 0;
@@ -103,7 +110,9 @@ function torso(r: Raster, o: number, b: number, side: Side, phase: number, arms:
   }
   rect(r, o + 10, b + 15, 12, 9, P.tunic);
   rect(r, o + 19, b + 15, 3, 9, P.tunicShade);
+  rect(r, o + 10, b + 15, 1, 6, P.tunicLight);
   rect(r, o + 10, b + 21, 12, 1, P.belt);
+  if (side === 's') rect(r, o + 15, b + 21, 2, 1, P.steel);
   if (arms !== 'down') return;
   const dl = ARM_SWING_LEFT[phase] ?? 0;
   const dr = ARM_SWING_RIGHT[phase] ?? 0;
@@ -152,11 +161,18 @@ function head(r: Raster, o: number, b: number, side: Side): void {
     if (dy < -1.5 || dx > 0.5) return dx > 3.5 ? P.hairShade : P.hair;
     return dy > 3 ? P.skinShade : P.skin;
   });
+  // One highlight on the hair's upper-left curve, one on the lit cheek (rule 6).
+  rect(r, o + 13, b + 3, 2, 1, P.hairLight);
+  setPixel(r, o + 12, b + 4, P.hairLight);
   if (side === 's') {
     rect(r, o + 13, b + 9, 1, 2, P.ink);
     rect(r, o + 18, b + 9, 1, 2, P.ink);
+    setPixel(r, o + 12, b + 11, P.skinLight);
   }
-  if (side === 'w') rect(r, o + 11, b + 9, 1, 2, P.ink);
+  if (side === 'w') {
+    rect(r, o + 11, b + 9, 1, 2, P.ink);
+    setPixel(r, o + 11, b + 11, P.skinLight);
+  }
 }
 
 function shield(r: Raster, o: number, b: number, pos: ShieldPos): void {
@@ -233,12 +249,14 @@ interface Pose {
   readonly sword?: SwordDir;
   readonly arms?: Arms;
   readonly blade?: Blade;
+  /** The idle breath: the body a pixel lower on the legs, the legs still. */
+  readonly breath?: boolean;
 }
 
 function drawPose(pose: Pose, size: number): Raster {
   const r = createRaster(size, size);
   const o = (size - SMALL) / 2;
-  const b = o + (pose.phase === 1 || pose.phase === 3 ? 1 : 0);
+  const b = o + (pose.phase === 1 || pose.phase === 3 || pose.breath === true ? 1 : 0);
   const [hx, hy] = HAND[pose.side];
   const behind = pose.side === 'n';
   const blade = pose.blade ?? 'sword';
@@ -390,6 +408,7 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
   const blade = kit.blade;
   for (const side of ['s', 'n', 'w'] as const) {
     add('idle', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side] }, SMALL));
+    add('idle', side, 1, drawPose({ side, phase: 0, shield: RESTING_KIT[side], breath: true }, SMALL));
     add('hurt', side, 0, drawPose({ side, phase: 0, shield: RESTING_KIT[side] }, SMALL));
     add('shield', side, 0, drawPose({ side, phase: 0, shield: RAISED_KIT[side] }, SMALL));
     for (let i = 0; i < 4; i++) {
@@ -492,7 +511,7 @@ function kitFrames(art: string, kit: HeroKit): SpriteFrame[] {
 const ALL: readonly Dir4[] = ['s', 'n', 'w', 'e'];
 
 export const HERO_ANIMS = {
-  idle: { frames: 1, fps: 1, loop: true, dirs: ALL },
+  idle: { frames: 2, fps: 2, loop: true, dirs: ALL },
   hurt: { frames: 1, fps: 1, loop: true, dirs: ALL },
   walk: { frames: 4, fps: 8, loop: true, dirs: ALL },
   shield: { frames: 1, fps: 1, loop: true, dirs: ALL },

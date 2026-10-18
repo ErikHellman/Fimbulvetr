@@ -5,6 +5,7 @@ import { BLOB_MASKS } from '@core/world/autotile';
 import { createPainter } from '../painter';
 import type { Raster } from '../raster';
 import { COVER_ART } from './cover';
+import { FRINGE_ART, FRINGE_IDS, paintFringe } from './fringe';
 import { SHADE_TILES, paintShade } from './shade';
 import { WATER_ART } from './water';
 import { TERRAIN_ART } from './terrain';
@@ -43,6 +44,8 @@ export interface Tileset {
   readonly water: { readonly flooded: number; readonly afloat: number };
   /** The shade overlay tiles: `start + mask` for each mask from core/world/shade. */
   readonly shade: { readonly start: number };
+  /** The fringe overlay tiles per spilling ground: `start + blobIndex(own)` (see fringeIndices). */
+  readonly fringe: Readonly<Partial<Record<TerrainId, { readonly start: number }>>>;
 }
 
 /**
@@ -96,7 +99,18 @@ export function buildTileset(): Tileset {
     paintShade(p, mask);
     tiles.push(p.r);
   }
-  return { tiles, entries, cover, water, shade };
+  const fringe: Partial<Record<TerrainId, { start: number }>> = {};
+  FRINGE_IDS.forEach((id, k) => {
+    const art = FRINGE_ART[id];
+    if (art === undefined) return;
+    fringe[id] = { start: tiles.length };
+    BLOB_MASKS.forEach((own, i) => {
+      const p = createPainter(16, 16, hashInts(0xf417, k, i));
+      paintFringe(p, own, art);
+      tiles.push(p.r);
+    });
+  });
+  return { tiles, entries, cover, water, shade, fringe };
 }
 
 /** Every animated tile in the set: one entry per frame-0 tile of each multi-frame terrain. */

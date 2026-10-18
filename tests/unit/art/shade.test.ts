@@ -36,9 +36,10 @@ describe('shade tiles', () => {
     expect(alphaAt(c, 8, 0)).toBe(0);
   });
 
-  it('leaves the empty mask fully transparent and sits at the end of the tileset', () => {
+  it('leaves the empty mask fully transparent and sits after the water tiles', () => {
     const ts = buildTileset();
-    expect(ts.shade.start + SHADE_TILES).toBe(ts.tiles.length);
+    expect(ts.shade.start).toBe(ts.water.afloat + 1);
+    expect(ts.shade.start + SHADE_TILES).toBeLessThanOrEqual(ts.tiles.length);
     expect(ts.tiles[ts.shade.start]?.data.every((v, i) => i % 4 !== 3 || v === 0)).toBe(true);
   });
 });

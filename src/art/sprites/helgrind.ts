@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { blit, createRaster, flipX, hex, setPixel, type Raster, type Rgba } from '../raster';
 import { wolf, type WolfPal, type WolfPose } from './enemies';
@@ -47,7 +47,7 @@ function hookEast(): Raster {
   line(r, 7, 7, 11, 3, IRON_LIGHT);
   line(r, 7, 7, 12, 7, IRON_LIGHT);
   line(r, 7, 7, 11, 11, IRON);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** Turns a square raster a quarter round, clockwise. */
@@ -215,7 +215,7 @@ function hollow(side: Side, phase: number, pose: HollowPose, bare: boolean): Ras
     else if (side === 'w') towerShield(r, 4, 20, 10, 28);
     else towerShield(r, 30, 22, 12, 24);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** The tower shield lying where it fell. 24×20, its middle at (12, 16). */
@@ -223,7 +223,7 @@ function shieldDown(): Raster {
   const r = createRaster(24, 20);
   ellipse(r, 12, 16, 9, 2, () => [0, 0, 0, 90]);
   towerShield(r, 3, 6, 18, 9);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /**
@@ -245,7 +245,7 @@ function bars(open: boolean): Raster {
     rect(r, 2, 15, 14, 2, IRON_DARK);
     rect(r, 2, 15, 14, 1, IRON);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function helgrindFrames(): SpriteFrame[] {

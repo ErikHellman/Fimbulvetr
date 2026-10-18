@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { blit, createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { drawPerson, type Look, type Side } from './people';
@@ -40,7 +40,7 @@ function warpStone(awake: boolean): Raster {
   line(r, 6, 17, 10, 17, c);
   line(r, 8, 22, 8, 26, c);
   line(r, 8, 22, 10, 24, c);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── The barrow-wight: a draugr in mail with a helm, a round shield and a sword (32×32, feet at 16, 30) ─
@@ -115,7 +115,7 @@ function slab(open: boolean): Raster {
   if (open) {
     rect(r, 1, base - 3, 16, 3, ROCK_SHADE);
     rect(r, 1, base - 3, 16, 1, ROCK_LIGHT);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   rect(r, 1, 4, 16, base - 3, ROCK);
   rect(r, 13, 4, 4, base - 3, ROCK_SHADE);
@@ -124,7 +124,7 @@ function slab(open: boolean): Raster {
   ellipse(r, 9, 16, 2.5, 2.5, ROCK);
   line(r, 5, 12, 13, 20, ROCK_SHADE);
   line(r, 13, 12, 5, 20, ROCK_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** One of the pass's three seals: a squat pillar whose rune burns once its stone is lit. */
@@ -142,7 +142,7 @@ function seal(lit: boolean): Raster {
     ellipse(r, 9, 6, 4, 4, hex('#3f6a74'));
     ellipse(r, 9, 6, 2, 2, RUNE);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A parry's spark: a four-pointed star that flares and fades (16×16, centred low). */
@@ -175,7 +175,7 @@ function arrowSide(): Raster {
   rect(r, 14, 3, 1, 1, HEAD);
   rect(r, 1, 2, 2, 1, FLETCH);
   rect(r, 1, 4, 2, 1, FLETCH);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 function arrowUp(): Raster {
@@ -185,7 +185,7 @@ function arrowUp(): Raster {
   rect(r, 3, 1, 1, 1, HEAD);
   rect(r, 2, 13, 1, 2, FLETCH);
   rect(r, 4, 13, 1, 2, FLETCH);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function flipY(src: Raster): Raster {
@@ -212,7 +212,7 @@ function arrowPot(): Raster {
     rect(r, x, top + 2, 1, 5, SHAFT);
     rect(r, x - 1, top, 3, 2, FLETCH);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** A heap of grave-gold: coins, a cup and a torc, glinting. */
@@ -233,7 +233,7 @@ function graveGold(): Raster {
     [6, 5],
   ] as const)
     rect(r, x, y, 1, 1, light);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** An eye carved in a stone block: shut (a closed lid) or opened by an arrow (a glowing pupil). */
@@ -247,7 +247,7 @@ function eyeStone(open: boolean): Raster {
     ellipse(r, 9, 9, 5, 2.8, hex('#e8e0c8'));
     ellipse(r, 9, 9, 2, 2, RUNE);
   } else line(r, 3, 9, 15, 9, ROCK_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 // ── The draugr archer (32×32, feet at 16, 30) and the barrow-warden (48×48, feet at 24, 45) ─────────────
@@ -311,7 +311,7 @@ function axe(i: number): Raster {
   );
   ellipse(r, cx + dx * 5, cy + dy * 5, 3, 3, pale);
   ellipse(r, cx + dx * 5, cy + dy * 5, 1.5, 1.5, ghost);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** Nearest-neighbour scale by 3/2: the warden is the wight drawn half again as large. */

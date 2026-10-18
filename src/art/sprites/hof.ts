@@ -1,8 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
-import { C } from '../palette';
+import { cel } from '../cel';
 import { blit, createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { flipY } from './haugar';
 import { raft } from './helgrind';
@@ -12,7 +11,6 @@ import type { SpriteFrame } from './types';
 
 /** Sökkva Hof (M7b): Vindr's gust, the wind fans that work the sluices, and the sailing raft. */
 
-const INK = hex(C.ink);
 const WIND: Rgba = [214, 236, 240, 200];
 const WIND_FAINT: Rgba = [180, 214, 224, 120];
 const STONE = hex('#46545a');
@@ -87,7 +85,7 @@ function fan(turn: number): Raster {
     ellipse(r, cx + dx * 0.8, cy + dy * 0.8, 1.6, 1.6, BRONZE_LIGHT);
   }
   ellipse(r, cx, cy, 2, 2, BRONZE_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** The raft with a mast and a square sail, slack or filled. */
@@ -135,7 +133,7 @@ function eel(pose: EelPose): Raster {
     ellipse(r, 36, 38, 6, 4, () => EEL);
     line(r, 35, 36, 37, 38, EEL_EYE);
     line(r, 37, 36, 35, 38, EEL_EYE);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   const top = pose === 'bite' ? 6 : 20;
   rect(r, 18, top + 8, 12, 43 - top - 8, EEL);
@@ -149,7 +147,7 @@ function eel(pose: EelPose): Raster {
     ellipse(r, 24, top + 10, 6, 4, () => MAW);
     for (const x of [20, 23, 26, 29]) rect(r, x - 1, top + 7, 1, 2, [240, 236, 220, 255]);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** One of Hrönn's iron grates in the floor, with bubbles rising through it while the eel lies under. */
@@ -172,7 +170,7 @@ function grate(bubbles: number | null): Raster {
           [6, 4],
         ])
       ellipse(r, x ?? 0, y ?? 0, 1.5, 1.5, () => BUBBLE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const HORSE = hex('#4a6670');
@@ -210,7 +208,7 @@ function horse(pose: HorsePose, side: boolean, frame: number): Raster {
     for (let x = 10; x < 46; x += 5) line(r, x, 38, x - 2, 34, MANE);
     line(r, cx + 15, 35, cx + 19, 39, HORSE_EYE);
     line(r, cx + 19, 35, cx + 15, 39, HORSE_EYE);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   const tall = pose === 'rear' ? 6 : pose === 'rise' ? 18 : pose === 'charge' ? 16 : 12;
   // The neck and chest out of the water.
@@ -235,7 +233,7 @@ function horse(pose: HorsePose, side: boolean, frame: number): Raster {
       line(r, cx + dx, 36, cx + dx * 1.6, 26, HORSE);
       rect(r, cx + dx * 1.6 - 1, 24, 3, 3, HORSE_DARK);
     }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const PINE = hex('#c89a5c');
@@ -249,7 +247,7 @@ function skiff(): Raster {
   rect(r, 2, 10, 12, 1, PINE);
   rect(r, 7, 7, 2, 4, PINE_DARK);
   line(r, 2, 13, 13, 13, WATER_RING);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const SILK: Rgba = [222, 226, 232, 230];

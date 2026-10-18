@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, flipX, hex, type Raster } from '../raster';
 import { flipY, roundShield } from './haugar';
@@ -78,7 +78,6 @@ function beamUp(i: number): Raster {
 const ICE = hex('#cfe8f2');
 const ICE_SHADE = hex('#8fb8cc');
 const ICE_LIGHT = hex('#f4fcff');
-const INK = hex(C.ink);
 
 /**
  * One tile of the rime wall across the gorge (18×34, like a slab gate): blue-white ice heaped higher than
@@ -89,7 +88,7 @@ function rime(open: boolean): Raster {
   const base = 31;
   if (open) {
     rect(r, 1, base - 2, 16, 2, ICE_SHADE);
-    return outline(r, INK, 1);
+    return cel(r, 1);
   }
   rect(r, 1, 6, 16, base - 6, ICE);
   rect(r, 12, 6, 5, base - 6, ICE_SHADE);
@@ -99,7 +98,7 @@ function rime(open: boolean): Raster {
   line(r, 6, 10, 9, 18, ICE_SHADE);
   line(r, 9, 18, 7, 25, ICE_SHADE);
   line(r, 11, 13, 13, 21, ICE_LIGHT);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const CHAR = hex('#2a2420');
@@ -131,7 +130,7 @@ function rubble(): Raster {
   line(r, 4, 4, 13, 13, CHAR);
   rect(r, 6, 12, 4, 2, CHAR);
   rect(r, 9, 9, 1, 1, EMBER);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 /** Planks nailed across a door (16×16): nobody lives here now. */
@@ -141,7 +140,7 @@ function boards(): Raster {
   line(r, 2, 5, 13, 8, PLANK_SHADE);
   line(r, 2, 10, 13, 12, PLANK);
   line(r, 2, 11, 13, 13, PLANK_SHADE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const WATTLE = hex('#9a7a4e');
@@ -156,7 +155,7 @@ function hurdle(): Raster {
     line(r, 1, y, 14, y, WATTLE);
     line(r, 1, y + 1, 14, y + 1, WATTLE_SHADE);
   }
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 const COMB = hex('#c8962e');
@@ -173,7 +172,7 @@ function hive(): Raster {
   rect(r, 7, 9, 2, 2, BEE);
   rect(r, 13, 4, 1, 1, BEE);
   rect(r, 2, 11, 1, 1, BEE);
-  return outline(r, INK, 1);
+  return cel(r, 1);
 }
 
 export function passFrames(): SpriteFrame[] {

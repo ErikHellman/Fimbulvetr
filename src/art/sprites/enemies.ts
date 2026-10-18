@@ -1,7 +1,7 @@
 import type { Dir4 } from '@core/math/dir';
 import type { AnimDef } from '../anims';
 import { ellipse, line, rect } from '../draw';
-import { outline } from '../outline';
+import { cel } from '../cel';
 import { C } from '../palette';
 import { createRaster, flipX, hex, type Raster, type Rgba } from '../raster';
 import { drawPerson, type Look, type Side } from './people';
@@ -74,7 +74,7 @@ function wolfSide(phase: number, pose: WolfPose, p: WolfPal): Raster {
     rect(r, hx - 4, hy - 5, 1, 1, INK);
     rect(r, hx - 1, hy - 1, 1, 1, p.eye);
     rect(r, hx + 1, hy - 6, 2, 3, p.shade);
-    return outline(r, INK, 2);
+    return cel(r, 2);
   }
   const hx = 8 - (pose === 'lunge' ? 1 : 0);
   const hy = 16 + low + (pose === 'crouch' ? 2 : 0);
@@ -91,7 +91,7 @@ function wolfSide(phase: number, pose: WolfPose, p: WolfPal): Raster {
     rect(r, hx - 4, hy + 2, 1, 1, FANG);
     rect(r, hx - 2, hy + 2, 1, 1, FANG);
   }
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 function wolfFront(phase: number, pose: WolfPose, p: WolfPal): Raster {
@@ -113,7 +113,7 @@ function wolfFront(phase: number, pose: WolfPose, p: WolfPal): Raster {
     rect(r, 15, hy - 3, 3, 1, INK);
     rect(r, 14, hy, 1, 1, p.eye);
     rect(r, 18, hy, 1, 1, p.eye);
-    return outline(r, INK, 2);
+    return cel(r, 2);
   }
   rect(r, 14, hy + 2, 5, 3, p.light);
   rect(r, 16, hy + 2, 1, 1, INK);
@@ -123,7 +123,7 @@ function wolfFront(phase: number, pose: WolfPose, p: WolfPal): Raster {
     rect(r, 14, hy + 4, 1, 1, FANG);
     rect(r, 18, hy + 4, 1, 1, FANG);
   }
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 function wolfBack(phase: number, pose: WolfPose, p: WolfPal): Raster {
@@ -140,7 +140,7 @@ function wolfBack(phase: number, pose: WolfPose, p: WolfPal): Raster {
   ellipse(r, 16, 13 + low - up, 4.5, 4, (x) => (x > 18 ? p.shade : p.fur));
   rect(r, 12, 8 + low - up, 2, 3, p.shade);
   rect(r, 18, 8 + low - up, 2, 3, p.shade);
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 export function wolf(side: Side, phase: number, pose: WolfPose, p: WolfPal = GREY_WOLF): Raster {
@@ -172,7 +172,7 @@ function raven(side: Side, pose: RavenPose): Raster {
     rect(r, 15, by + 6, 2, 2, BEAK);
     rect(r, 15, by - 2, 1, 1, RAVEN_EYE);
     rect(r, 17, by - 2, 1, 1, RAVEN_EYE);
-    return outline(r, INK, 2);
+    return cel(r, 2);
   }
   const wy = pose === 'up' ? -5 : pose === 'down' ? 3 : pose === 'hurt' ? 1 : -2;
   const span = pose === 'spread' ? 12 : 11;
@@ -186,7 +186,7 @@ function raven(side: Side, pose: RavenPose): Raster {
   // Body and tail.
   ellipse(r, 16, by + 1, 3.5, 3, (_x, y) => (y > by + 2 ? RAVEN_SHADE : RAVEN));
   rect(r, 15, by + 4, 3, 3, RAVEN_SHADE);
-  if (side === 'n') return outline(r, INK, 2);
+  if (side === 'n') return cel(r, 2);
   // Head, eyes and beak toward the viewer (south) or the west.
   const hx = side === 'w' ? 12 : 16;
   ellipse(r, hx, by - 2, 2.5, 2.5, () => RAVEN);
@@ -194,7 +194,7 @@ function raven(side: Side, pose: RavenPose): Raster {
   if (pose === 'spread') rect(r, hx - (side === 'w' ? 4 : 1), by - 1, 2, 1, INK);
   rect(r, hx - (side === 'w' ? 1 : 2), by - 3, 1, 1, RAVEN_EYE);
   if (side === 's') rect(r, hx + 1, by - 3, 1, 1, RAVEN_EYE);
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 // ── Draugr: a dead man in grave clothes, from the people parts ──────────────────────────────────────
@@ -305,7 +305,7 @@ function trollFront(P: TrollPal, phase: number, club: Club, back: boolean): Rast
     rect(r, 21, 20, 1, 2, P.tusk);
     rect(r, 27, 20, 1, 2, P.tusk);
   } else rect(r, 17, 11, 14, 4, P.moss);
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 function trollSide(P: TrollPal, phase: number, club: Club): Raster {
@@ -330,7 +330,7 @@ function trollSide(P: TrollPal, phase: number, club: Club): Raster {
     rect(r, 13, 30, 5, 14, P.shade);
     rect(r, 12, 42, 5, 11, P.club);
   }
-  return outline(r, INK, 2);
+  return cel(r, 2);
 }
 
 function troll(side: Side, phase: number, club: Club, P: TrollPal = RAID_TROLL): Raster {

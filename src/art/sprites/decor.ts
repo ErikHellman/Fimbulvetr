@@ -17,38 +17,45 @@ function frame(name: string, r: Raster): SpriteFrame {
   return { name, raster: outline(r, INK, 1), ox: Math.floor(r.w / 2), oy: r.h - 1 };
 }
 
-/** A round leaf tree: 4×10 trunk, a two-lobed canopy shaded to the lower right. */
-function tree(): Raster {
-  const r = createRaster(32, 40);
-  rect(r, 14, 26, 4, 12, P.trunk);
-  rect(r, 17, 26, 1, 12, P.woodShade);
-  const shade = (cx: number, cy: number) => (x: number, y: number) =>
-    x - cx + (y - cy) > 6 ? P.leafShade : P.leaf;
-  ellipse(r, 16, 16, 14, 12, shade(16, 16));
-  ellipse(r, 21, 8, 7, 5, shade(21, 8));
-  ellipse(r, 10, 10, 3.5, 3, P.leafLight);
+/**
+ * A round leaf tree: a trunk with a lit left edge, a two-lobed canopy shaded to the lower right and lit on
+ * the upper left. `size` scales the canopy: 0.8 a young tree, 1 the usual, 1.2 an old one.
+ */
+function tree(size = 1): Raster {
+  const w = Math.round(32 * size);
+  const h = Math.round(40 * size);
+  const r = createRaster(w, h);
+  const cx = w / 2;
+  const trunkH = Math.round(12 * size);
+  rect(r, Math.round(cx - 2), h - 2 - trunkH, 4, trunkH, P.trunk);
+  rect(r, Math.round(cx - 2), h - 2 - trunkH, 1, trunkH, P.woodLight);
+  rect(r, Math.round(cx + 1), h - 2 - trunkH, 1, trunkH, P.woodShade);
+  const shade = (ox: number, oy: number, rim: number) => (x: number, y: number) =>
+    x - ox + (y - oy) > rim ? P.leafShade : x - ox + (y - oy) < -rim ? P.leafLight : P.leaf;
+  const ry = 12 * size;
+  const my = 16 * size;
+  ellipse(r, cx, my, 14 * size, ry, shade(cx, my, 6 * size));
+  ellipse(r, cx + 5 * size, 8 * size, 7 * size, 5 * size, shade(cx + 5 * size, 8 * size, 4 * size));
+  ellipse(r, cx - 6 * size, 10 * size, 3.5 * size, 3 * size, P.leafLight);
   return r;
 }
 
-/** A spruce: three widening tiers on a short trunk, shaded on the right. */
-function pine(): Raster {
-  const r = createRaster(24, 44);
-  rect(r, 10, 34, 4, 8, P.trunk);
-  rect(r, 13, 34, 1, 8, P.woodShade);
-  for (let tier = 0; tier < 3; tier++) {
+/** A spruce: `tiers` widening tiers on a short trunk, lit on the left and shaded on the right. */
+function pine(tiers = 3): Raster {
+  const h = 14 + tiers * 10;
+  const r = createRaster(24, h);
+  rect(r, 10, h - 10, 4, 8, P.trunk);
+  rect(r, 10, h - 10, 1, 8, P.woodLight);
+  rect(r, 13, h - 10, 1, 8, P.woodShade);
+  for (let tier = 0; tier < tiers; tier++) {
     const top = 3 + tier * 10;
-    const baseHalf = 5 + tier * 3;
+    const baseHalf = Math.min(10, 5 + tier * 2.5);
     for (let i = 0; i < 12; i++) {
       const half = Math.max(1, Math.round(((i + 1) * baseHalf) / 12));
       rect(r, 12 - half, top + i, half * 2, 1, P.leaf);
-      rect(
-        r,
-        12 + half - Math.max(1, Math.floor(half / 3)),
-        top + i,
-        Math.max(1, Math.floor(half / 3)),
-        1,
-        P.leafShade,
-      );
+      const dark = Math.max(1, Math.floor(half / 3));
+      rect(r, 12 + half - dark, top + i, dark, 1, P.leafShade);
+      if (i > 2 && i % 3 === 0) rect(r, 12 - half, top + i, 1, 1, P.leafLight);
     }
   }
   rect(r, 9, 6, 2, 1, P.leafLight);
@@ -451,7 +458,10 @@ function tent(): Raster {
 export function decorFrames(): SpriteFrame[] {
   const out: SpriteFrame[] = [
     frame('decor_tree_idle_s_0', tree()),
+    frame('decor_tree_young_idle_s_0', tree(0.8)),
+    frame('decor_tree_old_idle_s_0', tree(1.2)),
     frame('decor_pine_idle_s_0', pine()),
+    frame('decor_pine_tall_idle_s_0', pine(4)),
     frame('decor_bed_idle_s_0', bed()),
     frame('decor_table_idle_s_0', table()),
     frame('decor_stump_idle_s_0', stump()),
@@ -484,7 +494,10 @@ const STILL = { idle: { frames: 1, fps: 1, loop: true, dirs: ['s'] } } satisfies
 
 export const DECOR_ANIMS: Readonly<Record<string, Readonly<Record<string, AnimDef>>>> = {
   decor_tree: STILL,
+  decor_tree_young: STILL,
+  decor_tree_old: STILL,
   decor_pine: STILL,
+  decor_pine_tall: STILL,
   decor_bed: STILL,
   decor_table: STILL,
   decor_stump: STILL,

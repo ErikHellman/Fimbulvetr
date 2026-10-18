@@ -1,3 +1,4 @@
+import type { FringeSpec } from '@core/world/fringe';
 import type { TerrainDef } from '@core/world/terrain';
 
 export const TERRAIN_IDS = [
@@ -117,7 +118,14 @@ export const TERRAIN = {
   path: { solid: false },
   water: { solid: true, low: true, swim: true },
   rock: { solid: true },
-  tree: { solid: true, decor: { art: ['decor_tree', 'decor_pine'], w: 1, h: 1 } },
+  tree: {
+    solid: true,
+    decor: {
+      art: ['decor_tree', 'decor_tree_old', 'decor_tree_young', 'decor_pine'],
+      w: 1,
+      h: 1,
+    },
+  },
   /** A low bank you can hop down (south) but not climb. */
   ledge: { solid: false, ledge: 's' },
   fence: { solid: true },
@@ -154,7 +162,7 @@ export const TERRAIN = {
   /** Planks over water: walkable, water laps right up to its edge. */
   jetty: { solid: false },
   /** Old pines of Myrkviðr, packed tight. */
-  pine: { solid: true, decor: { art: ['decor_pine', 'decor_pine_old'], w: 1, h: 1 } },
+  pine: { solid: true, decor: { art: ['decor_pine', 'decor_pine_old', 'decor_pine_tall'], w: 1, h: 1 } },
   /** A fallen trunk across a road, four tiles long. */
   log: { solid: true, decor: { art: ['decor_log'], w: 4, h: 1 } },
   /** A grave mound, where draugr climb out at night. */
@@ -292,3 +300,24 @@ export const TERRAIN = {
   giant_floor: { solid: false },
   giant_wall: { solid: true },
 } as const satisfies Record<TerrainId, TerrainDef>;
+
+/**
+ * Which ground spills over which at a boundary (docs/art-style-guide.md, rule 4). Soft, growing ground
+ * spills; worn, paved and cut ground only receives. Auto-tiled terrain carries its own bank and stays out.
+ */
+export const FRINGE_SPILL: FringeSpec = {
+  spill: { grass: 3, heath: 3, moss: 3, mire: 3, firn: 2, bog: 2, sand: 1, scree: 1, cave_floor: 1 },
+  receive: [
+    'path',
+    'yard',
+    'field',
+    'peat',
+    'flagstone',
+    'planks',
+    'mound',
+    'ledge',
+    'silt',
+    'crypt_floor',
+    'forge_floor',
+  ],
+};
