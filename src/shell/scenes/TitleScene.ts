@@ -10,6 +10,7 @@ import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
 import { FONT_KEY } from '@shell/gfx/font';
 import { connectedPads, readPad } from '@shell/input/gamepad';
+import { activePadStyle, prompt, type PadStyle } from '@shell/input/padLabels';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { bindingsOf } from '@shell/input/remap';
@@ -83,6 +84,8 @@ export class TitleScene extends Phaser.Scene {
   private achText: Phaser.GameObjects.BitmapText[] = [];
   /** The introduction, open between New game and the longhouse. */
   private intro: IntroState | null = null;
+  /** The kind of controller connected now, or null: prompts name its buttons while there is one. */
+  private padStyle: PadStyle | null = null;
   private slots: Record<SlotId, SaveSummary | null> = EMPTY;
   private readonly latch = new InputLatch();
   private readonly keys = new KeyboardState();
@@ -207,7 +210,9 @@ export class TitleScene extends Phaser.Scene {
     const codes = this.keys.takeCodes();
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
-    const pad = readPad(connectedPads(navigator));
+    const pads = connectedPads(navigator);
+    this.padStyle = activePadStyle(pads);
+    const pad = readPad(pads);
     this.mapper.sample(codes, pad);
     const frame = this.latch.consume();
     if (!this.busy) {
@@ -332,7 +337,12 @@ export class TitleScene extends Phaser.Scene {
     }
     if (this.settingsMenu !== null) {
       document.body.dataset.title = 'settings';
-      const { labels, values, hint } = settingsLines(this.settingsMenu, this.services.settings, lang);
+      const { labels, values, hint } = settingsLines(
+        this.settingsMenu,
+        this.services.settings,
+        lang,
+        this.padStyle,
+      );
       const left = 120;
       this.body.setText(labels.join('\n')).setPosition(left, 130);
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
@@ -342,7 +352,12 @@ export class TitleScene extends Phaser.Scene {
     }
     if (this.intro !== null) {
       document.body.dataset.title = 'intro';
-      const { heading, labels, values, hint } = introLines(this.intro, this.services.settings, lang);
+      const { heading, labels, values, hint } = introLines(
+        this.intro,
+        this.services.settings,
+        lang,
+        this.padStyle,
+      );
       this.subtitle.setText(heading).setX(this.centre(heading));
       this.body.setText(labels.join('\n')).setPosition(INTRO_LEFT, 130);
       this.values.setText(values.join('\n')).setPosition(INTRO_LEFT + introColumn(labels, values), 130);
@@ -356,16 +371,16 @@ export class TitleScene extends Phaser.Scene {
     let hint: string;
     switch (this.state.page) {
       case 'press':
-        lines = [t(UI.title_press, lang)];
+        lines = [t(this.padStyle === null ? UI.title_press : UI.title_press_pad, lang)];
         hint = '';
         break;
       case 'main':
         lines = titleRows(this.info()).map((r, i) => mark(i) + t(ROW_LABEL[r], lang));
-        hint = t(UI.title_hint, lang);
+        hint = prompt(UI.title_hint, UI.title_hint_pad, this.padStyle, lang);
         break;
       case 'confirmNew':
         lines = [t(UI.title_new, lang)];
-        hint = t(UI.title_confirm_new, lang);
+        hint = prompt(UI.title_confirm_new, UI.title_confirm_new_pad, this.padStyle, lang);
         break;
       case 'load':
         lines = LOAD_ROWS.map((r, i) =>
@@ -373,7 +388,7 @@ export class TitleScene extends Phaser.Scene {
             ? mark(i) + t(UI.set_back, lang)
             : `${mark(i)}${slotName(r, lang)}: ${summaryLine(this.slots[r], this.services.db, lang)}`,
         );
-        hint = t(UI.title_load_hint, lang);
+        hint = prompt(UI.title_load_hint, UI.title_load_hint_pad, this.padStyle, lang);
         break;
     }
     const widest = Math.max(...lines.map((l) => textWidth(l)));
@@ -397,7 +412,7 @@ export class TitleScene extends Phaser.Scene {
       this.achText[c * 2 + 1]?.setText(pick(true)).setPosition(x, 130);
     });
     this.body.setText(lines.hint).setPosition(this.centre(lines.hint), 130 + (ACH_ROWS + 1) * LINE_HEIGHT);
-    const keys = t(UI.ach_hint, lang);
+    const keys = prompt(UI.ach_hint, UI.ach_hint_pad, this.padStyle, lang);
     this.hint.setText(keys).setX(this.centre(keys));
   }
 
