@@ -5,6 +5,7 @@ import type { GameState } from '@core/state/gameState';
 import type { DevTools } from './dev/bridge';
 import type { ArtOverrides } from './gfx/atlases';
 import type { FrameIndex } from './gfx/frameIndex';
+import type { NativeHost } from './platform/host';
 import type { SaveService } from './platform/saveService';
 import type { Settings } from './platform/settings';
 
@@ -14,6 +15,8 @@ export interface Services {
   readonly settings: Settings;
   readonly saves: SaveService;
   readonly dev: DevTools | null;
+  /** The native TV app around the game, or null on the web. */
+  readonly host: NativeHost | null;
   /** Dev/test `?mute`. */
   readonly muted: boolean;
   /** Dev/test `?rolled=0` turns rolled weather and spawn tables off. */

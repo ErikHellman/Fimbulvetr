@@ -11,6 +11,7 @@ import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
 import { SaveService } from '@shell/platform/saveService';
+import { nativeHost } from '@shell/platform/host';
 import { registerServiceWorker } from '@shell/platform/pwa';
 import { openSaveStoreSafely } from '@shell/platform/saveStore';
 import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
@@ -76,7 +77,9 @@ async function main(): Promise<void> {
     showMessage(t(UI.already_open, lang));
     return;
   }
-  if (!import.meta.env.DEV) registerServiceWorker(lang);
+  const host = nativeHost();
+  // The TV app ships its web build inside the APK and updates through the store, not a service worker.
+  if (!import.meta.env.DEV && host === null) registerServiceWorker(lang);
 
   const wantSaves = query?.nosave !== true;
   const store = wantSaves ? await openSaveStoreSafely(indexedDbFactory()) : null;
@@ -101,6 +104,7 @@ async function main(): Promise<void> {
       settings,
       saves,
       dev,
+      host,
       muted: query?.mute === true,
       rolled: query?.rolled ?? true,
       ...(query?.weather === undefined ? {} : { weather: query.weather }),

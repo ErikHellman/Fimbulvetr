@@ -6,7 +6,15 @@ import tseslint from 'typescript-eslint';
 import { boundaryConfigs } from './eslint.boundaries.js';
 
 export default defineConfig([
-  globalIgnores(['dist/', 'dev-dist/', 'coverage/', 'playwright-report/', 'test-results/', 'public/']),
+  globalIgnores([
+    'dist/',
+    'dev-dist/',
+    'coverage/',
+    'playwright-report/',
+    'test-results/',
+    'public/',
+    'android/',
+  ]),
   {
     files: ['**/*.ts'],
     extends: [js.configs.recommended, tseslint.configs.strictTypeChecked],

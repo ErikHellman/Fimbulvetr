@@ -10,6 +10,7 @@ import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
 import { FONT_KEY } from '@shell/gfx/font';
 import { connectedPads, readPad } from '@shell/input/gamepad';
+import { withHostPad } from '@shell/platform/host';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { bindingsOf } from '@shell/input/remap';
@@ -199,6 +200,7 @@ export class TitleScene extends Phaser.Scene {
         s2: s.s2 !== null,
         s3: s.s3 !== null,
       },
+      tv: this.services.host !== null,
     };
   }
 
@@ -207,7 +209,7 @@ export class TitleScene extends Phaser.Scene {
     const codes = this.keys.takeCodes();
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
-    const pad = readPad(connectedPads(navigator));
+    const pad = readPad(withHostPad(this.services.host, connectedPads(navigator)));
     this.mapper.sample(codes, pad);
     const frame = this.latch.consume();
     if (!this.busy) {
@@ -307,6 +309,9 @@ export class TitleScene extends Phaser.Scene {
           break;
         case 'achievements':
           this.achievements = openAchievements();
+          break;
+        case 'exit':
+          this.services.host?.exit();
           break;
       }
     } finally {

@@ -6,3 +6,6 @@ test-results
 public
 pnpm-lock.yaml
 *.md
+android/app/src/main/assets
+android/build
+android/app/build
