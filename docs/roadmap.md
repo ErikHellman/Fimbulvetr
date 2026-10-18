@@ -317,3 +317,17 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Every villager on the shared body (`art-src/people`), the Askdalr decor (`decor` atlas) and the ford
   - [ ] Other regions' decor and tiles, enemies, fixtures, UI
   - [ ] Per-region atlas loading
+
+## TV apps (after 1.0.0)
+Plan: `docs/tv-port.md`.
+- [ ] Android TV
+  - [x] T1 WebView app, controller and remote bridge, TV title screen, APK in CI
+  - [ ] T2 Test on a real TV
+  - [ ] T3 TV polish (overscan margin, controller notice)
+  - [ ] T4 Play release
+- [ ] Apple TV
+  - [x] A1 The rules as a JavaScriptCore bundle, and the no-JIT benchmark
+  - [ ] A2 Events and art through the port
+  - [ ] A3 Draw list shared by the web and native renderers
+  - [ ] A4 Swift tvOS app
+  - [ ] A5 TestFlight and App Store
