@@ -313,5 +313,5 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
 - [ ] G4 Real art (see `docs/real-art.md`)
   - [x] Atlas loader: `public/atlases/manifest.json` replaces frames and tiles by name
   - [x] Hero sheet drawn in-repo (`art-src/hero`, three kits, `pnpm art:pack`)
-  - [ ] Embla sheet and the Askdalr tileset
+  - [x] Embla sheet (`art-src/embla`) and the Askdalr tileset (`art-src/askdalr`: grass, path, yard, field, fence, rock, roof, water)
   - [ ] Per-region atlas loading

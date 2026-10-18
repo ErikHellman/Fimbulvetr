@@ -21,7 +21,7 @@ and tile with its name, with any real art already in place.
 
 - Paths are relative to `public/atlases/`; subfolders are fine, `..` and absolute paths are not.
 - `atlases` are sprite atlases, `tiles` are tile sheets, one per terrain. Either list may be left out.
-- The shipped manifest lists the drawn hero atlas. Add entries as art arrives; a partial set is fine at every step.
+- The shipped manifest lists the drawn hero and people atlases and the Askdalr tile sheets. Add entries as art arrives; a partial set is fine at every step.
 
 ## Sprite atlases
 
@@ -86,13 +86,22 @@ is the step to take before the atlases grow past a few megabytes.
 
 ## Drawing art in the repo: `art-src/`
 
-The hero sheet is drawn in code, but not generated: `art-src/hero/parts.ts` and `props.ts` are hand-drawn
-pixel grids (one palette letter per pixel, `palette.ts` maps letters to colours), and `art-src/hero/build.ts`
-composes them into poses (legs, torso, arm, head, shield, weapon), outlines the result and emits the 25
-animations for the three weapon kits (`hero`, `hero_axe`, `hero_fork`). `art-src/lib` holds the tiny
-toolkit: PNG encoding, grid parsing, mirroring and rotation, shelf packing into an atlas, preview sheets.
+The drawn art is kept as source, not generated: hand-drawn pixel grids (one palette letter per pixel, a
+`palette.ts` per set maps letters to colours) and a small composition script per set.
 
-- `pnpm art:pack` rewrites `public/atlases/hero.png` and `hero.json`. Commit both with the source.
+- `art-src/hero`: Ask's parts (`parts.ts`, `props.ts`) composed into poses (legs, torso, arm, head,
+  shield, weapon), outlined, for the 25 animations of the three weapon kits (`hero`, `hero_axe`, `hero_fork`).
+- `art-src/embla`: Embla's head, braid, bodice and skirt, for `npc_embla` idle and walk (the `people` atlas;
+  other villagers join it under their own `npc_<id>` names).
+- `art-src/askdalr`: the ground. Plain terrain is drawn tile by tile; auto-tiled terrain (rock, roof, water)
+  is drawn as a 32×32 island (outer corners, edges, middle) plus a 16×16 tile holding the four inner
+  corners, and `build.ts` cuts both into 8×8 quarters and assembles the 47 blob cells in `BLOB_MASKS`
+  order. Water's four frames are four islands with the ripples moved a pixel.
+
+`art-src/lib` holds the tiny toolkit: PNG encoding, grid parsing, mirroring and rotation, shelf packing into
+an atlas, preview sheets.
+
+- `pnpm art:pack` rewrites everything under `public/atlases/` that the manifest lists. Commit it with the source.
 - `pnpm art:pack --preview <dir>` also writes one contact sheet per animation (`hero_walk.png`) and the
   placeholder's sheet beside it (`old_hero_walk.png`) for before/after review.
 - `art-src` is type-checked by `tsconfig.json` but is not part of the game bundle and may use Node.
