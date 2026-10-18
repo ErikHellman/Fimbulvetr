@@ -80,8 +80,10 @@ is the step to take before the atlases grow past a few megabytes.
 ## Status
 
 - [x] Atlas loader, manifest format, tile sheets, e2e coverage (G4, 2026-10-18).
-- [ ] Hero sheet (`hero`, `hero_axe`, `hero_fork`) and Embla.
-- [ ] The Askdalr tileset: grass, path, yard, field, water, rock, wood, roof, fence.
+- [x] Hero sheet (`hero`, `hero_axe`, `hero_fork`) and Embla.
+- [x] The Askdalr tileset: grass, path, yard, field, fence, rock, roof, water, ford.
+- [x] Every villager (`people` atlas, 55 people) and the Askdalr decor (trees, pines, birch, boulder, stump, menhir, runestone, well).
+- [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
 ## Drawing art in the repo: `art-src/`
@@ -91,12 +93,16 @@ The drawn art is kept as source, not generated: hand-drawn pixel grids (one pale
 
 - `art-src/hero`: Ask's parts (`parts.ts`, `props.ts`) composed into poses (legs, torso, arm, head,
   shield, weapon), outlined, for the 25 animations of the three weapon kits (`hero`, `hero_axe`, `hero_fork`).
-- `art-src/embla`: Embla's head, braid, bodice and skirt, for `npc_embla` idle and walk (the `people` atlas;
-  other villagers join it under their own `npc_<id>` names).
-- `art-src/askdalr`: the ground. Plain terrain is drawn tile by tile; auto-tiled terrain (rock, roof, water)
+- `art-src/people`: every villager (the `people` atlas, `npc_<id>` idle and walk). One shared body (the hero's
+  trousers and torso, or Embla's skirt and bodice), coloured per person from `LOOKS` in
+  `src/art/sprites/people.ts`, with overlays for long hair, braid, beard, apron, kerchief, bald heads, the
+  huldra's tail, and children drawn from cropped parts at child height. A new villager needs only a look entry.
+- `art-src/askdalr`: the ground and the decor. Plain terrain is drawn tile by tile; auto-tiled terrain (rock, roof, water, ford)
   is drawn as a 32×32 island (outer corners, edges, middle) plus a 16×16 tile holding the four inner
   corners, and `build.ts` cuts both into 8×8 quarters and assembles the 47 blob cells in `BLOB_MASKS`
-  order. Water's four frames are four islands with the ripples moved a pixel.
+  order. Water's and the ford's four frames are four islands with the ripples moved a pixel. `decor.ts` holds the
+  trees, stones and the well (`decor` atlas, `decor_<id>_idle_s_<n>`), at the placeholder sizes and standing on
+  their bottom centre.
 
 `art-src/lib` holds the tiny toolkit: PNG encoding, grid parsing, mirroring and rotation, shelf packing into
 an atlas, preview sheets.
