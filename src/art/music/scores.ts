@@ -37,7 +37,7 @@ const REGIONS = {
   music_askdalr: {
     ...base,
     theme: 11,
-    root: 67,
+    root: 55,
     mode: 'mixolydian',
     bpm: 104,
     beats: 3,
@@ -218,7 +218,7 @@ export const MUSIC_SCORES: Readonly<Record<MusicId, Score>> = {
   music_town: {
     ...base,
     theme: 31,
-    root: 67,
+    root: 55,
     mode: 'ionian',
     bpm: 116,
     beats: 3,

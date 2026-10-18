@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compose, MODES, type Score } from '@art/music/compose';
+import { compose, LEAD_OCTAVE, MODES, type Score } from '@art/music/compose';
 import { renderScore } from '@art/music/render';
 import { MUSIC_SCORES, winter } from '@art/music/scores';
 import { MUSIC } from '@content/music';
@@ -52,7 +52,7 @@ describe('compose', () => {
     const pitches = (s: Score): number[] =>
       compose(s)
         .notes.filter((n) => n.voice === s.lead && n.stem === 'main')
-        .map((n) => n.midi - (s.lead === 'flute' ? 12 : 0));
+        .map((n) => n.midi - LEAD_OCTAVE[s.lead]);
     expect(pitches(w)).toEqual(pitches(tiny));
   });
 });

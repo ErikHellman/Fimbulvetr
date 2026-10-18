@@ -92,12 +92,16 @@ function plucked(out: Float32Array, sr: number, f: number, rng: RngState, damp: 
   const delay = Math.max(2, sr / f - 0.5);
   const size = Math.ceil(delay) + 2;
   const line = new Float32Array(size);
+  // A soft pluck: the noise burst is low-passed near the string's own pitch.
+  const soft = lp(Math.min(2000, f * 5), sr);
   let prev = 0;
   for (let i = 0; i < size; i++) {
-    const n = nextFloat(rng) * 2 - 1;
-    line[i] = (n + prev) * 0.5;
-    prev = n;
+    prev += soft * (nextFloat(rng) * 2 - 1 - prev);
+    line[i] = prev;
   }
+  let peak = 1e-6;
+  for (const v of line) peak = Math.max(peak, Math.abs(v));
+  for (let i = 0; i < size; i++) line[i] = (line[i] ?? 0) / peak;
   let w = 0;
   let last = 0;
   const fade = Math.round(0.02 * sr);
@@ -127,13 +131,14 @@ export function renderVoice(
   const f = hz(midi);
   switch (voice) {
     case 'fiddle':
+      // The cutoff follows the note (about the fourth harmonic) and stays low, so the bow sings rather than buzzes.
       bowed(out, sr, f, dur, {
-        attack: 0.04,
-        rel: 0.15,
-        cutoff: 2600,
-        vib: 0.004,
+        attack: 0.09,
+        rel: 0.2,
+        cutoff: Math.min(1400, f * 4),
+        vib: 0.0035,
         detune: 0.0015,
-        octave: 0.12,
+        octave: 0.04,
       });
       break;
     case 'bow':
@@ -158,13 +163,13 @@ export function renderVoice(
     case 'flute': {
       let phase = 0;
       let breath = 0;
-      const a = lp(1800, sr);
+      const a = lp(900, sr);
       for (let i = 0; i < out.length; i++) {
         const t = i / sr;
         phase = (phase + (f * (1 + 0.003 * Math.min(1, t * 2) * Math.sin(TAU * 4.8 * t))) / sr) % 1;
         breath += a * (nextFloat(rng) * 2 - 1 - breath);
-        const tone = Math.sin(TAU * phase) + 0.15 * Math.sin(2 * TAU * phase);
-        out[i] = (tone * 0.8 + breath * 0.6) * env(t, dur, 0.09, 0.2);
+        const tone = Math.sin(TAU * phase) + 0.08 * Math.sin(2 * TAU * phase);
+        out[i] = (tone * 0.85 + breath * 0.12) * env(t, dur, 0.14, 0.25);
       }
       break;
     }
