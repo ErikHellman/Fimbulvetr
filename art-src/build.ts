@@ -3,8 +3,9 @@ import { buildAtlas } from './lib/atlas';
 import { previewSheet } from './lib/preview';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
-import { askdalrSheets, sheetImage } from './askdalr/build';
-import { emblaFrames } from './embla/build';
+import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
+import { decorFrames as placeholderDecor } from '@art/sprites/decor';
+import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
 import { encodePng } from './lib/png';
 import type { DrawnFrame } from './lib/sprite';
@@ -22,7 +23,12 @@ const previewDir = process.argv.includes('--preview')
 mkdirSync('public/atlases', { recursive: true });
 
 /** One atlas per set: its frames and the code-drawn placeholders for the before/after sheets. */
-const SETS: readonly { key: string; frames: DrawnFrame[]; placeholder: () => DrawnFrame[] }[] = [
+const SETS: readonly {
+  key: string;
+  frames: DrawnFrame[];
+  pageSize?: number;
+  placeholder: () => DrawnFrame[];
+}[] = [
   {
     key: 'hero',
     frames: Object.entries(KITS).flatMap(([art, kit]) => heroFrames(art, kit)),
@@ -31,11 +37,20 @@ const SETS: readonly { key: string; frames: DrawnFrame[]; placeholder: () => Dra
   },
   {
     key: 'people',
-    frames: emblaFrames(),
+    frames: peopleFrames(),
+    pageSize: 2048,
     placeholder: () =>
-      placeholderPeople()
-        .filter((f) => f.name.startsWith('npc_embla_'))
-        .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } })),
+      placeholderPeople().map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } })),
+  },
+  {
+    key: 'decor',
+    frames: askdalrDecor(),
+    placeholder: () => {
+      const drawn = new Set(askdalrDecor().map((f) => f.name));
+      return placeholderDecor()
+        .filter((f) => drawn.has(f.name))
+        .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } }));
+    },
   },
 ];
 
@@ -44,7 +59,7 @@ const ofAnim = (frames: readonly DrawnFrame[], key: string): DrawnFrame[] =>
   frames.filter((f) => f.name.startsWith(`${key}_`) && /_[a-z]_\d+$/.test(f.name.slice(key.length)));
 
 for (const set of SETS) {
-  const atlas = buildAtlas(`${set.key}.png`, set.frames);
+  const atlas = buildAtlas(`${set.key}.png`, set.frames, set.pageSize);
   writeFileSync(`public/atlases/${set.key}.png`, atlas.png);
   writeFileSync(`public/atlases/${set.key}.json`, atlas.json);
   console.log(`${set.key}: ${String(set.frames.length)} frames`);
@@ -59,6 +74,13 @@ for (const set of SETS) {
       writeFileSync(`${previewDir}/old_${key}.png`, previewSheet(before, 6, Math.min(6, before.length)));
   }
   console.log(`preview in ${previewDir}`);
+  // One sheet of everyone standing, for a quick look at the whole cast.
+  if (set.key === 'people') {
+    const cast = (frames: readonly DrawnFrame[]): DrawnFrame[] =>
+      frames.filter((f) => /_idle_s_0$/.test(f.name));
+    writeFileSync(`${previewDir}/people_cast.png`, previewSheet(cast(set.frames), 4, 14));
+    writeFileSync(`${previewDir}/old_people_cast.png`, previewSheet(cast(old), 4, 14));
+  }
 }
 
 // Tile sheets, one PNG per terrain under public/atlases/askdalr/.

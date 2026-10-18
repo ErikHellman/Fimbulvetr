@@ -5,8 +5,11 @@ import { NEW_GAME } from '@content/start';
 import { SCREEN_IDS } from '@content/world/screens';
 import { applyPreset } from '@core/dev/query';
 import { solve } from '@core/progress/solver';
-import { SEASONS } from '@core/clock/types';
+import type { Season } from '@core/clock/types';
 import { newGame, type GameState } from '@core/state/gameState';
+
+// The four seasons' solves take minutes, so each has its own test file
+// (solver_saevatn_<season>.test.ts) and Vitest runs them side by side.
 
 const nothing = (): boolean => false;
 
@@ -25,10 +28,10 @@ const LAKE = SCREEN_IDS.filter((id) => id.startsWith('sae_') || id === 'ref_int_
 const SUNK = ['sae_c_landing', 'sae_c_open', 'sae_c_drowned', 'sae_c_wreck', 'sae_c_narrows'];
 const UNDER_ICE = ['sae_c_landing', 'sae_c_open', 'sae_c_drowned', 'sae_c_wreck'];
 
-describe('the progression solver on Sævatn (M7a)', () => {
-  it.each(SEASONS)(
-    '%s: with the seal-skin, swims to every lake screen, the Refuge, the ore and each sunk thing not under ice',
-    (season) => {
+/** The progression solver's proofs of Sævatn (M7a) in one season. */
+export function saevatnProofs(season: Season): void {
+  describe('the progression solver on Sævatn (M7a)', () => {
+    it(`${season}: with the seal-skin, swims to every lake screen, the Refuge, the ore and each sunk thing not under ice`, () => {
       const r = solve(DB, afterHelgrind(true), nothing, { season, within });
       for (const id of LAKE) expect(r.screens, id).toContain(id);
       // In winter the ice lies over the open lake: only what sinks in water that never freezes is dived for.
@@ -41,13 +44,9 @@ describe('the progression solver on Sævatn (M7a)', () => {
         expect.arrayContaining(['shop_vala', 'shop_hreggvidr', 'war_table', 'hof_pray']),
       );
       expect(r.stranded).toEqual([]);
-    },
-    120_000,
-  );
+    }, 120_000);
 
-  it.each(SEASONS)(
-    '%s: without it, never lands on Holmr nor dives for anything',
-    (season) => {
+    it(`${season}: without it, never lands on Holmr nor dives for anything`, () => {
       const r = solve(DB, afterHelgrind(false), nothing, { season, within });
       // Winter ice reaches the outer edge of Holmr's screen; the warm ring keeps the island and its hall.
       expect(r.screens).not.toContain('ref_int_hall');
@@ -55,7 +54,6 @@ describe('the progression solver on Sævatn (M7a)', () => {
       for (const id of SUNK) expect(r.opened).not.toContain(id);
       expect(r.pieces).not.toContain('hp_sae_skerries');
       expect(r.stranded).toEqual([]);
-    },
-    120_000,
-  );
-});
+    }, 120_000);
+  });
+}

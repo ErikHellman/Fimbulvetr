@@ -1,15 +1,12 @@
-import { grid } from '../lib/sprite';
-import { EMBLA_PAL as P } from './palette';
-
 /**
- * Embla's parts on the same 13 px strips as Ask: head (11 rows), bodice (7 rows), skirt with feet
- * (8 rows). The braid is a separate overlay so it can hang over the shoulder (south), down the back
- * (west) or straight down the spine (north).
+ * The villagers' parts on the same 13 px strips as Ask, as text grids rendered per person with that
+ * person's palette (see `build.ts`). Women's bodies: a bodice (7 rows) and a skirt with feet (8 rows).
+ * Men's bodies reuse Ask's torso and legs. Heads: Ask's short crop, a woman's head framed by hair, and the
+ * overlays that make the other styles (long hair, braid, kerchief, bald, beard), the apron and the tail.
  */
-const g = (text: string) => grid(P, text);
 
-export const HEAD = {
-  s: g(`
+export const HEAD_W_TEXT = {
+  s: `
     ....yhhhh....
     ..yyhhhhhhh..
     .yhhhhhhhhhg.
@@ -21,8 +18,8 @@ export const HEAD = {
     .hfffffffffg.
     ..hffddffdg..
     ...dddddd....
-  `),
-  w: g(`
+  `,
+  w: `
     ....yhhhh....
     ..yyhhhhhhh..
     .yhhhhhhhhhg.
@@ -34,8 +31,8 @@ export const HEAD = {
     .ffffhhhhhgg.
     ..ddfhhhhgg..
     ...ddhhgg....
-  `),
-  n: g(`
+  `,
+  n: `
     ....yhhhh....
     ..yyhhhhhhh..
     .yhhhhhhhhhg.
@@ -47,13 +44,13 @@ export const HEAD = {
     ..ghhhhhgg...
     ...dghhggd...
     ...ddhhgd....
-  `),
+  `,
 };
 
 /** The braid, pasted after the bodice: over the right shoulder (s), down the back (w, n). */
-export const BRAID = {
+export const BRAID_TEXT = {
   s: {
-    raster: g(`
+    raster: `
     hg.
     ghg
     hgh
@@ -62,12 +59,12 @@ export const BRAID = {
     .gh
     .bb
     .g.
-  `),
+  `,
     dx: 1,
     dy: 10,
   },
   w: {
-    raster: g(`
+    raster: `
     hg
     gh
     hg
@@ -75,12 +72,12 @@ export const BRAID = {
     hg
     bb
     g.
-  `),
+  `,
     dx: 9,
     dy: 11,
   },
   n: {
-    raster: g(`
+    raster: `
     ghg
     hgh
     ghg
@@ -89,16 +86,16 @@ export const BRAID = {
     hgh
     .bb
     .g.
-  `),
+  `,
     dx: 5,
     dy: 10,
   },
 };
 
 /** Bodice with the arms down; the walk swings the hands a pixel. */
-export const BODICE = {
+export const BODICE_TEXT = {
   s: [
-    g(`
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttu.
@@ -106,8 +103,8 @@ export const BODICE = {
     .fbbbbbbbbbd.
     ..vtttttttu..
     ..vtttttttu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .ftttttttttu.
@@ -115,8 +112,8 @@ export const BODICE = {
     .vbbbbbbbbbd.
     ..vtttttttu..
     ..vtttttttu..
-  `),
-    g(`
+  `,
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .vtttttttttd.
@@ -124,10 +121,10 @@ export const BODICE = {
     .fbbbbbbbbbu.
     ..vtttttttu..
     ..vtttttttu..
-  `),
+  `,
   ],
   w: [
-    g(`
+    `
     ..vttttuu....
     .vvtttttuu...
     .vtttutttu...
@@ -135,8 +132,8 @@ export const BODICE = {
     .vbbbubbbu...
     ..vttfttu....
     ..vtttttu....
-  `),
-    g(`
+  `,
+    `
     ..vttttuu....
     .vvtttttuu...
     .vttutttuu...
@@ -144,8 +141,8 @@ export const BODICE = {
     .vbbubbbbu...
     ..vftttttu...
     ..vtttttu....
-  `),
-    g(`
+  `,
+    `
     ..vttttuu....
     .vvtttttuu...
     .vttttutttu..
@@ -153,10 +150,10 @@ export const BODICE = {
     .vbbbbubbu...
     ..vtttfttu...
     ..vtttttu....
-  `),
+  `,
   ],
   n: [
-    g(`
+    `
     ..vttttttuu..
     .vvtttttttuu.
     .dvtttttttud.
@@ -164,56 +161,56 @@ export const BODICE = {
     .dbbbbbbbbbd.
     ..vtttttttu..
     ..vtttttttu..
-  `),
+  `,
   ],
 };
 
 /** Skirt and feet per walk frame: 0 and 2 standing, 1 and 3 mid-step with the hem swung. */
-export const SKIRT = {
+export const SKIRT_TEXT = {
   s: [
-    g(`
-    .zsssAAAsssS.
-    .zsssAAEsssS.
-    zzsssAAEsssSS
-    zsssAAAAEsssS
-    zsssAAAAEsssS
+    `
+    .zsssssssssS.
+    .zsssssSsssS.
+    zzsssssSsssSS
+    zsssssssSsssS
+    zsssssssSsssS
     zSSSSSSSSSSSS
     ...oo...oo...
     ...oo...oo...
-  `),
-    g(`
-    .zsssAAAsssS.
-    .zsssAAEsssS.
-    zzsssAAEsssSS
-    zsssAAAAEsssS
-    zzssAAAAEssSS
+  `,
+    `
+    .zsssssssssS.
+    .zsssssSsssS.
+    zzsssssSsssSS
+    zsssssssSsssS
+    zzssssssSssSS
     zSSSSSSSSSSSS
     ...no...oo...
     ...oo........
-  `),
-    g(`
-    .zsssAAAsssS.
-    .zsssAAEsssS.
-    zzsssAAEsssSS
-    zsssAAAAEsssS
-    zsssAAAAEsssS
+  `,
+    `
+    .zsssssssssS.
+    .zsssssSsssS.
+    zzsssssSsssSS
+    zsssssssSsssS
+    zsssssssSsssS
     zSSSSSSSSSSSS
     ...oo...oo...
     ...oo...oo...
-  `),
-    g(`
-    .zsssAAAsssS.
-    .zsssAAEsssS.
-    zzsssAAEsssSS
-    zsssAAAAEsssS
-    zzssAAAAEssSS
+  `,
+    `
+    .zsssssssssS.
+    .zsssssSsssS.
+    zzsssssSsssSS
+    zsssssssSsssS
+    zzssssssSssSS
     zSSSSSSSSSSSS
     ...oo...no...
     ........oo...
-  `),
+  `,
   ],
   w: [
-    g(`
+    `
     ..zsssssS....
     ..zsssssS....
     ..zsssssSS...
@@ -222,8 +219,8 @@ export const SKIRT = {
     .zSSSSSSSSS..
     ...noo.oo....
     ...ooo.oo....
-  `),
-    g(`
+  `,
+    `
     ..zsssssS....
     ..zsssssS....
     ..zsssssSS...
@@ -232,8 +229,8 @@ export const SKIRT = {
     zSSSSSSSSSSS.
     .noo.....oo..
     .ooo.....oo..
-  `),
-    g(`
+  `,
+    `
     ..zsssssS....
     ..zsssssS....
     ..zsssssSS...
@@ -242,8 +239,8 @@ export const SKIRT = {
     .zSSSSSSSSS..
     ...noo.oo....
     ...ooo.oo....
-  `),
-    g(`
+  `,
+    `
     ..zsssssS....
     ..zsssssS....
     ..zsssssSS...
@@ -252,10 +249,10 @@ export const SKIRT = {
     .zSSSSSSSSSS.
     ..noo...oo...
     ..ooo...oo...
-  `),
+  `,
   ],
   n: [
-    g(`
+    `
     .zsssssssssS.
     .zsssssssssS.
     zzsssssssssSS
@@ -264,8 +261,8 @@ export const SKIRT = {
     zSSSSSSSSSSSS
     ...oo...oo...
     ...oo...oo...
-  `),
-    g(`
+  `,
+    `
     .zsssssssssS.
     .zsssssssssS.
     zzsssssssssSS
@@ -274,8 +271,8 @@ export const SKIRT = {
     zSSSSSSSSSSSS
     ...oo...oo...
     ........oo...
-  `),
-    g(`
+  `,
+    `
     .zsssssssssS.
     .zsssssssssS.
     zzsssssssssSS
@@ -284,8 +281,8 @@ export const SKIRT = {
     zSSSSSSSSSSSS
     ...oo...oo...
     ...oo...oo...
-  `),
-    g(`
+  `,
+    `
     .zsssssssssS.
     .zsssssssssS.
     zzsssssssssSS
@@ -294,6 +291,93 @@ export const SKIRT = {
     zSSSSSSSSSSSS
     ...oo...oo...
     ...oo........
-  `),
+  `,
   ],
+};
+
+/** Long hair falling past the shoulders: both sides (s), the back (w), a full fall (n). Pasted at the head's row 8. */
+export const LONG_TEXT = {
+  s: `
+    hh.........gg
+    hh.........gg
+    hh.........gg
+    hh.........gg
+    hh.........gg
+    hh.........gg
+    gh.........gg
+    .g.........g.
+  `,
+  w: `
+    .........hhgg
+    ........hhhgg
+    ........hhhgg
+    ........hhhgg
+    ........hhhgg
+    .........hhgg
+    .........hgg.
+    ..........g..
+  `,
+  n: `
+    ..hhhhhhhhgg.
+    ..hhhhhhhhgg.
+    ..hhhhhhhhgg.
+    ..hhhhhhhhgg.
+    ..hhhhhhhhgg.
+    ...hhhhhhgg..
+    ....hhhhgg...
+    .....gggg....
+  `,
+};
+
+/** A beard under the mouth: full (s) and seen from the side (w). Pasted at the head's row 8. */
+export const BEARD_TEXT = {
+  s: `
+    .mmmmmmmM.
+    .mmmmmmmM.
+    ..mmmmmMM.
+    ...mmmMM..
+    ....mMM...
+  `,
+  w: `
+    mmmmmM
+    mmmmMM
+    .mmmMM
+    ..mMM.
+    ...M..
+  `,
+};
+
+/** The apron panel from the belt down, south only. */
+export const APRON_TEXT = `
+    AAAAAAAE
+    AAAAAAAE
+    AAAAAAAE
+    AAAAAAAE
+    AAAAAAAE
+    AAAAAAAE
+    AAAAAAAE
+    AAAAAAAE
+    EEEEEEEE
+`;
+
+/** The huldra's cow tail from under the hem: down the back (n) and swinging out behind (w). */
+export const TAIL_TEXT = {
+  n: `
+    .TT.
+    .TT.
+    .TQ.
+    .TQ.
+    .TQ.
+    QQQQ
+    QQQQ
+  `,
+  w: `
+    TT..
+    .TT.
+    ..T.
+    ..T.
+    ..TQ
+    .QQQ
+    .QQQ
+  `,
 };
