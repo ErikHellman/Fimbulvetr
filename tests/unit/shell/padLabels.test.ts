@@ -59,6 +59,7 @@ describe('controller prompts', () => {
       { page: 'controls', cursor: 0, listening: null },
       DEFAULT_SETTINGS,
       'en',
+      'off',
       'xbox',
     );
     expect(controls.values[CONTROL_ROWS.indexOf('sword')]).toBe('X');

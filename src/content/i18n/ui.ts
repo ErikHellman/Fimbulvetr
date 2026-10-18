@@ -172,6 +172,17 @@ export const UI = {
   set_scaling: { en: 'Picture', sv: 'Bild' },
   set_scaling_integer: { en: 'Sharp pixels', sv: 'Skarpa pixlar' },
   set_scaling_fit: { en: 'Fill the window', sv: 'Fyll fönstret' },
+  set_fullscreen: { en: 'Full screen', sv: 'Helskärm' },
+  set_fullscreen_home: { en: 'Home Screen…', sv: 'Hemskärmen…' },
+  fullscreen_enter: { en: 'Full screen', sv: 'Helskärm' },
+  fullscreen_confirm: {
+    en: 'The browser wants a click, tap or key press before it goes full screen.',
+    sv: 'Webbläsaren vill ha ett klick, ett tryck eller en tangent innan den visar helskärm.',
+  },
+  fullscreen_home_screen: {
+    en: 'This browser cannot show the game in full screen. Tap Share, then "Add to Home Screen", and start Fimbulvetr from there to play without the browser bars.',
+    sv: 'Den här webbläsaren kan inte visa spelet i helskärm. Tryck på Dela och sedan "Lägg till på hemskärmen", och starta Fimbulvetr därifrån för att spela utan webbläsarens fält.',
+  },
   set_text_size: { en: 'Text size', sv: 'Textstorlek' },
   set_text_normal: { en: 'Normal', sv: 'Normal' },
   set_text_large: { en: 'Large', sv: 'Stor' },
