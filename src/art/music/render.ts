@@ -21,7 +21,7 @@ const GAIN = {
   drone: 0.2,
   drum: 0.55,
   tom: 0.35,
-  shaker: 0.16,
+  shaker: 0.07,
 } as const;
 
 /** Adds a note into a looping buffer: whatever runs past the end comes round to the start. */
@@ -33,6 +33,22 @@ function mix(into: Float32Array, at: number, src: Float32Array, gain: number): v
     j++;
     if (j === n) j = 0;
   }
+}
+
+/**
+ * Rounds off the top of the mix (a gentle two-pole low-pass at `cutoff`), run twice round the loop so it has
+ * no seam: the placeholder instruments are brighter than the wood and gut they stand in for.
+ */
+function tone(buf: Float32Array, sr: number, cutoff: number): void {
+  const a = 1 - Math.exp((-2 * Math.PI * cutoff) / sr);
+  let y1 = 0;
+  let y2 = 0;
+  for (let pass = 0; pass < 2; pass++)
+    for (let i = 0; i < buf.length; i++) {
+      y1 += a * ((buf[i] ?? 0) - y1);
+      y2 += a * (y1 - y2);
+      if (pass === 1) buf[i] = y2;
+    }
 }
 
 /**
@@ -75,8 +91,11 @@ function reverb(dry: Float32Array, sr: number, wet: number, spread: number): Flo
   return out;
 }
 
-/** Takes out any DC offset, scales to a peak and rounds off anything above it softly. */
-function master(buffers: readonly Float32Array[], target: number): void {
+/**
+ * Takes out any DC offset, scales to a loudness (`rms`, so every track sits at the same level) without letting
+ * the peak pass `target`, and rounds off anything above it softly.
+ */
+function master(buffers: readonly Float32Array[], target: number, rms = Infinity): void {
   for (const b of buffers) {
     let mean = 0;
     for (const v of b) mean += v;
@@ -85,7 +104,14 @@ function master(buffers: readonly Float32Array[], target: number): void {
   }
   let peak = 1e-9;
   for (const b of buffers) for (const v of b) peak = Math.max(peak, Math.abs(v));
-  const g = target / peak;
+  let sum = 0;
+  let n = 0;
+  for (const b of buffers)
+    for (const v of b) {
+      sum += v * v;
+      n++;
+    }
+  const g = Math.min(target / peak, rms / Math.sqrt(sum / Math.max(1, n) + 1e-12));
   for (const b of buffers)
     for (let i = 0; i < b.length; i++) b[i] = Math.tanh((b[i] ?? 0) * g * 1.2) / Math.tanh(1.2);
 }
@@ -113,11 +139,12 @@ export function renderScore(score: Score, sampleRate: number): RenderedTrack {
     }
   };
   for (const n of song.notes) place(n);
+  for (const b of [left, right, combat]) tone(b, sampleRate, 4500);
   const wetL = reverb(left, sampleRate, score.reverb, 0);
   const wetR = reverb(right, sampleRate, score.reverb, 23);
   const wetCombat = reverb(combat, sampleRate, 0.15, 0);
   const wetNight = reverb(night, sampleRate, 0.5, 11);
-  master([wetL, wetR], 0.75);
+  master([wetL, wetR], 0.75, 0.14);
   master([wetCombat], 0.6);
   master([wetNight], 0.5);
   return { sampleRate, left: wetL, right: wetR, combat: wetCombat, night: wetNight };

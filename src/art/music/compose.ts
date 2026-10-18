@@ -67,7 +67,7 @@ export interface Composition {
 }
 
 /** Octave shift of each lead from the score's root. */
-export const LEAD_OCTAVE: Readonly<Record<Lead, number>> = { fiddle: 0, harp: 0, flute: 12 };
+export const LEAD_OCTAVE: Readonly<Record<Lead, number>> = { fiddle: 0, harp: 0, flute: 0 };
 
 /** Chord roots (scale degrees) per bar of each kind of section. */
 const CHORDS = {
