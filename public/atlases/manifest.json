@@ -10,6 +10,11 @@
       "key": "people",
       "image": "people.png",
       "data": "people.json"
+    },
+    {
+      "key": "decor",
+      "image": "decor.png",
+      "data": "decor.json"
     }
   ],
   "tiles": [
@@ -44,6 +49,10 @@
     {
       "terrain": "water",
       "image": "askdalr/water.png"
+    },
+    {
+      "terrain": "ford",
+      "image": "askdalr/ford.png"
     }
   ]
 }
