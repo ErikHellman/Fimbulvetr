@@ -293,6 +293,7 @@ export class PlayScene extends Phaser.Scene {
     return {
       sim: this.sim,
       frames: this.services.assets.frames,
+      overrides: this.services.assets.overrides,
       stats: this.stats,
       settings: this.services.settings,
       saves: this.services.saves,

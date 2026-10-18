@@ -14,6 +14,10 @@ export class FrameIndex {
     this.refs.set(name, ref);
   }
 
+  has(name: string): boolean {
+    return this.refs.has(name);
+  }
+
   /** Unknown names fall back to the magenta `missing` frame and are reported once (tests fail on it). */
   get(name: string): FrameRef {
     const ref = this.refs.get(name);

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "atlases": [
+    {
+      "key": "hero",
+      "image": "hero.png",
+      "data": "hero.json"
+    },
+    {
+      "key": "people",
+      "image": "people.png",
+      "data": "people.json"
+    }
+  ],
+  "tiles": [
+    {
+      "terrain": "grass",
+      "image": "askdalr/grass.png"
+    },
+    {
+      "terrain": "path",
+      "image": "askdalr/path.png"
+    },
+    {
+      "terrain": "yard",
+      "image": "askdalr/yard.png"
+    },
+    {
+      "terrain": "field",
+      "image": "askdalr/field.png"
+    },
+    {
+      "terrain": "fence",
+      "image": "askdalr/fence.png"
+    },
+    {
+      "terrain": "rock",
+      "image": "askdalr/rock.png"
+    },
+    {
+      "terrain": "roof",
+      "image": "askdalr/roof.png"
+    },
+    {
+      "terrain": "water",
+      "image": "askdalr/water.png"
+    }
+  ]
+}

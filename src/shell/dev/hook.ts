@@ -38,6 +38,8 @@ export interface FimbulHook {
   setTime(text: string): boolean;
   setSeason(season: string): boolean;
   missingFrames(): string[];
+  /** Frame names and terrain ids that real art from `atlases/manifest.json` replaced. */
+  artOverrides(): { frames: string[]; tiles: string[] };
   stats(): FrameSummary;
   /** Decor, animated tiles, smoke and fish on stage. */
   view(): ViewStats;
@@ -213,6 +215,7 @@ export function installHook(current: () => DevBridge | null, counts: Record<stri
       return true;
     },
     missingFrames: () => bridge().frames.missingNames(),
+    artOverrides: () => ({ frames: [...bridge().overrides.frames], tiles: [...bridge().overrides.tiles] }),
     stats: () => bridge().stats.summary(),
     view: () => bridge().viewStats(),
     jumpFish: () => {

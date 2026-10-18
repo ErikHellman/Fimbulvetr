@@ -3,6 +3,7 @@ import type { WeatherKind } from '@core/clock/types';
 import type { ContentDb } from '@core/sim/db';
 import type { GameState } from '@core/state/gameState';
 import type { DevTools } from './dev/bridge';
+import type { ArtOverrides } from './gfx/atlases';
 import type { FrameIndex } from './gfx/frameIndex';
 import type { SaveService } from './platform/saveService';
 import type { Settings } from './platform/settings';
@@ -26,6 +27,8 @@ export interface Services {
 export interface RenderAssets {
   readonly frames: FrameIndex;
   readonly tileset: Tileset;
+  /** What real art from `atlases/manifest.json` replaced at boot. */
+  readonly overrides: ArtOverrides;
 }
 
 export interface PlayData extends Services {

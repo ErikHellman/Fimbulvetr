@@ -20,7 +20,8 @@
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "e2e": "playwright test",
     "budget": "node scripts/check-budget.mjs",
-    "icons": "node scripts/icons.mjs"
+    "icons": "node scripts/icons.mjs",
+    "art:pack": "tsx art-src/build.ts"
   },
   "dependencies": {
     "phaser": "4.2.1"
@@ -33,6 +34,7 @@
     "eslint-config-prettier": "10.1.8",
     "fake-indexeddb": "6.2.5",
     "prettier": "3.9.9",
+    "tsx": "^4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "8.70.1",
     "vite": "8.3.1",

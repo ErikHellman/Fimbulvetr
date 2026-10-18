@@ -58,12 +58,18 @@ export function registerSprites(
   return index;
 }
 
+/** The top-left of tile `i`'s 16 px square on the tileset page (inside its 1 px extrusion). */
+export function tileOrigin(i: number): { x: number; y: number } {
+  return { x: (i % TILESET_COLS) * TILE_CELL + 1, y: Math.floor(i / TILESET_COLS) * TILE_CELL + 1 };
+}
+
 export function registerTileset(textures: Phaser.Textures.TextureManager, tileset: Tileset): void {
   const rows = Math.ceil(tileset.tiles.length / TILESET_COLS);
   const page = canvas(TILESET_COLS * TILE_CELL, rows * TILE_CELL);
   const ctx = context(page);
   tileset.tiles.forEach((tile, i) => {
-    put(ctx, extrude(tile, 1), (i % TILESET_COLS) * TILE_CELL, Math.floor(i / TILESET_COLS) * TILE_CELL);
+    const at = tileOrigin(i);
+    put(ctx, extrude(tile, 1), at.x - 1, at.y - 1);
   });
   if (textures.addCanvas(TILESET_KEY, page) === null) throw new Error('could not add the tileset texture');
 }
