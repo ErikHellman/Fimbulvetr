@@ -3,6 +3,7 @@ import type { SimEvent } from '@core/sim/events';
 import type { Sim } from '@core/sim/sim';
 import type { SaveService } from '@shell/platform/saveService';
 import type { Settings } from '@shell/platform/settings';
+import type { ArtOverrides } from '@shell/gfx/atlases';
 import type { FrameIndex } from '@shell/gfx/frameIndex';
 import type { FrameStats } from './stats';
 
@@ -41,6 +42,8 @@ export interface ViewStats {
 export interface DevBridge {
   readonly sim: Sim;
   readonly frames: FrameIndex;
+  /** Frames and terrains that real art replaced at boot. */
+  readonly overrides: ArtOverrides;
   readonly stats: FrameStats;
   readonly settings: Settings;
   readonly saves: SaveService;

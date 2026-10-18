@@ -1,0 +1,85 @@
+# Real art: how it replaces the code-drawn placeholders
+
+Every frame and tile the game draws is generated in code at boot (`src/art`). Real art replaces it by
+name, with no code changes, through one file: `public/atlases/manifest.json`. The shell loads the
+manifest at boot, then every atlas and tile sheet it names, and lays them over the generated art before
+the first scene starts (`src/shell/gfx/atlases.ts`, rules in `src/art/atlas.ts`). A missing or broken
+manifest is reported once in the console and the placeholders stay.
+
+The look to match is `docs/art-style-guide.md`. `?dev=gallery` (dev and test builds) shows every frame
+and tile with its name, with any real art already in place.
+
+## The manifest
+
+```json
+{
+  "version": 1,
+  "atlases": [{ "key": "hero", "image": "hero.png", "data": "hero.json" }],
+  "tiles": [{ "terrain": "grass", "image": "askdalr/grass.png" }]
+}
+```
+
+- Paths are relative to `public/atlases/`; subfolders are fine, `..` and absolute paths are not.
+- `atlases` are sprite atlases, `tiles` are tile sheets, one per terrain. Either list may be left out.
+- The shipped manifest is empty. Add entries as art arrives; a partial set is fine at every step.
+
+## Sprite atlases
+
+An atlas is a PNG plus a TexturePacker-style JSON file (the "JSON hash" or "JSON array" format that
+free-tex-packer, TexturePacker and Aseprite all export). Every frame whose name matches a placeholder
+frame replaces it. Frame names with no placeholder are ignored and listed in a console warning, so a typo
+is easy to spot.
+
+- **Names** follow `<art>_<anim>_<dir>_<n>`: `hero_walk_s_0`, `enemy_vargr_idle_w_1`. The gallery shows
+  the full list; `src/art/anims.ts` and the sprite modules under `src/art/sprites/` are the source of
+  frame counts and frame rates per animation. East-facing frames are separate names (the placeholders
+  bake them by mirroring west), so an atlas supplies `_e_` frames too.
+- **Size** is free. A real frame may be bigger than the 32×32 placeholder; the game positions it by its
+  origin, so a taller or wider sprite grows outward and upward from the same feet point.
+- **Origin.** Give each frame a `pivot` in the JSON (TexturePacker: enable pivot points) where the feet
+  touch the ground, as a fraction of the frame: `{ "x": 0.5, "y": 0.95 }` for feet at the bottom centre
+  with a couple of rows of outline below. Without a pivot the game keeps the placeholder's feet point,
+  centred horizontally and bottom-aligned, which is right whenever the real frame is drawn in the same
+  pose box.
+- **Trimming** (transparent margins cut by the packer) is supported; sizes and pivots refer to the
+  untrimmed `sourceSize`.
+- **Pages** up to 2048×2048. Keep one atlas per region or per character family so a page is one request.
+- The hero has three kits with their own art names: `hero` (seax), `hero_axe` and `hero_fork`.
+
+## Tile sheets
+
+A tile sheet is a PNG of 16×16 cells for one terrain, read left to right then top to bottom, with as
+many cells per row as the image is wide. Cells follow the tileset's order for that terrain:
+
+- An **auto-tiled** terrain (grass, water, rock, walls, roofs…) has 47 cells, one per blob mask in
+  `BLOB_MASKS` order (`src/core/world/autotile.ts`), the standard blob-47 layout.
+- A **plain** terrain (path, yard, field, floors) has one cell per variant (`variants` in
+  `src/content/terrain.ts`, typically 4).
+- An **animated** terrain repeats its cells once per frame, frame-major: frame 0's 47 cells, then
+  frame 1's, and so on (`frames` in `src/content/terrain.ts`).
+
+A shorter sheet replaces only the cells it has, so a sheet can be filled in gradually. Cells are copied
+with their 1 px extrusion, so no bleeding rules apply beyond "draw to the edge of the cell". Season and
+time of day are the shell's: draw summer noon and let the colour matrix grade it (style guide rule 7).
+
+The shade bands, fringe tiles and cover tiles stay generated: they are translucent overlays that already
+read well over real ground.
+
+## Testing a drop
+
+1. Put the files under `public/atlases/` and list them in the manifest.
+2. `pnpm dev`, open `?dev=gallery` and check the replaced frames and tiles.
+3. Walk the screens the art appears on; `?screen=<id>&at=20,11&season=summer&time=12:00&nosave`.
+4. `pnpm e2e` runs `tests/e2e/art.spec.ts`, which serves a sample atlas and sheet from
+   `tests/fixtures/atlases/` and checks the loader; `pnpm build && pnpm budget` checks the size.
+
+Budget: GDD target under 8 MB for the first load once real atlases exist, 60 MB in all. Atlases under
+`public/` are precached by the service worker; per-region loading on first entry is still to come and
+is the step to take before the atlases grow past a few megabytes.
+
+## Status
+
+- [x] Atlas loader, manifest format, tile sheets, e2e coverage (G4, 2026-10-18).
+- [ ] Hero sheet (`hero`, `hero_axe`, `hero_fork`) and Embla.
+- [ ] The Askdalr tileset: grass, path, yard, field, water, rock, wood, roof, fence.
+- [ ] Per-region atlas loading and unloading.

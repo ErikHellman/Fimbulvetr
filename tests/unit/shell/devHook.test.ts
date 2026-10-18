@@ -53,6 +53,7 @@ describe('installHook importSaveJson', () => {
     const b: DevBridge = {
       sim: h.sim,
       frames: new FrameIndex(),
+      overrides: { frames: [], tiles: [] },
       stats: new FrameStats(),
       settings: { ...DEFAULT_SETTINGS },
       saves,
@@ -86,6 +87,7 @@ describe('installHook warp', () => {
     const b: DevBridge = {
       sim: h.sim,
       frames: new FrameIndex(),
+      overrides: { frames: [], tiles: [] },
       stats: new FrameStats(),
       settings: { ...DEFAULT_SETTINGS },
       saves: new SaveService(null, 'test', new Set<string>(SCREEN_IDS)),

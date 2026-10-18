@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "atlases": [
+    {
+      "key": "test",
+      "image": "test.png",
+      "data": "test.json"
+    }
+  ],
+  "tiles": [
+    {
+      "terrain": "grass",
+      "image": "grass.png"
+    }
+  ]
+}

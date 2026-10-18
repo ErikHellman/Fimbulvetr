@@ -20,6 +20,7 @@ function bridge(): { b: DevBridge; h: Harness } {
   const b: DevBridge = {
     sim: h.sim,
     frames: new FrameIndex(),
+    overrides: { frames: [], tiles: [] },
     stats: new FrameStats(),
     settings: { ...DEFAULT_SETTINGS },
     saves: new SaveService(null, 'test', new Set()),
@@ -150,6 +151,7 @@ describe('dev console commands', () => {
     const b: DevBridge = {
       sim: h.sim,
       frames: new FrameIndex(),
+      overrides: { frames: [], tiles: [] },
       stats: new FrameStats(),
       settings: { ...DEFAULT_SETTINGS },
       saves,

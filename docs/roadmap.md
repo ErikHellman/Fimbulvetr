@@ -310,4 +310,7 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
 - [x] G1 Presentation layer — contact shadows, shade overlay, soft warm lights and window glow, cloud shadows, vignette
 - [x] G2 Generator v2 — style guide (`docs/art-style-guide.md`), structured terrain, fringe tiles, wall faces, character template v2, decor variation, UI dressing
 - [x] G3 Creatures and effects — cel relight on every creature and prop, hit flash, roll dust, rain splashes, interior tile flips
-- [ ] G4 Real art — atlas loader, hero and Embla sheets, the Askdalr tileset
+- [ ] G4 Real art (see `docs/real-art.md`)
+  - [x] Atlas loader: `public/atlases/manifest.json` replaces frames and tiles by name
+  - [ ] Hero and Embla sheets, the Askdalr tileset (needs an artist)
+  - [ ] Per-region atlas loading
