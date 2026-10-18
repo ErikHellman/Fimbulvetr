@@ -84,6 +84,7 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] The Askdalr tileset: grass, path, yard, field, fence, rock, roof, water, ford.
 - [x] Every villager (`people` atlas, 55 people) and the Askdalr decor (trees, pines, birch, boulder, stump, menhir, runestone, well).
 - [x] Askdalr's houses (wall, door, door_shut, window, chimney, ledge, floor, wall_int, jetty), the ground under standing things, and the bed, table, hearth and trough.
+- [x] Myrkviðr: moss, bog, mound, cave_mouth, rapids, the kiln, reeds and the fallen log (`art-src/myrkvidr`).
 - [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 

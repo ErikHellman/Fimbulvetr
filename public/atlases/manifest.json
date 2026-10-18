@@ -124,7 +124,7 @@
     },
     {
       "terrain": "boulder",
-      "image": "askdalr/boulder.png"
+      "image": "myrkvidr/boulder.png"
     },
     {
       "terrain": "bed",
@@ -137,6 +137,34 @@
     {
       "terrain": "hearth",
       "image": "askdalr/hearth.png"
+    },
+    {
+      "terrain": "moss",
+      "image": "myrkvidr/moss.png"
+    },
+    {
+      "terrain": "bog",
+      "image": "myrkvidr/bog.png"
+    },
+    {
+      "terrain": "reeds",
+      "image": "myrkvidr/reeds.png"
+    },
+    {
+      "terrain": "mound",
+      "image": "myrkvidr/mound.png"
+    },
+    {
+      "terrain": "cave_mouth",
+      "image": "myrkvidr/cave_mouth.png"
+    },
+    {
+      "terrain": "kiln",
+      "image": "myrkvidr/kiln.png"
+    },
+    {
+      "terrain": "rapids",
+      "image": "myrkvidr/rapids.png"
     }
   ]
 }

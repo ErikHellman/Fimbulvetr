@@ -26,7 +26,7 @@ test('real art listed in atlases/manifest.json replaces frames and tiles by name
   expect(errors).toEqual([]);
 });
 
-test('the shipped manifest replaces the hero, villager and decor frames and the Askdalr ground', async ({
+test('the shipped manifest replaces the hero, villager and decor frames and the Askdalr and Myrkviðr ground', async ({
   page,
 }) => {
   const errors = collectErrors(page);
@@ -63,6 +63,13 @@ test('the shipped manifest replaces the hero, villager and decor frames and the 
     'bed',
     'table',
     'hearth',
+    'moss',
+    'bog',
+    'reeds',
+    'mound',
+    'cave_mouth',
+    'kiln',
+    'rapids',
   ]);
   expect(overrides?.frames).toContain('hero_idle_s_0');
   expect(overrides?.frames).toContain('hero_fork_attack1_e_2');
@@ -70,6 +77,7 @@ test('the shipped manifest replaces the hero, villager and decor frames and the 
   expect(overrides?.frames).toContain('npc_halvar_idle_n_1');
   expect(overrides?.frames).toContain('decor_well_idle_s_3');
   expect(overrides?.frames).toContain('decor_hearth_idle_s_3');
+  expect(overrides?.frames).toContain('decor_kiln_idle_s_0');
   expect(await page.evaluate(() => window.__fimbul?.missingFrames())).toEqual([]);
   expect(errors).toEqual([]);
 });
