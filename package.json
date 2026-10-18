@@ -21,7 +21,8 @@
     "e2e": "playwright test",
     "budget": "node scripts/check-budget.mjs",
     "icons": "node scripts/icons.mjs",
-    "art:pack": "tsx art-src/build.ts"
+    "art:pack": "tsx art-src/build.ts",
+    "promo": "node scripts/promo.mjs"
   },
   "dependencies": {
     "phaser": "4.2.1"
