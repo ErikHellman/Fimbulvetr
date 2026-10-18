@@ -30,10 +30,21 @@ jobs:
       - run: pnpm build
       - run: pnpm budget
 
+  # The Sævatn solver proofs take minutes per season, so they get two runners of their own.
   unit:
-    name: vitest
+    name: vitest (${{ matrix.part }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - part: saevatn summer, autumn
+            args: tests/content/solver_saevatn_summer.test.ts tests/content/solver_saevatn_autumn.test.ts
+          - part: saevatn winter, spring
+            args: tests/content/solver_saevatn_winter.test.ts tests/content/solver_saevatn_spring.test.ts
+          - part: rest
+            args: --exclude 'tests/content/solver_saevatn_*'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -42,7 +53,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test
+      - run: pnpm exec vitest run ${{ matrix.args }}
 
   e2e:
     name: e2e (${{ matrix.browser }} ${{ matrix.shard }}/4)
