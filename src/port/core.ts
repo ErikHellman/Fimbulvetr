@@ -15,8 +15,11 @@ import { canonicalJson, loadSave, makeSave } from '@core/state/save';
 export interface PortCore {
   /** Loads a save's JSON text, or starts a new game from `seed` when it is null. '' or why it failed. */
   boot(saveJson: string | null, seed: number): string;
-  /** One 1/60 s tick. `held`: action bits (`ACTIONS` order); `mx`, `my`: the stick in [-1, 1]. */
-  step(held: number, mx: number, my: number): void;
+  /**
+   * One 1/60 s tick. `held`: action bits (`ACTIONS` order); `mx`, `my`: the stick in [-1, 1]. Returns the
+   * tick's events (sounds, autosave, screen changes) as a JSON array, or '' when there were none.
+   */
+  step(held: number, mx: number, my: number): string;
   /** A sim command as JSON, applied on the next tick (warps for tools and benchmarks). */
   command(json: string): void;
   /** The sim's state hash, for determinism checks against the web build. */
@@ -57,7 +60,8 @@ export function createPort(): PortCore {
       const s = running();
       latch.report(held, mx, my);
       s.step(latch.consume());
-      s.drainEvents();
+      const events = s.drainEvents();
+      return events.length === 0 ? '' : JSON.stringify(events);
     },
     command(json) {
       running().command(JSON.parse(json) as Command);

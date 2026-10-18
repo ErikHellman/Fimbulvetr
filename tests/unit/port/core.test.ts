@@ -48,6 +48,19 @@ describe('port core (the game rules for native shells)', () => {
     expect(JSON.parse(b.status())).toEqual(JSON.parse(a.status()));
   });
 
+  it('returns the tick’s events as JSON, and nothing on a quiet tick', () => {
+    const port = createPort();
+    port.boot(null, 1);
+    port.command(JSON.stringify({ t: 'warp', screen: 'test_a', x: 40, y: 40 }));
+    const seen: { t: string }[] = [];
+    for (let i = 0; i < 90; i++) {
+      const e = port.step(0, 0, 0);
+      if (e !== '') seen.push(...(JSON.parse(e) as { t: string }[]));
+    }
+    expect(seen.map((e) => e.t)).toContain('screenEntered');
+    expect(port.step(0, 0, 0)).toBe('');
+  });
+
   it('applies commands given as JSON (warps, for tools and benchmarks)', () => {
     const port = createPort();
     port.boot(null, 1);

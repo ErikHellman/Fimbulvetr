@@ -1,12 +1,13 @@
 // The Apple TV feasibility check (`pnpm port:bench`): evaluates dist-port/fimbulvetr-core.js in a bare
 // context (no DOM, no console, no timers, like a JSContext on tvOS) and times the busiest screens of the
-// M10a save. Run under Bun, which is JavaScriptCore; BUN_JSC_useJIT=0 approximates an app's JSContext,
+// M10a save, and how long generating the art takes. Run under Bun, which is JavaScriptCore; BUN_JSC_useJIT=0 approximates an app's JSContext,
 // which runs without the JIT.
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { DB } from '@content/index';
 import { SCREEN_IDS, type ScreenId } from '@content/world/screens';
 import { tileFeet, type TilePos } from '@core/world/screen';
+import type { PortArt } from '@port/art';
 import type { PortCore } from '@port/core';
 
 const TICKS = 600;
@@ -28,7 +29,7 @@ function arrival(screen: ScreenId): TilePos {
 }
 
 const bundle = readFileSync('dist-port/fimbulvetr-core.js', 'utf8');
-const context: { FimbulvetrCore?: { createPort: () => PortCore } } = {};
+const context: { FimbulvetrCore?: { createPort: () => PortCore; buildPortArt: () => PortArt } } = {};
 const load = performance.now();
 runInNewContext(bundle, context);
 const core = context.FimbulvetrCore;
@@ -38,6 +39,9 @@ const port = core.createPort();
 const err = port.boot(save, 1);
 if (err !== '') throw new Error(err);
 const loadMs = performance.now() - load;
+const artStart = performance.now();
+const art = core.buildPortArt();
+const artMs = performance.now() - artStart;
 
 const jit = process.env.BUN_JSC_useJIT === '0' ? 'JIT off' : 'JIT on';
 const rows: string[] = [];
@@ -54,6 +58,9 @@ for (const screen of SCREENS) {
   rows.push(`  ${screen.padEnd(20)} ${ms.toFixed(3)} ms/tick`);
 }
 console.log(`port bench (${jit}): bundle load + boot ${loadMs.toFixed(0)} ms`);
+console.log(
+  `  art: ${artMs.toFixed(0)} ms for ${String(art.pages.length)} sprite pages and ${String(art.tileCount)} tiles`,
+);
 console.log(rows.join('\n'));
 console.log(
   `  worst ${worst.toFixed(3)} ms/tick of the 16.7 ms frame (${((worst / 16.7) * 100).toFixed(1)}%)`,
