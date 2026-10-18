@@ -14,6 +14,8 @@ export default defineConfig([
     'test-results/',
     'public/',
     'android/',
+    'apple/',
+    'dist-port/',
   ]),
   {
     files: ['**/*.ts'],

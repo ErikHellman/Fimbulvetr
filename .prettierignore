@@ -10,3 +10,5 @@ android/app/src/main/assets
 android/build
 android/app/build
 dist-port
+apple/Resources
+apple/build
