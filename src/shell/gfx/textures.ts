@@ -1,10 +1,12 @@
 import type * as Phaser from 'phaser';
+import { cloudShadows } from '@art/clouds';
 import { packShelves } from '@art/pack';
 import { extrude, type Raster } from '@art/raster';
 import type { SpriteFrame } from '@art/sprites';
 import type { Tileset } from '@art/tiles/tileset';
 import { TILE } from '@core/world/dims';
 import { FrameIndex } from './frameIndex';
+import { CLOUDS_KEY } from '@shell/view/cloudView';
 
 export const TILESET_KEY = 'tiles';
 /** Each 16 px tile is stored extruded to 18 px, so the tileset uses margin 1 and spacing 2. */
@@ -64,4 +66,12 @@ export function registerTileset(textures: Phaser.Textures.TextureManager, tilese
     put(ctx, extrude(tile, 1), (i % TILESET_COLS) * TILE_CELL, Math.floor(i / TILESET_COLS) * TILE_CELL);
   });
   if (textures.addCanvas(TILESET_KEY, page) === null) throw new Error('could not add the tileset texture');
+}
+
+/** The tiling cloud-shadow texture the CloudView scrolls over outdoor screens. */
+export function registerClouds(textures: Phaser.Textures.TextureManager): void {
+  const r = cloudShadows(0xc10d);
+  const page = canvas(r.w, r.h);
+  put(context(page), r, 0, 0);
+  if (textures.addCanvas(CLOUDS_KEY, page) === null) throw new Error('could not add the cloud texture');
 }

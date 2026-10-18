@@ -304,3 +304,10 @@ Full plan: `docs/superpowers/specs/2026-09-26-fimbulvetr-design.md` §4. Detaile
   - [x] Placeholder soundtrack composed in code: 29 tracks (8 regions with winter variants, 8 dungeons, town, boss, last battle, title, credits), combat and night stems, Music setting
   - [ ] Listen-through and tuning
   - [ ] Real recordings under the same keys (see docs/music.md)
+
+## Graphics overhaul (after 1.0.0)
+Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid direction, chosen 2026-10-17).
+- [x] G1 Presentation layer — contact shadows, shade overlay, soft warm lights and window glow, cloud shadows, vignette
+- [ ] G2 Generator v2 — style guide, structured terrain, blend tiles, wall faces, character template v2, decor variation, UI dressing
+- [ ] G3 Creatures and effects — enemies and bosses on the v2 rules, effects, settling weather
+- [ ] G4 Real art — atlas loader, hero and Embla sheets, the Askdalr tileset
