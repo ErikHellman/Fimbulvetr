@@ -16,6 +16,7 @@
       "@core/*": ["./src/core/*"],
       "@content/*": ["./src/content/*"],
       "@art/*": ["./src/art/*"],
+      "@port/*": ["./src/port/*"],
       "@shell/*": ["./src/shell/*"]
     }
   }

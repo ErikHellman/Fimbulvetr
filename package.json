@@ -21,6 +21,8 @@
     "e2e": "playwright test",
     "budget": "node scripts/check-budget.mjs",
     "android:web": "vite build && node scripts/android-web.mjs",
+    "port:build": "vite build --config vite.port.config.ts",
+    "port:bench": "pnpm port:build && bun scripts/port-bench.ts && BUN_JSC_useJIT=0 bun scripts/port-bench.ts",
     "icons": "node scripts/icons.mjs",
     "art:pack": "tsx art-src/build.ts"
   },

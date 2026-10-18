@@ -20,9 +20,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: android-actions/setup-android@v3
       - run: pnpm install --frozen-lockfile
       - run: pnpm android:web
+      # The runner image has the Android SDK (ANDROID_HOME); Gradle fetches any missing platform itself.
       - run: ./gradlew --no-daemon assembleDebug
         working-directory: android
       - uses: actions/upload-artifact@v4
