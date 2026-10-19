@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_BINDINGS } from '@content/bindings';
-import { InputLatch, isHeld, wasPressed, wasReleased } from '@core/input/actions';
+import { InputLatch, bit, isHeld, wasPressed, wasReleased } from '@core/input/actions';
 import { connectedPads, deadzone, readPad, type GamepadLike } from '@shell/input/gamepad';
 import { KeyboardState, isTextInput } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
@@ -84,6 +84,17 @@ describe('InputMapper', () => {
     const f = latch.consume();
     expect(isHeld(f, 'up') && isHeld(f, 'right')).toBe(true);
     expect([f.mx, f.my]).toEqual([1, -1]);
+  });
+
+  it('adds the on-screen controls: their buttons and the stick as an analog move', () => {
+    const { keys, latch, mapper } = setup();
+    mapper.sample(keys.codes(), null, { held: bit('sword') | bit('right'), ax: 0.5, ay: 0.25 });
+    const f = latch.consume();
+    expect(wasPressed(f, 'sword')).toBe(true);
+    expect([f.mx, f.my]).toEqual([0.5, 0.25]);
+    keys.down(key('KeyE'));
+    mapper.sample(keys.codes(), null, { held: 0, ax: 0, ay: 0 });
+    expect(wasPressed(latch.consume(), 'interact')).toBe(true);
   });
 
   it('releases everything when the window loses focus', () => {

@@ -3,7 +3,8 @@ import { textWidth } from '@art/font';
 import { UI } from '@content/i18n/ui';
 import { PAD_STYLES } from '@content/i18n/pad';
 import type { GamepadLike } from '@shell/input/gamepad';
-import { activePadStyle, padLabel, padStyleOf, prompt } from '@shell/input/padLabels';
+import { activePadStyle, padLabel, padStyleOf, prompt, promptDevice } from '@shell/input/padLabels';
+import { TOUCH_TEXT } from '@content/i18n/touch';
 import { DEFAULT_SETTINGS } from '@shell/platform/settings';
 import { GAME_W } from '@shell/scale';
 import { openIntro } from '@shell/ui/intro';
@@ -90,12 +91,47 @@ describe('controller prompts', () => {
       UI.fish_idle_pad,
       UI.fish_reel_pad,
     ];
-    for (const style of PAD_STYLES)
+    for (const style of [...PAD_STYLES, 'touch'] as const)
       for (const lang of ['en', 'sv'] as const)
         for (const h of hints) {
           const text = prompt(h, h, style, lang);
           expect(text).not.toMatch(/\{\w+\}/);
           expect(textWidth(text), text).toBeLessThan(GAME_W - 16);
         }
+  });
+
+  it('names the on-screen buttons while the touch controls show', () => {
+    expect(promptDevice(true, 'xbox')).toBe('touch');
+    expect(promptDevice(false, 'xbox')).toBe('xbox');
+    expect(promptDevice(false, null)).toBeNull();
+    expect(prompt(UI.set_hint, UI.set_hint_pad, 'touch', 'en')).toBe(
+      '↑↓: choose   ←→ or OK: change   Back: back',
+    );
+    expect(prompt(UI.game_over_continue, UI.game_over_continue_pad, 'touch', 'sv')).toBe('Res dig igen: OK');
+    const intro = introLines(openIntro(), DEFAULT_SETTINGS, 'en', 'touch');
+    expect(intro.values.join('\n')).toContain('the stick on the left');
+    expect(intro.values.join('\n')).toContain('Sword');
+    expect(intro.labels).toContain(TOUCH_TEXT.works_too.en);
+    const controls = settingsLines(
+      { page: 'controls', cursor: 0, listening: null },
+      DEFAULT_SETTINGS,
+      'en',
+      'off',
+      'touch',
+    );
+    expect(controls.values[CONTROL_ROWS.indexOf('sword')]).toBe('J');
+    expect(controls.hint).toBe('The on-screen buttons are set in Touch controls.   Back: back');
+  });
+
+  it('lists the touch page with its values', () => {
+    const page = settingsLines(
+      { page: 'touch', cursor: 0, listening: null },
+      DEFAULT_SETTINGS,
+      'sv',
+      'off',
+      'touch',
+    );
+    expect(page.labels[0]).toBe('> Skärmkontroller');
+    expect(page.values.slice(0, 4)).toEqual(['Efter en beröring', 'Normala', 'Av', 'På']);
   });
 });

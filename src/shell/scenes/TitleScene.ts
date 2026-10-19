@@ -10,7 +10,8 @@ import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
 import { FONT_KEY } from '@shell/gfx/font';
 import { connectedPads, readPad } from '@shell/input/gamepad';
-import { activePadStyle, prompt, type PadStyle } from '@shell/input/padLabels';
+import { activePadStyle, prompt, promptDevice, type PromptDevice } from '@shell/input/padLabels';
+import { TOUCH_TEXT } from '@content/i18n/touch';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { bindingsOf } from '@shell/input/remap';
@@ -27,7 +28,7 @@ import {
   stepAchievements,
   type AchievementsPage,
 } from '@shell/ui/achievementsPage';
-import { openIntro, stepIntro, type IntroState } from '@shell/ui/intro';
+import { INTRO_ROWS, openIntro, stepIntro, type IntroState } from '@shell/ui/intro';
 import { INTRO_LEFT, introColumn, introLines } from '@shell/ui/introText';
 import { currentFullscreen, requestFullscreenToggle } from '@shell/platform/fullscreen';
 import { openSettings, stepSettings, type SettingsMenuState } from '@shell/ui/settingsMenu';
@@ -62,6 +63,8 @@ const ROW_LABEL = {
   achievements: UI.title_achievements,
 } as const satisfies Record<TitleRow, unknown>;
 
+const NO_BUTTONS: ReadonlySet<never> = new Set();
+
 const EMPTY: Record<SlotId, SaveSummary | null> = {
   auto: null,
   auto_prev: null,
@@ -85,8 +88,11 @@ export class TitleScene extends Phaser.Scene {
   private achText: Phaser.GameObjects.BitmapText[] = [];
   /** The introduction, open between New game and the longhouse. */
   private intro: IntroState | null = null;
-  /** The kind of controller connected now, or null: prompts name its buttons while there is one. */
-  private padStyle: PadStyle | null = null;
+  /**
+   * What the prompts name: the on-screen controls while they show, else the kind of controller connected,
+   * or null for the keyboard.
+   */
+  private padStyle: PromptDevice | null = null;
   private slots: Record<SlotId, SaveSummary | null> = EMPTY;
   private readonly latch = new InputLatch();
   private readonly keys = new KeyboardState();
@@ -212,11 +218,15 @@ export class TitleScene extends Phaser.Scene {
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
     const pads = connectedPads(navigator);
-    this.padStyle = activePadStyle(pads);
     const pad = readPad(pads);
-    this.mapper.sample(codes, pad);
+    const touch = this.services.touch;
+    if (codes.size > 0 || (pad?.buttons.size ?? 0) > 0) touch.otherInput();
+    touch.frame('menu', NO_BUTTONS, this.services.settings.lang);
+    this.padStyle = promptDevice(touch.shown(), activePadStyle(pads));
+    this.mapper.sample(codes, pad, touch.snapshot());
     const frame = this.latch.consume();
-    if (!this.busy) {
+    touch.advance();
+    if (!this.busy && !touch.arranging()) {
       if (this.settingsMenu !== null) this.stepSettings(frame, fresh);
       else if (this.achievements !== null) {
         const r = stepAchievements(this.achievements, frame);
@@ -252,6 +262,7 @@ export class TitleScene extends Phaser.Scene {
       if (scaling !== this.services.settings.scaling) window.dispatchEvent(new Event('resize'));
     }
     if (r.fullscreen) requestFullscreenToggle(this.services.settings.lang);
+    if (r.arrange) this.services.touch.arrange();
     if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
   }
 
@@ -351,6 +362,18 @@ export class TitleScene extends Phaser.Scene {
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
       this.values.setText(values.join('\n')).setPosition(left + column, 130);
       this.hint.setText(hint).setX(this.centre(hint));
+      const valueW = Math.max(40, ...values.map((v) => textWidth(v)));
+      this.services.touch.targets.rows(
+        left - 8,
+        130,
+        GAME_W - 2 * (left - 8),
+        LINE_HEIGHT,
+        labels.length,
+        this.settingsMenu.cursor,
+        {
+          value: { x: left + column - 4, w: valueW + 8 },
+        },
+      );
       return;
     }
     if (this.intro !== null) {
@@ -365,6 +388,16 @@ export class TitleScene extends Phaser.Scene {
       this.body.setText(labels.join('\n')).setPosition(INTRO_LEFT, 130);
       this.values.setText(values.join('\n')).setPosition(INTRO_LEFT + introColumn(labels, values), 130);
       this.hint.setText(hint).setX(this.centre(hint));
+      // Only the last two lines (the box and Begin) are choices.
+      const first = labels.length - INTRO_ROWS.length;
+      this.services.touch.targets.rows(
+        INTRO_LEFT - 8,
+        130 + first * LINE_HEIGHT,
+        GAME_W - 2 * (INTRO_LEFT - 8),
+        LINE_HEIGHT,
+        INTRO_ROWS.length,
+        this.intro.cursor,
+      );
       return;
     }
     document.body.dataset.title = this.state.page;
@@ -374,7 +407,16 @@ export class TitleScene extends Phaser.Scene {
     let hint: string;
     switch (this.state.page) {
       case 'press':
-        lines = [t(this.padStyle === null ? UI.title_press : UI.title_press_pad, lang)];
+        lines = [
+          t(
+            this.padStyle === 'touch'
+              ? TOUCH_TEXT.press
+              : this.padStyle === null
+                ? UI.title_press
+                : UI.title_press_pad,
+            lang,
+          ),
+        ];
         hint = '';
         break;
       case 'main':
@@ -399,6 +441,27 @@ export class TitleScene extends Phaser.Scene {
     const bottom = this.message === '' ? hint : this.message;
     this.hint.setText(bottom).setX(this.centre(bottom));
     this.body.setY(this.state.page === 'load' ? 140 : 150 + (this.state.page === 'press' ? LINE_HEIGHT : 0));
+    const targets = this.services.touch.targets;
+    if (this.state.page === 'press')
+      targets.add({ k: 'press', x: 0, y: 0, w: GAME_W, h: GAME_H, action: 'confirm' });
+    else if (this.state.page === 'confirmNew')
+      targets.add({
+        k: 'press',
+        x: 160,
+        y: this.body.y - 4,
+        w: GAME_W - 320,
+        h: LINE_HEIGHT + 8,
+        action: 'confirm',
+      });
+    else
+      targets.rows(
+        Math.min(this.body.x, 160) - 8,
+        this.body.y,
+        GAME_W - 2 * (Math.min(this.body.x, 160) - 8),
+        LINE_HEIGHT,
+        lines.length,
+        this.state.cursor,
+      );
   }
 
   /** Two columns of twelve, the earned ones in gold, and the chosen one's hint underneath. */
@@ -415,6 +478,20 @@ export class TitleScene extends Phaser.Scene {
       this.achText[c * 2 + 1]?.setText(pick(true)).setPosition(x, 130);
     });
     this.body.setText(lines.hint).setPosition(this.centre(lines.hint), 130 + (ACH_ROWS + 1) * LINE_HEIGHT);
+    // Tapping one shows its hint; Back (or OK) leaves the page.
+    columns.forEach((rows, c) => {
+      for (let i = 0; i < rows.length; i++)
+        this.services.touch.targets.add({
+          k: 'row',
+          x: c === 0 ? 88 : 328,
+          y: 130 + i * LINE_HEIGHT,
+          w: 232,
+          h: LINE_HEIGHT,
+          row: c * ACH_ROWS + i,
+          cursor: page.cursor,
+          take: false,
+        });
+    });
     const keys = prompt(UI.ach_hint, UI.ach_hint_pad, this.padStyle, lang);
     this.hint.setText(keys).setX(this.centre(keys));
   }

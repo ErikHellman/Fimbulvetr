@@ -317,3 +317,9 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Every villager on the shared body (`art-src/people`), the Askdalr decor (`decor` atlas) and the ford
   - [ ] Other regions' decor and tiles, enemies, fixtures, UI
   - [ ] Per-region atlas loading
+
+## Touch controls (after 1.0.0)
+Analysis: `notes/touch-controls-analysis.md` in the project (approved 2026-10-19).
+- [x] T1 On-screen controls — floating stick, button cluster, d-pad with OK/Back in menus, auto show/hide, touch settings page, touch prompts and introduction, no scroll or zoom, rotate hint, e2e
+- [x] T2 Taps and polish — tap a menu line to choose it and again to take it (title, pause menu, settings, shops, choices, picker), the layout editor, vibration when hurt
+- [ ] User playtest on a phone and a tablet, and Swedish proofread

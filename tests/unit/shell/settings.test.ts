@@ -53,6 +53,33 @@ describe('settings', () => {
     });
   });
 
+  it('keeps the touch settings, and falls back field by field (older settings have none)', () => {
+    const s = parseSettings(
+      JSON.stringify({
+        touch: 'on',
+        touchSize: 'large',
+        touchLeft: true,
+        haptics: false,
+        touchLayout: { sword: { dx: -1, dy: 0.5 }, stick: { dx: 1, dy: 0 } },
+      }),
+      'en',
+    );
+    expect(s).toMatchObject({ touch: 'on', touchSize: 'large', touchLeft: true, haptics: false });
+    expect(s.touchLayout).toEqual({ sword: { dx: -1, dy: 0.5 }, stick: { dx: 1, dy: 0 } });
+    const bad = parseSettings(
+      JSON.stringify({
+        touch: 'sometimes',
+        touchSize: 9,
+        touchLeft: 'no',
+        touchLayout: { sword: { dx: 'x', dy: 0 }, nope: { dx: 1, dy: 1 }, roll: { dx: 99, dy: 0 } },
+      }),
+      'en',
+    );
+    expect(bad).toMatchObject({ touch: 'auto', touchSize: 'normal', touchLeft: false, haptics: true });
+    expect(bad.touchLayout).toEqual({});
+    expect(parseSettings(JSON.stringify({ volume: 0.5 }), 'en').touch).toBe('auto');
+  });
+
   it('keeps a music level from 0 to 1, and falls back outside it (older settings have none)', () => {
     expect(parseSettings(JSON.stringify({ music: 0.3 }), 'en').music).toBe(0.3);
     expect(parseSettings(JSON.stringify({ music: 3 }), 'en').music).toBe(DEFAULT_SETTINGS.music);

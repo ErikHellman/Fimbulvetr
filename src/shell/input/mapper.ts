@@ -2,6 +2,13 @@ import type { Bindings } from '@content/bindings';
 import { ACTIONS, bit, type InputLatch } from '@core/input/actions';
 import type { PadSnapshot } from './gamepad';
 
+/** The on-screen controls: actions held by fingers (and by a menu tap's presses), and the stick. */
+export interface TouchSnapshot {
+  readonly held: number;
+  readonly ax: number;
+  readonly ay: number;
+}
+
 export interface MapperOptions {
   readonly holdToggleShield: boolean;
 }
@@ -24,8 +31,8 @@ export class InputMapper {
     if (!options.holdToggleShield) this.shieldOn = false;
   }
 
-  sample(keys: ReadonlySet<string>, pad: PadSnapshot | null): void {
-    let held = 0;
+  sample(keys: ReadonlySet<string>, pad: PadSnapshot | null, touch: TouchSnapshot | null = null): void {
+    let held = touch?.held ?? 0;
     for (const action of ACTIONS) {
       const onKey = this.bindings.kb[action].some((code) => keys.has(code));
       const onPad = pad !== null && this.bindings.pad[action].some((b) => pad.buttons.has(b));
@@ -34,6 +41,10 @@ export class InputMapper {
     held = this.shieldToggle(held);
     let mx = pad?.ax ?? 0;
     let my = pad?.ay ?? 0;
+    if (mx === 0 && my === 0 && touch !== null) {
+      mx = touch.ax;
+      my = touch.ay;
+    }
     if (mx === 0 && my === 0) {
       mx = ((held & bit('right')) !== 0 ? 1 : 0) - ((held & bit('left')) !== 0 ? 1 : 0);
       my = ((held & bit('down')) !== 0 ? 1 : 0) - ((held & bit('up')) !== 0 ? 1 : 0);

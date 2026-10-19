@@ -3,7 +3,8 @@ import { UI } from '@content/i18n/ui';
 import { t, type Lang } from '@core/i18n/t';
 import type { Settings } from '@shell/platform/settings';
 import { PAD_TEXT } from '@content/i18n/pad';
-import { padLabel, prompt, type PadStyle } from '@shell/input/padLabels';
+import { TOUCH_BUTTONS, TOUCH_TEXT } from '@content/i18n/touch';
+import { padLabel, prompt, type PromptDevice } from '@shell/input/padLabels';
 import { bindingsOf, keyLabel, type RemappableAction } from '@shell/input/remap';
 import { INTRO_ROWS, type IntroState } from './intro';
 import { ACTION_LABEL } from './settingsText';
@@ -23,19 +24,22 @@ const PAGES = ['menu', 'map'] as const satisfies readonly RemappableAction[];
 /**
  * The introduction as a heading, two text columns (what, and the player's keys for it) and the hint
  * line. Rows with an empty value are notes or the two choices, drawn across both columns. With a
- * controller connected (`pad`), the second column names its buttons instead.
+ * controller connected (`pad`), the second column names its buttons instead; with the on-screen
+ * controls, theirs.
  */
 export function introLines(
   state: IntroState,
   s: Settings,
   lang: Lang,
-  pad: PadStyle | null = null,
+  pad: PromptDevice | null = null,
 ): { heading: string; labels: string[]; values: string[]; hint: string } {
   const { kb, pad: buttons } = bindingsOf(s.keys);
   const keys = (a: RemappableAction): string =>
     pad === null
       ? [...new Set(kb[a].map(keyLabel))].join(', ')
-      : buttons[a].map((b) => padLabel(b, pad, lang)).join(', ');
+      : pad === 'touch'
+        ? t(TOUCH_BUTTONS[a], lang)
+        : buttons[a].map((b) => padLabel(b, pad, lang)).join(', ');
   const nth = (n: number): string =>
     WALK.map((a) => kb[a][n])
       .filter((c): c is string => c !== undefined)
@@ -44,14 +48,17 @@ export function introLines(
   const walk =
     pad === null
       ? [nth(0), nth(1)].filter((k) => k !== '').join('  ·  ')
-      : `${t(PAD_TEXT.dpad, lang)}  ·  ${t(PAD_TEXT.stick, lang)}`;
+      : pad === 'touch'
+        ? t(TOUCH_TEXT.stick, lang)
+        : `${t(PAD_TEXT.dpad, lang)}  ·  ${t(PAD_TEXT.stick, lang)}`;
+  const note = pad === null ? UI.intro_pad : pad === 'touch' ? TOUCH_TEXT.works_too : UI.intro_keyboard;
   const rows: [string, string][] = [
     [t(UI.intro_walk, lang), walk],
     ...SHOWN.map((a): [string, string] => [t(ACTION_LABEL[a], lang), keys(a)]),
     [t(UI.intro_items, lang), [keys('item1'), keys('item2')].join(', ')],
     ...PAGES.map((a): [string, string] => [t(ACTION_LABEL[a], lang), keys(a)]),
     ['', ''],
-    [t(pad === null ? UI.intro_pad : UI.intro_keyboard, lang), ''],
+    [t(note, lang), ''],
     [t(UI.intro_saving, lang), ''],
     ['', ''],
   ];

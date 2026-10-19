@@ -5,6 +5,7 @@ import type { GameState } from '@core/state/gameState';
 import type { DevTools } from './dev/bridge';
 import type { ArtOverrides } from './gfx/atlases';
 import type { FrameIndex } from './gfx/frameIndex';
+import type { TouchControls } from './input/touch';
 import type { SaveService } from './platform/saveService';
 import type { Settings } from './platform/settings';
 
@@ -14,6 +15,8 @@ export interface Services {
   readonly settings: Settings;
   readonly saves: SaveService;
   readonly dev: DevTools | null;
+  /** The on-screen controls and menu taps, shared by every scene. */
+  readonly touch: TouchControls;
   /** Dev/test `?mute`. */
   readonly muted: boolean;
   /** Dev/test `?rolled=0` turns rolled weather and spawn tables off. */
