@@ -319,5 +319,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Myrkviðr's ground and decor (`art-src/myrkvidr`)
   - [x] Mýrland's and Uppvík's ground and decor (`art-src/myrland`)
   - [x] Haugar's ground and decor (`art-src/haugar`)
-  - [ ] Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
+  - [x] Niflmýrr's ground and the snag (`art-src/niflmyrr`)
+  - [ ] Sævatn, Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
   - [ ] Per-region atlas loading
