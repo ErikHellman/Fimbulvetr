@@ -297,6 +297,30 @@
     {
       "terrain": "cave_wall",
       "image": "dvergagrof/cave_wall.png"
+    },
+    {
+      "terrain": "firn",
+      "image": "hrimfjoll/firn.png"
+    },
+    {
+      "terrain": "glaze",
+      "image": "hrimfjoll/glaze.png"
+    },
+    {
+      "terrain": "rime",
+      "image": "hrimfjoll/rime.png"
+    },
+    {
+      "terrain": "tower_floor",
+      "image": "hrimfjoll/tower_floor.png"
+    },
+    {
+      "terrain": "tower_wall",
+      "image": "hrimfjoll/tower_wall.png"
+    },
+    {
+      "terrain": "clear_ice",
+      "image": "hrimfjoll/clear_ice.png"
     }
   ]
 }

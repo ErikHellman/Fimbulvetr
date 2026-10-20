@@ -322,5 +322,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Niflmýrr's ground and the snag (`art-src/niflmyrr`)
   - [x] Sævatn's currents and surges (`art-src/saevatn`)
   - [x] Dvergagröf's scree and the cave set (`art-src/dvergagrof`)
-  - [ ] Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
+  - [x] Hrímfjöll's firn, glaze and rime, and Hrímturn's floor, walls and clear ice (`art-src/hrimfjoll`)
+  - [ ] The dungeons; enemies, fixtures, UI
   - [ ] Per-region atlas loading

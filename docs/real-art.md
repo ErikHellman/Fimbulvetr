@@ -90,6 +90,7 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] Niflmýrr: mire, blackwater and the drowned path, the snag (`art-src/niflmyrr`).
 - [x] Sævatn: the currents and surges on the lake's water (`art-src/saevatn`); its sand, reeds, rock and the hall were drawn earlier.
 - [x] Dvergagröf: the scree, and the cave set (`cave_floor`, `cave_wall`) that Rótarhellir, the mines, the lake's well and the fisher's cave share (`art-src/dvergagrof`).
+- [x] Hrímfjöll and Hrímturn: firn, glaze, the rime cliffs (now an autotiled blob island, like the other cliffs), and the tower's floor, walls and clear ice (`art-src/hrimfjoll`).
 - [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
