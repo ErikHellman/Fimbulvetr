@@ -98,7 +98,8 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] The first dungeons' foes and bosses (`dungeon` atlas): the root-biter, rótvættr, sap bulb and root spike; the mud-crab, the lindormr and its mounds; the haugbúi, bogdraugr, haugvörðr and the Haugbúi King; the water-worm and the bog-light.
 - [x] The hof, Sævatn, Helgrind, Niflmýrr and pass foes: the drowned, the nykr and its foal, the hrönn eel and its grates; the helhound, Garmr, Náströnd and its tower shield; the mara, fog-draugr and marbendill; Styrr.
 - [x] The Forge, Hrímfjöll, tower and Útgarðr foes: Járnvörðr, Glóð, Belgr and Ívaldi; the ice wolf and the frost wisp; Svellr, Hrímgerðr and her icicles; Jötunvörðr, Kolbeinn, Hrímnir, his hand and his pillars. Every foe is now drawn.
-- [ ] Decor and tiles of the other regions, fixtures, UI.
+- [x] The fixtures (gates, cracks, chests, switches, fires, rafts), the props Ask lifts and breaks, the sheep and the raven, and the pickups (`art-src/fixtures`, in the `decor` atlas).
+- [ ] Effects, icons and UI.
 - [ ] Per-region atlas loading and unloading.
 
 ## Drawing art in the repo: `art-src/`
@@ -127,6 +128,10 @@ The drawn art is kept as source, not generated: hand-drawn pixel grids (one pale
   and Útgarðr's foes (`forge.ts`, `rime.ts`, `tower.ts`, `utgard.ts`, grids in `grids3.ts`) are grids again,
   with `fx.ts` for ground shadows, halos and the warden's rise; Glóð is the bog-light's grids in flame,
   Ísvargr the wolf in rime and Kolbeinn the people body with his staff.
+- `art-src/fixtures`: the room fixtures (gates, cracks, chests, switches, fires, braziers, rafts, the web, the
+  ripples), the props Ask lifts and breaks, the sheep and the raven, and the pickups, one grid per frame in
+  `grids.ts` with `palette.ts`; they join the `decor` atlas under the placeholder names and feet points, so the
+  sim's on/off frame pairs and hit boxes are unchanged.
 - `art-src/askdalr`: the ground and the decor. Plain terrain is drawn tile by tile; auto-tiled terrain (rock, roof, water, ford)
   is drawn as a 32×32 island (outer corners, edges, middle) plus a 16×16 tile holding the four inner
   corners, and `build.ts` cuts both into 8×8 quarters and assembles the 47 blob cells in `BLOB_MASKS`

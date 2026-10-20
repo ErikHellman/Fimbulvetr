@@ -159,6 +159,11 @@ test('the shipped manifest replaces the hero, villager, decor, wilds-foe and dun
   expect(overrides?.frames).toContain('enemy_hrimgerdr_cast_s_1');
   expect(overrides?.frames).toContain('enemy_hrimnir_open_n_0');
   expect(overrides?.frames).toContain('enemy_rime_pillar_fall_s_1');
+  expect(overrides?.frames).toContain('fix_chest_open_s_0');
+  expect(overrides?.frames).toContain('fix_fan_on_s_1');
+  expect(overrides?.frames).toContain('prop_bomb_blink_s_1');
+  expect(overrides?.frames).toContain('critter_sheep_walk_e_1');
+  expect(overrides?.frames).toContain('pickup_heart_container_idle_s_1');
   expect(await page.evaluate(() => window.__fimbul?.missingFrames())).toEqual([]);
   expect(errors).toEqual([]);
 });

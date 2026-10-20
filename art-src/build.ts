@@ -13,7 +13,10 @@ import { passFrames as placeholderPass } from '@art/sprites/pass';
 import { saevatnFrames as placeholderSaevatn } from '@art/sprites/saevatn';
 import { forgeFrames as placeholderForge } from '@art/sprites/forge';
 import { rimeFrames as placeholderRime } from '@art/sprites/rime';
-import { towerFoeFrames as placeholderTower } from '@art/sprites/tower';
+import {
+  towerFoeFrames as placeholderTower,
+  towerFrames as placeholderTowerFixtures,
+} from '@art/sprites/tower';
 import { utgardFrames as placeholderUtgard } from '@art/sprites/utgard';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
@@ -34,6 +37,11 @@ import { sokkvaSheets } from './sokkva/build';
 import { hofSheets } from './hof/build';
 import { utgardSheets } from './utgard/build';
 import { decorFrames as placeholderDecor } from '@art/sprites/decor';
+import { fixtureFrames as placeholderFixtures } from '@art/sprites/fixtures';
+import { farmFrames as placeholderFarm } from '@art/sprites/farm';
+import { dummyFrames as placeholderDummy } from '@art/sprites/dummy';
+import { uiFrames as placeholderUi } from '@art/sprites/ui';
+import { fixtureFrames } from './fixtures/build';
 import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
 import { encodePng } from './lib/png';
@@ -104,14 +112,43 @@ const SETS: readonly {
   },
   {
     key: 'decor',
-    frames: [...askdalrDecor(), ...myrkvidrDecor(), ...myrlandDecor(), ...haugarDecor(), ...niflmyrrDecor()],
+    frames: [
+      ...askdalrDecor(),
+      ...myrkvidrDecor(),
+      ...myrlandDecor(),
+      ...haugarDecor(),
+      ...niflmyrrDecor(),
+      ...fixtureFrames(),
+    ],
     placeholder: () => {
       const drawn = new Set(
-        [...askdalrDecor(), ...myrkvidrDecor(), ...myrlandDecor(), ...haugarDecor(), ...niflmyrrDecor()].map(
-          (f) => f.name,
-        ),
+        [
+          ...askdalrDecor(),
+          ...myrkvidrDecor(),
+          ...myrlandDecor(),
+          ...haugarDecor(),
+          ...niflmyrrDecor(),
+          ...fixtureFrames(),
+        ].map((f) => f.name),
       );
-      return placeholderDecor()
+      return [
+        ...placeholderDecor(),
+        ...placeholderFixtures(),
+        ...placeholderFarm(),
+        ...placeholderDummy(),
+        ...placeholderUi(),
+        ...placeholderCave(),
+        ...placeholderSokkva(),
+        ...placeholderHaugar(),
+        ...placeholderPass(),
+        ...placeholderNiflmyrr(),
+        ...placeholderHelgrind(),
+        ...placeholderHof(),
+        ...placeholderSaevatn(),
+        ...placeholderForge(),
+        ...placeholderTower(),
+        ...placeholderTowerFixtures(),
+      ]
         .filter((f) => drawn.has(f.name))
         .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } }));
     },
