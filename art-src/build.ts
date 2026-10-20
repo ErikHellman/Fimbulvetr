@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { buildAtlas } from './lib/atlas';
 import { previewSheet } from './lib/preview';
+import { enemyFrames as placeholderEnemies } from '@art/sprites/enemies';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
 import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
@@ -9,6 +10,7 @@ import { myrlandDecor, myrlandSheets } from './myrland/build';
 import { haugarDecor, haugarSheets } from './haugar/build';
 import { niflmyrrDecor, niflmyrrSheets } from './niflmyrr/build';
 import { dvergagrofSheets } from './dvergagrof/build';
+import { enemyFrames } from './enemies/build';
 import { forgeSheets } from './forge/build';
 import { hrimfjollSheets } from './hrimfjoll/build';
 import { konungshaugrSheets } from './konungshaugr/build';
@@ -54,6 +56,12 @@ const SETS: readonly {
     pageSize: 2048,
     placeholder: () =>
       placeholderPeople().map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } })),
+  },
+  {
+    key: 'enemies',
+    frames: enemyFrames(),
+    placeholder: () =>
+      placeholderEnemies().map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } })),
   },
   {
     key: 'decor',

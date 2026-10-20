@@ -15,6 +15,11 @@
       "key": "decor",
       "image": "decor.png",
       "data": "decor.json"
+    },
+    {
+      "key": "enemies",
+      "image": "enemies.png",
+      "data": "enemies.json"
     }
   ],
   "tiles": [

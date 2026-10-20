@@ -326,5 +326,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] The Forge's floor, walls, lava and belts (`art-src/forge`)
   - [x] Rótarhellir's sap and roots, Konungshaugr's floor, walls and pits (`art-src/rotarhellir`, `art-src/konungshaugr`)
   - [x] Sökkva Kvern's sluice, race, boards and mill wall, the hof's flags and arch, Útgarðr's floor and wall (`art-src/sokkva`, `art-src/hof`, `art-src/utgard`)
-  - [ ] Enemies, fixtures, UI
+  - [x] The wilds' foes: vargr, pack leader, rime raven, draugr, trolls, the stone troll, the death puff (`art-src/enemies`)
+  - [ ] The dungeons' foes and bosses, fixtures, UI
   - [ ] Per-region atlas loading
