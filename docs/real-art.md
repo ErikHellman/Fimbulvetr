@@ -94,7 +94,8 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] Ívaldi's Forge: iron flags, black stone walls bound with iron, lava under a drifting crust (4 frames) and the belts by the way they run (`art-src/forge`).
 - [x] Rótarhellir: the sap (a sunken blob island, 4 frames) and the roots (`art-src/rotarhellir`); Konungshaugr: the crypt's flags, its walls and the pits, with the ghost floor sharing the pit's cells (`art-src/konungshaugr`).
 - [x] Sökkva Kvern: the sluice floors at both levels, the race channels, the boards and the mill wall as a blob island over the boards (`art-src/sokkva`); the hof's flags at both levels and the sunken arch (`art-src/hof`); Útgarðr's giant floor and wall (`art-src/utgard`).
-- [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
+- [x] The wilds' foes (`enemies` atlas): the vargr and the pack leader, the rime raven, the draugr, the raid and forest trolls, the troll turned to stone, and the puff where a foe dies.
+- [ ] Decor and tiles of the other regions, the dungeons' foes and bosses, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
 ## Drawing art in the repo: `art-src/`
@@ -108,6 +109,10 @@ The drawn art is kept as source, not generated: hand-drawn pixel grids (one pale
   trousers and torso, or Embla's skirt and bodice), coloured per person from `LOOKS` in
   `src/art/sprites/people.ts`, with overlays for long hair, braid, beard, apron, kerchief, bald heads, the
   huldra's tail, and children drawn from cropped parts at child height. A new villager needs only a look entry.
+- `art-src/enemies`: the wilds' foes (the `enemies` atlas). The wolf, raven and troll are drawn as bodies with
+  separate leg, wing and club strips composed per pose; the draugr is the villagers' body with a grave look and
+  dead eyes, sunk into a mound for its rise; the raid, forest and stone trolls and the two wolves differ only by
+  palette (`palette.ts`). Mirroring supplies east.
 - `art-src/askdalr`: the ground and the decor. Plain terrain is drawn tile by tile; auto-tiled terrain (rock, roof, water, ford)
   is drawn as a 32×32 island (outer corners, edges, middle) plus a 16×16 tile holding the four inner
   corners, and `build.ts` cuts both into 8×8 quarters and assembles the 47 blob cells in `BLOB_MASKS`
