@@ -26,7 +26,7 @@ test('real art listed in atlases/manifest.json replaces frames and tiles by name
   expect(errors).toEqual([]);
 });
 
-test('the shipped manifest replaces the hero, villager, decor and wilds-foe frames and the Askdalr, Myrkviðr, Mýrland, Haugar, Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll ground, the Forge, Rótarhellir, Konungshaugr, Sökkva Kvern, the hof and Útgarðr', async ({
+test('the shipped manifest replaces the hero, villager, decor, wilds-foe and dungeon-foe frames and the Askdalr, Myrkviðr, Mýrland, Haugar, Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll ground, the Forge, Rótarhellir, Konungshaugr, Sökkva Kvern, the hof and Útgarðr', async ({
   page,
 }) => {
   const errors = collectErrors(page);
@@ -146,6 +146,10 @@ test('the shipped manifest replaces the hero, villager, decor and wilds-foe fram
   expect(overrides?.frames).toContain('enemy_troll_smash_s_1');
   expect(overrides?.frames).toContain('enemy_draugr_rise_n_3');
   expect(overrides?.frames).toContain('fx_poof_idle_s_3');
+  expect(overrides?.frames).toContain('enemy_root_biter_bite_s_1');
+  expect(overrides?.frames).toContain('enemy_lindormr_coil_e_0');
+  expect(overrides?.frames).toContain('enemy_haugkonungr_charge_w_1');
+  expect(overrides?.frames).toContain('enemy_myrljos_tell_n_0');
   expect(await page.evaluate(() => window.__fimbul?.missingFrames())).toEqual([]);
   expect(errors).toEqual([]);
 });

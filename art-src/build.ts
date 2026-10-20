@@ -2,6 +2,10 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { buildAtlas } from './lib/atlas';
 import { previewSheet } from './lib/preview';
 import { enemyFrames as placeholderEnemies } from '@art/sprites/enemies';
+import { caveFrames as placeholderCave } from '@art/sprites/cave';
+import { haugarFrames as placeholderHaugar } from '@art/sprites/haugar';
+import { myrlandFrames as placeholderMyrland } from '@art/sprites/myrland';
+import { sokkvaFrames as placeholderSokkva } from '@art/sprites/sokkva';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
 import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
@@ -11,6 +15,7 @@ import { haugarDecor, haugarSheets } from './haugar/build';
 import { niflmyrrDecor, niflmyrrSheets } from './niflmyrr/build';
 import { dvergagrofSheets } from './dvergagrof/build';
 import { enemyFrames } from './enemies/build';
+import { dungeonFrames } from './dungeon/build';
 import { forgeSheets } from './forge/build';
 import { hrimfjollSheets } from './hrimfjoll/build';
 import { konungshaugrSheets } from './konungshaugr/build';
@@ -62,6 +67,17 @@ const SETS: readonly {
     frames: enemyFrames(),
     placeholder: () =>
       placeholderEnemies().map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } })),
+  },
+  {
+    key: 'dungeon',
+    frames: dungeonFrames(),
+    pageSize: 2048,
+    placeholder: () => {
+      const drawn = new Set(dungeonFrames().map((f) => f.name));
+      return [...placeholderCave(), ...placeholderSokkva(), ...placeholderHaugar(), ...placeholderMyrland()]
+        .filter((f) => drawn.has(f.name))
+        .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } }));
+    },
   },
   {
     key: 'decor',
