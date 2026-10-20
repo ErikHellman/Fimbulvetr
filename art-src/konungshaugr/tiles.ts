@@ -1,0 +1,173 @@
+import { grid } from '../lib/sprite';
+import { KON_PAL as P } from './palette';
+
+/**
+ * Konungshaugr, drawn by hand at 16 px: the worn flags of the kings' hall, its dressed stone walls as a
+ * blob island, and the pits (the ghost floor over them is drawn the same, so it joins them).
+ */
+const g = (text: string) => grid(P, text);
+
+export const CRYPT_FLOOR = [
+  g(`
+    cccccccbcccccccb
+    caaabeabcaaaaaab
+    caaaaaabcaaaaaab
+    cabaaaabcaaaaaab
+    caaabaabccaaaaab
+    caaaaaabcaaacaab
+    caaaaabbcbaaaaab
+    bbbbbbbbbbbbbbbb
+    cccbcccccccbcccc
+    aaabcaabaaabcaaa
+    aaabcaaaaabbcaaa
+    aaabceaaaaabcaaa
+    aabbcaaaaaabcaae
+    aabbcaaaaaabcaaa
+    acabcaaaaaabcaaa
+    bbbbbbbbbbbbbbbb
+  `),
+  g(`
+    ccbcccccccbccccc
+    aabcaaaaaabcaaaa
+    aabccaaaeabcaaaa
+    aabceaaaaabcaaaa
+    acbcabaaaabcaaaa
+    eabcaaebabbceaaa
+    aabcabaaaabcaaaa
+    bbbbbbbbbbbbbbbb
+    ccccccbcccccccbc
+    aaaaaabcaaaaaabc
+    aaaaaabcaaaaaabc
+    aaeaaabcaaaaaabc
+    aaabaabcaacbabbc
+    bacaaabcbaaababc
+    aaaaaabcbaaaacbc
+    bbbbbbbbbbbbbbbb
+  `),
+  g(`
+    cccccbcccccccbcc
+    aaaaabccaaaaabca
+    aaaaabcabaaaabca
+    aaaaabcaaaaaabca
+    aabbbbcaabeaabca
+    abbaabcaaaaeabca
+    aaaaabcaaaaaabca
+    bbbbbbbbbbbbbbbb
+    cbcccccccbcccccc
+    abcaaaaaabcaacaa
+    abcabbababcbaaaa
+    abcccaababcbaaaa
+    abcaaaaaabcbbaaa
+    abcaaabeabcaaaca
+    abcaacaaabcaaaaa
+    bbbbbbbbbbbbbbbb
+  `),
+];
+
+export const CRYPT_WALL_ISLAND = g(`
+    ccbcccccccbcccccccbcccccccbccccc
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akwwwwwwwwwwwwwwwwwwwwwwwwwwVvka
+    akwvvvVvvvvVvvvVvvvvvvvwvvvVVvka
+    akwvvvvVvVvvvvwvvvvVvvvvvvvvvvka
+    ekwVvvvVVvvVvVvvvvvvvvvvvvvvVvka
+    akwVwvvVvvvvvvvvvvvvvvvvvVVVvVka
+    bkwvvVvvwvVvvvVvwvvvVvvvwvvVvvkb
+    ckwVvvvwvvvvvwvvvvvvvVvvvvvvvvkc
+    akwvvvvvvvvvvvvvvvvvvvVvvvvvvvkc
+    akwvvvVvvvvvvVVvvvvVvvvvvvVwvVkc
+    akwVwvvvvvVwwvVVvVvvwvvvvVVvwVkc
+    akwVvvvvvvvvvvvVvvvvvVvvvvVvvVkc
+    bkwVvvvvvvvvvVvvvvvvvvvvvwvVvvkc
+    akwvvvvvVvvvwwwvvvvVvvvvvvvvvvkc
+    bkwvvvvvwvvvvvvvwVvvvVvvwvvvvvkb
+    ckwvvvVvvvVvvvvvvVvVwvvvVvvvvVkc
+    akwvvvvvvvVvvvVVvvvvvvvvwVvvvvka
+    akwvvvvvvvvVwVvvwvVvvvvVvvvvvvka
+    akwvwVvwvVvVwvvvVvvvwvvVvvvvwvka
+    akwvVvvvvvvvvvVvvvvvVvvvvvvvvwka
+    ekwvvvvVvvvVVvVvVvvvVvvvvvVvvvka
+    akwvvvvVvvvvvvvvvvvvvvwvVvvvvvka
+    bkwvvvwvwwvVvVvVwvvvvvvvwVvvwvkb
+    ckwvvwvvVvwvvvVvvvvvvvvvvvvvvvkc
+    akwvVvVvvvvvvVvvwvvvvvvVvvvvvVkc
+    akwvvvvVvvwvvvvvvvvVvVVvvvvvvvkc
+    akwvwvVvvvvvwvVvvvvvwvvvvVvvwvkc
+    akvVVvvvvvvvvvvvvvvvvvvvvvvvvvkc
+    bkvvwvvVvvvvvvvwvvvvvVvvvvvvvvkc
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkkc
+    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+`);
+
+export const CRYPT_WALL_INNER = g(`
+    ccbkwvVvvvVwkccc
+    aakwVVvvvVVvwkaa
+    akwvvvvVvvvvvwka
+    kwvvvvvwvvvvvvwk
+    wvvvVwvvvvvvvvvw
+    vvvvvvvvvVvvvvvv
+    VvwvvvvvVVVvvVvv
+    vVvvvvvvvVVvvvvv
+    VvvVvvvwVvvvvwvw
+    vvvwvvvvvvvvvvvw
+    vvwvvwvvvvvvvvvv
+    wVvvvvvvvvvvvvVv
+    kwVVvvvvVvvvvVwk
+    bkwvvvvVvvVVvvkc
+    aakwVvvVvvvvvkbc
+    bbbkwvvvvvVvkbbb
+`);
+
+export const PIT_ISLAND = g(`
+    cccccccbcccccccbcccccccbcccccccb
+    ckkkkkkkkkkbbbbkkkkkkkkkkkkbbbbb
+    ckEbEEbbEbbEEbbbEbEEEEEEbEbEPPkb
+    cbEPpPPPPPpPPPpPPPPPPPPPPPPpPpkb
+    ckbPPPPPPPPPPpPPPPPPppPPPPPpPPkb
+    cbEPppPPPPPppPPPPPPPPPpPPPppPPkb
+    ckEPPPPPPPPPPPpPpPPPPPPPPPPPPPkb
+    bkbpPPPPbPPPPPPPEPpPPPPPbPPPpPkb
+    ckEpPPPPPPPPPPPPPPpPPPPPPPpPPPbc
+    abEPPPPPPPPPPPPpPPPPPPPPPPPPPpka
+    akbPPpPPpPPPPPPPPPPppPpPPpPPpPka
+    akbPEPpPPPPbEPPPPPPPEpPPpPPPEPba
+    akEPPPpppppPPPPPPPPPPPPPPPPPppbe
+    akEpPPPPPPPPpPPPpPpPpPPPPPPpPPka
+    akEPPPPPPpPPPEPppPPPPPPPpPPPpPka
+    bbEPPPpPEPPPPPpPbPppPpPPEPPPPPkb
+    cbbPPPpPppppPPPPPPPPPpPPpppPPPkb
+    ckEpPPpPPPpPPPpPPPPPPpPPpPPPPPbb
+    ckbPPpPPPPPPPPPpPPPpPPPPpPPPppkb
+    ckbPEpPPPPpPEpPPPPPPEPPPpPPPbPkb
+    ckbPPPPPPPPPPpPPPPPPPppPpPPpPpkb
+    cbEpPppPpPPPPpPPPPPPpPPPPPPPPpkb
+    ckEPPpPPpppPPPPPPppPpPbPPPPPpPbb
+    bkEPPPPpbPpPPPPPbPPPPPppEPpPPPkb
+    ckbPPPPpPppPPpPpppPpPPPPPPPPpPbc
+    abEPPpPPPPpPPPPPPpPPpPPPPPpPPPba
+    abbPPPPpPPPPPpPPPPPPPPPPPPPPpPka
+    akbPEPPPPPpPEPPPpPPPEPpPPPppEPka
+    akPPPpPPPPPPPPppPPPPpPPPPPPPpPbe
+    akPPPppPPpPppPPPPPPPPPpPPPPPPPba
+    akkkkkbkkkkkkkkkkbkkkkkkkkkkbbba
+    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+`);
+
+export const PIT_INNER = g(`
+    cccbEPPPpPPEkccb
+    cabEpPPPPPPPbbab
+    ckbPPPPPPPpPPEkb
+    kbPPPPPPPPPpPPbk
+    bppPPbpPPPPPPpPE
+    PPPPpPPPpPPPPPPP
+    pPPPpppPpPPPPpPP
+    PPpPpPPPPPPPPpPp
+    PPPPPPPEPPPPpppP
+    PpPEPPpPPpPPPppp
+    pPPPPPPpPPPpPPpP
+    EPppPPpPPPPpPPpP
+    bEPPpPPpPPpPPPPk
+    akEPPPpPPPPPpPka
+    ackbpPpPPPpPPkaa
+    bbbkEPPPPPPPkbbb
+`);

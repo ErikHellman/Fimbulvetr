@@ -349,6 +349,30 @@
     {
       "terrain": "belt_w",
       "image": "forge/belt_w.png"
+    },
+    {
+      "terrain": "sap",
+      "image": "rotarhellir/sap.png"
+    },
+    {
+      "terrain": "roots",
+      "image": "rotarhellir/roots.png"
+    },
+    {
+      "terrain": "crypt_floor",
+      "image": "konungshaugr/crypt_floor.png"
+    },
+    {
+      "terrain": "crypt_wall",
+      "image": "konungshaugr/crypt_wall.png"
+    },
+    {
+      "terrain": "pit",
+      "image": "konungshaugr/pit.png"
+    },
+    {
+      "terrain": "ghost",
+      "image": "konungshaugr/ghost.png"
     }
   ]
 }

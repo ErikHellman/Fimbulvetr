@@ -92,6 +92,7 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] Dvergagröf: the scree, and the cave set (`cave_floor`, `cave_wall`) that Rótarhellir, the mines, the lake's well and the fisher's cave share (`art-src/dvergagrof`).
 - [x] Hrímfjöll and Hrímturn: firn, glaze, the rime cliffs (now an autotiled blob island, like the other cliffs), and the tower's floor, walls and clear ice (`art-src/hrimfjoll`).
 - [x] Ívaldi's Forge: iron flags, black stone walls bound with iron, lava under a drifting crust (4 frames) and the belts by the way they run (`art-src/forge`).
+- [x] Rótarhellir: the sap (a sunken blob island, 4 frames) and the roots (`art-src/rotarhellir`); Konungshaugr: the crypt's flags, its walls and the pits, with the ghost floor sharing the pit's cells (`art-src/konungshaugr`).
 - [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
