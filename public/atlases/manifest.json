@@ -237,6 +237,22 @@
     {
       "terrain": "tent",
       "image": "haugar/tent.png"
+    },
+    {
+      "terrain": "mire",
+      "image": "niflmyrr/mire.png"
+    },
+    {
+      "terrain": "blackwater",
+      "image": "niflmyrr/blackwater.png"
+    },
+    {
+      "terrain": "drowned_path",
+      "image": "niflmyrr/drowned_path.png"
+    },
+    {
+      "terrain": "snag",
+      "image": "niflmyrr/snag.png"
     }
   ]
 }

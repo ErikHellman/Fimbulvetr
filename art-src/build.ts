@@ -7,6 +7,7 @@ import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
 import { myrkvidrDecor, myrkvidrSheets } from './myrkvidr/build';
 import { myrlandDecor, myrlandSheets } from './myrland/build';
 import { haugarDecor, haugarSheets } from './haugar/build';
+import { niflmyrrDecor, niflmyrrSheets } from './niflmyrr/build';
 import { decorFrames as placeholderDecor } from '@art/sprites/decor';
 import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
@@ -47,10 +48,12 @@ const SETS: readonly {
   },
   {
     key: 'decor',
-    frames: [...askdalrDecor(), ...myrkvidrDecor(), ...myrlandDecor(), ...haugarDecor()],
+    frames: [...askdalrDecor(), ...myrkvidrDecor(), ...myrlandDecor(), ...haugarDecor(), ...niflmyrrDecor()],
     placeholder: () => {
       const drawn = new Set(
-        [...askdalrDecor(), ...myrkvidrDecor(), ...myrlandDecor(), ...haugarDecor()].map((f) => f.name),
+        [...askdalrDecor(), ...myrkvidrDecor(), ...myrlandDecor(), ...haugarDecor(), ...niflmyrrDecor()].map(
+          (f) => f.name,
+        ),
       );
       return placeholderDecor()
         .filter((f) => drawn.has(f.name))
@@ -94,6 +97,7 @@ const sheets = [
   ...myrkvidrSheets().map((sheet) => ({ ...sheet, dir: 'myrkvidr' })),
   ...myrlandSheets().map((sheet) => ({ ...sheet, dir: 'myrland' })),
   ...haugarSheets().map((sheet) => ({ ...sheet, dir: 'haugar' })),
+  ...niflmyrrSheets().map((sheet) => ({ ...sheet, dir: 'niflmyrr' })),
 ];
 for (const sheet of sheets) {
   mkdirSync(`public/atlases/${sheet.dir}`, { recursive: true });
