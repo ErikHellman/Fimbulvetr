@@ -373,6 +373,50 @@
     {
       "terrain": "ghost",
       "image": "konungshaugr/ghost.png"
+    },
+    {
+      "terrain": "sluice",
+      "image": "sokkva/sluice.png"
+    },
+    {
+      "terrain": "sluice_hi",
+      "image": "sokkva/sluice_hi.png"
+    },
+    {
+      "terrain": "race",
+      "image": "sokkva/race.png"
+    },
+    {
+      "terrain": "race_hi",
+      "image": "sokkva/race_hi.png"
+    },
+    {
+      "terrain": "boards",
+      "image": "sokkva/boards.png"
+    },
+    {
+      "terrain": "mill_wall",
+      "image": "sokkva/mill_wall.png"
+    },
+    {
+      "terrain": "hof_floor",
+      "image": "hof/hof_floor.png"
+    },
+    {
+      "terrain": "hof_floor_hi",
+      "image": "hof/hof_floor_hi.png"
+    },
+    {
+      "terrain": "arch",
+      "image": "hof/arch.png"
+    },
+    {
+      "terrain": "giant_floor",
+      "image": "utgard/giant_floor.png"
+    },
+    {
+      "terrain": "giant_wall",
+      "image": "utgard/giant_wall.png"
     }
   ]
 }

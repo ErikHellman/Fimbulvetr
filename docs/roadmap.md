@@ -325,5 +325,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Hrímfjöll's firn, glaze and rime, and Hrímturn's floor, walls and clear ice (`art-src/hrimfjoll`)
   - [x] The Forge's floor, walls, lava and belts (`art-src/forge`)
   - [x] Rótarhellir's sap and roots, Konungshaugr's floor, walls and pits (`art-src/rotarhellir`, `art-src/konungshaugr`)
-  - [ ] The other dungeons (Sökkva Kvern, the hof, Útgarðr); enemies, fixtures, UI
+  - [x] Sökkva Kvern's sluice, race, boards and mill wall, the hof's flags and arch, Útgarðr's floor and wall (`art-src/sokkva`, `art-src/hof`, `art-src/utgard`)
+  - [ ] Enemies, fixtures, UI
   - [ ] Per-region atlas loading
