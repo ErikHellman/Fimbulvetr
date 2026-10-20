@@ -331,5 +331,5 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] The hof, Sævatn, Helgrind, Niflmýrr and pass foes: drowned, nykr and foal, hrönn and grates, helhound, Garmr, Náströnd, mara, fog-draugr, marbendill, Styrr
   - [x] The Forge, Hrímfjöll, tower and Útgarðr foes: Járnvörðr, Glóð, Belgr, Ívaldi, ice wolf, frost wisp, Svellr, Hrímgerðr, icicles, Jötunvörðr, Kolbeinn, Hrímnir, hand, pillars
   - [x] Fixtures, props, critters, pickups
-  - [ ] Effects, icons, UI
+  - [x] Effects, icons, UI (`art-src/ui`)
   - [ ] Per-region atlas loading

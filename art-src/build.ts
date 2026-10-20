@@ -41,7 +41,9 @@ import { fixtureFrames as placeholderFixtures } from '@art/sprites/fixtures';
 import { farmFrames as placeholderFarm } from '@art/sprites/farm';
 import { dummyFrames as placeholderDummy } from '@art/sprites/dummy';
 import { uiFrames as placeholderUi } from '@art/sprites/ui';
+import { fxFrames as placeholderFx } from '@art/sprites/fx';
 import { fixtureFrames } from './fixtures/build';
+import { uiFrames } from './ui/build';
 import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
 import { encodePng } from './lib/png';
@@ -119,6 +121,7 @@ const SETS: readonly {
       ...haugarDecor(),
       ...niflmyrrDecor(),
       ...fixtureFrames(),
+      ...uiFrames(),
     ],
     placeholder: () => {
       const drawn = new Set(
@@ -129,6 +132,7 @@ const SETS: readonly {
           ...haugarDecor(),
           ...niflmyrrDecor(),
           ...fixtureFrames(),
+          ...uiFrames(),
         ].map((f) => f.name),
       );
       return [
@@ -137,6 +141,9 @@ const SETS: readonly {
         ...placeholderFarm(),
         ...placeholderDummy(),
         ...placeholderUi(),
+        ...placeholderFx(),
+        ...placeholderMyrland(),
+        ...placeholderRime(),
         ...placeholderCave(),
         ...placeholderSokkva(),
         ...placeholderHaugar(),
