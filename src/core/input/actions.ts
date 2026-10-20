@@ -1,3 +1,4 @@
+import type { Dir4 } from '../math/dir';
 import { length, normalize, type Vec } from '../math/vec';
 
 export const ACTIONS = [
@@ -53,6 +54,18 @@ export function quantize(v: number): number {
 export function moveVector(f: InputFrame): Vec {
   const v = { x: f.mx, y: f.my };
   return length(v) > 1 ? normalize(v) : v;
+}
+
+/**
+ * The way the input points when it lies close to one axis: a straight key press, or an analog stick within
+ * about 27° of it (a stick held "left" is never exactly on the axis). Null for diagonals and no input.
+ */
+export function straightDir(f: InputFrame): Dir4 | null {
+  const ax = Math.abs(f.mx);
+  const ay = Math.abs(f.my);
+  if (ax >= 2 * ay && ax > 0) return f.mx > 0 ? 'e' : 'w';
+  if (ay >= 2 * ax && ay > 0) return f.my > 0 ? 's' : 'n';
+  return null;
 }
 
 /**

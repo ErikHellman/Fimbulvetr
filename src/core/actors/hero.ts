@@ -1,5 +1,5 @@
 import type { WeaponId } from '@content/ids';
-import { isHeld, moveVector, wasPressed, type InputFrame } from '../input/actions';
+import { isHeld, moveVector, straightDir, wasPressed, type InputFrame } from '../input/actions';
 import { at, type Box } from '../math/box';
 import { DIR_VEC, dirFromVec, type Dir4 } from '../math/dir';
 import { normalize, scale } from '../math/vec';
@@ -89,9 +89,7 @@ const move: HeroDef = {
 
 /** Counts ticks of walking straight into a hoppable ledge. */
 function pushingLedge(e: Entity, c: HeroCtx): boolean {
-  const m = moveVector(c.input);
-  const straight = (m.x === 0) !== (m.y === 0);
-  const ahead = straight && dirFromVec(m, e.facing) === e.facing ? c.ledgeHop(e.facing) : null;
+  const ahead = straightDir(c.input) === e.facing ? c.ledgeHop(e.facing) : null;
   const pushed = ahead === null ? 0 : mem(e, 'ledgePush') + 1;
   if (pushed !== mem(e, 'ledgePush')) e.mem['ledgePush'] = pushed;
   return pushed >= c.tuning.hero.ledgePushTicks;

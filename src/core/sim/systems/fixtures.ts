@@ -1,7 +1,7 @@
 import { createEntity, mem, setAnim, type Entity } from '../../actors/entity';
 import { heroSwordBox } from '../../actors/hero';
 import { PIERCE_SHIELD } from '../../combat/hit';
-import type { InputFrame } from '../../input/actions';
+import { moveVector, type InputFrame } from '../../input/actions';
 import { at, overlaps, type Box } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { dungeonOf } from '../../state/dungeons';
@@ -22,6 +22,8 @@ import { turnPrism } from './beams';
 /** A fire tile's burn: half a heart, and no shield keeps it off. */
 const FIRE = { amount: 2, knock: 4 } as const;
 const TILE_BOX = { x: -8, y: -14, w: 16, h: 16 } as const;
+/** How squarely Ask must walk into a locked door to try a key: a diagonal (0.71) still counts. */
+const LEAN = 0.7;
 const FLAME_BOX = { x: -6, y: -12, w: 12, h: 12 } as const;
 
 /**
@@ -381,8 +383,10 @@ export function unlockAt(rt: SimRt, box: Box): boolean {
 /** Walking into a locked door with a key opens it. */
 export function bumpLocks(rt: SimRt, input: InputFrame): void {
   if (rt.hero.fsm.s !== 'move') return;
+  // Leaning on the door is enough: a diagonal key press or a crooked stick still counts.
+  const m = moveVector(input);
   const d = DIR_VEC[rt.hero.facing];
-  if ((d.x === 0 || input.mx !== d.x) && (d.y === 0 || input.my !== d.y)) return;
+  if (m.x * d.x + m.y * d.y < LEAN) return;
   unlockAt(rt, probeBox(rt));
 }
 
