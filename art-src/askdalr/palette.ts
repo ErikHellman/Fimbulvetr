@@ -28,6 +28,11 @@ export const ASK_PAL: GridPalette = {
   O: C.woodLight,
   o: C.wood,
   q: C.woodShade,
+  P: C.floor,
+  p: C.floorShade,
+  Q: C.floorLight,
+  i: C.steel,
+  s: C.steelShade,
 };
 
 /** Letters used in the decor grids. */
@@ -54,4 +59,12 @@ export const DECOR_PAL: GridPalette = {
   p: C.sack,
   A: C.water,
   B: C.waterLight,
+  o: C.wood,
+  h: C.straw,
+  H: C.strawShade,
+  b: C.blanket,
+  c: C.blanketShade,
+  f: C.ember,
+  F: C.emberLight,
+  C: C.clay,
 };

@@ -315,5 +315,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Hero sheet drawn in-repo (`art-src/hero`, three kits, `pnpm art:pack`)
   - [x] Embla sheet and the Askdalr tileset (`art-src/askdalr`: grass, path, yard, field, fence, rock, roof, water)
   - [x] Every villager on the shared body (`art-src/people`), the Askdalr decor (`decor` atlas) and the ford
+  - [x] Askdalr's houses and interiors (`art-src/askdalr/house.ts`, `indoors.ts`): Askdalr is fully drawn
   - [ ] Other regions' decor and tiles, enemies, fixtures, UI
   - [ ] Per-region atlas loading

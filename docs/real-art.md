@@ -83,6 +83,7 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] Hero sheet (`hero`, `hero_axe`, `hero_fork`) and Embla.
 - [x] The Askdalr tileset: grass, path, yard, field, fence, rock, roof, water, ford.
 - [x] Every villager (`people` atlas, 55 people) and the Askdalr decor (trees, pines, birch, boulder, stump, menhir, runestone, well).
+- [x] Askdalr's houses (wall, door, door_shut, window, chimney, ledge, floor, wall_int, jetty), the ground under standing things, and the bed, table, hearth and trough.
 - [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
@@ -102,7 +103,9 @@ The drawn art is kept as source, not generated: hand-drawn pixel grids (one pale
   corners, and `build.ts` cuts both into 8×8 quarters and assembles the 47 blob cells in `BLOB_MASKS`
   order. Water's and the ford's four frames are four islands with the ripples moved a pixel. `decor.ts` holds the
   trees, stones and the well (`decor` atlas, `decor_<id>_idle_s_<n>`), at the placeholder sizes and standing on
-  their bottom centre.
+  their bottom centre; `house.ts` the house fronts, interiors, jetty and ledge; `indoors.ts` the bed, table,
+  hearth and trough. Terrain that only carries a standing thing (`tree`, `well`, `bed`, …) gets the plain
+  drawn ground or floor as its sheet, so the drawn piece never stands on a placeholder square.
 
 `art-src/lib` holds the tiny toolkit: PNG encoding, grid parsing, mirroring and rotation, shelf packing into
 an atlas, preview sheets.
