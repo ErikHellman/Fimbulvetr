@@ -4,7 +4,7 @@ import { changeState } from '../../actors/fsm';
 import { HERO_MACHINE, heroSwordBox } from '../../actors/hero';
 import type { PropDef } from '../../actors/prop';
 import { THROWN } from '../../combat/hit';
-import { EMPTY_FRAME, moveVector, wasPressed, type InputFrame } from '../../input/actions';
+import { EMPTY_FRAME, moveVector, straightDir, wasPressed, type InputFrame } from '../../input/actions';
 import { at, overlaps } from '../../math/box';
 import { DIR_VEC } from '../../math/dir';
 import { SOLID, boxHitsSolid, gridSolidAt, moveBox } from '../../world/collision';
@@ -263,14 +263,8 @@ export function pushBlocks(rt: SimRt, input: InputFrame): void {
   const hero = rt.hero;
   slideBlocks(rt);
   let push = 0;
-  const m = moveVector(input);
   const d = DIR_VEC[hero.facing];
-  if (
-    hero.fsm.s === 'move' &&
-    (m.x === 0) !== (m.y === 0) &&
-    Math.sign(m.x) === d.x &&
-    Math.sign(m.y) === d.y
-  ) {
+  if (hero.fsm.s === 'move' && straightDir(input) === hero.facing) {
     const probe = probeBox(rt);
     const block = rt.actors.find(
       (a) => isResting(a) && propDef(rt, a).pushable === true && overlaps(probe, at(a.body, a.pos)),

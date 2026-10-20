@@ -6,6 +6,7 @@ import {
   isHeld,
   moveVector,
   quantize,
+  straightDir,
   wasPressed,
   wasReleased,
 } from '@core/input/actions';
@@ -71,5 +72,25 @@ describe('moveVector', () => {
   it('keeps gentle analog input below 1', () => {
     const v = moveVector({ held: 0, pressed: 0, released: 0, mx: 0.5, my: 0 });
     expect(v).toEqual({ x: 0.5, y: 0 });
+  });
+});
+
+describe('straightDir', () => {
+  const f = (mx: number, my: number) => ({ held: 0, pressed: 0, released: 0, mx, my });
+
+  it('reads a straight key press as its direction', () => {
+    expect(straightDir(f(-1, 0))).toBe('w');
+    expect(straightDir(f(0, 1))).toBe('s');
+  });
+
+  it('reads a stick leaning close to one axis as that direction', () => {
+    expect(straightDir(f(-0.95, 0.12))).toBe('w');
+    expect(straightDir(f(0.2, -0.9))).toBe('n');
+  });
+
+  it('reads no direction from a diagonal or a resting stick', () => {
+    expect(straightDir(f(1, 1))).toBeNull();
+    expect(straightDir(f(0.7, -0.5))).toBeNull();
+    expect(straightDir(f(0, 0))).toBeNull();
   });
 });

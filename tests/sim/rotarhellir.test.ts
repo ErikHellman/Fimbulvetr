@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { InputFrame } from '@core/input/actions';
 import { DEV_PRESETS } from '@content/dev/presets';
 import { condCtx } from '@core/sim/systems/story';
 import { dungeonOf } from '@core/state/dungeons';
@@ -53,6 +54,22 @@ describe('Rótarhellir', () => {
       h.sim.actors.filter((a) => a.def === 'shutter' && a.mem['tx'] === 0).every((a) => a.anim === 'closed'),
     ).toBe(true);
     h.expectAnims();
+  });
+
+  it('pushes root blocks and opens locks with a slightly crooked analog stick', () => {
+    // A gamepad stick held "left" or "up" is never exactly on the axis.
+    const stick = (mx: number, my: number): InputFrame => ({ held: 0, pressed: 0, released: 0, mx, my });
+    const h = new Harness({ preset: DEV_PRESETS.d1 });
+    walkTo(h, 19, 2);
+    crossTo(h, 'n', 'd1_r04');
+    walkTo(h, 14, 10);
+    for (let i = 0; i < 90; i++) h.step(stick(-0.953125, 0.125));
+    const block = h.sim.actors.find((a) => a.def === 'root_block' && a.mem['moved'] === 1);
+    expect(block).toBeDefined();
+    dungeonOf(h.sim.state, 'd1').keys = 1;
+    walkTo(h, 19, 1);
+    for (let i = 0; i < 30; i++) h.step(stick(0.140625, -0.953125));
+    expect(dungeonOf(h.sim.state, 'd1')).toMatchObject({ keys: 0, doors: ['d1_lock_a'] });
   });
 
   it('ends at the runestone once Rótvættr is dead: it burns, Kolbeinn feels it, and Ask walks out', () => {
