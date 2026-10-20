@@ -33,6 +33,9 @@ jobs:
       - run: pnpm build
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # Crash reporting: the DSN is public (repo variable); the token uploads source maps (repo secret).
+          VITE_SENTRY_DSN: ${{ vars.SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

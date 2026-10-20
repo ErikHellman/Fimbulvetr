@@ -5,3 +5,8 @@ declare const __BUILD_ID__: string;
 
 /** The game's version, from package.json; shown on the title screen. */
 declare const __APP_VERSION__: string;
+
+interface ImportMetaEnv {
+  /** Sentry DSN; crash reporting is off when it is unset. */
+  readonly VITE_SENTRY_DSN?: string;
+}

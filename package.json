@@ -25,11 +25,13 @@
     "promo": "node scripts/promo.mjs"
   },
   "dependencies": {
+    "@sentry/browser": "11.8.0",
     "phaser": "4.2.1"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.63.0",
+    "@sentry/vite-plugin": "11.8.0",
     "@types/node": "22.20.4",
     "eslint": "10.11.0",
     "eslint-config-prettier": "10.1.8",

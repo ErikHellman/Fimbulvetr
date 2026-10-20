@@ -11,6 +11,7 @@ import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
 import { SaveService } from '@shell/platform/saveService';
+import { initErrorReporting } from '@shell/platform/errorReporting';
 import { registerServiceWorker } from '@shell/platform/pwa';
 import { openSaveStoreSafely } from '@shell/platform/saveStore';
 import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
@@ -60,6 +61,7 @@ function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
 }
 
 async function main(): Promise<void> {
+  initErrorReporting();
   document.title = GAME_TITLE;
   const query = DEV_TOOLS
     ? parseDevQuery(window.location.search, new Set<string>(SCREEN_IDS), new Set(Object.keys(DEV_PRESETS)))
