@@ -6,6 +6,11 @@ import { caveFrames as placeholderCave } from '@art/sprites/cave';
 import { haugarFrames as placeholderHaugar } from '@art/sprites/haugar';
 import { myrlandFrames as placeholderMyrland } from '@art/sprites/myrland';
 import { sokkvaFrames as placeholderSokkva } from '@art/sprites/sokkva';
+import { hofFrames as placeholderHof } from '@art/sprites/hof';
+import { helgrindFrames as placeholderHelgrind } from '@art/sprites/helgrind';
+import { niflmyrrFrames as placeholderNiflmyrr } from '@art/sprites/niflmyrr';
+import { passFrames as placeholderPass } from '@art/sprites/pass';
+import { saevatnFrames as placeholderSaevatn } from '@art/sprites/saevatn';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
 import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
@@ -74,7 +79,17 @@ const SETS: readonly {
     pageSize: 2048,
     placeholder: () => {
       const drawn = new Set(dungeonFrames().map((f) => f.name));
-      return [...placeholderCave(), ...placeholderSokkva(), ...placeholderHaugar(), ...placeholderMyrland()]
+      return [
+        ...placeholderCave(),
+        ...placeholderSokkva(),
+        ...placeholderHaugar(),
+        ...placeholderMyrland(),
+        ...placeholderHof(),
+        ...placeholderHelgrind(),
+        ...placeholderNiflmyrr(),
+        ...placeholderPass(),
+        ...placeholderSaevatn(),
+      ]
         .filter((f) => drawn.has(f.name))
         .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } }));
     },

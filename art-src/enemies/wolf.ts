@@ -323,10 +323,15 @@ function compose(pal: GridPalette, body: string, legs: string, bodyDy = 0): Rast
   const l = grid(pal, legs);
   paste(r, b, 0, bodyDy);
   paste(r, l, 0, 30 - l.h);
-  return outline(r, INK, 1);
+  return r;
 }
 
 export function wolf(side: Side, phase: number, pose: WolfPose, coat: Coat): Raster {
+  return outline(wolfRaw(side, phase, pose, coat), INK, 1);
+}
+
+/** The same frame before its ink outline, for composers that grow or crop it first. */
+export function wolfRaw(side: Side, phase: number, pose: WolfPose, coat: Coat): Raster {
   const pal = wolfPalette(coat);
   if (side === 'w') {
     if (pose === 'lunge') return compose(pal, SIDE_LUNGE, SIDE_LUNGE_LEGS, 3);
