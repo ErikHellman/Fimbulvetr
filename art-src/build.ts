@@ -4,6 +4,7 @@ import { previewSheet } from './lib/preview';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
 import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
+import { myrkvidrDecor, myrkvidrSheets } from './myrkvidr/build';
 import { decorFrames as placeholderDecor } from '@art/sprites/decor';
 import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
@@ -44,9 +45,9 @@ const SETS: readonly {
   },
   {
     key: 'decor',
-    frames: askdalrDecor(),
+    frames: [...askdalrDecor(), ...myrkvidrDecor()],
     placeholder: () => {
-      const drawn = new Set(askdalrDecor().map((f) => f.name));
+      const drawn = new Set([...askdalrDecor(), ...myrkvidrDecor()].map((f) => f.name));
       return placeholderDecor()
         .filter((f) => drawn.has(f.name))
         .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } }));
@@ -83,12 +84,16 @@ for (const set of SETS) {
   }
 }
 
-// Tile sheets, one PNG per terrain under public/atlases/askdalr/.
-mkdirSync('public/atlases/askdalr', { recursive: true });
-const sheets = askdalrSheets();
-for (const sheet of sheets)
-  writeFileSync(`public/atlases/askdalr/${sheet.terrain}.png`, encodePng(sheetImage(sheet.cells)));
-console.log(`askdalr: ${String(sheets.length)} tile sheets`);
+// Tile sheets, one PNG per terrain under public/atlases/<region>/.
+const sheets = [
+  ...askdalrSheets().map((sheet) => ({ ...sheet, dir: 'askdalr' })),
+  ...myrkvidrSheets().map((sheet) => ({ ...sheet, dir: 'myrkvidr' })),
+];
+for (const sheet of sheets) {
+  mkdirSync(`public/atlases/${sheet.dir}`, { recursive: true });
+  writeFileSync(`public/atlases/${sheet.dir}/${sheet.terrain}.png`, encodePng(sheetImage(sheet.cells)));
+}
+console.log(`tiles: ${String(sheets.length)} sheets`);
 if (previewDir !== undefined) {
   const tileset = buildTileset();
   const asFrames = (cells: readonly import('@art/raster').Raster[], prefix: string): DrawnFrame[] =>

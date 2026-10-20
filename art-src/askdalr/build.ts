@@ -133,7 +133,7 @@ export function askdalrSheets(): TileSheet[] {
     { terrain: 'jetty', cells: [JETTY] },
     // The ground under standing things, so a drawn tree or bed stands on the drawn floor or grass.
     ...(['pine'] as const).map((terrain) => ({ terrain, cells: [TREE_GROUND] })),
-    ...(['well', 'trough', 'stump', 'menhir', 'runestone', 'birch', 'boulder'] as const).map((terrain) => ({
+    ...(['well', 'trough', 'stump', 'menhir', 'runestone', 'birch'] as const).map((terrain) => ({
       terrain,
       cells: [GRASS[0] ?? TREE_GROUND],
     })),
@@ -152,7 +152,7 @@ export function sheetImage(cells: readonly Raster[], perRow = 12): Raster {
 }
 
 /** A decor frame stands on its bottom centre, outlined in ink like the placeholder decor. */
-function standing(name: string, r: Raster): DrawnFrame {
+export function standing(name: string, r: Raster): DrawnFrame {
   const raster = outline(r, hex(C.ink), 1);
   return { name, raster, pivot: { x: Math.floor(raster.w / 2) / raster.w, y: (raster.h - 1) / raster.h } };
 }
