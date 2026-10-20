@@ -93,6 +93,7 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] Hrímfjöll and Hrímturn: firn, glaze, the rime cliffs (now an autotiled blob island, like the other cliffs), and the tower's floor, walls and clear ice (`art-src/hrimfjoll`).
 - [x] Ívaldi's Forge: iron flags, black stone walls bound with iron, lava under a drifting crust (4 frames) and the belts by the way they run (`art-src/forge`).
 - [x] Rótarhellir: the sap (a sunken blob island, 4 frames) and the roots (`art-src/rotarhellir`); Konungshaugr: the crypt's flags, its walls and the pits, with the ghost floor sharing the pit's cells (`art-src/konungshaugr`).
+- [x] Sökkva Kvern: the sluice floors at both levels, the race channels, the boards and the mill wall as a blob island over the boards (`art-src/sokkva`); the hof's flags at both levels and the sunken arch (`art-src/hof`); Útgarðr's giant floor and wall (`art-src/utgard`).
 - [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 

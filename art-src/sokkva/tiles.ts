@@ -1,0 +1,222 @@
+import { grid } from '../lib/sprite';
+import { SOK_PAL as P } from './palette';
+
+/**
+ * Sökkva Kvern, drawn by hand at 16 px: the sluice floors of wet flagstones at both levels, the race
+ * channels with their planks lying on the bottom, the old boards of the mill and its walls (dressed stone
+ * as a blob island over the boards). The water that rises over them is an overlay.
+ */
+const g = (text: string) => grid(P, text);
+
+export const SLUICE = [
+  g(`
+    cccccccdcccccccd
+    cbaaaabdcaaaaaad
+    caaaaaadcaabaaad
+    caaaaaadccaaeaad
+    caaaaeadcaaaabad
+    caaaaaadcaaaaaad
+    caeaaabdcaaacabd
+    dddddddddddddddd
+    ccccdcccccccdccc
+    aaaadcaaaaaadcaa
+    baaadcaabaaadcaa
+    eacadcaabaaadcaa
+    aaaadcabaeeadcab
+    aaaadcbabbaadcaa
+    aaabdcaaaaabdcaa
+    dddddddddddddddd
+  `),
+  g(`
+    ccdcccccccdccccc
+    aadcaaaaaadcaaaa
+    aedcaabaaadcaaaa
+    aadcaaaaaadcaaaa
+    aadcaaaeaadcaaaa
+    eadcacaabadcaaaa
+    abdcaaababdcaaaa
+    dddddddddddddddd
+    cccccccdcccccccd
+    caaaaaadcabaaaad
+    caaaaaadcaabaaad
+    caaaaaadceaaaabd
+    caaaeaadcaaaaaad
+    ccaaaaadcecaaaad
+    caaaaabdceaacabd
+    dddddddddddddddd
+  `),
+];
+
+export const SLUICE_HI = [
+  g(`
+    CCCCCCCBCCCCCCCB
+    CAAAAaABCAAAAAAB
+    CAAAAAABCAAAAAAB
+    CAAAADABCAAAAAAB
+    CAAAaaABCAACADAB
+    CaAAAAABCAAAAAAB
+    CAaACAaBCAAAAAaB
+    BBBBBBBBBBBBBBBB
+    CCCCBCCCCCCCBCCC
+    CAAABCaAAAAABCAA
+    AaAABCAAAAAaBCAA
+    ACAABCAAAAAABCDA
+    AaAABCAAAAAABCAA
+    AAAABCAaAAAABCAA
+    AAAaBCAADAAaBCCA
+    BBBBBBBBBBBBBBBB
+  `),
+  g(`
+    CCBCCCCCCCBCCCCC
+    AABCAAAAAABCAAAA
+    DABCAAAADABCAAAA
+    AABCaCAAAABCAAAA
+    AABCAACAAABCAAAD
+    AABCAADADABCaAAA
+    AaBCAAAAAaBCAAaa
+    BBBBBBBBBBBBBBBB
+    CCCCCCCBCCCCCCCB
+    CaAAAAABCAAAAAAB
+    CaAaAAABCAaAAAAB
+    CAAAAAABCAAADAaB
+    CAAAAAABCAAAAAAB
+    CaAAAAABCaAAADAB
+    CAAAaAaBCAAAAAaB
+    BBBBBBBBBBBBBBBB
+  `),
+];
+
+export const RACE = [
+  g(`
+    bbbbbbbbbbbbbbbb
+    aaaacaaaaaaaaaac
+    mmmMnmmMmmmMmmmm
+    MnnmmmmmMMmmmmmm
+    mwwWwwwwmmmmmmmM
+    nwwwwwwwwwWWWwmM
+    mxxxxxxxwwwwwwmm
+    mmmMMmmmxxxxxxmm
+    mmmmmmmmmMmmmmmM
+    nmmmmMmmmmmmMmmm
+    mmwwWwmmnmmmmmmn
+    mmwwwwwWwwwwwmmm
+    mMxxxxwwwwwwwMMm
+    mmmmmMxxxxxxxmmm
+    dbddbddbbbdbddbd
+    aaaaaaaaaaaaaaaa
+  `),
+];
+
+export const RACE_HI = [
+  g(`
+    bbbbbbbbbbbbbbbb
+    aaaacaaaaaaaaaac
+    nnnnnnnnnnnnnnnn
+    nnnnnknnnnnkknnn
+    nwwWwwwwnnnkkkkn
+    kwwwwwwwwwWWWwnn
+    nxxxxxxxwwwwwwnn
+    nnknknnnxxxxxxnk
+    nnnknnnnnnnnnnkk
+    nnnnnnnnnnnnnnnn
+    nnwwWwnnnnnnnnkn
+    nnwwwwwWwwwwwnnn
+    kkxxxxwwwwwwwnkn
+    knnnnnxxxxxxxnnn
+    dbddbddbbbdbddbd
+    aaaaaaaaaaaaaaaa
+  `),
+];
+
+export const BOARDS = [
+  g(`
+    wWwWWWWWWWWWWWWW
+    wwwwwwwwwwwwwwww
+    wwwxwxwwwwxwwuwx
+    xxxxxxxxxxxxxxxx
+    WWwWwWWwWWWwWWWW
+    wwwwwwwwxxxwwwww
+    wxwwwwwwwwwwwwww
+    xxxxxxxxxxxxxxxx
+    WWWWWWWWWwWWWWWW
+    wwwwwxuwwwuwuwww
+    wwwwwxwwwwwwwwww
+    xxxxxxxxxxxxxxxx
+    wWWWWWWWwwwWwWWW
+    wwxwwwwwwwwwwwww
+    xwxwwwwwxwwwwwww
+    xxxxxxxxxxxxxxxx
+  `),
+  g(`
+    WwwxWwwxWwwxwwwx
+    WwwxWwwxWwwxwwwx
+    WwwxWwwxWuwxwwwx
+    WwxxwxwxWwwxwwwx
+    WwwxwwuxWxxxWwwx
+    WxwxWwwxWuwxwwwx
+    WwwxWwwxWwwxwwwx
+    wwwxWuwxWwwxWwwx
+    wwwxWwxxWwwxWwwx
+    WwwxWuwxWwwxWwwx
+    WwwxWwwxWwwxWxwx
+    WwwxWwwxWxwxWwwx
+    wwwxWwwxWwwxWwwx
+    WwwxWwwxWxwxWwwx
+    WwwxWwwxWwwxWwwx
+    WwwxWxwxWwwxWwux
+  `),
+];
+
+export const MILL_WALL_ISLAND = g(`
+    wWwWWWWWWWWWWWWWwWwWWWWWWWWWWWWW
+    wkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkw
+    wkAAAAAAAAAAAAAAAAAAAAAAAAAABBkx
+    xkAbbbbbbbbbbbbbbbbbbbbbbbbbbbkx
+    WkAbBBBBBBbBBBBBBbBBBcBBbBBBBBkW
+    wkAbBBBBBBbcBcBdBbBBBBBBbBcBBBkw
+    wkAbBBBcBBbBBBBBBbBBBBBBbBcBBBkw
+    xkAbbbbbAbbbbbbbAbbbbbbbAbbbbbkx
+    WkABBBBbcBBBBBbBBBBBcbcBBBBBbBkW
+    wkABBcBbdBBBBBbBBBBBBbBBBBBBbBkw
+    wkABBBBbBBBBBBbBBBdBBbBBBBcBbBkw
+    xkAbAbbbbbbAAbbbbbbbAbbbbbbbAbkx
+    wkABbBBBcBBbBdcBBBbBBBBBBbBBBdkW
+    wkABbBBdBBBbBBdBBBbBBBBBBbBcBBkw
+    xkABbcBBBBBbBABBBBbBBBBBBbBdcBkw
+    xkAbbbbbAbbbbbbbAbbbbbbbAbbbbbkx
+    wkABBBBBbBBdBBBbcBBBBBbBBdBBBbkW
+    wkAdBBBBbBdBBBBbBBBBcBbBBBcBcbkw
+    wkABBBcBbBBBBBBbBBBdBBbBdBBBBbkx
+    xkAbAbbbbbbbAbbbbbbbAbbbbbbbAbkx
+    WkAcBbBBBBBdbBcBBBBbBBBBBBbBBBkW
+    wkAdBbBcccdBbdcBBBBbBBBBcBbBBBkw
+    wkABBbBBBBBBbBBcBBBbBBABBBbBBdkw
+    xkAbbbbbAbbbbbbbAbbbbbbbAbbbbbkx
+    WkABBBBBBbBBBBBBbdBBBBBbBBBBBBkW
+    wkABBdBBcbBBBBBBbBBBBBBbBBBBBckw
+    wkABBBBBBbBBBBBBbBcBBdBbccBBBBkw
+    xkAbAbbbbbbbAbbbbbbbAbbbbbbbAbkx
+    wkdBBBbBBBBcBbBBBBcBbBBBBBBbBckW
+    wkBBBBbBBdBBBbBBBBBBbBBBBBBbBckw
+    xkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkw
+    xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+`);
+
+export const MILL_WALL_INNER = g(`
+    wWwkABbBBBBAkWWW
+    wwkABBbBdBBBAkww
+    wkABBBbBBBBBBAkx
+    kAbbbbbbbbbbbbAk
+    ABBbBABBBBbBcBBA
+    BBBbBcBBBBbBcBBB
+    BBBbBBBBBBbBBBBB
+    bbbbbbbbbbbbbbbb
+    bcBBBBBABBccBBbB
+    bBcAdBBbBBBBBBbB
+    bcBBBBBbBBBBBBbB
+    Abbbbbbbbbbbbbbb
+    kABBbBBBBBBbBBBk
+    wkABbBBcBBBbBBkw
+    xwkAbBdBBBBbckww
+    xxxkAbbbbbbbkxxx
+`);

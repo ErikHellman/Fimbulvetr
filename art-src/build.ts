@@ -14,6 +14,9 @@ import { hrimfjollSheets } from './hrimfjoll/build';
 import { konungshaugrSheets } from './konungshaugr/build';
 import { rotarhellirSheets } from './rotarhellir/build';
 import { saevatnSheets } from './saevatn/build';
+import { sokkvaSheets } from './sokkva/build';
+import { hofSheets } from './hof/build';
+import { utgardSheets } from './utgard/build';
 import { decorFrames as placeholderDecor } from '@art/sprites/decor';
 import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
@@ -110,6 +113,9 @@ const sheets = [
   ...forgeSheets().map((sheet) => ({ ...sheet, dir: 'forge' })),
   ...rotarhellirSheets().map((sheet) => ({ ...sheet, dir: 'rotarhellir' })),
   ...konungshaugrSheets().map((sheet) => ({ ...sheet, dir: 'konungshaugr' })),
+  ...sokkvaSheets().map((sheet) => ({ ...sheet, dir: 'sokkva' })),
+  ...hofSheets().map((sheet) => ({ ...sheet, dir: 'hof' })),
+  ...utgardSheets().map((sheet) => ({ ...sheet, dir: 'utgard' })),
 ];
 for (const sheet of sheets) {
   mkdirSync(`public/atlases/${sheet.dir}`, { recursive: true });
