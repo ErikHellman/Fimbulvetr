@@ -1,0 +1,213 @@
+import { grid } from '../lib/sprite';
+import { DVG_PAL as P } from './palette';
+
+/**
+ * Dvergagröf's ground and the caves, drawn by hand at 16 px: the scree of loose grey stones, the packed
+ * earth of a cave floor, and the living rock of the cave walls as a blob island (Rótarhellir, the mines,
+ * the lake's well and the fisher's cave all share them).
+ */
+const g = (text: string) => grid(P, text);
+
+export const SCREE = [
+  g(`
+    aaaaaaaaabaAaaaa
+    aaaabaabAAcabbaa
+    aAAAcaaabccbaaaa
+    abbbbaaacccaaaaa
+    abcccAaabbaaAAca
+    accccaaaaaaabbba
+    aabaaaaaabbabcca
+    abaaAaaaaabaccca
+    aaaAAcabaaaaaaaa
+    baabccbbaAAAcaaa
+    aaacccbbabbbbaaa
+    aaaabaaaabcccaAb
+    aaaaaaaaaccccAca
+    AAcaabaaaaaabbca
+    bccaaaabaAaaacca
+    cccbaaaAaabaaabb
+  `),
+  g(`
+    aaaaaaaaaaaaaaaa
+    aaaaaAAcaaabaaaa
+    abbaabbbaaaAAAcA
+    aabbabccaaabccca
+    aaaaacccaaacccca
+    aaaaaaAabaaaaaaa
+    aAAcaaaaaaaAAbAa
+    abbbaaaAcaaaabaa
+    abccababcbaaAAca
+    acccAaaccaabbbba
+    baaaaaaabaabbcca
+    aaaaAaaaaaaaccca
+    abaAAAcaaaaaaAaa
+    aaabcccbaAAcaaaa
+    aaaccccaabccaaaa
+    Aaaaabaaacccaaaa
+  `),
+  g(`
+    aaaaaaaaaAAAcbab
+    baAAcaaaabbbbaaa
+    aabccbaaabcccaaA
+    aacccaaaaccccaaa
+    aAabaaaaaaabaaaa
+    AcaabAAAcaaaaaaa
+    bcaaAbbbbabaAAca
+    ccbaabcccaaabcca
+    aaaaaccccAaaccca
+    aaaaaaaaaabaaaaa
+    aaAAcbaaabaaaaaa
+    aabbbaaaAAAcabaa
+    AabccaaabcccaAba
+    AacccaaaccccaAca
+    aaabbaaaaaaaabcb
+    aaaaabaaaabaaccA
+  `),
+  g(`
+    abaaaaaaaaabaaaa
+    AAcaaaaaaabaAAca
+    bbbabAAAAcaabbba
+    bccaaabcccaabcca
+    cccaaaccccaaccca
+    abbAaaababaaaaaa
+    aaaaaaabaAAcaaaa
+    aaaAcaaabbbbAaba
+    aaabcaaaabccaaaa
+    aabccaaaAcccabaa
+    aabaaaabaaaaAAca
+    aaaaaaaaaaaaabca
+    aAAAcabAAcaaacca
+    abcccabbbbaAaaba
+    accccbabccaaaaaa
+    aaaaAaacccaaaaaa
+  `),
+];
+
+export const CAVE_FLOOR = [
+  g(`
+    ffffffffffffffff
+    fffffffFffffFfff
+    fhffffffhffffffF
+    ffhffffffffffFff
+    ffFFfffffFfFffff
+    ffffffffFffffFff
+    ffffffffffhfffff
+    fffffFfhffFFffff
+    ffffffffffffffff
+    ffffFfffffffffff
+    ffffFFffffffffhf
+    fffFFfffffffffff
+    ffffffhfffffffff
+    ffffffFFfffffhff
+    ffffFffffffffFFf
+    fffhFffffffhffff
+  `),
+  g(`
+    ffffffffFfffffff
+    Fffffffffhhfffff
+    fffffhffFffFffff
+    fffffFFfffffhFff
+    ffffFffffffffffF
+    ffFfffffFFfFhfff
+    fFFffffffFFFFFff
+    ffFffffFFfffffff
+    ffffffffFfffffff
+    fffFffffkfffffFf
+    ffhffffFffffFfff
+    ffFFfFFffhffffFf
+    ffffFfFfffFfffff
+    fffFhffffhfFffff
+    fffffffffFFfffff
+    ffffffffffFfhfff
+  `),
+  g(`
+    ffhffffffFfffFfh
+    ffffffffhfffffff
+    fFffffffFFFFffFf
+    fffffffffhffkfff
+    ffffFffffffFFfff
+    fhfffffffffffFff
+    fffhffffFfffffFf
+    fffhffffffffffff
+    FffFFfffffffFfff
+    ffffffffhffffhff
+    fFhffffffffffFFf
+    ffffffffffffffff
+    ffffffffffffffhf
+    ffffffffffffffff
+    ffFfhfhfffffffff
+    ffffffFFhffhffff
+  `),
+  g(`
+    hfffffffffffFFff
+    fhfffffhfffffFff
+    fFFffffffffFffff
+    fffFfffffffhfffh
+    ffffffffhffFFfhf
+    ffhfffffffffffff
+    fffffffffhFFFfff
+    ffffffffFFFFFfff
+    FfffFfffffffffff
+    ffffhffffFffffff
+    ffffFFfhffFffFfF
+    Ffffffffffffhffh
+    ffFffhfffffhffff
+    fFffffffffffffff
+    ffffffffffhFffff
+    ffffhFhfFfffffff
+  `),
+];
+
+export const CAVE_WALL_ISLAND = g(`
+    ffffffffffffffffffffffffffffffff
+    fkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkf
+    fkxxxxxxxxxxxxxxxxxxxxxxxxxxvVkF
+    fkxVvvxVvvvvvvvvvvvvvvvvvvvVVVkf
+    fkxvvvvvvvvvvvvvvvvvVvvvvvvvVVkf
+    fkxVvvvvvvvvvvvvvvvvvvvVvvvvVVkf
+    fkxVVVVVVVVVVVVVVvVVVVVVVVvVVVkf
+    fkxvvvvVxvvvvVvVxvvvvvvVxvvvVVkf
+    fkxvvvvVvvvvvvvVVvvvvvvVvvvvVVkf
+    fkxVvvvVvvvVxvvVvvvvvvvVvvvvVVkf
+    fkxVVVVvVVVVVVVVvVVVVVVVVvVVVVkf
+    fkxVxvVvvvvxxvvvvxvVxvvvvvvVxVkf
+    fkxVvvvvvvvVVvvvvvvVvvvvvvvVVVkf
+    fkxVvvvvvvvVVvvVvvvVvvvvxVvVVVkf
+    fkxVVVvVVVVVVxVxVVVVVVVVVVVVVVkf
+    fkxvvvvVxvvvvvvVxvvvvvvVxvvvVVkf
+    fkxxvvvVvvvvvvxVvvvvvvVVvvvvVVkf
+    fkxvvvvVxvvvvvvVvvvvvvvVvVvvVVkf
+    fkxVVVVVVVVVVVvVVVVVVVVvVVVVVVkF
+    fkxVxvvvvvvVxvvvvvvVxvvvvvvVxVkf
+    fkxVvxvvVvvVvVvvvvvVvVvvvvvVVVkf
+    fkxVvvvvvxvVVvvvvvvVvVvvvVvVVVkf
+    fkxVvVVVVVVVVvVVVVVVVVxVVVVVVVkf
+    fkxvvvvVxvvvvvvVxvvvVvvVxvvxVVkf
+    fkxVvvvVvvvvvvvVvvvvvvvVvvvvVVkf
+    fkxvxVvVvvvvvvvVvvvvvvvVvvvvVVkf
+    fkxvVVVVVVVVvVVVVVVVVvVVVVVVVVkf
+    fkxVxvvvvvvVxvVvvvvVxvvVvvvVxVkf
+    fkvVVVVVVVVVVVVVVVVVVVVVVVVVVVkf
+    fkVVVVVVVVVVVVVVVVVVVVVVVVVVVVkf
+    fkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkf
+    fffhFffffffhfffffffhFffffffhffff
+`);
+
+export const CAVE_WALL_INNER = g(`
+    fffkxvvvvvvxkfff
+    ffkxvvvvvvvVxkff
+    fkxvvvvvvvvvvxkF
+    kxvvvvvvvvvvvvxk
+    xvvvVxvvvvxvvvvx
+    vvvvxvVVVVvvxVvv
+    vvvvvvVVvvvvvvvv
+    vvvvvvvvvvvvvvvv
+    vvvvvvvxvvvvvvvv
+    vvvxvvvvVvvvvvvv
+    vvvvVVVvVvvvvvvx
+    xvvvvvvvVvvvvvvV
+    kxvxvvvvvvvvvvVk
+    fkxvvvvvvvvvvVkf
+    ffkxvvvvvvvvVkFf
+    fffkxvvVvvvVkfff
+`);

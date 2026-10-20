@@ -152,6 +152,8 @@ test('praying at the hof saves to a slot that the title screen loads', async ({ 
 });
 
 test('each kind of weather draws', async ({ page }) => {
+  // Four boots in one test: each loads every drawn tile sheet, which can take over 7 s on a slow CI runner.
+  test.setTimeout(90_000);
   const errors = collectErrors(page);
   const view = () => page.evaluate(() => window.__fimbul?.view());
   await boot(page, 'preset=myr&nosave&weather=rain');
