@@ -135,3 +135,160 @@ export const TAIL_PAL: GridPalette = {
   U: '#2f4a40',
   V: '#6f9a86',
 };
+
+/** Járnvörðr, the iron warden: riveted plate round a slit of forge light. */
+export const WARDEN_PAL: GridPalette = {
+  '.': null,
+  i: '#4a4a54',
+  I: '#7a7a88',
+  d: '#2a2a32',
+  v: '#a8a090',
+  g: '#f08a2c',
+  G: '#f8d04a',
+  k: C.ink,
+};
+
+/** Glóð, the ember sprite: the bog-light's grids in coal and flame. */
+export const GLOD_PAL: GridPalette = {
+  '.': null,
+  H: '#f06a20',
+  w: '#f8a040',
+  c: '#fff0a0',
+  R: '#f06a20',
+};
+
+/** Belgr, the bellows: a leather bag on an iron frame with a brass intake. */
+export const BELGR_PAL: GridPalette = {
+  '.': null,
+  L: '#6a4630',
+  l: '#8a6040',
+  D: '#4a3020',
+  i: '#4a4a54',
+  I: '#7a7a88',
+  d: '#2a2a32',
+  v: '#a8a090',
+  B: '#b08a3a',
+  b: '#7a5a22',
+  m: '#1a0e0a',
+  F: '#f8a040',
+  f: '#fff0a0',
+  k: C.ink,
+};
+
+/** Ívaldi, the Anvil: a dwarf king in plate with a white beard, an iron crown and his hammer. */
+export const IVALDI_PAL: GridPalette = {
+  '.': null,
+  p: '#5a5a66',
+  P: '#8a8a98',
+  q: '#2a2a32',
+  s: '#c9a080',
+  n: '#a07858',
+  B: '#c8c0b0',
+  b: '#9a9284',
+  C: '#d8b040',
+  c: '#9a7a22',
+  j: '#c03030',
+  H: '#5a3a22',
+  h: '#8a5a36',
+  d: '#3a3a44',
+  i: '#7a7a88',
+  m: '#3a1a14',
+  k: C.ink,
+};
+
+/** Ívaldi's plate heated white in the forge. */
+export const IVALDI_HOT_PAL: GridPalette = { ...IVALDI_PAL, p: '#f8e8c0', P: '#ffffff', q: '#f0a050' };
+
+/** The frost wisp: a pale flame round a six-point crystal. */
+export const FROST_PAL: GridPalette = {
+  '.': null,
+  H: '#a8d8f0',
+  w: '#c4e8fa',
+  c: '#ffffff',
+  x: '#7ec4ec',
+  R: '#a8d8f0',
+};
+
+/** A ground shadow, turned translucent black in the composers. */
+export const SHADOW_KEY = '#000001';
+
+/** Svellr, the glacier construct: packed blue ice on four stumps. */
+export const SVELLR_PAL: GridPalette = {
+  '.': null,
+  p: '#9cc4dc',
+  P: '#d4ecf8',
+  q: '#5c86a4',
+  c: '#24405a',
+  e: '#3cc8ff',
+  S: SHADOW_KEY,
+  k: C.ink,
+};
+
+/** Hrímgerðr, the Glass: rime skin, a gown of ice, hair like a frozen fall, a crown of shards. */
+export const HRIMGERDR_PAL: GridPalette = {
+  '.': null,
+  s: '#dceef8',
+  t: '#9cbcd4',
+  g: '#6c98bc',
+  G: '#9cc0dc',
+  d: '#3c6488',
+  H: '#f4fbff',
+  h: '#c0d8e8',
+  C: '#7edcff',
+  e: '#3cc8ff',
+  m: '#24405a',
+  o: '#b4ecff',
+  O: '#ffffff',
+  S: SHADOW_KEY,
+  k: C.ink,
+};
+
+/** Her icicles: rime glass. */
+export const ICICLE_PAL: GridPalette = {
+  '.': null,
+  g: '#b4dcf2',
+  G: '#f0faff',
+  q: '#6c9cbc',
+  S: SHADOW_KEY,
+};
+
+/** Jötunvörðr: a frost-giant in a hauberk of rime over hide boots. */
+export const JOTUN_PAL: GridPalette = {
+  '.': null,
+  r: '#b8d4ea',
+  R: '#e6f4ff',
+  q: '#7a9ab8',
+  h: '#5a6878',
+  H: '#7a8a9a',
+  e: '#7edcff',
+  t: '#ffc89a',
+  S: SHADOW_KEY,
+  k: C.ink,
+};
+
+/** Jötunvörðr thawed by Eldr: his rime glows orange and runs. */
+export const JOTUN_THAW_PAL: GridPalette = {
+  ...JOTUN_PAL,
+  r: '#e8946a',
+  R: '#ffc89a',
+  q: '#b85a3a',
+  e: C.ink,
+};
+
+/** Hrímnir, the Rime King, his hand and his pillars: glacier ice, a beard of snow, the heart-rune. */
+export const KING_PAL: GridPalette = {
+  '.': null,
+  K: '#9cc4e0',
+  L: '#dcf0ff',
+  D: '#4c6e90',
+  B: '#f0f8ff',
+  b: '#c0d8ea',
+  C: '#7edcff',
+  e: '#7edcff',
+  u: '#3c5a78',
+  U: '#ff7a4a',
+  m: '#1a2a3c',
+  G: '#cfe8f8',
+  S: SHADOW_KEY,
+  k: C.ink,
+};

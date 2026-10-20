@@ -11,6 +11,10 @@ import { helgrindFrames as placeholderHelgrind } from '@art/sprites/helgrind';
 import { niflmyrrFrames as placeholderNiflmyrr } from '@art/sprites/niflmyrr';
 import { passFrames as placeholderPass } from '@art/sprites/pass';
 import { saevatnFrames as placeholderSaevatn } from '@art/sprites/saevatn';
+import { forgeFrames as placeholderForge } from '@art/sprites/forge';
+import { rimeFrames as placeholderRime } from '@art/sprites/rime';
+import { towerFoeFrames as placeholderTower } from '@art/sprites/tower';
+import { utgardFrames as placeholderUtgard } from '@art/sprites/utgard';
 import { heroFrames as placeholderHero } from '@art/sprites/hero';
 import { peopleFrames as placeholderPeople } from '@art/sprites/people';
 import { askdalrDecor, askdalrSheets, sheetImage } from './askdalr/build';
@@ -89,6 +93,10 @@ const SETS: readonly {
         ...placeholderNiflmyrr(),
         ...placeholderPass(),
         ...placeholderSaevatn(),
+        ...placeholderForge(),
+        ...placeholderRime(),
+        ...placeholderTower(),
+        ...placeholderUtgard(),
       ]
         .filter((f) => drawn.has(f.name))
         .map((f) => ({ name: f.name, raster: f.raster, pivot: { x: 0, y: 0 } }));

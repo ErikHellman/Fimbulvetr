@@ -97,7 +97,8 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] The wilds' foes (`enemies` atlas): the vargr and the pack leader, the rime raven, the draugr, the raid and forest trolls, the troll turned to stone, and the puff where a foe dies.
 - [x] The first dungeons' foes and bosses (`dungeon` atlas): the root-biter, rótvættr, sap bulb and root spike; the mud-crab, the lindormr and its mounds; the haugbúi, bogdraugr, haugvörðr and the Haugbúi King; the water-worm and the bog-light.
 - [x] The hof, Sævatn, Helgrind, Niflmýrr and pass foes: the drowned, the nykr and its foal, the hrönn eel and its grates; the helhound, Garmr, Náströnd and its tower shield; the mara, fog-draugr and marbendill; Styrr.
-- [ ] Decor and tiles of the other regions, the Forge, Hrímfjöll, tower and Útgarðr foes and bosses, fixtures, UI.
+- [x] The Forge, Hrímfjöll, tower and Útgarðr foes: Járnvörðr, Glóð, Belgr and Ívaldi; the ice wolf and the frost wisp; Svellr, Hrímgerðr and her icicles; Jötunvörðr, Kolbeinn, Hrímnir, his hand and his pillars. Every foe is now drawn.
+- [ ] Decor and tiles of the other regions, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
 ## Drawing art in the repo: `art-src/`
@@ -122,7 +123,10 @@ The drawn art is kept as source, not generated: hand-drawn pixel grids (one pale
   and the king, and sunk into a mound for their rise. The hof, Helgrind, Niflmýrr, pass and lake foes
   (`hof.ts`, `helgrind.ts`, `niflmyrr.ts`, `pass.ts`, grids in `grids2.ts`) reuse that body with a mist
   ring for the drowned, mara, fog-draugr and marbendill, the wolf body grown for the helhound, Garmr's three
-  heads and the nykr foal, and Styrr's own look with shield and sword.
+  heads and the nykr foal, and Styrr's own look with shield and sword. The Forge's, Hrímfjöll's, the tower's
+  and Útgarðr's foes (`forge.ts`, `rime.ts`, `tower.ts`, `utgard.ts`, grids in `grids3.ts`) are grids again,
+  with `fx.ts` for ground shadows, halos and the warden's rise; Glóð is the bog-light's grids in flame,
+  Ísvargr the wolf in rime and Kolbeinn the people body with his staff.
 - `art-src/askdalr`: the ground and the decor. Plain terrain is drawn tile by tile; auto-tiled terrain (rock, roof, water, ford)
   is drawn as a 32×32 island (outer corners, edges, middle) plus a 16×16 tile holding the four inner
   corners, and `build.ts` cuts both into 8×8 quarters and assembles the 47 blob cells in `BLOB_MASKS`
