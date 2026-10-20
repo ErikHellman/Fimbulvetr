@@ -88,6 +88,7 @@ is the step to take before the atlases grow past a few megabytes.
 - [x] Mýrland and Uppvík: sand, peat, silt, spring, shoal, planks, palisade, the drowned mill, the ferry, the stalls, the Þing-stone and the anvil (`art-src/myrland`).
 - [x] Haugar: heath, barrow, flagstone, drystone, the cairn and Geirmundr's tent (`art-src/haugar`).
 - [x] Niflmýrr: mire, blackwater and the drowned path, the snag (`art-src/niflmyrr`).
+- [x] Sævatn: the currents and surges on the lake's water (`art-src/saevatn`); its sand, reeds, rock and the hall were drawn earlier.
 - [ ] Decor and tiles of the other regions, enemies, fixtures, UI.
 - [ ] Per-region atlas loading and unloading.
 
