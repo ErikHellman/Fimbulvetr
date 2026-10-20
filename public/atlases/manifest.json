@@ -285,6 +285,18 @@
     {
       "terrain": "surge_w",
       "image": "saevatn/surge_w.png"
+    },
+    {
+      "terrain": "scree",
+      "image": "dvergagrof/scree.png"
+    },
+    {
+      "terrain": "cave_floor",
+      "image": "dvergagrof/cave_floor.png"
+    },
+    {
+      "terrain": "cave_wall",
+      "image": "dvergagrof/cave_wall.png"
     }
   ]
 }

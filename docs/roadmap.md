@@ -321,5 +321,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Haugar's ground and decor (`art-src/haugar`)
   - [x] Niflmýrr's ground and the snag (`art-src/niflmyrr`)
   - [x] Sævatn's currents and surges (`art-src/saevatn`)
-  - [ ] Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
+  - [x] Dvergagröf's scree and the cave set (`art-src/dvergagrof`)
+  - [ ] Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
   - [ ] Per-region atlas loading
