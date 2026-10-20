@@ -1,0 +1,287 @@
+import { grid } from '../lib/sprite';
+import { HAU_PAL as P } from './palette';
+
+/**
+ * Haugar's ground, drawn by hand at 16 px: the dun heath with heather in bloom, the turfed flanks of the
+ * grave-hills as a blob island, the grey flagstones of the ring and the King's road, dry-stone field walls,
+ * and the trodden ground under the cairns and Geirmundr's tent.
+ */
+const g = (text: string) => grid(P, text);
+
+export const HEATH = [
+  g(`
+    baaaaaaaaaabaaaa
+    aaaaaaabaaabmMma
+    aacaaaaaaaaammmm
+    acacaaaaaaammmMa
+    abbbaaaaaaaaabaa
+    aaaaaaaaaaaacaaa
+    aaaaaaaaaacaaaaa
+    acbaaaaaacacaaaa
+    aaamMaababbbaaaa
+    aaammmaaaaaaaaca
+    aammMaaaaaaaaaaa
+    aaaaaacaaaaaaaaa
+    acaaacacaaaaacaa
+    aaacabbbaaaacaca
+    aaaabbaaaaaabbba
+    aaaaaaaaaaacaaaa
+  `),
+  g(`
+    aaaabaaaaaaaaaab
+    baaaaccaaaaaaaac
+    aaaacacabaaaaaaa
+    aacbbbbacaaaaaaa
+    aaaaaaaaaaaacaaa
+    aaaaaaaaaaacacaa
+    aaaaaaaabaabbbba
+    aaaaaaamMmaaaaaa
+    aaaabaammmmaaaaa
+    acbaaammmMaaaaaa
+    cacaaaabaaaaaaaa
+    bbbaaaaaaababaab
+    aaaaaaaaacaaacab
+    aacaababcacaaamM
+    aacaaaaabbbaaamm
+    aaaaaaaaaaabammM
+  `),
+  g(`
+    aaaaaaaacbaaaaaa
+    aaaabaacacaaaaaa
+    baaaaaabbbbaabaa
+    bbaaaaaaaamMaaaa
+    aaaaaaaaaammmaaa
+    aaaaaaaaammMaaaa
+    caacaabaaaaaaaaa
+    aacacaaaaaaaaaaa
+    aabbbaaaaaaaacaa
+    aaaaaaaaaaaacaca
+    aacaaaaaaaaabbba
+    amMmaaaaaaaaaaaa
+    ammmmaaaaaaaaaac
+    mmmMacacaaaaaaaa
+    aaaaaacacaaaaaaa
+    aaaaaabbbaaaaaaa
+  `),
+  g(`
+    acaaaaacaaaaaaaa
+    cacaaaabaaaaaaaa
+    bbbaaaaabaacaaaa
+    aaaaaaaaaacacaaa
+    camMaaaaaabbbcaa
+    aammmaaaaaaaaaaa
+    ammMacaaabaaaaaa
+    aabaacaaaaaaaaaa
+    aaaacacaaaaaaaaa
+    aaaabbbamMmaaaaa
+    aaaaaaabmmmmaaaa
+    aaaaaaammmMaaaca
+    aaacaaaaaaaaacac
+    aaaaaaaaaaaaabbb
+    aaaaaaaaaaaaaaaa
+    aaabaaaaaaaaaaac
+  `),
+];
+
+export const FLAGSTONE = [
+  g(`
+    lllllllrRlllllrR
+    rrrrrrrRRrrrrrRR
+    rrnnrrrrRrrRrrrR
+    rrnrrrrrRrrrrrrR
+    rrrrrrrrRrrrrrrR
+    RRRRRRRRRrrrrrrR
+    RRRRRRRRRrrrRrrR
+    llllrRllllllllrR
+    rrrrRRrrRrrrrrRR
+    rrrrrRrrrlrrrrrR
+    rrrrrRrrRrrrrrrR
+    rrrrrRrrrrrrrrrR
+    rrrrrRrlrrrrrrrR
+    rrlrrRrrrrrrnnrR
+    RRRRRRRRRRRRnRRR
+    RRRRRRRRRRRRRRRR
+  `),
+  g(`
+    llllrRllllllllrR
+    rrrrRRrrrrrrrrRR
+    rrrRrRrrrrrrrnnR
+    rrrlrRrrrrrrrnrR
+    rrrrrRRRRRRRRRRR
+    rrrrrRRRRRRRRRRR
+    RRRRRRRRRRllllrR
+    RRRRRRRRRRrrrrRR
+    lllnnlllrRrrrrrR
+    rrrnrrrrRRrrrRrR
+    rrrrrrrrrRrrrrrR
+    rrrrrrrrrRrrrrrR
+    rrrlrrrRrRrrrlrR
+    rrRrRrrrrRrRrrrR
+    RRRRRRRRRRRRRRRR
+    RRRRRRRRRRRRRRRR
+  `),
+  g(`
+    llllllrRllllllrR
+    rrrrrrRRrrrrlrRR
+    rrrrrrrRrrlrlrrR
+    RRRRRRRRrrrrrrrR
+    RRRRRRRRrrrrrrrR
+    llllllrRrrrrRrrR
+    rrrrrrRnnRRRRRRR
+    rrrrrrrnRRRRRRRR
+    rrrrrrrRllllllrR
+    rrlrrrrRrrRrrrRR
+    rrrrrrrRrrrrrrrR
+    rrrrrrrRrrrrrrrR
+    rrrRrrrRrrrrrRrR
+    rnnrrrrRrrrrrrrR
+    RnRRRRRRRRRRRRRR
+    RRRRRRRRRRRRRRRR
+  `),
+];
+
+export const BARROW_ISLAND = g(`
+    baaaaaaaaaabaacabaaaaaaaaaabaaaa
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akYYYYYYYYYYYYYYYYYYYYYYYYYYYtkm
+    akYYYYYYYYYYYYYYYYYYYYYYYYYYYtka
+    akYTtTTTTTTTTYTTTTTTTTTTTTTTTtka
+    akYTYTTTTTTTTTTTTYTTYTTtTTTTttka
+    akYTttTTTYTTTTTTTTTTTTttTTTtTtka
+    akYTTTTTTTTTTTTTTTTTTTTTTTTTTtka
+    akYTTTTTTTTTTTTTTTTTYTTTlrTTTtka
+    akYtTTTtTTTTTTTTTYYTTTTtRTYTYtka
+    ckYTTTtYTlrYTTTtTTTTTTTTTTTYttka
+    akYtTTTtTRTTTTtTTTTTTTTTTTTTTtka
+    akYtTTTTttTTTTTTTYTTTTTTTTTTTtka
+    akYTTTTTTTTTTTTTTTtTTTTTTYYTTtka
+    akYTTTTTTTTTTtTTTTTTTTTTTTTTTtka
+    akYYTTTTTTTTTTTYTTTTTTTTTTTTTtka
+    bkYTYTTTTTtTTTtTTTTtTTTTTTTTTtka
+    akYTTTtTTTtTTtTTTTTTTTTTTTTTTtka
+    akYTTTTTTTTYtTtTTTTTTTTTTTTTTtkm
+    akYTTTTTTTTTTTTTTTTTlrTTTTTTTtka
+    akYTTTTtTTTtTTTTYTTTRTTtTTTTTtka
+    akYTTTTTTTTYTTTTTTTTTTTTTTTTTtka
+    akYTTTTTTTTTTTTTTTTtTTTTTTTTTtka
+    akYTtTTTTTTTTlrTTTTTTYTTTTYTTtka
+    akYTYTTTTTTTTRYTTTTTTTTtYTtTTtka
+    akYTtYTTTTTTTTYTTYTtTTYtTTTTTtka
+    akYTTTTTTTTTTttTTTTTTTTTTTTTTtka
+    akYtttttttttttttttttttttttttttkc
+    akttttttttttttttttttttttttttttka
+    akttttttttttttttttttttttttttttka
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    aaaaaaaaaaacaaaaaaaaaaaaaaacaaaa
+`);
+
+export const BARROW_INNER = g(`
+    aaakYTTtTTTYkaab
+    bakYTTTYTTTTYkac
+    akYTTTTTYTTTTYka
+    kYTTTTTTTTTTTTYk
+    YTTTtYTTTTTTTYTY
+    TtTTYTTTTTTTTTTT
+    TYTTttTTTYTTTTTT
+    TTYTTTTTTTTTTTTT
+    TTTTTTTYTTTTTTTT
+    TTTYTTTtTTTTTTTT
+    TTTTTTtYTTTYTTTt
+    YTTtTTTtTTTTTTtT
+    kYttTTTTttTTTTTk
+    akYTTTTTTTTTTTkM
+    aakYTTTTTTTTTkmm
+    aaakYTTTTTTTkmmM
+`);
+
+export const DRYSTONE_ISLAND = g(`
+    aaaaaaaacbaaaaaaaaaaaaaacbaaaaaa
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    bkllllllllllllllllllllllllllllll
+    bkrrrrrrkrrrrrkrrrrrrrrkrrrrkrrr
+    akrrrrrrkrrrrrkrrrrrrrrkrrrrkrrr
+    akRRRRRRkRRRRRkRRRRRRRRkRRRRkRRR
+    ckkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akrrrrrkrrrrrrrrkrrrrkrrrrrrrkka
+    akrrrrrkrrrrrrrrkrrrrkrrrrrrrkka
+    akrrrrrkrrrrrrrrkrrrrkrrrrrrrkka
+    akRRRRRkRRRRRRRRkRRRRkRRRRRRRkka
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akrrrrrrrrkrrrrkrrrrrrrkrrrrrkkc
+    mkrrrrrrrrkrrrrkrrrrrrrkrrrrrkka
+    akRRRRRRRRkRRRRkRRRRRRRkRRRRRkka
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akrrrrkrrrrrrrkrrrrrkrrrrrrkrrrr
+    akrrrrkrrrrrrrkrrrrrkrrrrrrkrrrr
+    bkrrrrkrrrrrrrkrrrrrkrrrrrrkrrrr
+    bkRRRRkRRRRRRRkRRRRRkRRRRRRkRRRR
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akrrrrrrrkrrrrrkrrrrrrkrrrrrkrrr
+    ckrrrrrrrkrrrrrkrrrrrrkrrrrrkrrr
+    akrrrrrrrkrrrrrkrrrrrrkrrrrrkrrr
+    akRRRRRRRkRRRRRkRRRRRRkRRRRRkRRR
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    akrrrrrkrrrrrrkrrrrrkrrrrrrrrkka
+    akrrrrrkrrrrrrkrrrrrkrrrrrrrrkka
+    akRRRRRkRRRRRRkRRRRRkRRRRRRRRkkc
+    mkRRRRRRRRRRRRRRRRRRRRRRRRRRRRka
+    akkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+    aaaaaabbbaaaaaaaaaaaaabbbaaaaaaa
+`);
+
+export const DRYSTONE_INNER = g(`
+    acaklkllllllkaaa
+    cakrrkrrrrrrrkaa
+    bkrrrkrrrrrrrrka
+    kRRRRkRRRRRRRRkk
+    kkkkkkkkkkkkkkkk
+    rrrrrrrrkrrrrkrr
+    rrrrrrrrkrrrrkrr
+    RRRRRRRRkRRRRkRR
+    kkkkkkkkkkkkkkkk
+    rrrrkrrrrrrrkrrr
+    rrrrkrrrrrrrkrrr
+    rrrrkrrrrrrrkrrr
+    kRRRkRRRRRRRkRRk
+    akkkkkkkkkkkkkkb
+    aakrrrrkrrrrrkaa
+    aaakrrrkrrrrkaac
+`);
+
+export const CAIRN_GROUND = g(`
+    baaaaaaaaaabaaaa
+    aaaaaaabaaabmMma
+    aacaaaaaaaaammmm
+    acacaaaaaaammmMa
+    abbbaaaaaaaaabaa
+    aaaaaaaaaaaacaaa
+    aaaaaaaaaacaaaaa
+    acbaaaaaacacaaaa
+    aaamMaababbbaaaa
+    aaammRaaaaaRaaca
+    aammMaaaaRaaaaaa
+    aaaaaacRaaaaaaaa
+    acaaacacaaaaacaa
+    aaacabbbaaaacaca
+    aaaabbaaaaaabbba
+    aaaaaaaaaaacaaaa
+`);
+
+export const TENT_GROUND = g(`
+    aaaabaaaaaaaaaab
+    baaaaccaaaaaaaac
+    aaabcacabadaadaa
+    aacbbbdacadbaaaa
+    aabadbaaaaaabaaa
+    aaaaadaaaaadacaa
+    aadaadaabadbdbba
+    aaaaaaamMmaaaaba
+    aaaabbammbmaaaba
+    acbaaabmmMaaadaa
+    cacaaabbabdaaaaa
+    bbbadaaaaababaab
+    abaaaaaaacbaacab
+    aadaababcababadM
+    aacaaaaabbbadadm
+    aaaaaaaaaaabammM
+`);

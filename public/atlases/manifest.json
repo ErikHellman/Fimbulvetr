@@ -213,6 +213,30 @@
     {
       "terrain": "thingstone",
       "image": "myrland/thingstone.png"
+    },
+    {
+      "terrain": "heath",
+      "image": "haugar/heath.png"
+    },
+    {
+      "terrain": "barrow",
+      "image": "haugar/barrow.png"
+    },
+    {
+      "terrain": "flagstone",
+      "image": "haugar/flagstone.png"
+    },
+    {
+      "terrain": "drystone",
+      "image": "haugar/drystone.png"
+    },
+    {
+      "terrain": "cairn",
+      "image": "haugar/cairn.png"
+    },
+    {
+      "terrain": "tent",
+      "image": "haugar/tent.png"
     }
   ]
 }
