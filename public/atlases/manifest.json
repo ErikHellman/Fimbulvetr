@@ -321,6 +321,34 @@
     {
       "terrain": "clear_ice",
       "image": "hrimfjoll/clear_ice.png"
+    },
+    {
+      "terrain": "forge_floor",
+      "image": "forge/forge_floor.png"
+    },
+    {
+      "terrain": "forge_wall",
+      "image": "forge/forge_wall.png"
+    },
+    {
+      "terrain": "lava",
+      "image": "forge/lava.png"
+    },
+    {
+      "terrain": "belt_n",
+      "image": "forge/belt_n.png"
+    },
+    {
+      "terrain": "belt_e",
+      "image": "forge/belt_e.png"
+    },
+    {
+      "terrain": "belt_s",
+      "image": "forge/belt_s.png"
+    },
+    {
+      "terrain": "belt_w",
+      "image": "forge/belt_w.png"
     }
   ]
 }
