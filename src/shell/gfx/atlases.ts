@@ -114,6 +114,8 @@ export function applyArtOverrides(scene: Phaser.Scene, frames: FrameIndex, tiles
       blitExtruded(ctx, img, src.x, src.y, dst.x, dst.y);
     }
     if (n > 0) replacedTiles.push(t.terrain);
+    // Painted into the tileset: the sheet itself is never drawn again.
+    textures.remove(key);
   }
   if (replacedTiles.length > 0) page.refresh();
   return { frames: replacedFrames, tiles: replacedTiles };

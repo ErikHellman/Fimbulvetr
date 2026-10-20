@@ -12,13 +12,16 @@ export function collectErrors(page: Page): string[] {
 /**
  * Loads the game (optionally with a dev query string) and waits until the Play scene runs. Rolled weather
  * and spawn tables are pinned off (`rolled=0`) and the title screen skipped (`title=0`) unless the query
- * names them itself.
+ * names them itself, then lets two frames render so the game loop is really running.
  */
 export async function boot(page: Page, query = ''): Promise<void> {
   const extra = [/(^|&)rolled=/.test(query) ? '' : 'rolled=0', /(^|&)title=/.test(query) ? '' : 'title=0'];
   const q = [query, ...extra].filter((s) => s !== '').join('&');
   await page.goto(`/?${q}`);
   await page.waitForFunction(() => window.__fimbul?.ready === true, undefined, { timeout: 20_000 });
+  // The first frame after `ready` is the slow one (shaders compile, textures upload: 300–450 ms under
+  // SwiftShader), so a key held for a fixed time right after boot could fall inside it and go unseen.
+  await frames(page);
 }
 
 export const screenId = (page: Page): Promise<string | undefined> =>

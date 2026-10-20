@@ -317,5 +317,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Every villager on the shared body (`art-src/people`), the Askdalr decor (`decor` atlas) and the ford
   - [x] Askdalr's houses and interiors (`art-src/askdalr/house.ts`, `indoors.ts`): Askdalr is fully drawn
   - [x] Myrkviðr's ground and decor (`art-src/myrkvidr`)
-  - [ ] Mýrland, Haugar, Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
+  - [x] Mýrland's and Uppvík's ground and decor (`art-src/myrland`)
+  - [ ] Haugar, Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
   - [ ] Per-region atlas loading

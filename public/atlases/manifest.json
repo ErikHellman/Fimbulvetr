@@ -165,6 +165,54 @@
     {
       "terrain": "rapids",
       "image": "myrkvidr/rapids.png"
+    },
+    {
+      "terrain": "sand",
+      "image": "myrland/sand.png"
+    },
+    {
+      "terrain": "peat",
+      "image": "myrland/peat.png"
+    },
+    {
+      "terrain": "silt",
+      "image": "myrland/silt.png"
+    },
+    {
+      "terrain": "spring",
+      "image": "myrland/spring.png"
+    },
+    {
+      "terrain": "shoal",
+      "image": "myrland/shoal.png"
+    },
+    {
+      "terrain": "planks",
+      "image": "myrland/planks.png"
+    },
+    {
+      "terrain": "palisade",
+      "image": "myrland/palisade.png"
+    },
+    {
+      "terrain": "mill",
+      "image": "myrland/mill.png"
+    },
+    {
+      "terrain": "boat",
+      "image": "myrland/boat.png"
+    },
+    {
+      "terrain": "anvil",
+      "image": "myrland/anvil.png"
+    },
+    {
+      "terrain": "stall",
+      "image": "myrland/stall.png"
+    },
+    {
+      "terrain": "thingstone",
+      "image": "myrland/thingstone.png"
     }
   ]
 }
