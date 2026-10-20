@@ -318,5 +318,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Askdalr's houses and interiors (`art-src/askdalr/house.ts`, `indoors.ts`): Askdalr is fully drawn
   - [x] Myrkviðr's ground and decor (`art-src/myrkvidr`)
   - [x] Mýrland's and Uppvík's ground and decor (`art-src/myrland`)
-  - [ ] Haugar, Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
+  - [x] Haugar's ground and decor (`art-src/haugar`)
+  - [ ] Niflmýrr, Sævatn, Dvergagröf and Hrímfjöll tiles and decor; the dungeons; enemies, fixtures, UI
   - [ ] Per-region atlas loading
