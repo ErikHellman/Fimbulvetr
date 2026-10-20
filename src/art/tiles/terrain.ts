@@ -295,6 +295,7 @@ const MYRLAND_WATERS = {
   mill: {
     autotile: false,
     variants: 1,
+    group: 'water',
     paint: (p) => {
       p.fill(C.waterShade);
       p.speckle(C.water, 0.2);
@@ -304,6 +305,7 @@ const MYRLAND_WATERS = {
   boat: {
     autotile: false,
     variants: 1,
+    group: 'water',
     paint: (p) => {
       p.fill(C.water);
       p.speckle(C.waterShade, 0.15);
