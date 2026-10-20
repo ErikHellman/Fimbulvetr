@@ -26,7 +26,7 @@ test('real art listed in atlases/manifest.json replaces frames and tiles by name
   expect(errors).toEqual([]);
 });
 
-test('the shipped manifest replaces the hero, villager and decor frames and the Askdalr, Myrkviðr, Mýrland, Haugar and Niflmýrr ground', async ({
+test('the shipped manifest replaces the hero, villager and decor frames and the Askdalr, Myrkviðr, Mýrland, Haugar, Niflmýrr and Sævatn ground', async ({
   page,
 }) => {
   const errors = collectErrors(page);
@@ -92,6 +92,14 @@ test('the shipped manifest replaces the hero, villager and decor frames and the 
     'blackwater',
     'drowned_path',
     'snag',
+    'current_n',
+    'current_e',
+    'current_s',
+    'current_w',
+    'surge_n',
+    'surge_e',
+    'surge_s',
+    'surge_w',
   ]);
   expect(overrides?.frames).toContain('hero_idle_s_0');
   expect(overrides?.frames).toContain('hero_fork_attack1_e_2');

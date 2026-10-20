@@ -253,6 +253,38 @@
     {
       "terrain": "snag",
       "image": "niflmyrr/snag.png"
+    },
+    {
+      "terrain": "current_n",
+      "image": "saevatn/current_n.png"
+    },
+    {
+      "terrain": "current_e",
+      "image": "saevatn/current_e.png"
+    },
+    {
+      "terrain": "current_s",
+      "image": "saevatn/current_s.png"
+    },
+    {
+      "terrain": "current_w",
+      "image": "saevatn/current_w.png"
+    },
+    {
+      "terrain": "surge_n",
+      "image": "saevatn/surge_n.png"
+    },
+    {
+      "terrain": "surge_e",
+      "image": "saevatn/surge_e.png"
+    },
+    {
+      "terrain": "surge_s",
+      "image": "saevatn/surge_s.png"
+    },
+    {
+      "terrain": "surge_w",
+      "image": "saevatn/surge_w.png"
     }
   ]
 }

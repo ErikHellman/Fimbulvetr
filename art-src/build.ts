@@ -8,6 +8,7 @@ import { myrkvidrDecor, myrkvidrSheets } from './myrkvidr/build';
 import { myrlandDecor, myrlandSheets } from './myrland/build';
 import { haugarDecor, haugarSheets } from './haugar/build';
 import { niflmyrrDecor, niflmyrrSheets } from './niflmyrr/build';
+import { saevatnSheets } from './saevatn/build';
 import { decorFrames as placeholderDecor } from '@art/sprites/decor';
 import { peopleFrames } from './people/build';
 import { KITS, heroFrames } from './hero/build';
@@ -98,6 +99,7 @@ const sheets = [
   ...myrlandSheets().map((sheet) => ({ ...sheet, dir: 'myrland' })),
   ...haugarSheets().map((sheet) => ({ ...sheet, dir: 'haugar' })),
   ...niflmyrrSheets().map((sheet) => ({ ...sheet, dir: 'niflmyrr' })),
+  ...saevatnSheets().map((sheet) => ({ ...sheet, dir: 'saevatn' })),
 ];
 for (const sheet of sheets) {
   mkdirSync(`public/atlases/${sheet.dir}`, { recursive: true });
