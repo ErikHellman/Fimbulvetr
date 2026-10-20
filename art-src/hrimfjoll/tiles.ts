@@ -1,0 +1,275 @@
+import { grid } from '../lib/sprite';
+import { HRF_PAL as P } from './palette';
+
+/**
+ * Hrímfjöll and Hrímturn, drawn by hand at 16 px: wind-packed firn, polished glaze, the rime cliffs as a blob
+ * island under their frost crust, and the tower's pale flags, dark ashlar and walls of clear ice.
+ */
+const g = (text: string) => grid(P, text);
+
+export const FIRN = [
+  g(`
+    SSSSSSSSSSSSSSSS
+    SSSSSSnSSSSSSSSS
+    SSSSSSnSSSSSSSSS
+    wwwwSSSSSSSSwwww
+    nnnnwwwwwwwwnnnn
+    SSSSnnnnnnnnSSSS
+    nSwSSSSSSSSwSSSS
+    wSSSSSSSwSSSSSSS
+    SSSSSSSSSwSSSSSS
+    wwwwwwwwwwwwwwww
+    nnnnnnnnnnnnnnnn
+    SSSSSSSSSSSSSSSS
+    SSSSSSSSwSSSSSSS
+    SSSSSSSSSwSSSSSS
+    wwwwSSSSSSSSwwww
+    nnnnwwwwwwwwnnnn
+  `),
+  g(`
+    SSSSSSwSSSSnSwSS
+    SSSSSSSSSSSSSSSS
+    wwwwwwwwwwwwwwww
+    nnnnnnnnnnnnnnnn
+    SSSSSSSSSnSSSSwS
+    wSSSSSSSSSnSSnSS
+    SSSSSSSSnSnSSSSS
+    wwwwSSSSSSSSwwww
+    nnnnwwwwwwwwnnnn
+    SSSSnnnnnnnnSSSS
+    SSSSSSSSSSSSwSSS
+    SSSSSSSSSSwSSSSS
+    wwwwwwwwwwwwwwww
+    nnnnnnnnnnnnnnnn
+    SSSSSSSSSSSwSSSS
+    SSSSSSSSSSSSSSSS
+  `),
+  g(`
+    SSSwSSSSSSSSSSSS
+    SSSSSSwSSSnSSSwS
+    SSSSSwSSSSSSSSSS
+    SSSSSSnwSnnSSSSS
+    wwwwSSSSSwSSwwww
+    nnnnwwwwwwwwnnnn
+    wSSnnnnnnnnnwSSS
+    SSSSSSSSwSSnSSwS
+    SnSSSSSSSwnSSnSS
+    SSSSSSSnnSSSSSSS
+    wwwwSnSSSSSSwwww
+    nnnnwwwwwwwwnnnn
+    SSSSnnnnnnnnSSSS
+    SSSSwSSSwSSSSSSS
+    SwSSnSSSSSSSSSSS
+    SSwSSSSSnSnSSSSS
+  `),
+  g(`
+    SSSSSwSSSSSSSSSS
+    wwwwwwwwwwwwwwww
+    nnnnnnnnnnnnnnnn
+    SSSSSSSSSSSSSSSS
+    SSwSnSSSSSSSSSSS
+    SSnSSSSnSSSSSSSw
+    wwwwSSSSSSSSwwww
+    nnnnwwwwwwwwnnnn
+    SSSSnnnnnnnnwSSS
+    SnSSSSSSSSSSSSSS
+    SSSSnSSSSSSSSSSS
+    wwwwwwwwwwwwwwww
+    nnnnnnnnnnnnnnnn
+    SSSSSSSSSSSnSSwS
+    SSnSSSSSSSwSSSSS
+    wwwwwwwwwwwwwwww
+  `),
+];
+
+export const GLAZE = [
+  g(`
+    IIIIIIIjIjIIiIIj
+    IIIIIIIIIIIIijII
+    IIIjIIIIIIIIIiII
+    IJJJJJJJIjIIIiII
+    IIIIIIIIIIIIIiII
+    IIIIIIIIIIIIIIiI
+    IjIIIIIIIIIIIIiI
+    IIIIIIIIIIIIIIiI
+    IIIIIIIjIIIIIijI
+    IIIIIjIIIIIIIiII
+    IIIIIjIIJJJJJJII
+    IIjjjIjIIIjIIIiI
+    IIIIIIIIIIIIIIIj
+    jIIIjIjIIjIIIIII
+    IIIIIIjjIIjjIIIj
+    iiiiiiiiiiiiiiii
+  `),
+  g(`
+    IIIIIIiiIIIIijII
+    IIIIIIiIIIIIIIII
+    iIIIIiIiIjIIIIII
+    jIIIIJJiJJJJIIII
+    IIIIIIIiIIjIIjII
+    IIIIIIIIiIIIIIII
+    IIIIIIIIiIIIIIII
+    IIjIIIIIiIIIIIII
+    IIIjjIIiIIIjjIII
+    IIjIIIIiIiIIIIII
+    IIIIjJJJJJJIIIjI
+    IIIIIIIjjjiIIIjI
+    jIIjIIjIIIIjIIij
+    IIjIIjIIjIIIIIII
+    IjIIIIjIIIjIIIII
+    iiiiiiiiiiiiiiii
+  `),
+];
+
+export const TOWER_FLOOR = [
+  g(`
+    hhhhhhhFhhhhhhhF
+    hfffFFfFhffffffF
+    hfFffffFhffffffF
+    hffffffFhfffFffF
+    hffffffFhffffFfF
+    hffffffFhfffFffF
+    hffffffFhffhfffF
+    FFFFFFFFFFFFFFFF
+    hhhFhhhhhhhFhhhh
+    fffFhffffffFhfff
+    fffFhffffffFhfff
+    FffFhffffffFhfff
+    fffFhffffffFhfff
+    fhfFhffffffFhfff
+    fffFhffffffFhfff
+    FFFFFFFFFFFFFFFF
+  `),
+  g(`
+    hhhFhhhhhhhFhhhh
+    fffFhhffhffFhfff
+    ffhFhhffffhFhfff
+    FffFhffffffFhffh
+    fffFhffffffFhhff
+    fffFhffhfffFhfff
+    fffFhfFffffFhfff
+    FFFFFFFFFFFFFFFF
+    hhhhhhhFhhhhhhhF
+    hffffffFhfFffffF
+    hfffffFFhffffffF
+    hffffffFhffffffF
+    hffffffFhffffffF
+    hFffhffFhfffFffF
+    hffffffFhfhfhfFF
+    FFFFFFFFFFFFFFFF
+  `),
+];
+
+export const TOWER_WALL = [
+  g(`
+    xxxxxxxxxxxxxxxx
+    uvxvVxvxxvvxxvxV
+    vvvuVvuvvvvVvvvV
+    VVVVVVVVVVVVVVVV
+    uuVuuuVuuuuuVuuu
+    vvVvvuVuvvvvVvvv
+    vvVvvvVvvvvvVuvv
+    VVVVVVVVVVVVVVVV
+    uuVuuuuuuuVuuuVu
+    vvVuvvvvuvVvvvVv
+    vvVvvvvvuvVvvvVu
+    VVVVVVVVVVVVVVVV
+    VVVVVVvVvvVvVVVV
+    VVVVVVVVVVVVVVVV
+    VVVVVVVVVVVVVVVV
+    VVVVVVVVVVVVVVVV
+  `),
+  g(`
+    xxxxxxxxxxxxxxxx
+    vvuVxvvVuvvvvxxv
+    vvvVvvvVvvvvvVvv
+    VVVVVVVVVVVVVVVV
+    uuuVuuuuuuuVuuuV
+    vvvVvvvvvvvVuvvV
+    vvvVvuuuvuvVvvvV
+    VVVVVVVVVVVVVVVV
+    uuuVuuuuVuuuVuuu
+    vvvVvvvvVvvuVvvv
+    vvvVuvvvVvvuVuuv
+    VVVVVVVVVVVVVVVV
+    VVVVVVvVVvVvvVVV
+    VVVVVVVVVVVVVVVV
+    VVVVVVVVVVVVVVVV
+    VVVVVVVVVVVVVVVV
+  `),
+];
+
+export const CLEAR_ICE = [
+  g(`
+    JCCCCJCCCCCCCCCC
+    CCwCCJCJCCCCCCCC
+    CCwCJJCCCCwCJCCC
+    CCwJJCCCJCwCCCCC
+    CJwCJCCCCCCwJCCC
+    JCwCJJCCCCCwCCCC
+    CCwCCCCJCJCwCCCC
+    JCCwJJCCCCCwCCCC
+    CCCwCCCCCCCCwCCC
+    CCCwCCJCCCCCJJCJ
+    CCJwCCCCJCCCJCCC
+    CCCJCCJCCCCJJCCC
+    JCCCJCCCCCCJCCCJ
+    iiiiiiiiiiiiiiii
+    cccccccccccccccc
+    cccccccccccccccc
+  `),
+];
+
+export const RIME_ISLAND = g(`
+    SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+    SkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkS
+    SkSllllSllllSllllllllllSllSlrRkS
+    wklrrqRqRrrrrrrrRrrrrqrrrrrrRRkw
+    nklrqrrrrrrqrrrrrqrrrrrrqrrrRRkn
+    SklrrrqrrrrrrrqrrrqrqrrrrrrrRRkS
+    nklRRRRRrRRRRRRRRrRRRRRRRRrRRRkS
+    wklrrrrRlrrRRqrRlrqrrrrRSqrrRRkS
+    SklrrrrRrrrrrrrRrqqrrrrRrrrqRRkS
+    wklrrrrRrrrrqrqRrrqrrrrRrrrrRRkw
+    nklRRRRqRRRRRRRRqRRRRRRRRrRRRRkn
+    SklRlrrrrrrlSrqrrrrRlrrrrrrRlRkS
+    SklRrrqrrrrRRqrrrrrRRrRrrrrRRRkS
+    SklRqrrqrrrRRqRrrrrRrrrrrrrRRRkS
+    wklRRRrRRRRRRlRrRRRRRRRRrRRRRRkw
+    nklrrrrRSrrrrrrRlrrrrqrRlrrrRRkn
+    SkSrrrrRrrrrqrrRrrrqrqrRrqrrRRkS
+    SklrqrrRRrrrqrrRrrrrrqrRrrrrRRkS
+    SkSRRrRRRRRRRRrRRRRRRRRrRRRRRRkS
+    wklRlqqrrrrRlrrrqrrRlqrrqrrRlRkw
+    nklRrrrrrrrRrrrrrqrRrRrqrqrRRRkn
+    SkSRrrrrrrrRrrrrrqrRrRrrrqqRRRkS
+    nklRrRRRRRRRRrRRRRRRRRlRRRRRRRkS
+    wklrrrrRlrrrrrrRlqrrqrrRlrrRRRkS
+    SklqqrrRrrrrqrrRrrrrqrrRrrqrRRkS
+    wklqrqqRrrrqrrrRRrrqqrrRrrrrRRkw
+    nkSrRRRRRRRRrRRRRRRRRrRRRRRRRRkn
+    SkSRlrRrrqrRlrrrrrrRSrrrrrRRlRkS
+    SkrRRRRRRRRRRRRRRRRRRRRRRRRRRRkS
+    SkRRRRRRRRRRRRRRRRRRRRRRRRRRRRkS
+    wkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkw
+    nnnnwwwwwwwwnnnnnnnnwwwwwwwwnnnn
+`);
+
+export const RIME_INNER = g(`
+    SSSkSrrrrqrlkSSS
+    SSklrqrrrrrqSkSS
+    SklrrrrrrrqrqlkS
+    klqrrrrrrrrrrrlk
+    lRrrrlrrrRqqrrrS
+    rqrrqrRRRRrqrrRr
+    qrrrrrrrrrqrrrqr
+    rrrrrrqrrrrRrrqr
+    rrrrRrrSrrrrrqrr
+    rrrSrrrrRrrrrrqr
+    rrRrRRRrRqRrrrqr
+    lrrrrrrrRrrqrrqR
+    klrrrrrrrrrrrqRk
+    SklRrqrqrrrrrRkS
+    wwklrrrrrrrrRkww
+    nnnklqrrrrrRknnn
+`);

@@ -747,13 +747,17 @@ const HRIMFJOLL = {
     },
   },
   rime: {
-    autotile: false,
-    variants: 2,
-    paint: (p) => {
-      p.fill('#5e7e9c');
-      p.speckle('#7898b6', 0.25);
-      p.speckle('#c8dcec', 0.05);
-      p.rect(0, 12, 16, 4, '#46627e');
+    autotile: true,
+    variants: 0,
+    paint: (p, v) => {
+      p.fill('#e4ecf2');
+      regionLit(p, v.mask, 0, {
+        base: '#5e7e9c',
+        shade: '#46627e',
+        light: '#c8dcec',
+        relief: 'raised',
+      });
+      clip(p, interior(v.mask, 1)).speckle('#7898b6', 0.25);
     },
   },
   tower_floor: {
