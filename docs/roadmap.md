@@ -323,5 +323,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Sævatn's currents and surges (`art-src/saevatn`)
   - [x] Dvergagröf's scree and the cave set (`art-src/dvergagrof`)
   - [x] Hrímfjöll's firn, glaze and rime, and Hrímturn's floor, walls and clear ice (`art-src/hrimfjoll`)
-  - [ ] The dungeons; enemies, fixtures, UI
+  - [x] The Forge's floor, walls, lava and belts (`art-src/forge`)
+  - [ ] The other dungeons (crypt, roots and sap, pit, hof, Útgarðr); enemies, fixtures, UI
   - [ ] Per-region atlas loading
