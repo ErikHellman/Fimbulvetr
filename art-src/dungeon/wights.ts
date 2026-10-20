@@ -2,12 +2,13 @@ import { line } from '@art/draw';
 import type { GridPalette } from '@art/grid';
 import { outline } from '@art/outline';
 import { C } from '@art/palette';
-import { createRaster, getPixel, hex, setPixel, type Raster } from '@art/raster';
+import { ellipse } from '@art/draw';
+import { createRaster, getPixel, hex, setPixel, type Raster, type Rgba } from '@art/raster';
 import type { Look } from '@art/sprites/people';
 import { ARMS_FWD_TEXT, ARMS_UP_TEXT, HEAD_TEXT, LEGS_TEXT, TORSO_TEXT, render } from '../hero/parts';
 import { blade, type Dir8 } from '../hero/props';
 import { frame, grid, mirror, paste, type DrawnFrame } from '../lib/sprite';
-import { BEARD_TEXT, HEAD_W_TEXT, LONG_TEXT } from '../people/parts';
+import { BEARD_TEXT, BODICE_TEXT, HEAD_W_TEXT, LONG_TEXT, SKIRT_TEXT } from '../people/parts';
 import { palette } from '../people/build';
 
 /**
@@ -17,8 +18,8 @@ import { palette } from '../people/build';
  * gems blaze when he charges). All rise out of a grave mound like the draugr.
  */
 
-type Side = 's' | 'w' | 'n';
-type Arms = 'down' | 'up' | 'forward';
+export type Side = 's' | 'w' | 'n';
+export type Arms = 'down' | 'up' | 'forward';
 const SIZE = 32;
 const X = 9;
 const Y = 4;
@@ -227,32 +228,60 @@ const pick = <T>(list: readonly T[], i: number): T => {
 /** Where the weapon hand is per facing: the sword hangs from here at rest and rises from here on the tell. */
 const HAND: Readonly<Record<Side, number>> = { s: 23, w: 12, n: 10 };
 
-interface Gear {
+export interface Gear {
   readonly helm: boolean;
   readonly shield: boolean;
   readonly sword: boolean;
   readonly bow: boolean;
+  /** The tower shield of Náströnd, or the chain-flail whirling over his head (drawn on the grown frame). */
+  readonly tower?: boolean;
 }
 
-/** One of the barrows' dead: its parts rendered once, posed on demand. */
-class Wight {
+export const NO_GEAR: Gear = { helm: false, shield: false, sword: false, bow: false };
+
+/** How a figure is built: the eyes it has, whether it wears a bodice and skirt, and what it rises out of. */
+export interface Build {
+  /** The colour of dead eyes; left out, the eyes stay ink. */
+  readonly eyes?: string;
+  /** A fish tail in place of the legs (the marbendill), per facing. */
+  readonly tail?: Readonly<Record<Side, Raster>>;
+  /** What it rises out of: a mound of earth, or a ring of mist. */
+  readonly rise?: 'mound' | 'mist';
+}
+
+const MIST: Rgba = [200, 210, 214, 120];
+
+/** A ring of mist on the ground where something rises or lies hidden. */
+export function mistRing(r: Raster, cx: number, cy: number, rx: number, ry: number): void {
+  ellipse(r, cx, cy, rx, ry, () => MIST);
+}
+
+/** One of the dead (or a living foe) on the villagers' body: its parts rendered once, posed on demand. */
+export class Wight {
   private readonly head;
   private readonly torso;
   private readonly legs;
+  private readonly bodice;
+  private readonly skirt;
   private readonly armsUp;
   private readonly armsFwd;
   private readonly beard;
   private readonly long;
   private readonly look: Look;
+  private readonly build: Build;
 
-  constructor(look: Look) {
+  constructor(look: Look, build: Build = { eyes: DEAD_EYES, rise: 'mound' }) {
     this.look = look;
-    const pal: GridPalette = { ...palette(look), E: DEAD_EYES };
-    const base = look.hairStyle === 'long' ? HEAD_W_TEXT : HEAD_TEXT;
+    this.build = build;
+    const pal: GridPalette = { ...palette(look), E: build.eyes ?? C.ink };
+    const woman = look.legs === 'skirt';
+    const base = woman || look.hairStyle === 'long' ? HEAD_W_TEXT : HEAD_TEXT;
     const headText = look.hairStyle === 'bald' ? { s: bald(base.s), w: bald(base.w), n: bald(base.n) } : base;
     this.head = render({ s: deadEyes(headText.s), w: deadEyes(headText.w), n: headText.n }, pal);
     this.torso = render(TORSO_TEXT, pal);
     this.legs = render(LEGS_TEXT, pal);
+    this.bodice = render(BODICE_TEXT, pal);
+    this.skirt = render(SKIRT_TEXT, pal);
     this.armsUp = render(ARMS_UP_TEXT, pal);
     this.armsFwd = render(ARMS_FWD_TEXT, pal);
     this.beard = render(BEARD_TEXT, pal);
@@ -274,8 +303,12 @@ class Wight {
     if (behind) sword();
     if (behind && gear.shield) paste(r, SHIELD.back, 11, Y + bob + 11);
     if (behind && arms === 'up') paste(r, this.armsUp.n, X - 2, Y + bob - 2);
-    paste(r, pick(this.legs[side], step), X, Y + 20);
-    paste(r, pick(this.torso[side], arms === 'down' ? (SWING[step] ?? 0) : 3), X, Y + 11 + bob);
+    const woman = this.look.legs === 'skirt';
+    if (this.build.tail !== undefined) paste(r, this.build.tail[side], X, Y + 20);
+    else if (woman) paste(r, pick(this.skirt[side], step), X, Y + 20);
+    else paste(r, pick(this.legs[side], step), X, Y + 20);
+    if (woman) paste(r, pick(this.bodice[side], side === 'n' ? 0 : (SWING[step] ?? 0)), X, Y + 13 + bob);
+    else paste(r, pick(this.torso[side], arms === 'down' ? (SWING[step] ?? 0) : 3), X, Y + 11 + bob);
     if (!behind && arms === 'up') paste(r, this.armsUp[side], X - 2, Y + bob - 2);
     paste(r, this.head[side], X, Y + bob);
     if (this.look.hairStyle === 'long') paste(r, this.long[side], X, Y + 8 + bob);
@@ -320,22 +353,29 @@ class Wight {
     return outline(this.figure(side, step, arms, gear, swordDir), INK, 1);
   }
 
-  /** The figure sunk `sink` px into its grave, the earth heaped over what is under the ground line. */
-  risen(side: Side, sink: number, gear: Gear): Raster {
-    const figure = this.figure(side, 0, 'up', { ...gear, shield: false, sword: false, bow: false });
+  /** The figure sunk `sink` px into its grave, the earth heaped (or the mist curled) over what is under the ground line. */
+  risen(side: Side, sink: number, gear: Gear, arms: Arms = 'up', step = 0): Raster {
+    const figure = this.figure(side, step, arms, { ...gear, shield: false, sword: false, bow: false });
+    const mist = this.build.rise === 'mist';
     const r = createRaster(SIZE, SIZE);
-    for (let y = 0; y < 27; y++)
+    const ground = mist ? 29 : 27;
+    for (let y = 0; y < ground; y++)
       for (let x = 0; x < SIZE; x++) {
         const sy = y - sink;
         if (sy >= 0) setPixel(r, x, y, getPixel(figure, x, sy));
       }
+    if (mist) {
+      const out = outline(r, INK, 1);
+      mistRing(out, 16, 28, 10, 2.2);
+      return out;
+    }
     paste(r, mound, 0, 25);
     return outline(r, INK, 1);
   }
 }
 
-/** Nearest-neighbour scale by 3/2: the warden and the king are the wight drawn half again as large. */
-function grow(src: Raster): Raster {
+/** Nearest-neighbour scale by 3/2: the warden, the king and the hollow are the figure drawn half again as large. */
+export function grow(src: Raster): Raster {
   const w = Math.floor((src.w * 3) / 2);
   const h = Math.floor((src.h * 3) / 2);
   const r = createRaster(w, h);
@@ -345,11 +385,12 @@ function grow(src: Raster): Raster {
   return r;
 }
 
-const PIVOT_32 = { x: 0.5, y: 30 / SIZE };
+export const PIVOT_32 = { x: 0.5, y: 30 / SIZE };
 const PIVOT_48 = { x: 0.5, y: 45 / 48 };
-const PIVOT_KING = { x: 0.5, y: 51 / 54 };
+export const PIVOT_KING = { x: 0.5, y: 51 / 54 };
 const SIDES: readonly Side[] = ['s', 'w', 'n'];
-const FORWARD: Readonly<Record<Side, Dir8>> = { s: 's', w: 'w', n: 'n' };
+export const FORWARD: Readonly<Record<Side, Dir8>> = { s: 's', w: 'w', n: 'n' };
+export { INK };
 const WIGHT_GEAR: Gear = { helm: true, shield: true, sword: true, bow: false };
 const ARCHER_GEAR: Gear = { helm: false, shield: false, sword: false, bow: true };
 const KING_GEAR: Gear = { helm: false, shield: false, sword: true, bow: false };

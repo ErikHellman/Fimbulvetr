@@ -76,3 +76,62 @@ export const WISP_PAL: GridPalette = {
   c: '#ffffff',
   R: '#5fb89a',
 };
+
+/** Nykr, the Tide: a grey-green water horse with a weed mane and a rotten bridle. */
+export const NYKR_PAL: GridPalette = {
+  '.': null,
+  h: '#4a6670',
+  l: '#7c98a0',
+  d: '#2c3e46',
+  m: '#2e5a3a',
+  M: '#4a8a52',
+  b: '#6a4a2a',
+  e: '#f0f4c0',
+  W: '#aad2dc',
+  w: '#182c34',
+  F: '#e2f2f6',
+  k: C.ink,
+};
+
+/** Hrönn, the great eel, and her grates. */
+export const EEL_PAL: GridPalette = {
+  '.': null,
+  g: '#3e5a52',
+  L: '#6f8f7c',
+  b: '#b8c49a',
+  e: '#e8f070',
+  m: '#6a1e24',
+  t: '#f0ece0',
+  W: '#aad2dc',
+  w: '#182c34',
+  s: '#28463e',
+  k: C.ink,
+  x: '#fff2a8',
+};
+
+export const GRATE_PAL: GridPalette = {
+  '.': null,
+  i: '#3c3c44',
+  I: '#6a6a76',
+  d: '#101820',
+  B: '#c8ecf4',
+  k: C.ink,
+};
+
+/** Náströnd's tower shield: dark planks, an iron rim and boss. */
+export const TOWER_PAL: GridPalette = {
+  '.': null,
+  S: '#3a3026',
+  R: '#7a828e',
+  B: '#c8ccd4',
+  q: '#2a2219',
+  k: C.ink,
+};
+
+/** The marbendill's scaled tail. */
+export const TAIL_PAL: GridPalette = {
+  '.': null,
+  T: '#46685e',
+  U: '#2f4a40',
+  V: '#6f9a86',
+};

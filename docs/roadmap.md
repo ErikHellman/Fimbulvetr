@@ -328,5 +328,6 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Sökkva Kvern's sluice, race, boards and mill wall, the hof's flags and arch, Útgarðr's floor and wall (`art-src/sokkva`, `art-src/hof`, `art-src/utgard`)
   - [x] The wilds' foes: vargr, pack leader, rime raven, draugr, trolls, the stone troll, the death puff (`art-src/enemies`)
   - [x] The first dungeons' foes: root-biter, rótvættr, bulb, spike, mud-crab, lindormr, the barrows' dead and their king, water-worm, bog-light (`art-src/dungeon`)
-  - [ ] The remaining dungeons' foes and bosses (hof, Sævatn, Helgrind, Niflmýrr, the pass, the Forge, Hrímfjöll, the tower, Útgarðr), fixtures, UI
+  - [x] The hof, Sævatn, Helgrind, Niflmýrr and pass foes: drowned, nykr and foal, hrönn and grates, helhound, Garmr, Náströnd, mara, fog-draugr, marbendill, Styrr
+  - [ ] The remaining dungeons' foes and bosses (the Forge, Hrímfjöll, the tower, Útgarðr), fixtures, UI
   - [ ] Per-region atlas loading
