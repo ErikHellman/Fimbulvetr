@@ -20,6 +20,11 @@
       "key": "enemies",
       "image": "enemies.png",
       "data": "enemies.json"
+    },
+    {
+      "key": "dungeon",
+      "image": "dungeon.png",
+      "data": "dungeon.json"
     }
   ],
   "tiles": [
