@@ -18,7 +18,7 @@ export type Step =
   | { readonly k: 'talk'; readonly dialogue: DialogueId; readonly with?: NpcId }
   /** A single text box. */
   | { readonly k: 'say'; readonly who: Speaker; readonly text: L10n }
-  /** A full-screen card ("Day 2", "To be continued…"), dismissed with confirm. */
+  /** A full-screen card ("The second day."), dismissed with confirm. */
   | { readonly k: 'card'; readonly text: L10n }
   /** Walks an actor in a straight line to a tile (no collision: the script owns the stage). */
   | { readonly k: 'move'; readonly actor: ActorRef; readonly to: TilePos; readonly speed?: number }

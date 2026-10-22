@@ -97,7 +97,7 @@ describe('Rótarhellir', () => {
     expect(h.sim.mode).toBe('play');
     expect(h.sim.state.flags.st_stone1_lit).toBe(true);
     expect(h.sim.screen.id).toBe('myr_roots');
-    expect(cards.at(-1)).toBe('To be continued.');
+    expect(cards).not.toContain('To be continued.');
     const q = questLog(h.sim.db.quests, condCtx(h.sim)).find((e) => e.id === 'q_runestone_1');
     expect(q).toMatchObject({
       done: true,
