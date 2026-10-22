@@ -4,6 +4,7 @@ import { InputLatch, isHeld, wasPressed, wasReleased } from '@core/input/actions
 import { connectedPads, deadzone, readPad, type GamepadLike } from '@shell/input/gamepad';
 import { KeyboardState, isTextInput } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
+import { openMenu, stepMenu } from '@shell/ui/pauseMenu';
 
 function key(
   code: string,
@@ -106,6 +107,24 @@ describe('InputMapper', () => {
     expect(wasPressed(f, 'sword')).toBe(true);
     expect(wasPressed(f, 'roll')).toBe(true);
     expect(f.mx).toBeGreaterThan(0.8);
+  });
+
+  it('lets a pad switch the quest tab between active and done (A) and move through it (d-pad)', () => {
+    const { latch, mapper } = setup();
+    const press = (buttons: number[]) => {
+      mapper.sample(new Set(), readPad([pad(buttons)]));
+      const f = latch.consume();
+      mapper.sample(new Set(), readPad([pad([])]));
+      latch.consume();
+      return f;
+    };
+    let menu = openMenu('quests');
+    menu = stepMenu(menu, press([13]), [], 3).state ?? menu;
+    expect(menu.cursor).toBe(1);
+    menu = stepMenu(menu, press([0]), [], 3).state ?? menu;
+    expect(menu).toMatchObject({ tab: 'quests', filter: 'done', cursor: 0 });
+    menu = stepMenu(menu, press([0]), [], 3).state ?? menu;
+    expect(menu.filter).toBe('active');
   });
 
   it('turns shield into a toggle when hold-to-toggle is on', () => {
