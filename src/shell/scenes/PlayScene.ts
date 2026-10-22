@@ -9,6 +9,8 @@ import { tileFlips, tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import type { ScreenId } from '@content/world/screens';
 import { daylight, seasonAt } from '@core/clock/clock';
+import { overworldMap } from '@core/world/mapModel';
+import { stepMapLook } from '@shell/ui/mapLook';
 import type { Entity } from '@core/actors/entity';
 import { InputLatch, wasPressed, type InputFrame } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
@@ -259,7 +261,10 @@ export class PlayScene extends Phaser.Scene {
     }
     if (this.menu !== null) {
       if (this.settingsMenu !== null) this.updateSettings(this.latch.consume(), fresh);
-      else this.updateMenu(this.latch.consume());
+      else {
+        const frame = this.latch.consume();
+        if (!this.updateMapLook(frame)) this.updateMenu(frame);
+      }
       this.acc.acc = 0;
       this.draw(0);
       return;
@@ -363,6 +368,22 @@ export class PlayScene extends Phaser.Scene {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
     } else if (ev.t === 'autosave') this.services.saves.autosaver.request(this.sim.snapshot());
+  }
+
+  /** The map tab's look-around frame; false when the press is left to the pause menu. */
+  private updateMapLook(frame: InputFrame): boolean {
+    const menu = this.menu;
+    if (menu === null) return false;
+    const { db, state } = this.sim;
+    const map =
+      db.screens[this.sim.screen.id].dungeon === undefined
+        ? overworldMap(db.layout, db.screens, state.world.visited, this.sim.screen.id)
+        : null;
+    const r = stepMapLook(menu, frame, map);
+    if (r === null) return false;
+    if (r.moved) this.audio.play('sfx_menu_move');
+    this.setMenu(r.state);
+    return true;
   }
 
   /** Opens or closes the pause menu; everything that moves on its own clock stops while it is open. */

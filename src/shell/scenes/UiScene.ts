@@ -1,5 +1,6 @@
 import { GALDR_DEFS } from '@content/galdr';
 import { RING_NAMES } from '@content/gear';
+import { npcsByCell } from '@core/world/mapModel';
 import * as Phaser from 'phaser';
 import {
   FONT_HEIGHT,
@@ -472,7 +473,9 @@ export class UiScene extends Phaser.Scene {
 
   /**
    * The overworld as coloured cells: visited screens by region, the hero's cell framed in gold, and a
-   * seiðr-blue diamond on each screen a verse held points at (unvisited ones drawn dim).
+   * seiðr-blue diamond on each screen a verse held points at (unvisited ones drawn dim). Above the map, the
+   * name of the area looked at (the hero's, or the look-around frame's, drawn in white); below it, who is
+   * there right now.
    */
   private menuMap(top: number, lang: Lang): void {
     const { sim } = this.link;
@@ -488,6 +491,7 @@ export class UiScene extends Phaser.Scene {
         ? [...verses, ...beaconMarks(sim.db.layout, sim.db.screens, sim.state)]
         : verses;
     const m = overworldMap(sim.db.layout, sim.db.screens, sim.state.world.visited, sim.screen.id, marks);
+    const look = this.link.menu()?.state.look ?? null;
     const cw = 22;
     const ch = 13;
     const cols = m.x1 - m.x0 + 3;
@@ -503,6 +507,7 @@ export class UiScene extends Phaser.Scene {
       this.menuBox.fillStyle(seen ? REGION_COLOURS[c.region] : DIM, seen ? 1 : 0.5);
       this.menuBox.fillRect(cx + 1, cy + 1, cw - 2, ch - 2);
       if (c.here) this.menuBox.lineStyle(2, GOLD, 1).strokeRect(cx + 1, cy + 1, cw - 2, ch - 2);
+      if (c.id === look) this.menuBox.lineStyle(2, PAPER, 1).strokeRect(cx, cy, cw, ch);
       if (c.marked) {
         const mx = cx + cw / 2;
         const my = cy + ch / 2;
@@ -511,10 +516,25 @@ export class UiScene extends Phaser.Scene {
       }
     }
     this.menuBox.lineStyle(1, DIM, 1).strokeRect(ox + 0.5, oy + 0.5, cols * cw - 1, rows * ch - 1);
-    const here = m.cells.find((c) => c.here);
-    const label =
-      here === undefined ? '' : `${t(REGION_NAMES[here.region], lang)} — ${t(UI.menu_here, lang)}`;
-    this.menuBody.setText(label).setPosition(MENU.x + 24, top);
+    const at = m.cells.find((c) => (look === null ? c.here : c.id === look));
+    const lines: string[] = [];
+    if (at !== undefined) {
+      const area = t(REGION_NAMES[at.region], lang);
+      lines.push(at.here ? `${area} — ${t(UI.menu_here, lang)}` : area);
+      while (top + lines.length * LINE_HEIGHT < oy + rows * ch + 6) lines.push('');
+      const who = npcsByCell(sim.db.layout, sim.db.screens, sim.db.npcs, condCtx(sim)).get(at.id) ?? [];
+      const people =
+        who.length === 0
+          ? t(UI.map_nobody, lang)
+          : t(UI.map_people, lang, { who: who.map((id) => t(NPC_NAMES[id], lang)).join(', ') });
+      lines.push(...layoutText(people, MENU.w - 48).slice(0, 3));
+    }
+    this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+    this.menuHint.setText(
+      look === null
+        ? prompt(UI.map_look_hint, UI.map_look_hint_pad, this.link.pad(), lang)
+        : prompt(UI.map_looking_hint, UI.map_looking_hint_pad, this.link.pad(), lang),
+    );
   }
 
   /**
