@@ -3,6 +3,7 @@ import { wasPressed, type Action, type InputFrame } from '@core/input/actions';
 import type { ItemDef } from '@core/items/defs';
 import { ringFlag } from '@core/items/rings';
 import type { GameState, InventoryState } from '@core/state/gameState';
+import type { ScreenId } from '@content/world/screens';
 
 /** The pause menu: pure state and input handling, drawn by the UI scene. The sim does not run meanwhile. */
 
@@ -16,6 +17,8 @@ export type MenuTab = (typeof MENU_TABS)[number];
 export const SYSTEM_ROWS = ['resume', 'settings', 'start_over'] as const;
 
 export interface MenuState {
+  /** The map tab's look-around frame, on this screen (see mapLook.ts); missing or null when put away. */
+  readonly look?: ScreenId | null;
   readonly tab: MenuTab;
   readonly cursor: number;
   /** The system tab is asking "start a new game?". */

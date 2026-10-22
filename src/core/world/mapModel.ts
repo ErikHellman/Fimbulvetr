@@ -1,8 +1,11 @@
 import type { FlagId } from '@content/flags';
-import type { DungeonId, EnemyId, RegionId } from '@content/ids';
+import type { DungeonId, EnemyId, NpcId, RegionId } from '@content/ids';
 import type { L10n } from '../i18n/t';
 import type { ScreenId } from '@content/world/screens';
 import type { EnemyDef } from '../actors/enemies/defs';
+import type { NpcDef } from '../actors/npc';
+import { DIR_VEC, type Dir4 } from '../math/dir';
+import { evalCond, type CondCtx } from '../story/cond';
 import { peekDungeon } from '../state/dungeons';
 import type { GameState } from '../state/gameState';
 import type { ScreenDef, WorldLayout } from './screen';
@@ -123,6 +126,71 @@ export function overworldMap(
     x1: xs.length === 0 ? 0 : Math.max(...xs),
     y1: ys.length === 0 ? 0 : Math.max(...ys),
   };
+}
+
+/** Grid screens by screen, per screen table: `gridScreenOf` walks every door, so it is worked out once. */
+const gridCache = new WeakMap<object, Map<ScreenId, ScreenId | null>>();
+
+function cachedGridScreen(
+  layout: WorldLayout,
+  screens: Readonly<Record<ScreenId, ScreenDef>>,
+  id: ScreenId,
+): ScreenId | null {
+  let cache = gridCache.get(screens);
+  if (cache === undefined) {
+    cache = new Map();
+    gridCache.set(screens, cache);
+  }
+  let grid = cache.get(id);
+  if (grid === undefined) {
+    grid = gridScreenOf(layout, screens, id);
+    cache.set(id, grid);
+  }
+  return grid;
+}
+
+/**
+ * Who is where on the overworld right now: each NPC under the grid screen its current place is on (or the
+ * screen whose door leads to the house it is in), in registry order. NPCs in dungeons or nowhere are left out.
+ */
+export function npcsByCell(
+  layout: WorldLayout,
+  screens: Readonly<Record<ScreenId, ScreenDef>>,
+  npcs: Readonly<Partial<Record<NpcId, NpcDef>>>,
+  ctx: CondCtx,
+): Map<ScreenId, NpcId[]> {
+  const out = new Map<ScreenId, NpcId[]>();
+  for (const def of Object.values(npcs)) {
+    const place = def.places.find((p) => evalCond(p.when, ctx));
+    if (place === undefined || screens[place.screen].dungeon !== undefined) continue;
+    const grid = cachedGridScreen(layout, screens, place.screen);
+    if (grid === null) continue;
+    out.set(grid, [...(out.get(grid) ?? []), def.id]);
+  }
+  return out;
+}
+
+/**
+ * Moving the map's look-around frame one step `dir` from `from`: to the nearest screen seen (visited or the
+ * hero's) that way, favouring ones straight ahead. Stays put when nothing seen lies that way.
+ */
+export function lookStep(m: MapModel, from: ScreenId, dir: Dir4): ScreenId {
+  const start = m.cells.find((c) => c.id === from);
+  if (start === undefined) return from;
+  const v = DIR_VEC[dir];
+  let best: { id: ScreenId; score: number; side: number } | null = null;
+  for (const c of m.cells) {
+    if (!c.visited && !c.here) continue;
+    const dx = c.gx - start.gx;
+    const dy = c.gy - start.gy;
+    const ahead = dx * v.x + dy * v.y;
+    if (ahead <= 0) continue;
+    const side = Math.abs(dx * v.y - dy * v.x);
+    const score = ahead + 2 * side;
+    if (best === null || score < best.score || (score === best.score && side < best.side))
+      best = { id: c.id, score, side };
+  }
+  return best?.id ?? from;
 }
 
 /** One room on a dungeon's map. */

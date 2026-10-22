@@ -267,6 +267,24 @@ export const UI = {
   fish_snapped: { en: 'Snap! The line broke.', sv: 'Pang! Linan brast.' },
   fish_slipped: { en: 'It slipped the hook.', sv: 'Den slet sig från kroken.' },
   fish_landed: { en: '{fish}! Kári pays {silver} silver.', sv: '{fish}! Kári betalar {silver} silver.' },
+  map_people: { en: 'People here: {who}', sv: 'Folk här: {who}' },
+  map_nobody: { en: 'No one about here.', sv: 'Ingen här just nu.' },
+  map_look_hint: {
+    en: 'E: look around   Left/Right: page   Esc or Tab: back to the game',
+    sv: 'E: se dig omkring   Vänster/Höger: sida   Esc eller Tab: tillbaka till spelet',
+  },
+  map_look_hint_pad: {
+    en: '{interact}: look around   ←→: page   {cancel} or {menu}: back to the game',
+    sv: '{interact}: se dig omkring   ←→: sida   {cancel} eller {menu}: tillbaka till spelet',
+  },
+  map_looking_hint: {
+    en: '↑↓←→: move   E or Esc: done   M: close',
+    sv: '↑↓←→: flytta   E eller Esc: klar   M: stäng',
+  },
+  map_looking_hint_pad: {
+    en: '↑↓←→: move   {interact} or {cancel}: done   {map}: close',
+    sv: '↑↓←→: flytta   {interact} eller {cancel}: klar   {map}: stäng',
+  },
 } as const satisfies Record<string, L10n>;
 
 export type UiKey = keyof typeof UI;
