@@ -145,4 +145,10 @@ describe('story content', () => {
       expect(t !== undefined && !DB.terrain[t].solid, name).toBe(true);
     }
   });
+
+  it('never says "To be continued" now that the whole story is in', () => {
+    for (const o of walk(DB.scripts))
+      if (o['k'] === 'card' && isL10n(o['text'] as Record<string, unknown>))
+        expect((o['text'] as L10n).en, JSON.stringify(o['text'])).not.toMatch(/to be continued/i);
+  });
 });

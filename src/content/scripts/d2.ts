@@ -62,7 +62,6 @@ const stone2Light: ScriptDef = {
     },
     { k: 'warp', screen: 'myl_mill', at: { x: 18, y: 16 }, facing: 's' },
     { k: 'fade', out: false },
-    { k: 'card', text: { en: 'To be continued.', sv: 'Fortsättning följer.' } },
   ],
 };
 

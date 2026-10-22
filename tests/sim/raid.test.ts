@@ -135,6 +135,36 @@ describe('the morning after', () => {
     ).toBe(true);
   });
 
+  it('lets Ask sleep in his own bed again without the raid starting over', () => {
+    const h = new Harness({ preset: DEV_PRESETS.morning });
+    h.sim.state.inv.weapon = 'seax';
+    h.sim.state.clock.minute = 22 * 60;
+    h.sim.command({ t: 'warp', screen: 'ask_int_longhouse', x: 10 * 16 + 8, y: 8 * 16 + 14 });
+    h.idle(1);
+    h.hold(['up'], 2).press(['interact']);
+    expect(h.sim.mode).toBe('story');
+    finishStory(h);
+    const s = h.sim.state;
+    expect(s.inv.weapon).toBe('seax');
+    expect(s.clock.minute).toBeGreaterThanOrEqual(6 * 60);
+    expect(s.clock.minute).toBeLessThan(7 * 60);
+    expect(h.sim.enemies).toHaveLength(0);
+    expect(h.sim.actors.some((a) => a.kind === 'fixture' && a.def === 'fire' && a.anim === 'burn')).toBe(
+      false,
+    );
+  });
+
+  it('keeps Ask out of bed while the raid burns', () => {
+    const h = new Harness({ preset: DEV_PRESETS.raid });
+    h.hold(['up'], 2).press(['interact']);
+    h.until((s) => s.storyUi() !== null, 60);
+    expect(h.sim.storyUi()?.k).toBe('text');
+    finishStory(h);
+    expect(h.sim.state.clock.minute).toBe(120);
+    expect(h.sim.state.inv.weapon).toBe('pitchfork');
+    expect(h.sim.enemies.map((e) => e.def)).toEqual(['draugr']);
+  });
+
   it('keeps the gate barred before the legend', () => {
     const h = new Harness({ preset: DEV_PRESETS.morning });
     h.sim.command({ t: 'warp', screen: 'ask_gate', x: 20 * 16 + 8, y: 8 * 16 + 14 });

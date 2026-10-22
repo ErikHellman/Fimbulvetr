@@ -1,5 +1,5 @@
 import type { ScriptDef } from '@core/story/script';
-import { all, day, flag } from '../dialogue/util';
+import { afterRaid, all, day, evening as dark, flag, raidNight } from '../dialogue/util';
 
 const DUSK = 20 * 60;
 const DAWN = 6 * 60;
@@ -18,43 +18,107 @@ const evening: ScriptDef = {
   ],
 };
 
-/** Ask's bed: sleeps to the next morning once the day's evening scene has played; day 3 ends in the raid. */
+/**
+ * Ask's bed: sleeps to the next morning once the day's evening scene has played; day 3 ends in the raid.
+ * After the raid it is a plain bed again: a night's sleep after dark, a rest by day.
+ */
 const sleep: ScriptDef = {
   steps: [
     {
       k: 'if',
-      when: all(day(3), flag('ev_embla_d3')),
-      then: [{ k: 'run', script: 'raid_begins' }],
-      else: [
+      when: afterRaid,
+      then: [
         {
           k: 'if',
-          when: { k: 'any', of: [all(day(1), flag('ev_embla_d1')), all(day(2), flag('ev_embla_d2'))] },
+          when: dark,
           then: [
             { k: 'fade', out: true },
             {
               k: 'do',
               effects: [
-                { k: 'add', flag: 'st_farm_day', n: 1 },
                 { k: 'sleep', until: DAWN },
                 { k: 'heal', n: 0 },
               ],
             },
-            {
-              k: 'if',
-              when: day(2),
-              then: [{ k: 'card', text: { en: 'The second day.', sv: 'Den andra dagen.' } }],
-              else: [{ k: 'card', text: { en: 'The third day.', sv: 'Den tredje dagen.' } }],
-            },
             { k: 'fade', out: false },
+            {
+              k: 'say',
+              who: null,
+              text: {
+                en: 'Ask sleeps in his own bed, in a house too quiet now, and wakes at first light.',
+                sv: 'Ask sover i sin egen säng, i ett hus som är för tyst nu, och vaknar i gryningen.',
+              },
+            },
           ],
           else: [
+            { k: 'do', effects: [{ k: 'heal', n: 0 }] },
+            {
+              k: 'say',
+              who: null,
+              text: {
+                en: 'Ask lies down a while. The straw still smells of smoke.',
+                sv: 'Ask lägger sig en stund. Halmen luktar fortfarande rök.',
+              },
+            },
+          ],
+        },
+      ],
+      else: [
+        {
+          k: 'if',
+          when: raidNight,
+          then: [
             {
               k: 'say',
               who: 'ask',
               text: {
-                en: 'Not tired yet. The day’s work is not done.',
-                sv: 'Inte trött än. Dagens arbete är inte gjort.',
+                en: 'No time for sleep. The roof is burning!',
+                sv: 'Ingen tid att sova. Taket brinner!',
               },
+            },
+          ],
+          else: [
+            {
+              k: 'if',
+              when: all(day(3), flag('ev_embla_d3')),
+              then: [{ k: 'run', script: 'raid_begins' }],
+              else: [
+                {
+                  k: 'if',
+                  when: {
+                    k: 'any',
+                    of: [all(day(1), flag('ev_embla_d1')), all(day(2), flag('ev_embla_d2'))],
+                  },
+                  then: [
+                    { k: 'fade', out: true },
+                    {
+                      k: 'do',
+                      effects: [
+                        { k: 'add', flag: 'st_farm_day', n: 1 },
+                        { k: 'sleep', until: DAWN },
+                        { k: 'heal', n: 0 },
+                      ],
+                    },
+                    {
+                      k: 'if',
+                      when: day(2),
+                      then: [{ k: 'card', text: { en: 'The second day.', sv: 'Den andra dagen.' } }],
+                      else: [{ k: 'card', text: { en: 'The third day.', sv: 'Den tredje dagen.' } }],
+                    },
+                    { k: 'fade', out: false },
+                  ],
+                  else: [
+                    {
+                      k: 'say',
+                      who: 'ask',
+                      text: {
+                        en: 'Not tired yet. The day’s work is not done.',
+                        sv: 'Inte trött än. Dagens arbete är inte gjort.',
+                      },
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },

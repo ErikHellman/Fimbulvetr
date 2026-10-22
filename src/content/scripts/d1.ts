@@ -62,7 +62,6 @@ const stone1Light: ScriptDef = {
     },
     { k: 'warp', screen: 'myr_roots', at: { x: 19, y: 4 }, facing: 's' },
     { k: 'fade', out: false },
-    { k: 'card', text: { en: 'To be continued.', sv: 'Fortsättning följer.' } },
   ],
 };
 
