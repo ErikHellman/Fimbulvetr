@@ -3,6 +3,8 @@ import { FONT_SIZES } from '@art/font';
 import { LANGS } from '@core/i18n/t';
 import { DEFAULT_SETTINGS, type Settings } from '@shell/platform/settings';
 import { REMAPPABLE, rebind, type RemappableAction } from '@shell/input/remap';
+import { TOUCH_SIZES } from '@shell/input/touchLayout';
+import { TOUCH_MODES } from '@shell/platform/settings';
 
 /**
  * The settings menu: pure state and input handling, drawn by the UI and title scenes. It edits a copy of
@@ -23,6 +25,7 @@ export const SETTING_ROWS = [
   'colourBlind',
   'showIntro',
   'controls',
+  'touch',
   'back',
 ] as const;
 export type SettingRow = (typeof SETTING_ROWS)[number];
@@ -31,8 +34,12 @@ export type SettingRow = (typeof SETTING_ROWS)[number];
 export const CONTROL_ROWS = [...REMAPPABLE, 'reset', 'back'] as const;
 export type ControlRow = (typeof CONTROL_ROWS)[number];
 
+/** The touch page: when the on-screen controls show, their size and hand, vibration, and moving them. */
+export const TOUCH_ROWS = ['touch', 'touchSize', 'touchLeft', 'haptics', 'arrange', 'back'] as const;
+export type TouchRow = (typeof TOUCH_ROWS)[number];
+
 export interface SettingsMenuState {
-  readonly page: 'main' | 'controls';
+  readonly page: 'main' | 'controls' | 'touch';
   readonly cursor: number;
   /** Waiting for the key to bind to this action (Escape cancels). */
   readonly listening: RemappableAction | null;
@@ -47,6 +54,8 @@ export interface SettingsStep {
   readonly moved: boolean;
   /** The full screen row was pressed: the caller toggles it (full screen is the browser's, not a setting). */
   readonly fullscreen: boolean;
+  /** "Move the buttons" was picked: the caller opens the layout editor over the menu. */
+  readonly arrange: boolean;
 }
 
 export function openSettings(): SettingsMenuState {
@@ -85,6 +94,25 @@ function nudge(s: Settings, row: SettingRow, dir: 1 | -1): Settings {
       return { ...s, [row]: !s[row] };
     case 'fullscreen':
     case 'controls':
+    case 'touch':
+    case 'back':
+      return s;
+  }
+}
+
+const cycle = <T>(list: readonly T[], v: T, dir: 1 | -1): T =>
+  list[(list.indexOf(v) + (dir === 1 ? 1 : list.length - 1)) % list.length] ?? v;
+
+function nudgeTouch(s: Settings, row: TouchRow, dir: 1 | -1): Settings {
+  switch (row) {
+    case 'touch':
+      return { ...s, touch: cycle(TOUCH_MODES, s.touch, dir) };
+    case 'touchSize':
+      return { ...s, touchSize: cycle(TOUCH_SIZES, s.touchSize, dir) };
+    case 'touchLeft':
+    case 'haptics':
+      return { ...s, [row]: !s[row] };
+    case 'arrange':
     case 'back':
       return s;
   }
@@ -100,7 +128,7 @@ export function stepSettings(
   settings: Settings,
   code: string | null,
 ): SettingsStep {
-  const same = { state, settings, changed: false, moved: false, fullscreen: false };
+  const same = { state, settings, changed: false, moved: false, fullscreen: false, arrange: false };
   if (state.listening !== null) {
     if (code === null) return same;
     const listening = null;
@@ -114,27 +142,31 @@ export function stepSettings(
       moved: true,
     };
   }
-  const rows = state.page === 'main' ? SETTING_ROWS.length : CONTROL_ROWS.length;
+  const rows = (state.page === 'main' ? SETTING_ROWS : state.page === 'touch' ? TOUCH_ROWS : CONTROL_ROWS)
+    .length;
   if (any(frame, ['up', 'down'])) {
     const cursor = (state.cursor + (wasPressed(frame, 'down') ? 1 : rows - 1)) % rows;
     return { ...same, state: { ...state, cursor }, moved: true };
   }
   if (state.page === 'controls') return stepControls(state, frame, settings);
+  if (state.page === 'touch') return stepTouch(state, frame, settings);
   if (any(frame, ['cancel'])) return { ...same, state: null };
   const row = SETTING_ROWS[state.cursor] ?? 'back';
   const confirm = any(frame, ['confirm', 'interact']);
   if (row === 'back' && confirm) return { ...same, state: null };
   if (row === 'controls' && confirm)
     return { ...same, state: { page: 'controls', cursor: 0, listening: null }, moved: true };
+  if (row === 'touch' && confirm)
+    return { ...same, state: { page: 'touch', cursor: 0, listening: null }, moved: true };
   const dir = wasPressed(frame, 'left') ? -1 : wasPressed(frame, 'right') || confirm ? 1 : 0;
-  if (dir === 0 || row === 'controls' || row === 'back') return same;
+  if (dir === 0 || row === 'controls' || row === 'touch' || row === 'back') return same;
   if (row === 'fullscreen') return { ...same, moved: true, fullscreen: true };
   const next = nudge(settings, row, dir);
   return { ...same, settings: next, changed: true, moved: true };
 }
 
 function stepControls(state: SettingsMenuState, frame: InputFrame, settings: Settings): SettingsStep {
-  const same = { state, settings, changed: false, moved: false, fullscreen: false };
+  const same = { state, settings, changed: false, moved: false, fullscreen: false, arrange: false };
   const back = {
     ...same,
     state: { page: 'main', cursor: SETTING_ROWS.indexOf('controls'), listening: null } as const,
@@ -152,4 +184,21 @@ function stepControls(state: SettingsMenuState, frame: InputFrame, settings: Set
       moved: true,
     };
   return { ...same, state: { ...state, listening: row }, moved: true };
+}
+
+function stepTouch(state: SettingsMenuState, frame: InputFrame, settings: Settings): SettingsStep {
+  const same = { state, settings, changed: false, moved: false, fullscreen: false, arrange: false };
+  const back = {
+    ...same,
+    state: { page: 'main', cursor: SETTING_ROWS.indexOf('touch'), listening: null } as const,
+    moved: true,
+  };
+  if (any(frame, ['cancel'])) return back;
+  const row = TOUCH_ROWS[state.cursor] ?? 'back';
+  const confirm = any(frame, ['confirm', 'interact']);
+  if (row === 'back') return confirm ? back : same;
+  if (row === 'arrange') return confirm ? { ...same, moved: true, arrange: true } : same;
+  const dir = wasPressed(frame, 'left') ? -1 : wasPressed(frame, 'right') || confirm ? 1 : 0;
+  if (dir === 0) return same;
+  return { ...same, settings: nudgeTouch(settings, row, dir), changed: true, moved: true };
 }

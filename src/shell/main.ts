@@ -13,7 +13,8 @@ import { hasWebGL } from '@shell/boot/webgl';
 import { SaveService } from '@shell/platform/saveService';
 import { registerServiceWorker } from '@shell/platform/pwa';
 import { openSaveStoreSafely } from '@shell/platform/saveStore';
-import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
+import { browserStorage, loadSettings, preferredLang, saveSettings } from '@shell/platform/settings';
+import { TouchControls } from '@shell/input/touch';
 import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { attachFullscreenHotkey } from '@shell/platform/fullscreen';
@@ -94,6 +95,11 @@ async function main(): Promise<void> {
   if (query?.preset !== undefined && isDevPresetId(query.preset))
     applyPreset(state, DEV_PRESETS[query.preset]);
   if (query !== null) applyDevQuery(state, query);
+  const touch = new TouchControls({
+    settings,
+    force: new URLSearchParams(window.location.search).get('touch') === '1',
+    save: () => saveSettings(browserStorage(), settings),
+  });
   const dev = DEV_TOOLS ? (await import('@shell/dev/index')).createDevTools() : null;
   const gallery = query?.gallery === true ? new (await import('@shell/dev/gallery')).GalleryScene() : null;
   startGame(
@@ -103,6 +109,7 @@ async function main(): Promise<void> {
       settings,
       saves,
       dev,
+      touch,
       muted: query?.mute === true,
       rolled: query?.rolled ?? true,
       ...(query?.weather === undefined ? {} : { weather: query.weather }),

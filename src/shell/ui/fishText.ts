@@ -3,7 +3,7 @@ import { t, type Lang } from '@core/i18n/t';
 import type { ContentDb } from '@core/sim/db';
 import type { StoryUi } from '@core/sim/systems/story';
 import { FISHING } from '@core/story/fishing';
-import { prompt, type PadStyle } from '@shell/input/padLabels';
+import { prompt, type PromptDevice } from '@shell/input/padLabels';
 
 export type FishUi = Extract<NonNullable<StoryUi>, { k: 'fish' }>;
 
@@ -20,7 +20,7 @@ export interface FishPanel {
   readonly dist: number | null;
 }
 
-export function fishPanel(ui: FishUi, db: ContentDb, lang: Lang, pad: PadStyle | null = null): FishPanel {
+export function fishPanel(ui: FishUi, db: ContentDb, lang: Lang, pad: PromptDevice | null = null): FishPanel {
   const none = { tension: null, dist: null } as const;
   switch (ui.phase) {
     case 'idle':

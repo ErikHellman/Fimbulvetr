@@ -40,7 +40,8 @@ import { slotName, summaryLine } from '@shell/ui/slotText';
 import { wareName } from '@shell/ui/wareText';
 import { gearLines } from '@shell/ui/gearText';
 import { fishPanel, type FishUi } from '@shell/ui/fishText';
-import { prompt, type PadStyle } from '@shell/input/padLabels';
+import { prompt, type PromptDevice } from '@shell/input/padLabels';
+import type { TapTargets } from '@shell/input/tapTargets';
 import { warpLines } from '@shell/ui/warpText';
 import { creditsRoll } from '@shell/ui/creditsText';
 import { GAME_H, GAME_W } from '@shell/scale';
@@ -52,8 +53,10 @@ export interface UiLink {
   readonly lang: () => Lang;
   /** Plays a sound unless muted. */
   readonly sfx: (id: 'sfx_talk') => void;
-  /** The kind of controller connected now, or null; prompts name its buttons while there is one. */
-  readonly pad: () => PadStyle | null;
+  /** What prompts name: the on-screen controls, a connected controller's kind, or null for keys. */
+  readonly pad: () => PromptDevice | null;
+  /** What can be tapped this frame: the scene adds its menu lines and boxes as it draws them. */
+  readonly taps: TapTargets;
   /** The key bound to an action now, as the HUD labels it (K, L, I… or the player's own, or a pad button). */
   readonly keyLabel: (action: 'item1' | 'item2' | 'galdr') => string;
   /** The text-size setting: dialogue, its choices and story cards are drawn at it. */
@@ -336,12 +339,26 @@ export class UiScene extends Phaser.Scene {
       .strokeRect(MENU.x + 0.5, MENU.y + 0.5, MENU.w - 1, MENU.h - 1)
       .lineBetween(MENU.x + 8, MENU.y + 24.5, MENU.x + MENU.w - 8, MENU.y + 24.5);
     let x = MENU.x + 14;
+    const taps = this.link.taps;
+    const tabNow = MENU_TABS.indexOf(state.tab);
     MENU_TABS.forEach((tab, i) => {
       const label = t(TAB_LABEL[tab], lang);
       this.menuTabs[i]
         ?.setText(label)
         .setPosition(x, MENU.y + 8)
         .setTint(tab === state.tab ? GOLD : DIM);
+      if (view.settings === null && !state.confirm)
+        taps.add({
+          k: 'row',
+          x: x - 12,
+          y: MENU.y,
+          w: textWidth(label) + 24,
+          h: 24,
+          row: i,
+          cursor: tabNow,
+          axis: 'h',
+          take: false,
+        });
       x += textWidth(label) + 24;
     });
     this.menuHint
@@ -364,6 +381,10 @@ export class UiScene extends Phaser.Scene {
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
       this.menuValues.setText(values.join('\n')).setPosition(MENU.x + 24 + column, top);
       this.menuHint.setText(hint);
+      const valueW = Math.max(40, ...values.map((v) => textWidth(v)));
+      taps.rows(MENU.x + 16, top, MENU.w - 32, LINE_HEIGHT, labels.length, view.settings.state.cursor, {
+        value: { x: MENU.x + 20 + column, w: valueW + 8 },
+      });
       return;
     }
     if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
@@ -380,6 +401,17 @@ export class UiScene extends Phaser.Scene {
           prompt(UI.menu_start_over_confirm, UI.menu_start_over_confirm_pad, this.link.pad(), lang),
         );
       this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+      if (state.confirm) {
+        const y = top + (SYSTEM_ROWS.length + 1) * LINE_HEIGHT;
+        taps.add({
+          k: 'press',
+          x: MENU.x + 16,
+          y: y - 2,
+          w: MENU.w - 32,
+          h: LINE_HEIGHT + 4,
+          action: 'confirm',
+        });
+      } else taps.rows(MENU.x + 16, top, MENU.w - 32, LINE_HEIGHT, SYSTEM_ROWS.length, state.cursor);
     }
   }
 
@@ -403,6 +435,7 @@ export class UiScene extends Phaser.Scene {
       return `${mark}     ${this.itemName(item.id, lang)}${count}${slot}`;
     });
     this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
+    this.link.taps.rows(MENU.x + 16, top, MENU.w - 32, LINE_HEIGHT, items.length, state.cursor);
     items.forEach((item, i) => {
       let icon = this.menuIcons[i];
       if (icon === undefined) {
@@ -570,6 +603,7 @@ export class UiScene extends Phaser.Scene {
     this.fallenPrompt
       .setText(show ? rise : '')
       .setPosition(Math.round((GAME_W - textWidth(rise)) / 2), y + 24);
+    if (age >= CONTINUE_DELAY) this.link.taps.add({ k: 'press', x, y, w, h: 44, action: 'confirm' });
   }
 
   private text(x: number, y: number, value: string, colour: number): Phaser.GameObjects.BitmapText {
@@ -785,6 +819,7 @@ export class UiScene extends Phaser.Scene {
       const y = 40;
       this.panel(x, y, w, h);
       this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
+      this.link.taps.rows(x, y + 8 + 2 * LINE_HEIGHT, w, LINE_HEIGHT, ui.rows.length + 1, ui.cursor);
       return;
     }
     const size = this.link.textSize();
@@ -799,6 +834,7 @@ export class UiScene extends Phaser.Scene {
       const lines = full.split('\n');
       const w = Math.max(...lines.map((l) => textWidth(l, size)));
       this.cardText.setPosition(Math.round((GAME_W - w) / 2), Math.round((GAME_H - lines.length * lh) / 2));
+      this.link.taps.add({ k: 'press', x: 0, y: 0, w: GAME_W, h: GAME_H, action: 'confirm' });
       return;
     }
     // The box keeps its bottom edge and grows upward to fit the text at the chosen size.
@@ -818,6 +854,9 @@ export class UiScene extends Phaser.Scene {
     sizeText(this.body, size)
       .setPosition(BOX.x + 12, top + 10)
       .setText(shown);
+    // Tapping the box moves the text on, unless there are choices to tap instead.
+    if (ui.choices.length === 0)
+      this.link.taps.add({ k: 'press', x: BOX.x, y: top, w: BOX.w, h, action: 'confirm' });
     if (ui.choices.length > 0) {
       const lines = ui.choices.map((c, i) => `${i === ui.cursor ? '>' : ' '} ${t(c, lang)}`);
       const ch = lines.length * lh + 12;
@@ -828,6 +867,7 @@ export class UiScene extends Phaser.Scene {
       sizeText(this.choices, size)
         .setPosition(x + 8, y + 6)
         .setText(lines.join('\n'));
+      this.link.taps.rows(x, y + 6, w, lh, lines.length, ui.cursor);
     }
   }
 
@@ -857,6 +897,7 @@ export class UiScene extends Phaser.Scene {
     const y = 40;
     this.panel(x, y, w, h);
     this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
+    this.link.taps.rows(x, y + 8 + 2 * LINE_HEIGHT, w, LINE_HEIGHT, rows.length, ui.cursor);
   }
 
   /** The slots a hof or mead hall offers, with what each holds now. */
@@ -883,6 +924,9 @@ export class UiScene extends Phaser.Scene {
     const y = 40;
     this.panel(x, y, w, h);
     this.shop.setPosition(x + 12, y + 8).setText(lines.join('\n'));
+    if (state.phase === 'pick')
+      this.link.taps.rows(x, y + 8 + 2 * LINE_HEIGHT, w, LINE_HEIGHT, rows.length, state.cursor);
+    else if (state.phase === 'done') this.link.taps.add({ k: 'press', x, y, w, h, action: 'confirm' });
   }
 
   private itemName(item: ItemId, lang: Lang): string {

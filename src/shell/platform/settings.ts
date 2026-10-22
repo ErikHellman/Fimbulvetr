@@ -2,6 +2,11 @@ import { FONT_SIZES, type FontSize } from '@art/font';
 import { ACTIONS, type Action } from '@core/input/actions';
 import { LANGS, type Lang } from '@core/i18n/t';
 import type { Scaling } from '@shell/scale';
+import { MOVABLE, TOUCH_SIZES, type Offsets, type TouchSize } from '@shell/input/touchLayout';
+
+/** On-screen controls: shown after a touch until a key or button is used (auto), always, or never. */
+export const TOUCH_MODES = ['auto', 'on', 'off'] as const;
+export type TouchMode = (typeof TOUCH_MODES)[number];
 
 export interface Settings {
   lang: Lang;
@@ -21,6 +26,14 @@ export interface Settings {
   showIntro: boolean;
   /** Keyboard keys per action that differ from the defaults (KeyboardEvent.code values). */
   keys: Partial<Record<Action, readonly string[]>>;
+  touch: TouchMode;
+  touchSize: TouchSize;
+  /** The on-screen controls mirrored: buttons on the left, the stick on the right. */
+  touchLeft: boolean;
+  /** A short buzz when Ask is hurt (on devices that can; touch controls only). */
+  haptics: boolean;
+  /** On-screen controls moved in the layout editor. */
+  touchLayout: Offsets;
 }
 
 export const SETTINGS_KEY = 'fimbulvetr.settings.v1';
@@ -38,6 +51,11 @@ export const DEFAULT_SETTINGS: Settings = {
   colourBlind: false,
   showIntro: true,
   keys: {},
+  touch: 'auto',
+  touchSize: 'normal',
+  touchLeft: false,
+  haptics: true,
+  touchLayout: {},
 };
 
 export type StorageLike = Pick<Storage, 'getItem' | 'setItem'>;
@@ -58,9 +76,26 @@ function parseKeys(v: unknown): Settings['keys'] {
   return out;
 }
 
+/** A moved control may sit at most this many button widths from home (the layout clamps it on screen). */
+const MAX_OFFSET = 30;
+
+function parseOffsets(v: unknown): Offsets {
+  if (typeof v !== 'object' || v === null) return {};
+  const out: Offsets = {};
+  const ok = (n: unknown): n is number =>
+    typeof n === 'number' && Number.isFinite(n) && Math.abs(n) <= MAX_OFFSET;
+  for (const id of MOVABLE) {
+    const o = (v as Record<string, unknown>)[id];
+    if (typeof o !== 'object' || o === null) continue;
+    const { dx, dy } = o as Record<string, unknown>;
+    if (ok(dx) && ok(dy)) out[id] = { dx, dy };
+  }
+  return out;
+}
+
 /** Stored JSON merged over validated defaults; anything unusable falls back field by field. */
 export function parseSettings(raw: string | null, fallbackLang: Lang): Settings {
-  const base: Settings = { ...DEFAULT_SETTINGS, lang: fallbackLang, keys: {} };
+  const base: Settings = { ...DEFAULT_SETTINGS, lang: fallbackLang, keys: {}, touchLayout: {} };
   if (raw === null) return base;
   let data: unknown;
   try {
@@ -91,6 +126,11 @@ export function parseSettings(raw: string | null, fallbackLang: Lang): Settings 
     colourBlind: bool(d['colourBlind'], base.colourBlind),
     showIntro: bool(d['showIntro'], base.showIntro),
     keys: parseKeys(d['keys']),
+    touch: TOUCH_MODES.find((m) => m === d['touch']) ?? base.touch,
+    touchSize: TOUCH_SIZES.find((z) => z === d['touchSize']) ?? base.touchSize,
+    touchLeft: bool(d['touchLeft'], base.touchLeft),
+    haptics: bool(d['haptics'], base.haptics),
+    touchLayout: parseOffsets(d['touchLayout']),
   };
 }
 

@@ -5,6 +5,7 @@ import { bindingsOf } from '@shell/input/remap';
 import {
   CONTROL_ROWS,
   SETTING_ROWS,
+  TOUCH_ROWS,
   openSettings,
   stepSettings,
   type SettingsMenuState,
@@ -19,6 +20,7 @@ function run(settings: Settings, ...inputs: Input[]) {
   let s = settings;
   let changes = 0;
   let fullscreen = 0;
+  let arrange = 0;
   for (const i of inputs) {
     if (state === null) break;
     const r: SettingsStep = Array.isArray(i)
@@ -28,8 +30,9 @@ function run(settings: Settings, ...inputs: Input[]) {
     s = r.settings;
     if (r.changed) changes += 1;
     if (r.fullscreen) fullscreen += 1;
+    if (r.arrange) arrange += 1;
   }
-  return { state, settings: s, changes, fullscreen };
+  return { state, settings: s, changes, fullscreen, arrange };
 }
 
 const down = (n: number): Action[][] => Array.from({ length: n }, () => ['down']);
@@ -102,5 +105,25 @@ describe('settings menu', () => {
       expect(r.settings).toEqual(DEFAULT_SETTINGS);
     }
     expect(run(DEFAULT_SETTINGS, ...at).fullscreen).toBe(0);
+  });
+
+  it('sets the touch controls on their own page, and asks for the layout editor', () => {
+    const toTouch = [...down(rowOf('touch')), ['confirm']] as Action[][];
+    const at = (r: (typeof TOUCH_ROWS)[number]): Action[][] => down(TOUCH_ROWS.indexOf(r));
+    expect(run(DEFAULT_SETTINGS, ...toTouch, ['right']).settings.touch).toBe('on');
+    expect(run(DEFAULT_SETTINGS, ...toTouch, ['left']).settings.touch).toBe('off');
+    expect(run(DEFAULT_SETTINGS, ...toTouch, ...at('touchSize'), ['confirm']).settings.touchSize).toBe(
+      'large',
+    );
+    expect(run(DEFAULT_SETTINGS, ...toTouch, ...at('touchLeft'), ['right']).settings.touchLeft).toBe(true);
+    expect(run(DEFAULT_SETTINGS, ...toTouch, ...at('haptics'), ['confirm']).settings.haptics).toBe(false);
+    const arrange = run(DEFAULT_SETTINGS, ...toTouch, ...at('arrange'), ['confirm']);
+    expect(arrange.arrange).toBe(1);
+    expect(arrange.changes).toBe(0);
+    expect(run(DEFAULT_SETTINGS, ...toTouch, ['cancel']).state).toEqual({
+      page: 'main',
+      cursor: rowOf('touch'),
+      listening: null,
+    });
   });
 });

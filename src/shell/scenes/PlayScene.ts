@@ -29,7 +29,9 @@ import { musicOf } from '@core/audio/music';
 import type { DevBridge, ViewStats } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
 import { connectedPads, readPad } from '@shell/input/gamepad';
-import { activePadStyle, padLabel, type PadStyle } from '@shell/input/padLabels';
+import { activePadStyle, padLabel, promptDevice, type PromptDevice } from '@shell/input/padLabels';
+import type { Action } from '@core/input/actions';
+import type { PlayButton } from '@shell/input/touchLayout';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { LETTERBOX } from '@shell/scale';
@@ -117,8 +119,11 @@ export class PlayScene extends Phaser.Scene {
   private settingsMenu: SettingsMenuState | null = null;
   /** The save-slot picker, while the sim's `save` step waits. */
   private picker: PickerState | null = null;
-  /** The kind of controller connected now, or null: prompts name its buttons while there is one. */
-  private pad: PadStyle | null = null;
+  /**
+   * What the prompts name: the on-screen controls while they show, else the kind of controller
+   * connected, or null for the keyboard.
+   */
+  private pad: PromptDevice | null = null;
   private pickerSlots: Record<'s1' | 's2' | 's3', SaveSummary | null> = { s1: null, s2: null, s3: null };
   private pickerResult: 'saved' | 'failed' | null = null;
   /** Keys held last frame, to find the one freshly pressed (for rebinding). */
@@ -208,7 +213,10 @@ export class PlayScene extends Phaser.Scene {
       frames: data.assets.frames,
       lang: () => data.settings.lang,
       pad: () => this.pad,
+      taps: data.touch.targets,
       keyLabel: (action) => {
+        // The on-screen item buttons read 1 and 2; the galdr button is named on itself.
+        if (this.pad === 'touch') return action === 'item1' ? '1' : action === 'item2' ? '2' : '';
         const button = bindingsOf(data.settings.keys).pad[action][0];
         return this.pad !== null && button !== undefined
           ? padLabel(button, this.pad, data.settings.lang)
@@ -245,11 +253,30 @@ export class PlayScene extends Phaser.Scene {
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
     const pads = connectedPads(navigator);
-    this.pad = activePadStyle(pads);
-    this.mapper.sample(codes, readPad(pads));
+    const pad = readPad(pads);
+    const touch = this.services.touch;
+    if (codes.size > 0 || (pad?.buttons.size ?? 0) > 0) touch.otherInput();
     if (this.picker === null && this.sim.storyUi()?.k === 'save') this.openPicker();
+    // Screen slides keep the play controls, so a thumb on the stick walks on into the next screen.
+    const playing =
+      this.menu === null && this.picker === null && this.sim.storyUi() === null && this.sim.mode !== 'over';
+    touch.frame(
+      playing ? 'play' : 'menu',
+      this.missingButtons(),
+      this.services.settings.lang,
+      this.menuButtons(),
+    );
+    this.pad = promptDevice(touch.shown(), activePadStyle(pads));
+    this.mapper.sample(codes, pad, touch.snapshot());
+    if (touch.arranging()) {
+      this.latch.consume();
+      this.acc.acc = 0;
+      this.draw(0);
+      return;
+    }
     if (this.picker !== null) {
       this.updatePicker(this.latch.consume());
+      touch.advance();
       this.acc.acc = 0;
       this.draw(0);
       return;
@@ -257,11 +284,14 @@ export class PlayScene extends Phaser.Scene {
     if (this.menu !== null) {
       if (this.settingsMenu !== null) this.updateSettings(this.latch.consume(), fresh);
       else this.updateMenu(this.latch.consume());
+      touch.advance();
       this.acc.acc = 0;
       this.draw(0);
       return;
     }
     const { steps, alpha } = advance(this.acc, delta);
+    // One scripted press per frame the sim reads, however many ticks this frame runs.
+    if (steps > 0) touch.advance();
     const started = performance.now();
     for (let i = 0; i < steps; i++) {
       const frame = this.latch.consume();
@@ -278,6 +308,25 @@ export class PlayScene extends Phaser.Scene {
     this.audio.handle(events);
     this.services.dev?.onEvents(events);
     this.draw(alpha);
+  }
+
+  /** Play buttons with nothing to do yet: an empty item slot, no galdr known, no sword or shield. */
+  private missingButtons(): ReadonlySet<Action> {
+    const inv = this.sim.state.inv;
+    const out = new Set<Action>();
+    if (inv.slots[0] === null) out.add('item1');
+    if (inv.slots[1] === null) out.add('item2');
+    if (inv.galdr.length === 0) out.add('galdr');
+    if (inv.weapon === 'none') out.add('sword');
+    if (!inv.shield) out.add('shield');
+    return out;
+  }
+
+  /** The items page of the pause menu puts things in a slot with the item buttons, so it shows them. */
+  private menuButtons(): readonly PlayButton[] {
+    if (this.menu?.tab !== 'items' || this.settingsMenu !== null) return [];
+    const items = menuItems(this.sim.state.inv, this.services.db.items);
+    return items.some((i) => i.kind === 'sub') ? ['item1', 'item2'] : [];
   }
 
   /** Every half second of play, newly earned achievements are stored and queued as toasts. */
@@ -345,6 +394,7 @@ export class PlayScene extends Phaser.Scene {
       this.fx.spark({ x: origin.x + ev.x, y: origin.y + ev.y }, this.sim.tick);
     } else if (ev.t === 'hit' && ev.target === this.sim.hero.id && !ev.blocked && ev.dealt > 0) {
       if (this.services.settings.shake) this.cameras.main.shake(120, 0.004);
+      this.services.touch.vibrate(40);
     } else if (ev.t === 'hit' && !ev.blocked && ev.dealt > 0) {
       const target = this.sim.entities.find((e) => e.id === ev.target);
       if (target !== undefined) {
@@ -452,6 +502,7 @@ export class PlayScene extends Phaser.Scene {
       if (scaling !== this.services.settings.scaling) window.dispatchEvent(new Event('resize'));
     }
     if (r.fullscreen) requestFullscreenToggle(this.services.settings.lang);
+    if (r.arrange) this.services.touch.arrange();
     if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
     if (r.state === null) this.audio.play('sfx_talk');
   }

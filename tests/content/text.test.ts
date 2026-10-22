@@ -4,6 +4,7 @@ import type { L10n } from '@core/i18n/t';
 import { GALDR_DEFS } from '@content/galdr';
 import { ARMOR_NAMES, RING_NAMES, WEAPON_NAMES } from '@content/gear';
 import { UI } from '@content/i18n/ui';
+import { TOUCH_BUTTONS, TOUCH_TEXT } from '@content/i18n/touch';
 import { ITEM_NAMES } from '@content/items';
 import { NPC_NAMES } from '@content/npcs';
 
@@ -13,6 +14,8 @@ const tables: Record<string, Readonly<Record<string, L10n>>> = {
   ARMOR_NAMES,
   RING_NAMES,
   UI,
+  TOUCH_BUTTONS,
+  TOUCH_TEXT,
   NPC_NAMES,
   GALDR: Object.fromEntries(Object.entries(GALDR_DEFS).map(([id, def]) => [id, def.name])),
 };
