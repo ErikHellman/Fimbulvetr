@@ -1,6 +1,6 @@
 # Fimbulvetr
 
-![Ask, armed with a seax, is stalked by three wolves in the rain-lashed pine forest of Myrkviðr at dusk](docs/images/screenshot.png)
+![Ask stands at the crossroads of Askdalr, the home village, between four turf-roofed longhouses, a well and a rune stone](docs/images/askdalr-village.png)
 
 A top-down action-adventure in the mould of _A Link to the Past_, set in a Norse-myth world. It runs entirely in the browser.
 
@@ -20,7 +20,7 @@ Choose **New game** on the title screen. A short page shows the controls first (
 - **Find the hidden things.** Four heart pieces make a heart. Bragi the skald sells verses that hint at the best-hidden ones.
 - **Save often.** The game saves on its own when you move between screens. Save to a slot at a hof or a mead hall, and use **Export** on the title screen to keep a copy as a file.
 
-The settings menu holds the language (English or Swedish), the volume, the text size, key bindings and the accessibility options: colour-blind aid, no screen shake, no lightning flashes, a shield that stays up on a tap, and long days.
+The settings menu holds the language (English or Swedish), the sound and music volume, the screen scaling (whole-pixel or fit to window), the text size, key bindings and the accessibility options: colour-blind aid, no screen shake, no lightning flashes, a shield that stays up on a tap, and long days.
 
 ## Goals
 
@@ -33,14 +33,23 @@ The full design is in [`Fimbulvetr-game-design-document.md`](Fimbulvetr-game-des
 
 The target is a 15–20 hour main quest with 8 overworld regions, 8 dungeons and 9 bosses, about 45 named NPCs and around 25 side quests. All text is bilingual: English and Swedish.
 
-The project is also an experiment in building a complete game solo with [Claude Code](https://claude.com/claude-code). The roadmap is split into AI-sized milestones, and every rule of the game lives in a deterministic, heavily tested pure-TypeScript core. The placeholder art and sound effects are generated in code, so the game is fully playable before any hand-made art exists.
+The project is also an experiment in building a complete game solo with [Claude Code](https://claude.com/claude-code). The roadmap is split into AI-sized milestones, and every rule of the game lives in a deterministic, heavily tested pure-TypeScript core.
+
+## Art, sound and music
+
+- **Pixel art.** Every sprite, tile, effect and icon is drawn as text grids in [`art-src/`](art-src) (one palette letter per pixel) and packed into the atlases under `public/atlases/` with `pnpm art:pack`. The game also generates matching placeholder art in code (`src/art`), so any frame the atlases leave out still has a picture. [`docs/real-art.md`](docs/real-art.md) and [`docs/art-style-guide.md`](docs/art-style-guide.md) describe the pipeline and the look.
+- **Sound effects** are synthesised in code at boot.
+- **Music** is composed in code too: 29 Nordic-folk tracks (each region with a winter variant, each dungeon, the town, bosses, the last battle, the title and the credits), with a combat drum stem and a night drone that fade in and out. [`docs/music.md`](docs/music.md) explains the approach and how real recordings replace a track by its key.
+- A colour grade that follows the season, the hour and the weather, soft lights, cloud shadows, and rain, snow and fog sit on top.
 
 ## Tech
 
 - [Phaser 4](https://phaser.io/) (WebGL) for rendering, input and audio, kept to a thin shell.
-- Strict TypeScript and [Vite](https://vite.dev/). The game installs as a PWA.
+- Strict TypeScript and [Vite](https://vite.dev/). The game installs as a PWA and plays offline once loaded.
 - A pure, deterministic simulation (`src/core`) with no Phaser, no DOM and no wall-clock time. That makes the whole game testable headlessly, down to full playthroughs of each milestone.
 - Saves live in the browser (IndexedDB). They can be exported and imported as files. Nothing is sent to a server.
+
+- Every push to `main` runs the full check and deploys to GitHub Pages (`.github/workflows/deploy.yml`). Pull requests run CI as parallel jobs: typecheck, lint, build and size budget; the Vitest suite, including solver proofs that every region can be finished in every season; and the Playwright suite on Chromium and WebKit in shards (`.github/workflows/ci.yml`).
 
 [`ARCHITECTURE.md`](ARCHITECTURE.md) describes the layers, the frame loop and the key modules.
 
@@ -65,7 +74,7 @@ Then open the URL that Vite prints (usually <http://localhost:5173>).
 
 | Action           | Keyboard           | Gamepad      |
 | ---------------- | ------------------ | ------------ |
-| Move             | WASD / arrow keys  | D-pad        |
+| Move             | WASD / arrow keys  | D-pad / left stick |
 | Sword            | J                  | X            |
 | Items            | K, L               | B, Y         |
 | Galdr (spell)    | I                  | RT           |
@@ -74,7 +83,7 @@ Then open the URL that Vite prints (usually <http://localhost:5173>).
 | Interact/confirm | E / Enter          | A            |
 | Pause menu / map | Tab / M            | Start / Back |
 
-All bindings can be changed in the settings menu.
+Keyboard keys can be rebound in the settings menu. Any standard-mapping controller works (Xbox, PlayStation, Switch Pro and similar), and the on-screen prompts use that controller's own button names.
 
 ### Dev shortcuts
 
@@ -97,6 +106,8 @@ F1 toggles a debug overlay and the backquote key (`` ` ``) opens a dev console (
 | `pnpm build`   | Production build into `dist/`.                             |
 | `pnpm preview` | Serve the production build locally.                        |
 | `pnpm budget`  | Check the gzipped JS size budget (run after `pnpm build`). |
+| `pnpm art:pack` | Pack the drawn art in `art-src/` into `public/atlases/`. |
+| `pnpm promo`   | Capture the promo screenshots and trailer (see [`promo/README.md`](promo/README.md)). |
 
 The first time you run the end-to-end tests, install the browsers with `pnpm exec playwright install chromium webkit`.
 
@@ -107,8 +118,11 @@ src/core     rules and simulation (pure TypeScript, deterministic)
 src/content  typed game data: screens, items, dialogue, quests, tuning
 src/art      generated placeholder art and sound
 src/shell    Phaser scenes, views, input, audio, storage, dev tools
-tests/       Vitest units, headless sim scenarios and Playwright e2e
-docs/        design spec, roadmap, milestone briefs and plans
+art-src/     the drawn pixel art as text grids, packed by `pnpm art:pack`
+public/      packed atlases, icons and the CNAME for GitHub Pages
+tests/       Vitest units, headless sim scenarios, save fixtures and Playwright e2e
+promo/       screenshots and a trailer captured from the game
+docs/        design spec, roadmap, briefs, music and art guides
 ```
 
 ## License
