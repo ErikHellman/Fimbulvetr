@@ -39,6 +39,7 @@ import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { menuItems, openMenu, ownedRings, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
+import { questPage, type QuestFilter } from '@shell/ui/questPage';
 import { EntityViews } from '@shell/view/entityViews';
 import { CloudView } from '@shell/view/cloudView';
 import { DarknessView, FOG } from '@shell/view/darknessView';
@@ -53,6 +54,7 @@ import { ACHIEVEMENT_DEFS } from '@content/achievements';
 import type { AchievementId } from '@content/ids';
 import { fresh as freshAchievements } from '@core/progress/achievements';
 import { condCtx } from '@core/sim/systems/story';
+import { questLog, type QuestLine } from '@core/story/quests';
 import { loadAchievements, saveAchievements } from '@shell/platform/achievements';
 import { noToasts, pushToasts, tickToasts, type Toasts } from '@shell/ui/toast';
 import type { SaveSummary } from '@shell/platform/saveStore';
@@ -229,6 +231,7 @@ export class PlayScene extends Phaser.Scene {
           : {
               state: this.menu,
               items: menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
+              quests: this.menuQuests(this.menu.filter),
               settings:
                 this.settingsMenu === null
                   ? null
@@ -404,6 +407,7 @@ export class PlayScene extends Phaser.Scene {
       menu,
       frame,
       menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
+      this.menuQuests(menu.filter).length,
     );
     for (const a of r.actions) {
       if (a.k === 'settings') {
@@ -421,9 +425,18 @@ export class PlayScene extends Phaser.Scene {
       }
     }
     if (r.actions.length > 0) this.sim.flushCommands();
-    if (r.state !== menu && r.state !== null && (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab))
+    if (
+      r.state !== menu &&
+      r.state !== null &&
+      (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab || r.state.filter !== menu.filter)
+    )
       this.audio.play('sfx_talk');
     this.setMenu(r.state);
+  }
+
+  /** What the quest tab lists under `filter`. */
+  private menuQuests(filter: QuestFilter): QuestLine[] {
+    return questPage(questLog(this.sim.db.quests, condCtx(this.sim)), filter);
   }
 
   private openPicker(): void {

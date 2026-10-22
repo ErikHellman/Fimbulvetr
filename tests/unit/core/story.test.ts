@@ -96,6 +96,38 @@ describe('quests', () => {
       { id: 'q_chores', name: chores.name, text: { en: 'Done', sv: 'Klart' }, done: true },
     ]);
   });
+
+  it('carry who gave them and where the current stage happens', () => {
+    const c = ctx();
+    const giver = { who: { en: 'Halvar', sv: 'Halvar' }, place: { en: 'Askdalr', sv: 'Askdalr' } };
+    const field = { en: 'The field', sv: 'Åkern' };
+    const q: QuestDef = {
+      ...chores,
+      giver,
+      stages: [
+        {
+          when: { k: 'flag', id: 'st_farm_day', gte: 1 },
+          text: { en: 'Pen the sheep', sv: 'Fålla fåren' },
+          at: field,
+        },
+        { when: { k: 'flag', id: 'q_sheep_d1' }, text: { en: 'Done', sv: 'Klart' } },
+      ],
+    };
+    c.state.flags.st_farm_day = 1;
+    expect(questLog({ q_chores: q }, c)[0]).toMatchObject({ giver, at: field, done: false });
+    c.state.flags.q_sheep_d1 = true;
+    expect(questLog({ q_chores: q }, c)[0]?.at).toBeUndefined();
+  });
+
+  it('stay open on their last stage until `openUntil` holds', () => {
+    const c = ctx();
+    const q: QuestDef = { ...chores, openUntil: { k: 'flag', id: 'st_raid_done' } };
+    c.state.flags.st_farm_day = 1;
+    c.state.flags.q_sheep_d1 = true;
+    expect(questLog({ q_chores: q }, c)[0]?.done).toBe(false);
+    c.state.flags.st_raid_done = true;
+    expect(questLog({ q_chores: q }, c)[0]?.done).toBe(true);
+  });
 });
 
 describe('applyEffect', () => {

@@ -36,12 +36,16 @@ describe('v1-m9b fixture', () => {
     expect(result.state.world.opened).toEqual(expect.arrayContaining(['d7_hc', 'd7_c_bigkey']));
   });
 
-  it('runs: the Rime Tower is done, and the quest log says so', () => {
+  it('runs: the Rime Tower is beaten, and the quest log sends Ask after Halvar', () => {
     if (!result.ok) throw new Error(result.error.detail);
     const sim = new Sim(DB, result.state);
     for (let i = 0; i < 120; i++) sim.step(frameOf([]));
     expect(sim.mode).toBe('play');
-    const log = questLog(DB.quests, { state: sim.state, quests: DB.quests });
-    expect(log.find((q) => q.id === 'q_rime')?.done).toBe(true);
+    const rime = () =>
+      questLog(DB.quests, { state: sim.state, quests: DB.quests }).find((q) => q.id === 'q_rime');
+    expect(rime()?.done).toBe(false);
+    expect(rime()?.text.en).toMatch(/Halvar has gone up the mountain/);
+    sim.state.flags.st_halvar_confessed = true;
+    expect(rime()?.done).toBe(true);
   });
 });
