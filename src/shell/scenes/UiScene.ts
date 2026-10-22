@@ -21,11 +21,12 @@ import { condCtx } from '@core/sim/systems/story';
 import { ACHIEVEMENT_DEFS } from '@content/achievements';
 import type { AchievementId } from '@content/ids';
 import { progressLine } from '@shell/ui/progressText';
-import { questLog } from '@core/story/quests';
+import { questLog, type QuestLine } from '@core/story/quests';
 import { peekDungeon } from '@core/state/dungeons';
 import { dungeonMap, overworldMap, verseMarks, beaconMarks } from '@core/world/mapModel';
 import { VERSES } from '@content/verses';
 import { MENU_TABS, SYSTEM_ROWS, type MenuItem, type MenuState } from '@shell/ui/pauseMenu';
+import { QUEST_FILTERS, questCounts, scrollTop } from '@shell/ui/questPage';
 import type { Sim, StoryUi } from '@core/sim/sim';
 import type { Speaker } from '@core/story/dialogue';
 import { FONT_KEY, fontKey } from '@shell/gfx/font';
@@ -62,6 +63,8 @@ export interface UiLink {
   readonly menu: () => {
     readonly state: MenuState;
     readonly items: readonly MenuItem[];
+    /** What the quest tab lists, under the menu's filter. */
+    readonly quests: readonly QuestLine[];
     /** The settings menu, when it is open over the game tab. */
     readonly settings: { readonly state: SettingsMenuState; readonly values: Settings } | null;
   } | null;
@@ -89,6 +92,17 @@ const SYSTEM_LABEL = {
   start_over: UI.menu_start_over,
 } as const;
 const MENU = { x: 16, y: 14, w: GAME_W - 32, h: GAME_H - 28 };
+/** The quest tab: rows of quest names that fit above the footer, and the width of their column. */
+const QUEST_ROWS = 19;
+const QUEST_LIST_W = 200;
+
+/** `text`, cut short with an ellipsis if it is wider than `w`. */
+function fitText(text: string, w: number): string {
+  if (textWidth(text) <= w) return text;
+  let cut = text;
+  while (cut.length > 0 && textWidth(`${cut}...`) > w) cut = cut.slice(0, -1);
+  return `${cut.trimEnd()}...`;
+}
 
 export const UI_LINK = 'uiLink';
 
@@ -205,6 +219,10 @@ export class UiScene extends Phaser.Scene {
   /** The second column of the settings menu. */
   private menuValues!: Phaser.GameObjects.BitmapText;
   private menuIcons: Phaser.GameObjects.Image[] = [];
+  /** The quest tab's filter labels, its chosen quest's name, and that quest's details. */
+  private questFilters: Phaser.GameObjects.BitmapText[] = [];
+  private questTitle!: Phaser.GameObjects.BitmapText;
+  private questDetail!: Phaser.GameObjects.BitmapText;
   private toastBox!: Phaser.GameObjects.Graphics;
   private toastText!: Phaser.GameObjects.BitmapText;
   private fallen!: Phaser.GameObjects.Rectangle;
@@ -278,6 +296,9 @@ export class UiScene extends Phaser.Scene {
     this.menuHint = this.text(0, 0, '', DIM);
     this.menuValues = this.text(0, 0, '', GOLD);
     this.menuIcons = [];
+    this.questFilters = QUEST_FILTERS.map(() => this.text(0, 0, '', DIM));
+    this.questTitle = this.text(0, 0, '', GOLD);
+    this.questDetail = this.text(0, 0, '', PAPER);
     this.toastBox = this.add.graphics();
     this.toastText = this.text(0, 0, '', GOLD);
   }
@@ -321,6 +342,9 @@ export class UiScene extends Phaser.Scene {
     this.menuBox.clear();
     for (const icon of this.menuIcons) icon.setVisible(false);
     this.menuValues.setText('');
+    for (const f of this.questFilters) f.setText('');
+    this.questTitle.setText('');
+    this.questDetail.setText('');
     if (view === null) {
       for (const tab of this.menuTabs) tab.setText('');
       this.menuBody.setText('');
@@ -348,7 +372,9 @@ export class UiScene extends Phaser.Scene {
       .setText(
         state.tab === 'items'
           ? prompt(UI.menu_items_hint, UI.menu_items_hint_pad, this.link.pad(), lang)
-          : prompt(UI.menu_tabs_hint, UI.menu_tabs_hint_pad, this.link.pad(), lang),
+          : state.tab === 'quests'
+            ? prompt(UI.menu_quests_hint, UI.menu_quests_hint_pad, this.link.pad(), lang)
+            : prompt(UI.menu_tabs_hint, UI.menu_tabs_hint_pad, this.link.pad(), lang),
       )
       .setPosition(MENU.x + 14, MENU.y + MENU.h - 18);
     const top = MENU.y + 36;
@@ -369,7 +395,7 @@ export class UiScene extends Phaser.Scene {
     if (state.tab === 'items') this.menuItems(view.items, state, top, lang);
     else if (state.tab === 'gear') this.menuGear(top, lang);
     else if (state.tab === 'map') this.menuMap(top, lang);
-    else if (state.tab === 'quests') this.menuQuests(top, lang);
+    else if (state.tab === 'quests') this.menuQuests(view.quests, state, top, lang);
     else {
       const lines = SYSTEM_ROWS.map(
         (r, i) => `${i === state.cursor ? '>' : ' '} ${t(SYSTEM_LABEL[r], lang)}`,
@@ -529,22 +555,69 @@ export class UiScene extends Phaser.Scene {
     this.menuBody.setText(lines.join('\n')).setPosition(MENU.x + 24, top);
   }
 
-  private menuQuests(top: number, lang: Lang): void {
+  /**
+   * The quest tab: active or done (E switches) over a list of quest names on the left, and the chosen
+   * quest on the right: who gave it and where, where to go now, and what the log says.
+   */
+  private menuQuests(quests: readonly QuestLine[], state: MenuState, top: number, lang: Lang): void {
     const { sim } = this.link;
-    const log = questLog(sim.db.quests, condCtx(sim));
+    const ctx = condCtx(sim);
+    const log = questLog(sim.db.quests, ctx);
+    this.menuValues
+      .setText(progressLine(ctx, this.link.achievements(), lang))
+      .setPosition(MENU.x + 24, MENU.y + MENU.h - 32);
     if (log.length === 0) {
       this.menuBody.setText(t(UI.menu_no_quests, lang)).setPosition(MENU.x + 24, top);
       return;
     }
-    const lines = log.flatMap((q) => [
-      `${t(q.name, lang)}${q.done ? ` (${t(UI.menu_quest_done, lang)})` : ''}`,
-      ...layoutText(t(q.text, lang), MENU.w - 64).map((l) => `   ${l}`),
+    const counts = questCounts(log);
+    let x = MENU.x + 24;
+    QUEST_FILTERS.forEach((f, i) => {
+      const label = t(f === 'active' ? UI.menu_quests_active : UI.menu_quests_done, lang, { n: counts[f] });
+      this.questFilters[i]
+        ?.setText(label)
+        .setPosition(x, top)
+        .setTint(f === state.filter ? GOLD : DIM);
+      x += textWidth(label) + 16;
+    });
+    const listTop = top + 16;
+    if (quests.length === 0) {
+      const empty = state.filter === 'active' ? UI.menu_no_quests_active : UI.menu_no_quests_done;
+      this.menuBody
+        .setText(layoutText(t(empty, lang), MENU.w - 48).join('\n'))
+        .setPosition(MENU.x + 24, listTop);
+      return;
+    }
+    const cursor = Math.min(state.cursor, quests.length - 1);
+    const first = scrollTop(cursor, quests.length, QUEST_ROWS);
+    const names = quests
+      .slice(first, first + QUEST_ROWS)
+      .map((q, i) => `${first + i === cursor ? '>' : ' '} ${fitText(t(q.name, lang), QUEST_LIST_W - 12)}`);
+    this.menuBody.setText(names.join('\n')).setPosition(MENU.x + 24, listTop);
+    const split = MENU.x + 24 + QUEST_LIST_W + 8;
+    this.menuBox
+      .lineStyle(1, DIM, 1)
+      .lineBetween(split + 0.5, top, split + 0.5, top + (QUEST_ROWS + 1) * LINE_HEIGHT);
+    const q = quests[cursor];
+    if (q === undefined) return;
+    const dx = split + 12;
+    const width = MENU.x + MENU.w - 16 - dx;
+    this.questTitle.setText(fitText(t(q.name, lang), width)).setPosition(dx, top);
+    const from =
+      q.giver === undefined
+        ? t(UI.menu_quest_main, lang)
+        : q.giver.who === undefined
+          ? t(UI.menu_quest_found, lang, { place: t(q.giver.place, lang) })
+          : t(UI.menu_quest_from, lang, { who: t(q.giver.who, lang), place: t(q.giver.place, lang) });
+    const lines = [
+      ...layoutText(from, width),
+      ...(q.done || q.at === undefined
+        ? []
+        : layoutText(t(UI.menu_quest_where, lang, { place: t(q.at, lang) }), width)),
       '',
-    ]);
-    this.menuBody.setText(lines.slice(0, 21).join('\n')).setPosition(MENU.x + 24, top);
-    this.menuValues
-      .setText(progressLine(condCtx(sim), this.link.achievements(), lang))
-      .setPosition(MENU.x + 24, MENU.y + MENU.h - 32);
+      ...layoutText(t(q.text, lang), width),
+    ];
+    this.questDetail.setText(lines.slice(0, QUEST_ROWS).join('\n')).setPosition(dx, listTop);
   }
 
   /** After the fall: the screen dims and, a moment later, the way to rise again. */

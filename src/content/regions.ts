@@ -13,6 +13,21 @@ export const REGION_NAMES = {
   hrimfjoll: { en: 'Hrímfjöll', sv: 'Hrímfjöll' },
 } as const satisfies Record<RegionId, L10n>;
 
+/** Where a quest step happens, for the quest log: the regions, and the towns and halls inside them. */
+export const PLACE_NAMES = {
+  ...REGION_NAMES,
+  uppvik: { en: 'Uppvík', sv: 'Uppvík' },
+  holmr: { en: 'Holmr', sv: 'Holmr' },
+  rotarhellir: { en: 'Rótarhellir', sv: 'Rótarhellir' },
+  sokkva_kvern: { en: 'Sökkva Kvern', sv: 'Sökkva Kvern' },
+  konungshaugr: { en: 'Konungshaugr', sv: 'Konungshaugr' },
+  helgrind: { en: 'Helgrind', sv: 'Helgrind' },
+  sokkva_hof: { en: 'Sökkva Hof', sv: 'Sökkva Hov' },
+  forge: { en: 'Ívaldi’s Forge', sv: 'Ívaldis smedja' },
+  hrimturn: { en: 'Hrímturn', sv: 'Hrímturn' },
+  utgard: { en: 'Útgarðr', sv: 'Útgarðr' },
+} as const satisfies Record<string, L10n>;
+
 /** Dungeon names for the map and the HUD. Old Norse names are kept in both languages. */
 export const DUNGEON_NAMES = {
   d1: { en: 'Rótarhellir', sv: 'Rótarhellir' },

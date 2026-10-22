@@ -38,14 +38,17 @@ describe('v1-m8b fixture', () => {
     expect(result.state.world.opened).toContain('d6_hc');
   });
 
-  it('runs: Þorkell and Rannveig are home, and the forge quest is done', () => {
+  it('runs: Þorkell and Rannveig are home, and the forge quest is open until Hrímfjöll', () => {
     if (!result.ok) throw new Error(result.error.detail);
     const sim = new Sim(DB, result.state);
     for (let i = 0; i < 120; i++) sim.step(frameOf([]));
     expect(sim.mode).toBe('play');
     expect(sim.actors.some((a) => a.kind === 'npc' && a.def === 'thorkell')).toBe(true);
     expect(sim.actors.some((a) => a.kind === 'npc' && a.def === 'rannveig')).toBe(true);
-    const log = questLog(DB.quests, { state: sim.state, quests: DB.quests });
-    expect(log.find((q) => q.id === 'q_forge')?.done).toBe(true);
+    const forge = () =>
+      questLog(DB.quests, { state: sim.state, quests: DB.quests }).find((q) => q.id === 'q_forge');
+    expect(forge()).toMatchObject({ done: false, at: { en: 'Hrímfjöll' } });
+    sim.state.flags.st_hrf_reached = true;
+    expect(forge()?.done).toBe(true);
   });
 });
