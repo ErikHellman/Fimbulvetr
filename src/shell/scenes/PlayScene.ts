@@ -363,8 +363,11 @@ export class PlayScene extends Phaser.Scene {
       // `amount` is in pixels; Phaser's intensity is a share of the view.
       if (this.services.settings.shake) this.cameras.main.shake(240, ev.amount / this.scale.width);
     } else if (ev.t === 'screenTransition') this.showScreen(ev.to);
-    else if (ev.t === 'coverChanged') this.screens.get(ev.screen)?.view.setCover(this.coverTiles(ev.screen));
-    else if (ev.t === 'screenEntered') {
+    else if (ev.t === 'coverChanged') {
+      const stage = this.screens.get(ev.screen);
+      stage?.view.setCover(this.coverTiles(ev.screen));
+      stage?.ambient.setCover(this.sim.coverOf(ev.screen));
+    } else if (ev.t === 'screenEntered') {
       this.showScreen(ev.screen);
       this.dropScreensExcept(ev.screen);
     } else if (ev.t === 'autosave') this.services.saves.autosaver.request(this.sim.snapshot());
@@ -639,6 +642,7 @@ export class PlayScene extends Phaser.Scene {
     const ambient = new AmbientView(this, {
       origin,
       grid,
+      cover: this.sim.coverOf(id),
       salt,
       frames,
       anims: ANIMS,
