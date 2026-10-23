@@ -2,7 +2,8 @@ import type * as Phaser from 'phaser';
 import { frameFor, type AnimTable } from '@art/anims';
 import type { TerrainId } from '@content/terrain';
 import type { Vec } from '@core/math/vec';
-import { fishJump, openWaterCells } from '@core/world/ambient';
+import { fishJump, openWaterCells, uncoveredCells } from '@core/world/ambient';
+import type { CoverGrid } from '@core/world/cover';
 import { TILE } from '@core/world/dims';
 import { tileFeet, type TilePos } from '@core/world/screen';
 import type { TerrainGrid } from '@core/world/textmap';
@@ -24,6 +25,8 @@ export interface AmbientStats {
 export interface AmbientViewOptions {
   readonly origin: Vec;
   readonly grid: TerrainGrid;
+  /** The screen's ground cover when the stage is built: ice on the water keeps fish down. */
+  readonly cover: CoverGrid;
   readonly salt: number;
   readonly frames: FrameIndex;
   readonly anims: AnimTable;
@@ -40,7 +43,9 @@ interface Fish {
 /** A screen's ambient life: smoke from every chimney, steam off warm springs, and fish jumping in open water. */
 export class AmbientView {
   private readonly emitters: Phaser.GameObjects.Particles.ParticleEmitter[] = [];
-  private readonly cells: readonly TilePos[];
+  private readonly water: readonly TilePos[];
+  /** The open water with no ice or other cover on it right now. */
+  private cells: readonly TilePos[];
   private readonly fish: Fish[] = [];
   private readonly fishTicks: number;
   private lastSlot = -1;
@@ -51,7 +56,8 @@ export class AmbientView {
     private readonly scene: Phaser.Scene,
     private readonly o: AmbientViewOptions,
   ) {
-    this.cells = openWaterCells(o.grid, o.isWater);
+    this.water = openWaterCells(o.grid, o.isWater);
+    this.cells = uncoveredCells(this.water, o.cover);
     const def = o.anims[FISH_ART]?.['idle'];
     this.fishTicks = def === undefined ? 0 : Math.ceil((def.frames * 60) / def.fps);
     this.addSmoke();
@@ -81,6 +87,11 @@ export class AmbientView {
       f.image.setTexture(ref.key, ref.frame).setOrigin(ref.ox, ref.oy);
       f.frame = frame;
     }
+  }
+
+  /** The cover changed (the season turned, Ís froze the water): fish jump only where the water is still open. */
+  setCover(cover: CoverGrid): void {
+    this.cells = uncoveredCells(this.water, cover);
   }
 
   /** Starts a fish jump in open-water cell `i` now (dev tools call it with the default). */

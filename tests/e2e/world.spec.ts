@@ -39,6 +39,18 @@ test('the brook runs with open water where a fish can jump', async ({ page }) =>
   expect(errors).toEqual([]);
 });
 
+test('no fish jumps through the winter ice on the brook', async ({ page }) => {
+  const errors = collectErrors(page);
+  await boot(page, 'nosave&screen=ask_brook&at=20,11&season=winter');
+  expect((await view(page))?.openWater).toBe(0);
+  await page.evaluate(() => {
+    window.__fimbul?.jumpFish();
+  });
+  expect((await view(page))?.fishAlive).toBe(0);
+  expect((await view(page))?.fishJumps).toBe(0);
+  expect(errors).toEqual([]);
+});
+
 test('the longhouse has its beds, hearth and tables and no smoke indoors', async ({ page }) => {
   const errors = collectErrors(page);
   await boot(page, 'nosave&screen=ask_int_longhouse&at=19,15');

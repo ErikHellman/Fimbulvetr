@@ -14,6 +14,7 @@ export interface ViewStats {
   readonly animatedDecor: number;
   readonly animatedTiles: number;
   readonly emitters: number;
+  /** Open-water cells with no ice or other cover on them right now. */
   readonly openWater: number;
   readonly fishAlive: number;
   readonly fishJumps: number;

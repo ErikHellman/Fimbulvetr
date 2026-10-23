@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { TerrainId } from '@content/terrain';
 import { LEGEND } from '@content/world/legend';
-import { fishJump, openWaterCells } from '@core/world/ambient';
+import { fishJump, openWaterCells, uncoveredCells } from '@core/world/ambient';
+import type { CoverGrid } from '@core/world/cover';
 import { parseTextMap, type TerrainGrid } from '@core/world/textmap';
 
 const isWater = (t: TerrainId): boolean => t === 'water' || t === 'ford' || t === 'jetty';
@@ -51,5 +52,32 @@ describe('fishJump', () => {
 
   it('never fires without open water', () => {
     for (let slot = 0; slot < 100; slot++) expect(fishJump(1, slot, 0)).toBeNull();
+  });
+});
+
+describe('uncoveredCells', () => {
+  const cover = (n: number, kinds: Record<number, number>, cleared: number[] = []): CoverGrid => {
+    const kind = new Uint8Array(n * n);
+    const clr = new Uint8Array(n * n);
+    for (const [i, k] of Object.entries(kinds)) kind[Number(i)] = k;
+    for (const i of cleared) clr[i] = 1;
+    return {
+      cols: n,
+      rows: n,
+      kind,
+      cleared: clr,
+      epoch: 0,
+      wet: false,
+      burn: new Uint8Array(n * n),
+      burning: 0,
+    };
+  };
+
+  it('drops cells under ice or other standing cover, and keeps cover that was broken', () => {
+    const cells = openWaterCells(pond(5), isWater);
+    expect(uncoveredCells(cells, cover(5, {}))).toEqual(cells);
+    const frozen = Object.fromEntries(cells.map((c) => [c.y * 5 + c.x, 1]));
+    expect(uncoveredCells(cells, cover(5, frozen))).toEqual([]);
+    expect(uncoveredCells(cells, cover(5, frozen, [2 * 5 + 2]))).toEqual([{ x: 2, y: 2 }]);
   });
 });

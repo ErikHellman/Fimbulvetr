@@ -1,6 +1,7 @@
 import type { TerrainId } from '@content/terrain';
 import { hashInts } from '../math/hash';
 import { neighbourMask } from './autotile';
+import type { CoverGrid } from './cover';
 import type { TilePos } from './screen';
 import type { TerrainGrid } from './textmap';
 
@@ -25,6 +26,14 @@ export function openWaterCells(grid: TerrainGrid, isWaterGroup: (t: TerrainId) =
     }
   }
   return out;
+}
+
+/** The cells with nothing standing on the water: winter ice, Ís ice or any other cover there keeps fish down. */
+export function uncoveredCells(cells: readonly TilePos[], cover: CoverGrid): TilePos[] {
+  return cells.filter((c) => {
+    const i = c.y * cover.cols + c.x;
+    return (cover.kind[i] ?? 0) === 0 || cover.cleared[i] === 1;
+  });
 }
 
 /**
