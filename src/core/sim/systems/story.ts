@@ -535,6 +535,7 @@ export function checkInteract(rt: SimRt, input: InputFrame): boolean {
     }
     if (
       thing.k === 'use' &&
+      (thing.facing === undefined || thing.facing === rt.hero.facing) &&
       overlaps(probe, tileBox(thing.at.x, thing.at.y, thing.w, thing.h)) &&
       evalCond(thing.when, condCtx(rt))
     ) {

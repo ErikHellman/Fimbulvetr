@@ -421,6 +421,15 @@ function solidThing(
   }
 }
 
+/** Whether Ask on the edge tile (dx, dy) of a `tw`×`th` use faces into it when facing `facing` (any way if unset). */
+function facesInto(facing: Dir4 | undefined, dx: number, dy: number, tw: number, th: number): boolean {
+  if (facing === 'n') return dy === th;
+  if (facing === 's') return dy === -1;
+  if (facing === 'e') return dx === -1;
+  if (facing === 'w') return dx === tw;
+  return true;
+}
+
 /** Tiles beside a `use` whose script warps, mapped to where the warp puts Ask (knocking at a gate). */
 function warpEdges(w: World, state: GameState): Map<number, number[]> {
   const out = new Map<number, number[]>();
@@ -436,7 +445,7 @@ function warpEdges(w: World, state: GameState): Map<number, number[]> {
       for (let dy = -1; dy <= th; dy++)
         for (let dx = -1; dx <= tw; dx++) {
           const edge = (dx === -1 || dx === tw) !== (dy === -1 || dy === th);
-          if (!edge) continue;
+          if (!edge || !facesInto(t.facing, dx, dy, tw, th)) continue;
           const from = w.tile(id, t.at.x + dx, t.at.y + dy);
           out.set(from, [...(out.get(from) ?? []), to]);
         }

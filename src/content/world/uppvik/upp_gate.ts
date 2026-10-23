@@ -8,9 +8,28 @@ export const uppGate: ScreenDef = {
   things: [
     /** The town gate: shut at night. */
     { k: 'gate', at: { x: 18, y: 12 }, w: 4, h: 1, art: 'palisade', closed: { k: 'phase', is: 'night' } },
-    /** Knocking at night, from outside or inside. */
-    { k: 'use', at: { x: 18, y: 13 }, w: 4, script: 'upp_knock_in', when: { k: 'phase', is: 'night' } },
-    { k: 'use', at: { x: 18, y: 11 }, w: 4, script: 'upp_knock_out', when: { k: 'phase', is: 'night' } },
+    /**
+     * Knocking at night, from outside or inside, anywhere across the road: on the gate itself or a step back
+     * from it. Each side covers the gate's row, so which way Ask faces tells them apart.
+     */
+    {
+      k: 'use',
+      at: { x: 16, y: 12 },
+      w: 8,
+      h: 2,
+      facing: 'n',
+      script: 'upp_knock_in',
+      when: { k: 'phase', is: 'night' },
+    },
+    {
+      k: 'use',
+      at: { x: 16, y: 11 },
+      w: 8,
+      h: 2,
+      facing: 's',
+      script: 'upp_knock_out',
+      when: { k: 'phase', is: 'night' },
+    },
     {
       k: 'trigger',
       at: { x: 18, y: 16 },
