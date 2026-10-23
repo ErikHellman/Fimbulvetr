@@ -59,6 +59,12 @@ jobs:
     name: e2e (${{ matrix.browser }} ${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Playwright's image ships both browsers and their system libraries. Installing WebKit's
+    # with `playwright install --with-deps` crawled from the Ubuntu mirror past the job timeout.
+    # The tag must match @playwright/test in package.json (tests/tooling/ci.test.ts checks it).
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
     strategy:
       fail-fast: false
       matrix:
@@ -72,7 +78,6 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
       - run: pnpm e2e --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/4
       - if: failure()
         uses: actions/upload-artifact@v4
