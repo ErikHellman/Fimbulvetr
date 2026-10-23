@@ -111,6 +111,58 @@ describe('Náströnd', () => {
     expect(mem(byDef(h, 'nastrond'), 'guard')).toBe(1);
   });
 
+  it('is open only briefly: the shield lands near him and he is armed again within a second and a half', () => {
+    const h = withGrapple(new Harness({ db: arena([['nastrond', 17, 10]]), tile: [10, 10], facing: 'e' }));
+    h.until((s) => s.enemies[0]?.fsm.s === 'stalk', 200);
+    h.press(['item1']);
+    h.until((s) => s.enemies.some((e) => e.def === 'tower_shield'), 60);
+    const shield = byDef(h, 'tower_shield');
+    expect(Math.abs(shield.pos.x - byDef(h, 'nastrond').pos.x)).toBeLessThanOrEqual(NASTROND.throwTo);
+    h.until((s) => !s.enemies.some((e) => e.def === 'tower_shield'), 90);
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s !== 'arm', NASTROND.armTicks + 2);
+    expect(mem(byDef(h, 'nastrond'), 'guard')).toBe(1);
+  });
+
+  it('cuts at Ask bare-handed when Ask stands in his way while he fetches his shield', () => {
+    const h = withGrapple(new Harness({ db: arena([['nastrond', 13, 10]]), tile: [10, 10], facing: 'e' }));
+    h.until((s) => s.enemies[0]?.fsm.s === 'stalk', 200);
+    h.press(['item1']);
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'fetch', 60 + NASTROND.tornTicks);
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'brace', 60);
+    expect(mem(byDef(h, 'nastrond'), 'guard')).toBe(0);
+    const hp = h.sim.hero.hp;
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'bash', NASTROND.braceTicks + 2);
+    h.idle(4);
+    expect(h.sim.hero.hp).toBeLessThan(hp);
+  });
+
+  it('gates each phase: one opening takes him no lower than the next third, then he snatches his shield back', () => {
+    const h = withGrapple(new Harness({ db: arena([['nastrond', 17, 10]]), tile: [10, 10], facing: 'e' }));
+    h.until((s) => s.enemies[0]?.fsm.s === 'stalk', 200);
+    h.press(['item1']);
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'fetch', 60 + NASTROND.tornTicks);
+    // A flurry that would carry him past both thresholds at once.
+    byDef(h, 'nastrond').hp = 5;
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'raise', 4);
+    expect(byDef(h, 'nastrond').hp).toBe(NASTROND.phaseAt[0]);
+    expect(mem(byDef(h, 'nastrond'), 'phase')).toBe(1);
+    expect(mem(byDef(h, 'nastrond'), 'guard')).toBe(1);
+    h.idle(2);
+    expect(h.sim.enemies.some((e) => e.def === 'tower_shield')).toBe(false);
+    h.idle(NASTROND.raiseTicks + 2);
+    expect(byDef(h, 'nastrond').fsm.s).not.toBe('fetch');
+  });
+
+  it('throws Ask back with the roar of a new phase', () => {
+    const h = new Harness({ db: arena([['nastrond', 13, 10]]), tile: [10, 10], facing: 'e' });
+    h.until((s) => s.enemies[0]?.fsm.s === 'stalk', 200);
+    const gap = byDef(h, 'nastrond').pos.x - h.sim.hero.pos.x;
+    byDef(h, 'nastrond').hp = NASTROND.phaseAt[0];
+    h.until((s) => s.enemies.find((e) => e.def === 'nastrond')?.fsm.s === 'raise', 4);
+    h.idle(12);
+    expect(byDef(h, 'nastrond').pos.x - h.sim.hero.pos.x).toBeGreaterThan(gap);
+  });
+
   it('raises two fog-draugr at two thirds, and fills the hall with fog at the last third', () => {
     const h = new Harness({ db: arena([['nastrond', 17, 10]]), tile: [10, 10], facing: 'e' });
     h.until((s) => s.enemies[0]?.fsm.s === 'stalk', 200);

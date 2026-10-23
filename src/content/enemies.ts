@@ -922,6 +922,29 @@ export const ENEMY_DEFS = {
         knock: 8,
         tags: 0,
       },
+      /** Bare, a quick cut at Ask in his way while he fetches his shield. */
+      bash: {
+        from: 0,
+        to: 6,
+        boxes: {
+          e: { x: 0, y: -40, w: 32, h: 40 },
+          w: { x: -32, y: -40, w: 32, h: 40 },
+          s: { x: -20, y: -14, w: 40, h: 32 },
+          n: { x: -20, y: -50, w: 40, h: 32 },
+        },
+        amount: 4,
+        knock: 6,
+        tags: 0,
+      },
+      /** The roar of a new phase throws Ask back from him as he snatches his shield. */
+      raise: {
+        from: 0,
+        to: 6,
+        boxes: around({ x: -64, y: -72, w: 128, h: 100 }),
+        amount: 2,
+        knock: 12,
+        tags: 0,
+      },
     },
   },
   /** Náströnd's tower shield, lying where the grapple flung it until he takes it up (see nastrond.ts). */

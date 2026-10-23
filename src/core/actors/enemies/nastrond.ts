@@ -5,7 +5,19 @@ import { distToHero, faceHero, still, steerTo } from './common';
 import type { ActorCtx } from './defs';
 
 export type NastrondState =
-  'throne' | 'roar' | 'stalk' | 'tell' | 'cut' | 'torn' | 'fetch' | 'arm' | 'raise' | 'wind' | 'flail';
+  | 'throne'
+  | 'roar'
+  | 'stalk'
+  | 'tell'
+  | 'cut'
+  | 'torn'
+  | 'fetch'
+  | 'brace'
+  | 'bash'
+  | 'arm'
+  | 'raise'
+  | 'wind'
+  | 'flail';
 
 /** Thane Náströnd's numbers: px, px per tick and ticks. */
 export const NASTROND = {
@@ -16,13 +28,17 @@ export const NASTROND = {
   reach: 34,
   cutTell: 24,
   cutTicks: 10,
-  /** How far towards Ask the torn shield lands. */
-  throwTo: 56,
+  /** How far towards Ask the torn shield lands: close by him, so the opening is short. */
+  throwTo: 32,
   /** Staggered as the shield is torn from his arm. */
   tornTicks: 24,
   /** Walking back for it, open to the blade; quicker once the dead are raised. */
-  fetchSpeed: 0.5,
-  fetchSpeedLater: 0.9,
+  fetchSpeed: 0.8,
+  fetchSpeedLater: 1.2,
+  /** Bare, he cuts at Ask in his way (300 ms tell), at most once every `bashEvery` ticks. */
+  braceTicks: 18,
+  bashTicks: 12,
+  bashEvery: 50,
   armTicks: 20,
   raiseTicks: 60,
   roarTicks: 50,
@@ -55,19 +71,30 @@ function torn(e: Entity): boolean {
   return mem(e, 'bare') !== 1;
 }
 
-/** A phase change is waiting: he raises the dead (and, the last time, the fog). */
-const raising = (e: Entity): boolean => phaseOf(e.hp) > mem(e, 'phase');
+/**
+ * A phase change is waiting: he raises the dead (and, the last time, the fog). One opening takes him no
+ * lower than the threshold he crosses: the rest of the flurry is lost, so every phase is fought.
+ */
+function raising(e: Entity): boolean {
+  const phase = mem(e, 'phase');
+  if (phaseOf(e.hp) <= phase) return false;
+  e.hp = Math.max(e.hp, NASTROND.phaseAt[phase] ?? 0);
+  return true;
+}
 
 function countdown(e: Entity): void {
   e.mem['flailCd'] = Math.max(0, mem(e, 'flailCd') - 1);
+  e.mem['bashCd'] = Math.max(0, mem(e, 'bashCd') - 1);
 }
 
 /**
  * Thane Náströnd, the Hollow, first of the Rime King's four. His tower shield turns every blow; he stalks
  * and cuts (400 ms tell). The grapple chain tears the shield from his arm: it lands near Ask, and he walks
- * back to fetch it, open to the blade, then takes it up again. At two thirds of his health he raises two
- * fog-draugr and fetches his shield quicker; at the last third he fills the hall with fog (`mem.fog`) and
- * swings a chain-flail round himself between cuts, which Ask's shield can stop.
+ * back to fetch it, open to the blade but cutting at Ask in his way, then takes it up again. Each phase is
+ * a gate: one opening takes him no lower than the next third, and there he roars Ask back and snatches his
+ * shield. At two thirds of his health he raises two fog-draugr and fetches his shield quicker; at the last
+ * third he fills the hall with fog (`mem.fog`) and swings a chain-flail round himself between cuts, which
+ * Ask's shield can stop.
  */
 export const NASTROND_MACHINE: Machine<NastrondState, ActorCtx> = {
   throne: {
@@ -172,11 +199,41 @@ export const NASTROND_MACHINE: Machine<NastrondState, ActorCtx> = {
       if (raising(e)) return 'raise';
       countdown(e);
       if (mem(e, 'phase') >= 2 && mem(e, 'flailCd') === 0) return 'wind';
+      if (mem(e, 'bashCd') === 0 && distToHero(e, c) < NASTROND.reach) return 'brace';
       const to = { x: mem(e, 'sx'), y: mem(e, 'sy') };
       if (length(sub(to, e.pos)) < 10) return 'arm';
       const speed = mem(e, 'phase') >= 1 ? NASTROND.fetchSpeedLater : NASTROND.fetchSpeed;
       steerTo(e, c, to, speed);
       return undefined;
+    },
+  },
+  brace: {
+    enter(e, c) {
+      still(e);
+      faceHero(e, c);
+      setAnim(e, 'bare_tell');
+    },
+    tick(e) {
+      still(e);
+      guarded(e);
+      e.mem['hooked'] = 0;
+      if (raising(e)) return 'raise';
+      return e.fsm.t >= NASTROND.braceTicks - 1 ? 'bash' : undefined;
+    },
+  },
+  bash: {
+    enter(e, c) {
+      setAnim(e, 'bare_cut');
+      c.emit({ t: 'sfx', id: 'sfx_swing' });
+    },
+    tick(e) {
+      still(e);
+      guarded(e);
+      e.mem['hooked'] = 0;
+      if (raising(e)) return 'raise';
+      if (e.fsm.t < NASTROND.bashTicks - 1) return undefined;
+      e.mem['bashCd'] = NASTROND.bashEvery;
+      return 'fetch';
     },
   },
   arm: {
@@ -199,8 +256,12 @@ export const NASTROND_MACHINE: Machine<NastrondState, ActorCtx> = {
   raise: {
     enter(e, c) {
       still(e);
-      e.mem['phase'] = phaseOf(e.hp);
-      setAnim(e, mem(e, 'bare') === 1 ? 'bare_idle' : 'roar');
+      e.mem['phase'] = mem(e, 'phase') + 1;
+      // He snatches his shield back as he roars (its own behaviour sees it taken and goes).
+      e.mem['bare'] = 0;
+      e.mem['shield'] = 0;
+      guarded(e);
+      setAnim(e, 'roar');
       c.emit({ t: 'sfx', id: 'sfx_boss_roar' });
       c.emit({ t: 'shake', amount: 5 });
       if (mem(e, 'phase') === 1)
@@ -213,7 +274,7 @@ export const NASTROND_MACHINE: Machine<NastrondState, ActorCtx> = {
       e.mem['hooked'] = 0;
       if (e.fsm.t < NASTROND.raiseTicks - 1) return undefined;
       e.mem['flailCd'] = NASTROND.flailEvery;
-      return mem(e, 'bare') === 1 ? 'fetch' : 'stalk';
+      return 'stalk';
     },
   },
   wind: {

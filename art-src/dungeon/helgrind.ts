@@ -190,6 +190,9 @@ export function helgrindFrames(): DrawnFrame[] {
     n('tell', 1, hollowAt(side, 1, 'raise', false));
     n('cut', 0, hollowAt(side, 0, 'cut', false));
     n('bare_idle', 0, hollowAt(side, 0, 'rest', true));
+    n('bare_tell', 0, hollowAt(side, 0, 'raise', true));
+    n('bare_tell', 1, hollowAt(side, 1, 'raise', true));
+    n('bare_cut', 0, hollowAt(side, 0, 'cut', true));
     for (let i = 0; i < 4; i++) n('bare_walk', i, hollowAt(side, i, 'rest', true));
     n('flail', 0, hollowAt(side, 0, 'flail', true));
     n('flail', 1, hollowAt(side, 2, 'flail', true));
