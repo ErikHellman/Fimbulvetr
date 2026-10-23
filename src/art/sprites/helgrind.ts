@@ -300,6 +300,9 @@ export function helgrindFrames(): SpriteFrame[] {
     n('tell', 1, hollow(side, 1, 'raise', false));
     n('cut', 0, hollow(side, 0, 'cut', false));
     n('bare_idle', 0, hollow(side, 0, 'rest', true));
+    n('bare_tell', 0, hollow(side, 0, 'raise', true));
+    n('bare_tell', 1, hollow(side, 1, 'raise', true));
+    n('bare_cut', 0, hollow(side, 0, 'cut', true));
     for (let i = 0; i < 4; i++) n('bare_walk', i, hollow(side, i, 'rest', true));
     n('flail', 0, hollow(side, 0, 'flail', true));
     n('flail', 1, hollow(side, 2, 'flail', true));
@@ -344,6 +347,8 @@ export const HELGRIND_ANIMS: Readonly<Record<string, Readonly<Record<string, Ani
     tell: all(2, 6),
     cut: all(1, 1),
     bare_idle: all(1, 1),
+    bare_tell: all(2, 6),
+    bare_cut: all(1, 1),
     bare_walk: all(4, 6),
     flail: all(2, 10),
   },

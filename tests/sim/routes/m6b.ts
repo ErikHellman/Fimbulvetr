@@ -187,6 +187,9 @@ function squareUp(b: { dir: Dir4; dx: number; dy: number }): Action {
   return b.dir === 'e' || b.dir === 'w' ? (b.dy > 0 ? 'down' : 'up') : b.dx > 0 ? 'right' : 'left';
 }
 
+/** The way Ask slipped sideways last, kept while Ask stays cornered so Ask never dithers mid-wall. */
+const slipping = new WeakMap<Harness, Action>();
+
 /** One step back from a foe, or round it when a wall is at Ask's back. */
 function backOff(h: Harness, b: { dir: Dir4; dx: number; dy: number }): void {
   const p = h.sim.hero.pos;
@@ -198,7 +201,13 @@ function backOff(h: Harness, b: { dir: Dir4; dx: number; dy: number }): void {
         : b.dir === 'w'
           ? p.x > 35 * 16
           : p.x < 4 * 16;
-  h.step(frameOf([cornered ? across(h, b) : AWAY[b.dir]]));
+  const { x, y } = p;
+  const side = slipping.get(h) ?? across(h, b);
+  if (cornered) slipping.set(h, side);
+  else slipping.delete(h);
+  h.step(frameOf([cornered ? side : AWAY[b.dir]]));
+  // Backed into a pillar or a cell's bars: slip sideways instead.
+  if (!cornered && h.sim.hero.pos.x === x && h.sim.hero.pos.y === y) h.step(frameOf([across(h, b)]));
 }
 
 /** Steps in on a foe that is open to the blade and swings, square on. */
@@ -257,7 +266,7 @@ function garmr(h: Harness): void {
 
 /**
  * Fights Náströnd: hooks his tower shield away when square on at chain's length, cuts at him while he
- * walks back to it bare, and keeps out of his cut and his flail's sweep.
+ * walks back to it bare, and keeps out of his cuts (shielded or bare) and his flail's sweep.
  */
 function nastrond(h: Harness): void {
   const until = h.sim.tick + 60_000;
@@ -283,7 +292,7 @@ function nastrond(h: Harness): void {
       }
       continue;
     }
-    if (s === 'wind' || s === 'flail' || s === 'tell' || s === 'cut') {
+    if (s === 'wind' || s === 'flail' || s === 'tell' || s === 'cut' || s === 'brace' || s === 'bash') {
       if (b.along < 72) backOff(h, b);
       else h.idle(1);
     } else if (bare && (s === 'fetch' || s === 'arm' || s === 'torn')) strikeAt(h, n);
@@ -403,6 +412,8 @@ export function playM6b(seed: number, from?: GameState): Harness {
   expect(h.sim.state.flags.st_thane_nastrond).toBe(true);
   h.until((sim) => sim.mode === 'play' || sim.mode === 'story', 60);
   if (h.sim.mode === 'story') finishStory(h);
+  // Round the heart container (20, 11), wherever the fight ended, to take it from below.
+  walkTo(h, 19, 13);
   walkTo(h, 20, 12);
   h.until((sim) => sim.mode === 'story', 120, frameOf(['up']));
   finishStory(h);
