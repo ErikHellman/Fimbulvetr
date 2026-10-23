@@ -58,6 +58,26 @@ describe('Uppvík', () => {
     expect(Math.floor((h.sim.hero.pos.y - 1) / 16)).toBe(14);
   });
 
+  it('opens at night when Ask knocks pressed against it, from either side and anywhere on the road', () => {
+    for (const x of [16, 19, 23]) {
+      // Arriving by warp stone at night, Ask walks down the road from the square right up to the gate.
+      const h = town('upp_gate', [x, 9], 23 * 60);
+      h.sim.state.flags.st_uppvik_reached = true;
+      h.sim.hero.facing = 's';
+      h.hold(['down'], 60);
+      expect(Math.floor((h.sim.hero.pos.y - 1) / 16)).toBe(11);
+      h.press(['interact']);
+      finishStory(h);
+      expect(Math.floor((h.sim.hero.pos.y - 1) / 16)).toBe(14);
+      h.sim.hero.facing = 'n';
+      h.hold(['up'], 60);
+      expect(Math.floor((h.sim.hero.pos.y - 1) / 16)).toBe(13);
+      h.press(['interact']);
+      finishStory(h);
+      expect(Math.floor((h.sim.hero.pos.y - 1) / 16)).toBe(10);
+    }
+  });
+
   it('lets Ask sleep on the mead-hall benches till morning, healed, and offers the slots', () => {
     const h = town('upp_int_meadhall', [10, 7], 22 * 60);
     h.sim.hero.facing = 'w';

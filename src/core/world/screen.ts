@@ -80,6 +80,8 @@ export type Thing =
       readonly h?: number;
       readonly script: ScriptId;
       readonly when?: Cond;
+      /** Only while Ask faces this way (the two sides of a barred gate share its tiles). */
+      readonly facing?: Dir4;
     }
   /** Runs a script when the hero's feet enter the tile rectangle and `when` holds. */
   | {
