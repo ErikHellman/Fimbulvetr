@@ -3,6 +3,8 @@ import { wasPressed, type Action, type InputFrame } from '@core/input/actions';
 import type { ItemDef } from '@core/items/defs';
 import { ringFlag } from '@core/items/rings';
 import type { GameState, InventoryState } from '@core/state/gameState';
+import type { ScreenId } from '@content/world/screens';
+import type { QuestFilter } from './questPage';
 
 /** The pause menu: pure state and input handling, drawn by the UI scene. The sim does not run meanwhile. */
 
@@ -16,10 +18,14 @@ export type MenuTab = (typeof MENU_TABS)[number];
 export const SYSTEM_ROWS = ['resume', 'settings', 'start_over'] as const;
 
 export interface MenuState {
+  /** The map tab's look-around frame, on this screen (see mapLook.ts); missing or null when put away. */
+  readonly look?: ScreenId | null;
   readonly tab: MenuTab;
   readonly cursor: number;
   /** The system tab is asking "start a new game?". */
   readonly confirm: boolean;
+  /** Which quests the quest tab lists. */
+  readonly filter: QuestFilter;
 }
 
 /**
@@ -61,7 +67,7 @@ export type MenuAction =
   | { readonly k: 'startOver' };
 
 export function openMenu(tab: MenuTab = 'items'): MenuState {
-  return { tab, cursor: 0, confirm: false };
+  return { tab, cursor: 0, confirm: false, filter: 'active' };
 }
 
 /**
@@ -97,8 +103,9 @@ export function menuItems(
   ];
 }
 
-function rows(state: MenuState, items: readonly MenuItem[]): number {
+function rows(state: MenuState, items: readonly MenuItem[], quests: number): number {
   if (state.tab === 'items') return items.length;
+  if (state.tab === 'quests') return quests;
   if (state.tab === 'system') return SYSTEM_ROWS.length;
   return 0;
 }
@@ -106,11 +113,12 @@ function rows(state: MenuState, items: readonly MenuItem[]): number {
 const any = (frame: InputFrame, actions: readonly Action[]): boolean =>
   actions.some((a) => wasPressed(frame, a));
 
-/** One frame of menu input. A null state means the menu closed. */
+/** One frame of menu input; `quests` is how many the quest tab lists. A null state means the menu closed. */
 export function stepMenu(
   state: MenuState,
   frame: InputFrame,
   items: readonly MenuItem[],
+  quests = 0,
 ): { state: MenuState | null; actions: MenuAction[] } {
   const close = { state: null, actions: [{ k: 'close' } as const] };
   if (state.confirm) {
@@ -126,7 +134,7 @@ export function stepMenu(
     const step = wasPressed(frame, 'right') ? 1 : MENU_TABS.length - 1;
     return { state: openMenu(MENU_TABS[(tabIndex + step) % MENU_TABS.length]), actions: [] };
   }
-  const n = rows(state, items);
+  const n = rows(state, items, quests);
   if (n > 0 && (wasPressed(frame, 'up') || wasPressed(frame, 'down'))) {
     const cursor = (state.cursor + (wasPressed(frame, 'down') ? 1 : n - 1)) % n;
     return { state: { ...state, cursor }, actions: [] };
@@ -146,6 +154,11 @@ export function stepMenu(
         return { state, actions: [{ k: 'equip', slot: 0, item: item.id }] };
     } else if (any(frame, ['confirm', 'interact'])) return { state, actions: [{ k: 'eat', item: item.id }] };
   }
+  if (state.tab === 'quests' && any(frame, ['confirm', 'interact']))
+    return {
+      state: { ...state, cursor: 0, filter: state.filter === 'active' ? 'done' : 'active' },
+      actions: [],
+    };
   if (state.tab === 'system' && any(frame, ['confirm', 'interact'])) {
     const row = SYSTEM_ROWS[state.cursor];
     if (row === 'resume') return close;

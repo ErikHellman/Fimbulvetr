@@ -70,7 +70,25 @@ export const UI = {
   },
   menu_no_items: { en: 'You carry nothing you can use yet.', sv: 'Du bär inget du kan använda än.' },
   menu_no_quests: { en: 'Nothing to do yet.', sv: 'Inget att göra än.' },
-  menu_quest_done: { en: 'done', sv: 'klart' },
+  menu_quests_active: { en: 'Active ({n})', sv: 'Pågående ({n})' },
+  menu_quests_done: { en: 'Done ({n})', sv: 'Klara ({n})' },
+  menu_no_quests_active: {
+    en: 'Nothing open. Talk to people: someone may need a hand.',
+    sv: 'Inget pågår. Prata med folk: någon kan behöva en hand.',
+  },
+  menu_no_quests_done: { en: 'No quest done yet.', sv: 'Inget uppdrag klart än.' },
+  menu_quest_main: { en: 'The story', sv: 'Berättelsen' },
+  menu_quest_from: { en: 'From: {who}, {place}', sv: 'Från: {who}, {place}' },
+  menu_quest_found: { en: 'Found in {place}', sv: 'Hittat i {place}' },
+  menu_quest_where: { en: 'Where: {place}', sv: 'Var: {place}' },
+  menu_quests_hint: {
+    en: 'Up/Down: quest   E: active or done   Left/Right: page   Esc: back',
+    sv: 'Upp/Ner: uppdrag   E: pågående eller klara   Vänster/Höger: sida   Esc: tillbaka',
+  },
+  menu_quests_hint_pad: {
+    en: '↑↓: quest   {interact}: active or done   ←→: page   {cancel}: back',
+    sv: '↑↓: uppdrag   {interact}: pågående eller klara   ←→: sida   {cancel}: tillbaka',
+  },
   menu_here: { en: 'You are here', sv: 'Du är här' },
   menu_keys: { en: 'Keys: {detail}', sv: 'Nycklar: {detail}' },
   menu_no_map: {
@@ -267,6 +285,24 @@ export const UI = {
   fish_snapped: { en: 'Snap! The line broke.', sv: 'Pang! Linan brast.' },
   fish_slipped: { en: 'It slipped the hook.', sv: 'Den slet sig från kroken.' },
   fish_landed: { en: '{fish}! Kári pays {silver} silver.', sv: '{fish}! Kári betalar {silver} silver.' },
+  map_people: { en: 'People here: {who}', sv: 'Folk här: {who}' },
+  map_nobody: { en: 'No one about here.', sv: 'Ingen här just nu.' },
+  map_look_hint: {
+    en: 'E: look around   Left/Right: page   Esc or Tab: back to the game',
+    sv: 'E: se dig omkring   Vänster/Höger: sida   Esc eller Tab: tillbaka till spelet',
+  },
+  map_look_hint_pad: {
+    en: '{interact}: look around   ←→: page   {cancel} or {menu}: back to the game',
+    sv: '{interact}: se dig omkring   ←→: sida   {cancel} eller {menu}: tillbaka till spelet',
+  },
+  map_looking_hint: {
+    en: '↑↓←→: move   E or Esc: done   M: close',
+    sv: '↑↓←→: flytta   E eller Esc: klar   M: stäng',
+  },
+  map_looking_hint_pad: {
+    en: '↑↓←→: move   {interact} or {cancel}: done   {map}: close',
+    sv: '↑↓←→: flytta   {interact} eller {cancel}: klar   {map}: stäng',
+  },
 } as const satisfies Record<string, L10n>;
 
 export type UiKey = keyof typeof UI;

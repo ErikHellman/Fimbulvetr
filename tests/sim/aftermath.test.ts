@@ -56,7 +56,7 @@ describe('Askdalr after the raid', () => {
 });
 
 describe('coming home in the Fimbulvetr', () => {
-  it('starts at the third stone and ends with the road north buried in rime', () => {
+  it('starts at the third stone and stays open on the gorge buried in rime until it melts', () => {
     const h = after(false);
     expect(fimbulvetr(h)?.done).toBe(false);
     h.sim.state.flags.st_pass_open = true;
@@ -76,8 +76,10 @@ describe('coming home in the Fimbulvetr', () => {
     talkTo(h, 'gyda');
     expect(h.sim.state.flags.st_blood_told).toBe(true);
     const q = fimbulvetr(h);
-    expect(q?.done).toBe(true);
-    expect(q?.text.en).toBe('The pass is open, but the road north is buried in rime.');
+    expect(q?.done).toBe(false);
+    expect(q?.text.en).toMatch(/^The pass is open, but the gorge past it is buried in rime\./);
+    h.sim.state.flags.st_rime_open = true;
+    expect(fimbulvetr(h)?.done).toBe(true);
   });
 
   it('gives each of the named people a new line once the pass is open', () => {

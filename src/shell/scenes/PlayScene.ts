@@ -9,6 +9,8 @@ import { tileFlips, tileIndices } from '@art/tiles/indices';
 import { tileAnimations, type TileAnim } from '@art/tiles/tileset';
 import type { ScreenId } from '@content/world/screens';
 import { daylight, seasonAt } from '@core/clock/clock';
+import { overworldMap } from '@core/world/mapModel';
+import { stepMapLook } from '@shell/ui/mapLook';
 import type { Entity } from '@core/actors/entity';
 import { InputLatch, wasPressed, type InputFrame } from '@core/input/actions';
 import { fnv1a } from '@core/math/hash';
@@ -37,6 +39,7 @@ import type { PlayData } from '@shell/services';
 import { UI_LINK, type UiLink } from '@shell/scenes/UiScene';
 import { AmbientView } from '@shell/view/ambientView';
 import { menuItems, openMenu, ownedRings, stepMenu, type MenuState } from '@shell/ui/pauseMenu';
+import { questPage, type QuestFilter } from '@shell/ui/questPage';
 import { EntityViews } from '@shell/view/entityViews';
 import { CloudView } from '@shell/view/cloudView';
 import { DarknessView, FOG } from '@shell/view/darknessView';
@@ -51,6 +54,7 @@ import { ACHIEVEMENT_DEFS } from '@content/achievements';
 import type { AchievementId } from '@content/ids';
 import { fresh as freshAchievements } from '@core/progress/achievements';
 import { condCtx } from '@core/sim/systems/story';
+import { questLog, type QuestLine } from '@core/story/quests';
 import { loadAchievements, saveAchievements } from '@shell/platform/achievements';
 import { noToasts, pushToasts, tickToasts, type Toasts } from '@shell/ui/toast';
 import type { SaveSummary } from '@shell/platform/saveStore';
@@ -227,6 +231,7 @@ export class PlayScene extends Phaser.Scene {
           : {
               state: this.menu,
               items: menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
+              quests: this.menuQuests(this.menu.filter),
               settings:
                 this.settingsMenu === null
                   ? null
@@ -256,7 +261,10 @@ export class PlayScene extends Phaser.Scene {
     }
     if (this.menu !== null) {
       if (this.settingsMenu !== null) this.updateSettings(this.latch.consume(), fresh);
-      else this.updateMenu(this.latch.consume());
+      else {
+        const frame = this.latch.consume();
+        if (!this.updateMapLook(frame)) this.updateMenu(frame);
+      }
       this.acc.acc = 0;
       this.draw(0);
       return;
@@ -362,6 +370,22 @@ export class PlayScene extends Phaser.Scene {
     } else if (ev.t === 'autosave') this.services.saves.autosaver.request(this.sim.snapshot());
   }
 
+  /** The map tab's look-around frame; false when the press is left to the pause menu. */
+  private updateMapLook(frame: InputFrame): boolean {
+    const menu = this.menu;
+    if (menu === null) return false;
+    const { db, state } = this.sim;
+    const map =
+      db.screens[this.sim.screen.id].dungeon === undefined
+        ? overworldMap(db.layout, db.screens, state.world.visited, this.sim.screen.id)
+        : null;
+    const r = stepMapLook(menu, frame, map);
+    if (r === null) return false;
+    if (r.moved) this.audio.play('sfx_menu_move');
+    this.setMenu(r.state);
+    return true;
+  }
+
   /** Opens or closes the pause menu; everything that moves on its own clock stops while it is open. */
   private setMenu(next: MenuState | null): void {
     const was = this.menu !== null;
@@ -383,6 +407,7 @@ export class PlayScene extends Phaser.Scene {
       menu,
       frame,
       menuItems(this.sim.state.inv, this.services.db.items, ownedRings(this.sim.state)),
+      this.menuQuests(menu.filter).length,
     );
     for (const a of r.actions) {
       if (a.k === 'settings') {
@@ -400,9 +425,18 @@ export class PlayScene extends Phaser.Scene {
       }
     }
     if (r.actions.length > 0) this.sim.flushCommands();
-    if (r.state !== menu && r.state !== null && (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab))
+    if (
+      r.state !== menu &&
+      r.state !== null &&
+      (r.state.cursor !== menu.cursor || r.state.tab !== menu.tab || r.state.filter !== menu.filter)
+    )
       this.audio.play('sfx_talk');
     this.setMenu(r.state);
+  }
+
+  /** What the quest tab lists under `filter`. */
+  private menuQuests(filter: QuestFilter): QuestLine[] {
+    return questPage(questLog(this.sim.db.quests, condCtx(this.sim)), filter);
   }
 
   private openPicker(): void {
