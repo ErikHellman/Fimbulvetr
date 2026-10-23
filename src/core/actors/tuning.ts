@@ -222,6 +222,8 @@ export interface SeidrTuning {
   readonly regenTicks: number;
   /** Regen stops once the bar holds this many (or is full, if smaller). */
   readonly floor: number;
+  /** No regen while a foe is about on the screen (asleep or immortal ones aside); the count restarts after. */
+  readonly pauseForFoes: boolean;
 }
 
 /** The swing of a weapon. */
