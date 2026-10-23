@@ -34,6 +34,7 @@ keyboard/gamepad ─► InputMapper ─► InputLatch ──► Sim.step(frame) 
 | core | `src/core` | core, `import type` from content | math, clock and weather, state and save, input frames, world (text maps, auto-tile masks, collision, layout), actors (state machines, hero, enemies), combat, sim, dev query |
 | content | `src/content` | core, content | ids, flags, names (en/sv), terrain, legend, screens, layout, tuning, clock rules, bindings, `DB` |
 | art | `src/art` | core, content, art | rasters, grids, outlines, painters, packing, animations, colour grading, tiles, sprites, SFX synth, music composer |
+| port | `src/port` | core, content, art | `createPort()`: the rules behind a string-and-number API for native shells, bundled by `pnpm port:build` into one script for JavaScriptCore (Apple TV) |
 | shell | `src/shell` | anything | Phaser scenes, texture registration, views, input devices, audio, storage (IndexedDB, localStorage), PWA, dev tools |
 
 The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.boundaries.js`, which is covered by `tests/tooling/boundaries.test.ts`.
@@ -218,6 +219,11 @@ The layers are enforced by `tsconfig.pure.json` (no DOM types) and `eslint.bound
   1. Bump `SAVE_VERSION`.
   2. Add `MIGRATIONS[old]`.
   3. Commit `tests/fixtures/saves/v<new>.json`.
+
+## TV apps
+Plan and status: `docs/tv-port.md`.
+- **Android TV** (`android/`): a WebView app serving the web build from its assets (`pnpm android:web`; CI builds the APK). It injects `window.FimbulvetrHost`, which `src/shell/platform/host.ts` reads: a standard-layout pad polled every frame (`withHostPad`, ahead of browser pads) and `exit()`. With a host, the title has no Import or Export, Back on its main list exits, and no service worker registers. The remote's centre button arrives as Enter and Back as Escape plus Start.
+- **Apple TV**: `src/port` and `pnpm port:bench` (the bundle in a bare JavaScriptCore context, JIT on and off). The Swift app is still to come.
 
 ## Dev and test tools
 - **Query string** (dev and `--mode test` builds): `?screen=&at=x,y&season=&time=HH:MM|day|night&seed=&lang=&preset=&weather=<kind>&rolled=0|1&title=0|1&dev=gallery&nosave&mute`. The title screen shows unless the query names a screen, a preset or `nosave` (or says `title=0`); `rolled=0` turns rolled weather and spawns off.

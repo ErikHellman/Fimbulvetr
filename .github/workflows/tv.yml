@@ -1,0 +1,71 @@
+name: TV apps
+
+# Manual only for now: switch the push and pull_request triggers back on once the Google Play and Apple
+# developer accounts are set up (Actions → TV apps → Run workflow builds a branch on demand).
+on:
+  workflow_dispatch:
+
+jobs:
+  android-tv:
+    name: Android TV APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm android:web
+      # The runner image has the Android SDK (ANDROID_HOME); Gradle fetches any missing platform itself.
+      - run: ./gradlew --no-daemon assembleDebug
+        working-directory: android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fimbulvetr-androidtv-debug
+          path: android/app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+
+  apple-tv:
+    name: Apple TV app
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm apple:resources
+      - run: brew install xcodegen
+      - run: xcodegen generate
+        working-directory: apple
+      # Unsigned builds: one for the simulator (the artifact) and one for devices (a compile check until
+      # signing is set up for TestFlight).
+      - name: Build for the tvOS simulator
+        working-directory: apple
+        run: >
+          xcodebuild -project Fimbulvetr.xcodeproj -scheme Fimbulvetr -configuration Debug
+          -destination 'generic/platform=tvOS Simulator' -derivedDataPath build
+          CODE_SIGNING_ALLOWED=NO build
+      - name: Build for Apple TV devices
+        working-directory: apple
+        run: >
+          xcodebuild -project Fimbulvetr.xcodeproj -scheme Fimbulvetr -configuration Release
+          -destination 'generic/platform=tvOS' -derivedDataPath build
+          CODE_SIGNING_ALLOWED=NO build
+      - run: ditto -c -k --keepParent build/Build/Products/Debug-appletvsimulator/Fimbulvetr.app Fimbulvetr-tvsim.zip
+        working-directory: apple
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fimbulvetr-appletv-simulator
+          path: apple/Fimbulvetr-tvsim.zip
+          retention-days: 14

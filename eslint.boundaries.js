@@ -43,6 +43,14 @@ export const boundaryConfigs = [
     },
   },
   {
+    files: ['src/port/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: [noShell, noPhaser] }],
+      'no-restricted-properties': ['error', ...noEntropy],
+      'no-restricted-syntax': ['error', noNewDate],
+    },
+  },
+  {
     files: ['src/art/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', { patterns: [noShell, noPhaser] }],
