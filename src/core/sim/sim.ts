@@ -64,6 +64,7 @@ import { stepRafts } from './systems/raft';
 import { pushBlocks, stepProps, swordProps } from './systems/props';
 import { spawnActors } from './systems/spawn';
 import { checkInteract, checkTriggers, stepStory, storyUi, type StoryUi } from './systems/story';
+import { regenSeidr } from './systems/seidr';
 import { tickTimers } from './systems/timers';
 import { ringFlag } from '../items/rings';
 import { stepTrial } from './systems/trial';
@@ -128,6 +129,7 @@ export class Sim implements SimRt {
   burnTicks?: number;
   coldTicks?: number;
   freezeTicks?: number;
+  seidrTicks?: number;
   crust?: Map<number, number>;
   beamSegs?: readonly BeamSeg[];
   escort?: Escort;
@@ -393,6 +395,7 @@ export class Sim implements SimRt {
         burn: this.burnTicks,
         cold: this.coldTicks,
         freeze: this.freezeTicks,
+        seidrRegen: this.seidrTicks,
         crust: this.crust === undefined ? undefined : [...this.crust],
         escort: this.escort,
         fire: fireKey(this),
@@ -488,6 +491,7 @@ export class Sim implements SimRt {
     stepCold(this);
     stepBinding(this);
     stepCrust(this);
+    regenSeidr(this);
     checkDeath(this);
     if (this.mode === 'over') return;
     tickTimers(this);

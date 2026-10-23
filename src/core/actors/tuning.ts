@@ -210,6 +210,18 @@ export interface Tuning {
   readonly stones: StoneTuning;
   readonly enemyIframes: number;
   readonly knockDecay: number;
+  readonly seidr: SeidrTuning;
+}
+
+/**
+ * Seiðr comes back on its own, slowly and only up to a floor: enough for one galdr when the bar runs dry,
+ * never a full bar (that stays with jars, mead and rune-stones).
+ */
+export interface SeidrTuning {
+  /** Play-ticks for each point regained. */
+  readonly regenTicks: number;
+  /** Regen stops once the bar holds this many (or is full, if smaller). */
+  readonly floor: number;
 }
 
 /** The swing of a weapon. */

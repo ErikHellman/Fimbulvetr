@@ -102,6 +102,8 @@ export interface SimRt {
   /** Cold on Ask from the killing frost, in ticks, and ticks spent freezing at full cold (undefined at 0). */
   coldTicks?: number;
   freezeTicks?: number;
+  /** Ticks toward the next point of seiðr regen (undefined at or above the floor). */
+  seidrTicks?: number;
   /** Ticks Ask has stood outside the binding's ring in Hrímnir's hall (M10b; undefined when inside or none). */
   bindTicks?: number;
   /** Ís crust on lava (tile index → ticks left), on this screen only (undefined when none). */

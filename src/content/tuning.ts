@@ -138,4 +138,6 @@ export const TUNING: Tuning = {
   textCps: 45,
   enemyIframes: 6,
   knockDecay: 0.8,
+  /** Slow seiðr regen, only up to one galdr's worth: 1 point every 8 s while the bar is below 5. */
+  seidr: { regenTicks: 480, floor: 5 },
 };
