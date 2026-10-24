@@ -1,0 +1,34 @@
+# XcodeGen spec for the Apple TV app (`xcodegen generate` writes Fimbulvetr.xcodeproj, which is not
+# committed). Resources/ is filled by `pnpm apple:resources`: the rules bundle and the baked art.
+name: Fimbulvetr
+options:
+  bundleIdPrefix: cloud.hellman
+  deploymentTarget:
+    tvOS: '17.0'
+targets:
+  Fimbulvetr:
+    type: application
+    platform: tvOS
+    sources:
+      - path: Fimbulvetr
+      - path: Resources
+        type: folder
+        buildPhase: resources
+    info:
+      path: Fimbulvetr/Info.plist
+      properties:
+        CFBundleDisplayName: Fimbulvetr
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GCSupportsControllerUserInteraction: true
+        GCSupportedGameControllers:
+          - ProfileName: ExtendedGamepad
+          - ProfileName: MicroGamepad
+        UIRequiredDeviceCapabilities: [arm64]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: cloud.hellman.fimbulvetr
+        MARKETING_VERSION: '1.0.0'
+        CURRENT_PROJECT_VERSION: '1'
+        SWIFT_VERSION: '5.0'
+        TARGETED_DEVICE_FAMILY: '3'

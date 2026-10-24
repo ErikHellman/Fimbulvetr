@@ -20,6 +20,11 @@
     "check": "pnpm typecheck && pnpm lint && pnpm test",
     "e2e": "playwright test",
     "budget": "node scripts/check-budget.mjs",
+    "android:web": "vite build && node scripts/android-web.mjs",
+    "port:build": "vite build --config vite.port.config.ts",
+    "port:art": "tsx scripts/port-art.ts",
+    "apple:resources": "pnpm port:build && pnpm port:art && node scripts/apple-resources.mjs",
+    "port:bench": "pnpm port:build && bun scripts/port-bench.ts && BUN_JSC_useJIT=0 bun scripts/port-bench.ts",
     "icons": "node scripts/icons.mjs",
     "art:pack": "tsx art-src/build.ts",
     "promo": "node scripts/promo.mjs"

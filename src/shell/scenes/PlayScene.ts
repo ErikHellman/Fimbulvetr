@@ -32,6 +32,7 @@ import type { DevBridge, ViewStats } from '@shell/dev/bridge';
 import { FrameStats } from '@shell/dev/stats';
 import { connectedPads, readPad } from '@shell/input/gamepad';
 import { activePadStyle, padLabel, type PadStyle } from '@shell/input/padLabels';
+import { withHostPad } from '@shell/platform/host';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { LETTERBOX } from '@shell/scale';
@@ -249,7 +250,7 @@ export class PlayScene extends Phaser.Scene {
     const codes = this.keys.takeCodes();
     const fresh = [...codes].find((c) => !this.lastCodes.has(c)) ?? null;
     this.lastCodes = new Set(codes);
-    const pads = connectedPads(navigator);
+    const pads = withHostPad(this.services.host, connectedPads(navigator));
     this.pad = activePadStyle(pads);
     this.mapper.sample(codes, readPad(pads));
     if (this.picker === null && this.sim.storyUi()?.k === 'save') this.openPicker();

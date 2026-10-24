@@ -27,6 +27,17 @@ describe('layer boundaries', () => {
     expect(ids).toContain('no-restricted-imports');
   });
 
+  it('rejects the shell and wall-clock time in port', async () => {
+    const shell = await ruleIds(
+      "import { x } from '@shell/main';\nexport const y = x;\n",
+      'src/port/probe.ts',
+    );
+    expect(shell).toContain('no-restricted-imports');
+    expect(await ruleIds('export const t = Date.now();\n', 'src/port/probe.ts')).toContain(
+      'no-restricted-properties',
+    );
+  });
+
   it('rejects art in content', async () => {
     const ids = await ruleIds(
       "import { x } from '@art/raster';\nexport const y = x;\n",

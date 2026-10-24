@@ -7,5 +7,6 @@ export const aliases = {
   '@core': dir('./src/core'),
   '@content': dir('./src/content'),
   '@art': dir('./src/art'),
+  '@port': dir('./src/port'),
   '@shell': dir('./src/shell'),
 };

@@ -20,6 +20,8 @@ export const LOAD_ROWS = ['s1', 's2', 's3', 'auto_prev', 'back'] as const satisf
 export interface TitleInfo {
   /** Which slots hold a save. */
   readonly filled: Readonly<Record<SlotId, boolean>>;
+  /** Running in a TV app: no files to import or export, and Back on the main list exits. */
+  readonly tv?: boolean;
 }
 
 export interface TitleState {
@@ -34,7 +36,8 @@ export type TitleAction =
   | { readonly k: 'import' }
   | { readonly k: 'export' }
   | { readonly k: 'settings' }
-  | { readonly k: 'achievements' };
+  | { readonly k: 'achievements' }
+  | { readonly k: 'exit' };
 
 export interface TitleStep {
   readonly state: TitleState;
@@ -47,16 +50,20 @@ export function openTitle(): TitleState {
   return { page: 'press', cursor: 0 };
 }
 
-/** The main list: Continue and Export only with an autosave, Load only with another save to load. */
+/**
+ * The main list: Continue and Export only with an autosave, Load only with another save to load, and no
+ * Import or Export in a TV app.
+ */
 export function titleRows(info: TitleInfo): TitleRow[] {
   const f = info.filled;
   const loadable = f.s1 || f.s2 || f.s3 || f.auto_prev;
+  const files = info.tv !== true;
   return [
     ...(f.auto ? (['continue'] as const) : []),
     'new',
     ...(loadable ? (['load'] as const) : []),
-    'import',
-    ...(f.auto ? (['export'] as const) : []),
+    ...(files ? (['import'] as const) : []),
+    ...(files && f.auto ? (['export'] as const) : []),
     'settings',
     'achievements',
   ];
@@ -94,6 +101,7 @@ export function stepTitle(state: TitleState, frame: InputFrame, info: TitleInfo,
     if (row === 'back') return back;
     return info.filled[row] ? go(state, { k: 'load', slot: row }) : same;
   }
+  if (wasPressed(frame, 'cancel') && info.tv === true) return go(state, { k: 'exit' });
   if (!confirm) return same;
   const row = titleRows(info)[state.cursor];
   switch (row) {

@@ -100,6 +100,18 @@ describe('title menu', () => {
 });
 
 describe('the version line', () => {
+  it('drops Import and Export where there are no files (a TV app)', () => {
+    const tv: TitleInfo = { ...info('auto', 's1'), tv: true };
+    expect(titleRows(tv)).toEqual(['continue', 'new', 'load', 'settings', 'achievements']);
+  });
+
+  it('exits from the main list on Back in a TV app, and only there', () => {
+    const tv: TitleInfo = { ...info(), tv: true };
+    expect(run(tv, 'any', ['cancel']).actions).toEqual([{ k: 'exit' }]);
+    expect(run(info(), 'any', ['cancel']).actions).toEqual([]);
+    expect(run({ ...info('s1'), tv: true }, 'any', ['down'], ['confirm'], ['cancel']).actions).toEqual([]);
+  });
+
   it('shows the version, and the build when there is one', () => {
     expect(versionLabel('0.5.0', 'dev')).toBe('v0.5.0');
     expect(versionLabel('0.5.0', 'abc1234')).toBe('v0.5.0 (abc1234)');
