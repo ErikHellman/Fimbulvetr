@@ -1,7 +1,14 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Route } from '@playwright/test';
 import { boot, collectErrors, tap } from './helpers';
 
-/** Cloud saves: connecting Dropbox through the popup, with Dropbox itself stood in for by routes. */
+/** Cloud saves: connecting Dropbox and Google Drive through the popup, with the services stood in for by routes. */
+
+/** The service's sign-in page sending the popup back. WebKit refuses to fulfil a route with a 302. */
+const redirectTo = (route: Route, url: string): Promise<void> =>
+  route.fulfill({
+    contentType: 'text/html',
+    body: `<script>location.replace(${JSON.stringify(url)})</script>`,
+  });
 
 test('connects Dropbox in a popup and syncs from the title screen', async ({ page, context }) => {
   const errors = collectErrors(page);
@@ -12,7 +19,7 @@ test('connects Dropbox in a popup and syncs from the title screen', async ({ pag
     const back = new URL(authorize.searchParams.get('redirect_uri') ?? '');
     back.searchParams.set('code', 'test-code');
     back.searchParams.set('state', authorize.searchParams.get('state') ?? '');
-    await route.fulfill({ status: 302, headers: { location: back.href } });
+    await redirectTo(route, back.href);
   });
   await context.route('https://api.dropboxapi.com/**', (route) => {
     const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' };
@@ -75,7 +82,7 @@ test('connects Google Drive through the token flow and sends a save', async ({ p
       token_type: 'Bearer',
       state: asked.searchParams.get('state') ?? '',
     }).toString();
-    await route.fulfill({ status: 302, headers: { location: back.href } });
+    await redirectTo(route, back.href);
   });
   await context.route('https://www.googleapis.com/**', async (route) => {
     const cors = { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' };
