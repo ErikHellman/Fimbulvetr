@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1b1522" />
+    <link rel="icon" href="/icons/icon-192.png" />
+    <title>Privacy policy · Fimbulvetr</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        background: #000;
+        color: #f2ead8;
+        font:
+          17px/1.6 system-ui,
+          sans-serif;
+      }
+      main {
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 4rem;
+      }
+      article {
+        background: #1b1522;
+        border: 2px solid #d9b34a;
+        padding: 1.5rem 1.75rem;
+        margin-bottom: 2rem;
+      }
+      h1,
+      h2 {
+        color: #d9b34a;
+        line-height: 1.25;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin-top: 1.75rem;
+      }
+      a {
+        color: #e8c96a;
+      }
+      code {
+        font-size: 0.9em;
+      }
+      nav {
+        text-align: right;
+        margin-bottom: 1rem;
+      }
+      .muted {
+        color: #b8ad98;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav><a href="#en" hreflang="en">English</a> · <a href="#sv" hreflang="sv">Svenska</a></nav>
+
+      <article id="en" lang="en">
+        <h1>Fimbulvetr privacy policy</h1>
+        <p class="muted">Last updated 25 October 2026</p>
+
+        <p>
+          Fimbulvetr is a game that runs entirely in your web browser, at
+          <a href="https://fimbulvetr.hellman.cloud/">fimbulvetr.hellman.cloud</a>. It has no accounts, no game
+          server, no ads, no analytics and no tracking. The short version: your game stays on your device, unless you
+          choose to keep a copy in your own cloud storage.
+        </p>
+
+        <h2>Who is responsible</h2>
+        <p>
+          Fimbulvetr is made by Erik Hellman, Sweden. Questions about this policy:
+          <a href="mailto:erikhellman@hellsoft.se">erikhellman@hellsoft.se</a>.
+        </p>
+
+        <h2>What the game stores on your device</h2>
+        <p>The game keeps these in your browser's own storage. They never leave your device by themselves.</p>
+        <ul>
+          <li><strong>Saved games</strong> (IndexedDB, database <code>fimbulvetr</code>): your progress in the game.</li>
+          <li>
+            <strong>Settings</strong> (localStorage, <code>fimbulvetr.settings.v1</code>): language, volume, display,
+            accessibility options and key bindings.
+          </li>
+          <li><strong>Achievements</strong> (localStorage, <code>fimbulvetr.achievements.v1</code>).</li>
+          <li>
+            <strong>Game files</strong> (service worker cache), so the game loads quickly and works offline.
+          </li>
+        </ul>
+        <p>
+          The game asks the browser to keep this storage persistent, so your saves are not cleared when space runs low.
+          None of it contains your name or other personal details. You can delete all of it at any time by clearing
+          the site data for <code>fimbulvetr.hellman.cloud</code> in your browser. If you export a save, the file goes
+          wherever you choose to put it.
+        </p>
+        <p>The game sets no cookies.</p>
+
+        <h2>What the game sends over the internet</h2>
+        <p>
+          Nothing, apart from downloading the game itself. Your saves, settings and play are not sent to us or to anyone
+          else. There are no analytics, crash reports, ads or third-party scripts.
+        </p>
+
+        <h2>Hosting</h2>
+        <p>
+          The site is hosted on GitHub Pages. When your browser downloads the game, GitHub receives technical data
+          such as your IP address, as with any website, and may log it for security and operations. We do not get
+          access to those logs. See the
+          <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+            >GitHub General Privacy Statement</a
+          >.
+        </p>
+
+        <h2>Cloud saves (optional)</h2>
+        <p>
+          The game can offer to keep a copy of your saves in your own Dropbox, Microsoft OneDrive or Google Drive.
+          This is off unless you turn it on and sign in to one of these services. If you do:
+        </p>
+        <ul>
+          <li>
+            Sign-in happens directly between your browser and the service. The game never sees your password, and
+            there is no Fimbulvetr server in between.
+          </li>
+          <li>
+            The game asks only for access to its own app folder: <code>Apps/Fimbulvetr</code> in Dropbox and
+            OneDrive, or the hidden app data folder in Google Drive. It cannot see or change any of your other files.
+          </li>
+          <li>
+            In that folder it reads and writes only its save files. It may read your account's display name to show
+            which account you are signed in with.
+          </li>
+          <li>
+            The sign-in token the service gives the game is kept only in your browser's storage. Signing out in the
+            game's settings deletes it.
+          </li>
+          <li>
+            We never receive your saves, your account details or your tokens, and nothing is shared with anyone else.
+            Your files are handled by the service under its own privacy policy:
+            <a href="https://www.dropbox.com/privacy">Dropbox</a>,
+            <a href="https://privacy.microsoft.com/privacystatement">Microsoft</a>,
+            <a href="https://policies.google.com/privacy">Google</a>.
+          </li>
+        </ul>
+        <p>
+          Fimbulvetr's use and transfer of information received from Google APIs adheres to the
+          <a href="https://developers.google.com/terms/api-services-user-data-policy"
+            >Google API Services User Data Policy</a
+          >, including the Limited Use requirements.
+        </p>
+        <p>
+          You can stop at any time by signing out in the game, and you can remove the game's access in your account
+          settings: <a href="https://www.dropbox.com/account/connected_apps">Dropbox</a>,
+          <a href="https://account.live.com/consent/Manage">Microsoft</a>,
+          <a href="https://myaccount.google.com/connections">Google</a>. Deleting the app folder removes the cloud
+          copies.
+        </p>
+
+        <h2>Your rights</h2>
+        <p>
+          Because we do not collect or store personal data about you, there is nothing for us to show, correct or
+          delete. Everything the game keeps is in your browser or your own cloud account, under your control. If you
+          think something here is wrong, contact us at the address above, or the Swedish Authority for Privacy
+          Protection (<a href="https://www.imy.se/">IMY</a>).
+        </p>
+
+        <h2>Children</h2>
+        <p>The game collects no personal data from anyone, including children.</p>
+
+        <h2>Changes</h2>
+        <p>If the game starts handling data differently, this page will be updated first, with a new date at the top.</p>
+
+        <p><a href="/">Back to the game</a></p>
+      </article>
+
+      <article id="sv" lang="sv">
+        <h1>Integritetspolicy för Fimbulvetr</h1>
+        <p class="muted">Senast uppdaterad 25 oktober 2026</p>
+
+        <p>
+          Fimbulvetr är ett spel som körs helt i din webbläsare, på
+          <a href="https://fimbulvetr.hellman.cloud/">fimbulvetr.hellman.cloud</a>. Det har inga konton, ingen
+          spelserver, ingen reklam, ingen analys och ingen spårning. Kort sagt: ditt spel stannar på din enhet, om du
+          inte själv väljer att spara en kopia i din egen molnlagring.
+        </p>
+
+        <h2>Vem som är ansvarig</h2>
+        <p>
+          Fimbulvetr är gjort av Erik Hellman, Sverige. Frågor om den här policyn:
+          <a href="mailto:erikhellman@hellsoft.se">erikhellman@hellsoft.se</a>.
+        </p>
+
+        <h2>Vad spelet sparar på din enhet</h2>
+        <p>Spelet sparar följande i webbläsarens egen lagring. Inget av det lämnar din enhet av sig självt.</p>
+        <ul>
+          <li><strong>Sparade spel</strong> (IndexedDB, databasen <code>fimbulvetr</code>): hur långt du har kommit.</li>
+          <li>
+            <strong>Inställningar</strong> (localStorage, <code>fimbulvetr.settings.v1</code>): språk, volym, bild,
+            tillgänglighetsval och tangenter.
+          </li>
+          <li><strong>Prestationer</strong> (localStorage, <code>fimbulvetr.achievements.v1</code>).</li>
+          <li>
+            <strong>Spelets filer</strong> (service workerns cache), så att spelet laddar snabbt och fungerar utan
+            nätverk.
+          </li>
+        </ul>
+        <p>
+          Spelet ber webbläsaren att behålla lagringen, så att dina sparningar inte rensas när utrymmet tar slut.
+          Inget av det innehåller ditt namn eller andra personuppgifter. Du kan när som helst radera allt genom att
+          rensa webbplatsdata för <code>fimbulvetr.hellman.cloud</code> i din webbläsare. Om du exporterar en sparning
+          hamnar filen där du själv väljer att lägga den.
+        </p>
+        <p>Spelet använder inga kakor.</p>
+
+        <h2>Vad spelet skickar över internet</h2>
+        <p>
+          Ingenting, förutom att själva spelet laddas ner. Dina sparningar, inställningar och ditt spelande skickas
+          inte till oss eller till någon annan. Det finns ingen analys, inga kraschrapporter, ingen reklam och inga
+          skript från tredje part.
+        </p>
+
+        <h2>Webbhotell</h2>
+        <p>
+          Webbplatsen ligger på GitHub Pages. När din webbläsare laddar ner spelet tar GitHub emot tekniska uppgifter
+          som din IP-adress, precis som för alla webbplatser, och kan logga dem för säkerhet och drift. Vi har inte
+          tillgång till de loggarna. Se
+          <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+            >GitHubs allmänna integritetspolicy</a
+          >.
+        </p>
+
+        <h2>Molnsparningar (frivilligt)</h2>
+        <p>
+          Spelet kan erbjuda att spara en kopia av dina sparningar i din egen Dropbox, Microsoft OneDrive eller Google
+          Drive. Det är avstängt tills du slår på det och loggar in hos en av tjänsterna. Om du gör det:
+        </p>
+        <ul>
+          <li>
+            Inloggningen sker direkt mellan din webbläsare och tjänsten. Spelet ser aldrig ditt lösenord, och det
+            finns ingen Fimbulvetr-server emellan.
+          </li>
+          <li>
+            Spelet ber bara om tillgång till sin egen appmapp: <code>Apps/Fimbulvetr</code> i Dropbox och OneDrive,
+            eller den dolda mappen för appdata i Google Drive. Det kan inte se eller ändra några andra filer.
+          </li>
+          <li>
+            I den mappen läser och skriver det bara sina sparfiler. Det kan läsa kontots visningsnamn för att visa
+            vilket konto du är inloggad med.
+          </li>
+          <li>
+            Inloggningstoken som tjänsten ger spelet sparas bara i din webbläsares lagring. När du loggar ut i
+            spelets inställningar raderas den.
+          </li>
+          <li>
+            Vi får aldrig dina sparningar, dina kontouppgifter eller dina token, och inget delas med någon annan.
+            Dina filer hanteras av tjänsten enligt dess egen integritetspolicy:
+            <a href="https://www.dropbox.com/privacy">Dropbox</a>,
+            <a href="https://privacy.microsoft.com/sv-se/privacystatement">Microsoft</a>,
+            <a href="https://policies.google.com/privacy?hl=sv">Google</a>.
+          </li>
+        </ul>
+        <p>
+          Fimbulvetrs användning och överföring av uppgifter från Googles API:er följer
+          <a href="https://developers.google.com/terms/api-services-user-data-policy"
+            >Google API Services User Data Policy</a
+          >, inklusive kraven på begränsad användning (Limited Use).
+        </p>
+        <p>
+          Du kan sluta när som helst genom att logga ut i spelet, och du kan ta bort spelets åtkomst i dina
+          kontoinställningar: <a href="https://www.dropbox.com/account/connected_apps">Dropbox</a>,
+          <a href="https://account.live.com/consent/Manage">Microsoft</a>,
+          <a href="https://myaccount.google.com/connections">Google</a>. Om du raderar appmappen försvinner
+          kopiorna i molnet.
+        </p>
+
+        <h2>Dina rättigheter</h2>
+        <p>
+          Eftersom vi inte samlar in eller lagrar personuppgifter om dig finns det inget för oss att visa, rätta eller
+          radera. Allt spelet sparar finns i din webbläsare eller ditt eget molnkonto, och du bestämmer över det. Om
+          du tycker att något här är fel kan du kontakta oss på adressen ovan, eller Integritetsskyddsmyndigheten
+          (<a href="https://www.imy.se/">IMY</a>).
+        </p>
+
+        <h2>Barn</h2>
+        <p>Spelet samlar inte in några personuppgifter från någon, inte heller från barn.</p>
+
+        <h2>Ändringar</h2>
+        <p>
+          Om spelet börjar hantera uppgifter på ett annat sätt uppdateras den här sidan först, med ett nytt datum
+          överst.
+        </p>
+
+        <p><a href="/">Tillbaka till spelet</a></p>
+      </article>
+    </main>
+  </body>
+</html>
