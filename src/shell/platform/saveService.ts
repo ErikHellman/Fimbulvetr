@@ -6,12 +6,17 @@ import type { SaveStore, SaveSummary, SlotId } from './saveStore';
 
 export const SLOT_IDS = ['auto', 'auto_prev', 's1', 's2', 's3'] as const satisfies readonly SlotId[];
 export type ManualSlot = 's1' | 's2' | 's3';
+/** The slots cloud saves copy: `auto_prev` stays a backup in this browser only. */
+export const CLOUD_SLOTS = ['auto', 's1', 's2', 's3'] as const satisfies readonly SlotId[];
+export type CloudSlot = (typeof CLOUD_SLOTS)[number];
 
 export const AUTOSAVE_INTERVAL_MS = 4000;
 
 /** Everything the game does with saves. Works (as a no-op for storage) when IndexedDB is unavailable. */
 export class SaveService {
   readonly autosaver: Autosaver;
+  /** Told about every save the game writes (the autosave and manual slots), for cloud saves. */
+  onWrite: ((slot: CloudSlot, save: SaveData) => void) | null = null;
   private persistAsked = false;
 
   constructor(
@@ -78,7 +83,9 @@ export class SaveService {
   async writeSlot(slot: ManualSlot, state: GameState): Promise<boolean> {
     if (this.store === null) return false;
     try {
-      await this.store.writeSlot(slot, this.toSave(state));
+      const save = this.toSave(state);
+      await this.store.writeSlot(slot, save);
+      this.onWrite?.(slot, save);
       return true;
     } catch (e) {
       console.warn(`[save] writing ${slot} failed:`, e);
@@ -105,6 +112,34 @@ export class SaveService {
     return null;
   }
 
+  /** The stored saves of the slots cloud saves copy, as written (missing or unreadable ones left out). */
+  async stored(): Promise<Partial<Record<CloudSlot, SaveData>>> {
+    const out: Partial<Record<CloudSlot, SaveData>> = {};
+    if (this.store === null) return out;
+    for (const slot of CLOUD_SLOTS) {
+      try {
+        const record = await this.store.get(slot);
+        if (record !== undefined) out[slot] = record.save;
+      } catch (e) {
+        console.warn(`[save] reading ${slot} failed:`, e);
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Stores a save that came from elsewhere (the cloud) in a slot, if it loads here. A fetched autosave moves
+   * the current one to `auto_prev`, as any autosave does. Not reported to `onWrite`.
+   */
+  async adopt(slot: CloudSlot, raw: unknown): Promise<boolean> {
+    if (this.store === null) return false;
+    if (!loadSave(raw, this.knownScreens).ok) return false;
+    const save = raw as SaveData;
+    if (slot === 'auto') await this.store.writeAuto(save);
+    else await this.store.writeSlot(slot, save);
+    return true;
+  }
+
   exportJson(state: GameState): string {
     return JSON.stringify(this.toSave(state), null, 2);
   }
@@ -123,7 +158,9 @@ export class SaveService {
 
   private async writeAuto(state: GameState): Promise<void> {
     if (this.store === null) return;
-    await this.store.writeAuto(this.toSave(state));
+    const save = this.toSave(state);
+    await this.store.writeAuto(save);
+    this.onWrite?.('auto', save);
     if (this.persistAsked) return;
     this.persistAsked = true;
     if ((await this.store.getMeta('persistAsked')) === true) return;

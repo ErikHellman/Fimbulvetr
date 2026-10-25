@@ -10,6 +10,7 @@ import { t } from '@core/i18n/t';
 import { newGame } from '@core/state/gameState';
 import { showMessage } from '@shell/boot/message';
 import { hasWebGL } from '@shell/boot/webgl';
+import { browserCloudSaves } from '@shell/platform/cloud/browser';
 import { SaveService } from '@shell/platform/saveService';
 import { registerServiceWorker } from '@shell/platform/pwa';
 import { openSaveStoreSafely } from '@shell/platform/saveStore';
@@ -86,6 +87,16 @@ async function main(): Promise<void> {
     showMessage(t(UI.storage_unavailable, lang), [{ label: t(UI.ok, lang), run: () => undefined }]);
   }
   const saves = new SaveService(store, __BUILD_ID__, new Set<string>(SCREEN_IDS));
+  const cloud = store === null ? null : browserCloudSaves(saves);
+  if (cloud !== null) {
+    saves.onWrite = (slot, save) => {
+      cloud.noteWrite(slot, save);
+    };
+    // Leaving the tab sends the newest autosave too, without waiting out the minute.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') void saves.autosaver.flush().then(() => cloud.flush());
+    });
+  }
   const fresh = query?.screen !== undefined || query?.preset !== undefined;
   // The title screen, unless a dev query names where to start (or says `title=0`).
   const title = query?.title ?? !(fresh || query?.nosave === true);
@@ -102,6 +113,7 @@ async function main(): Promise<void> {
       state,
       settings,
       saves,
+      cloud,
       dev,
       muted: query?.mute === true,
       rolled: query?.rolled ?? true,

@@ -40,6 +40,9 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,png,json,webmanifest}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         cleanupOutdatedCaches: true,
+        // The sign-in callback comes back with ?code=…, which the precache does not match; without this the
+        // navigation fallback would answer it with the game itself.
+        navigateFallbackDenylist: [/\/oauth-callback\.html/],
       },
     }),
   ],

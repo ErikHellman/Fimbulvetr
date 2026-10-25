@@ -11,7 +11,8 @@ import type { SlotId } from '@shell/platform/saveStore';
 export const versionLabel = (version: string, build: string): string =>
   build === 'dev' ? `v${version}` : `v${version} (${build})`;
 
-export type TitleRow = 'continue' | 'new' | 'load' | 'import' | 'export' | 'settings' | 'achievements';
+export type TitleRow =
+  'continue' | 'new' | 'load' | 'import' | 'export' | 'cloud' | 'settings' | 'achievements';
 /** Rows of the load page: the manual slots, the backup autosave, then back. */
 export const LOAD_ROWS = ['s1', 's2', 's3', 'auto_prev', 'back'] as const satisfies readonly (
   SlotId | 'back'
@@ -20,6 +21,8 @@ export const LOAD_ROWS = ['s1', 's2', 's3', 'auto_prev', 'back'] as const satisf
 export interface TitleInfo {
   /** Which slots hold a save. */
   readonly filled: Readonly<Record<SlotId, boolean>>;
+  /** Cloud saves can be offered (this browser stores saves at all). */
+  readonly cloud: boolean;
 }
 
 export interface TitleState {
@@ -33,6 +36,7 @@ export type TitleAction =
   | { readonly k: 'load'; readonly slot: SlotId }
   | { readonly k: 'import' }
   | { readonly k: 'export' }
+  | { readonly k: 'cloud' }
   | { readonly k: 'settings' }
   | { readonly k: 'achievements' };
 
@@ -47,7 +51,10 @@ export function openTitle(): TitleState {
   return { page: 'press', cursor: 0 };
 }
 
-/** The main list: Continue and Export only with an autosave, Load only with another save to load. */
+/**
+ * The main list: Continue and Export only with an autosave, Load only with another save to load, Cloud saves
+ * only where saves are stored.
+ */
 export function titleRows(info: TitleInfo): TitleRow[] {
   const f = info.filled;
   const loadable = f.s1 || f.s2 || f.s3 || f.auto_prev;
@@ -57,6 +64,7 @@ export function titleRows(info: TitleInfo): TitleRow[] {
     ...(loadable ? (['load'] as const) : []),
     'import',
     ...(f.auto ? (['export'] as const) : []),
+    ...(info.cloud ? (['cloud'] as const) : []),
     'settings',
     'achievements',
   ];
@@ -100,6 +108,7 @@ export function stepTitle(state: TitleState, frame: InputFrame, info: TitleInfo,
     case 'continue':
     case 'import':
     case 'export':
+    case 'cloud':
     case 'settings':
     case 'achievements':
       return go(state, { k: row });
