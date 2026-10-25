@@ -5,6 +5,7 @@ import type { GameState } from '@core/state/gameState';
 import type { DevTools } from './dev/bridge';
 import type { ArtOverrides } from './gfx/atlases';
 import type { FrameIndex } from './gfx/frameIndex';
+import type { CloudSaves } from './platform/cloud/cloudSaves';
 import type { SaveService } from './platform/saveService';
 import type { Settings } from './platform/settings';
 
@@ -13,6 +14,8 @@ export interface Services {
   readonly state: GameState;
   readonly settings: Settings;
   readonly saves: SaveService;
+  /** Cloud saves (Dropbox); null where saves or localStorage are unavailable. */
+  readonly cloud: CloudSaves | null;
   readonly dev: DevTools | null;
   /** Dev/test `?mute`. */
   readonly muted: boolean;

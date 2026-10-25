@@ -4,7 +4,7 @@ import { UI } from '@content/i18n/ui';
 import { GAME_TITLE } from '@content/meta';
 import { NEW_GAME } from '@content/start';
 import { InputLatch, wasPressed } from '@core/input/actions';
-import { t } from '@core/i18n/t';
+import { t, type L10n } from '@core/i18n/t';
 import { newGame, type GameState } from '@core/state/gameState';
 import { MusicPlayer, musicLevel } from '@shell/audio/music';
 import { AudioDirector } from '@shell/audio/sfx';
@@ -14,6 +14,8 @@ import { activePadStyle, prompt, type PadStyle } from '@shell/input/padLabels';
 import { KeyboardState, attachKeyboard } from '@shell/input/keyboard';
 import { InputMapper } from '@shell/input/mapper';
 import { bindingsOf } from '@shell/input/remap';
+import type { CloudProvider, CloudStatus, ConnectResult } from '@shell/platform/cloud/cloudSaves';
+import { CloudAuthError } from '@shell/platform/cloud/types';
 import { importMessageKey, pickSaveFile } from '@shell/platform/exportImport';
 import { loadAchievements } from '@shell/platform/achievements';
 import { browserStorage, saveSettings } from '@shell/platform/settings';
@@ -27,6 +29,13 @@ import {
   stepAchievements,
   type AchievementsPage,
 } from '@shell/ui/achievementsPage';
+import {
+  cloudRows,
+  openCloudPage,
+  stepCloudPage,
+  type CloudPageState,
+  type CloudRow,
+} from '@shell/ui/cloudPage';
 import { openIntro, stepIntro, type IntroState } from '@shell/ui/intro';
 import { INTRO_LEFT, introColumn, introLines } from '@shell/ui/introText';
 import { currentFullscreen, requestFullscreenToggle } from '@shell/platform/fullscreen';
@@ -58,9 +67,27 @@ const ROW_LABEL = {
   load: UI.title_load,
   import: UI.title_import,
   export: UI.title_export,
+  cloud: UI.title_cloud,
   settings: UI.menu_settings,
   achievements: UI.title_achievements,
 } as const satisfies Record<TitleRow, unknown>;
+const CLOUD_LABEL = {
+  sync: UI.cloud_sync,
+  reconnect: UI.cloud_reconnect_row,
+  disconnect: UI.cloud_disconnect,
+  back: UI.set_back,
+} as const satisfies Record<Exclude<CloudRow, CloudProvider>, unknown>;
+/** Names, not words: the same in both languages. */
+const SERVICE = { dropbox: 'Dropbox', google: 'Google Drive' } as const satisfies Record<
+  CloudProvider,
+  string
+>;
+const CONNECT_MESSAGE = {
+  connected: UI.cloud_connected,
+  cancelled: UI.cloud_cancelled,
+  denied: UI.cloud_cancelled,
+  failed: UI.cloud_failed,
+} as const satisfies Record<Exclude<ConnectResult, 'redirected'>, unknown>;
 
 const EMPTY: Record<SlotId, SaveSummary | null> = {
   auto: null,
@@ -72,7 +99,7 @@ const EMPTY: Record<SlotId, SaveSummary | null> = {
 
 /**
  * The title screen: "press any key" (which also lets the browser play sound), then Continue, New game,
- * Load (three slots and the backup autosave), Import, Export, Settings and Achievements. A new game first shows the
+ * Load (three slots and the backup autosave), Import, Export, Cloud saves, Settings and Achievements. A new game first shows the
  * introduction (the basic controls) until the player ticks "don't show this again". Dev queries that name a
  * screen or preset skip the title screen.
  */
@@ -81,6 +108,11 @@ export class TitleScene extends Phaser.Scene {
   private state: TitleState = openTitle();
   private settingsMenu: SettingsMenuState | null = null;
   private achievements: AchievementsPage | null = null;
+  private cloudPage: CloudPageState | null = null;
+  /** Cloud work under way: `signin` waits for the Dropbox popup (Esc stops it), `work` blocks input. */
+  private cloudBusy: 'signin' | 'work' | null = null;
+  /** The service a sign-in under way is for. */
+  private signingIn: CloudProvider | null = null;
   /** The achievements page's columns: locked ones dim and earned ones gold, left then right. */
   private achText: Phaser.GameObjects.BitmapText[] = [];
   /** The introduction, open between New game and the longhouse. */
@@ -111,6 +143,9 @@ export class TitleScene extends Phaser.Scene {
     this.state = openTitle();
     this.settingsMenu = null;
     this.achievements = null;
+    this.cloudPage = null;
+    this.cloudBusy = null;
+    this.signingIn = null;
     this.intro = null;
     this.busy = false;
     this.message = '';
@@ -166,7 +201,45 @@ export class TitleScene extends Phaser.Scene {
     this.hint = this.text(0, GAME_H - 30, DIM);
     this.achText = [DIM, GOLD, DIM, GOLD].map((c) => this.text(0, 130, c));
     void this.refreshSlots();
+    void this.startCloud();
     document.body.dataset.title = 'press';
+  }
+
+  /** Finishes a sign-in that left the tab, or syncs quietly so Continue and Load see the newest saves. */
+  private async startCloud(): Promise<void> {
+    const cloud = this.services.cloud;
+    if (cloud === null) return;
+    const resumed = await cloud.resume();
+    if (resumed !== null && resumed !== 'redirected') {
+      this.cloudPage = openCloudPage();
+      this.message = this.cloudText(CONNECT_MESSAGE[resumed]);
+      if (resumed === 'connected') await this.cloudSync(false);
+      return;
+    }
+    if (cloud.status === 'on') await this.cloudSync(true);
+  }
+
+  /** `quiet`: only speak up when newer saves arrived (the sync when the title screen opens). */
+  private async cloudSync(quiet: boolean): Promise<void> {
+    const cloud = this.services.cloud;
+    if (cloud === null) return;
+    if (!quiet) this.message = this.cloudText(UI.cloud_syncing);
+    try {
+      const r = await cloud.sync();
+      if (!quiet) this.message = this.cloudText(UI.cloud_synced, { pulled: r.pulled, pushed: r.pushed });
+      else if (r.pulled > 0) this.message = this.cloudText(UI.cloud_fetched);
+    } catch (e) {
+      console.warn('[cloud] sync failed:', e);
+      if (!quiet || e instanceof CloudAuthError)
+        this.message = this.cloudText(e instanceof CloudAuthError ? UI.cloud_reconnect : UI.cloud_failed);
+    }
+    await this.refreshSlots();
+  }
+
+  /** A cloud line in the current language, naming the service connected (or being connected). */
+  private cloudText(text: L10n, vars: Readonly<Record<string, number>> = {}): string {
+    const provider = this.signingIn ?? this.services.cloud?.provider ?? 'dropbox';
+    return t(text, this.services.settings.lang, { service: SERVICE[provider], ...vars });
   }
 
   /** Flakes drift over the dark: the great winter, before the game begins. */
@@ -203,6 +276,7 @@ export class TitleScene extends Phaser.Scene {
         s2: s.s2 !== null,
         s3: s.s3 !== null,
       },
+      cloud: this.services.cloud !== null,
     };
   }
 
@@ -218,6 +292,7 @@ export class TitleScene extends Phaser.Scene {
     const frame = this.latch.consume();
     if (!this.busy) {
       if (this.settingsMenu !== null) this.stepSettings(frame, fresh);
+      else if (this.cloudPage !== null) this.stepCloud(frame);
       else if (this.achievements !== null) {
         const r = stepAchievements(this.achievements, frame);
         this.achievements = r.state;
@@ -253,6 +328,58 @@ export class TitleScene extends Phaser.Scene {
     }
     if (r.fullscreen) requestFullscreenToggle(this.services.settings.lang);
     if (r.moved) this.audio.play(r.changed ? 'sfx_menu_ok' : 'sfx_menu_move');
+  }
+
+  private stepCloud(frame: ReturnType<InputLatch['consume']>): void {
+    const cloud = this.services.cloud;
+    const page = this.cloudPage;
+    if (cloud === null || page === null) return;
+    if (this.cloudBusy !== null) {
+      if (this.cloudBusy === 'signin' && wasPressed(frame, 'cancel')) cloud.cancel();
+      return;
+    }
+    const r = stepCloudPage(page, frame, cloud.status);
+    this.cloudPage = r.state;
+    if (r.moved) this.audio.play(r.action === null ? 'sfx_menu_move' : 'sfx_menu_ok');
+    if (r.action === 'back') {
+      this.cloudPage = null;
+      this.message = '';
+      this.state = { page: 'main', cursor: titleRows(this.info()).indexOf('cloud') };
+    } else if (r.action !== null) {
+      this.message = '';
+      void this.cloudAct(r.action);
+    }
+  }
+
+  private async cloudAct(row: Exclude<CloudRow, 'back'>): Promise<void> {
+    const cloud = this.services.cloud;
+    if (cloud === null) return;
+    const provider =
+      row === 'dropbox' || row === 'google' ? row : row === 'reconnect' ? cloud.provider : null;
+    this.cloudBusy = provider === null ? 'work' : 'signin';
+    this.signingIn = provider;
+    try {
+      if (provider !== null) {
+        const result = await cloud.connect(provider);
+        if (result === 'redirected') return;
+        this.cloudBusy = 'work';
+        this.message = this.cloudText(CONNECT_MESSAGE[result]);
+        if (result === 'connected') {
+          this.cloudPage = openCloudPage();
+          await this.cloudSync(false);
+        }
+      } else if (row === 'sync') {
+        await this.cloudSync(false);
+      } else {
+        const message = this.cloudText(UI.cloud_disconnected);
+        await cloud.disconnect();
+        this.cloudPage = openCloudPage();
+        this.message = message;
+      }
+    } finally {
+      this.cloudBusy = null;
+      this.signingIn = null;
+    }
   }
 
   private stepIntro(frame: ReturnType<InputLatch['consume']>): void {
@@ -309,6 +436,10 @@ export class TitleScene extends Phaser.Scene {
           if (state !== null) this.services.saves.download(state);
           break;
         }
+        case 'cloud':
+          this.cloudPage = openCloudPage();
+          this.message = '';
+          break;
         case 'settings':
           this.settingsMenu = openSettings();
           break;
@@ -351,6 +482,11 @@ export class TitleScene extends Phaser.Scene {
       const column = Math.max(...labels.map((l) => textWidth(l))) + 24;
       this.values.setText(values.join('\n')).setPosition(left + column, 130);
       this.hint.setText(hint).setX(this.centre(hint));
+      return;
+    }
+    if (this.cloudPage !== null && this.services.cloud !== null) {
+      document.body.dataset.title = 'cloud';
+      this.drawCloud(this.cloudPage, this.services.cloud.status);
       return;
     }
     if (this.intro !== null) {
@@ -399,6 +535,36 @@ export class TitleScene extends Phaser.Scene {
     const bottom = this.message === '' ? hint : this.message;
     this.hint.setText(bottom).setX(this.centre(bottom));
     this.body.setY(this.state.page === 'load' ? 140 : 150 + (this.state.page === 'press' ? LINE_HEIGHT : 0));
+  }
+
+  private drawCloud(page: CloudPageState, status: CloudStatus): void {
+    const lang = this.services.settings.lang;
+    const heading = t(UI.title_cloud, lang);
+    this.subtitle.setText(heading).setX(this.centre(heading));
+    const about = this.cloudText(
+      status === 'on' ? UI.cloud_on : status === 'reconnect' ? UI.cloud_reconnect : UI.cloud_off,
+    );
+    const rows = cloudRows(status);
+    const cursor = Math.min(page.cursor, rows.length - 1);
+    const lines = rows.map((r, i) => {
+      const label =
+        r === 'dropbox' || r === 'google'
+          ? t(UI.cloud_connect, lang, { service: SERVICE[r] })
+          : this.cloudText(CLOUD_LABEL[r]);
+      return (i === cursor ? '> ' : '  ') + label;
+    });
+    this.values.setText(about).setPosition(this.centre(about), 130);
+    const widest = Math.max(...lines.map((l) => textWidth(l)));
+    this.body.setText(lines.join('\n')).setPosition(Math.round((GAME_W - widest) / 2), 130 + 2 * LINE_HEIGHT);
+    const bottom =
+      this.cloudBusy === 'signin'
+        ? prompt(UI.cloud_waiting, UI.cloud_waiting_pad, this.padStyle, lang, {
+            service: SERVICE[this.signingIn ?? 'dropbox'],
+          })
+        : this.message !== ''
+          ? this.message
+          : prompt(UI.cloud_hint, UI.cloud_hint_pad, this.padStyle, lang);
+    this.hint.setText(bottom).setX(this.centre(bottom));
   }
 
   /** Two columns of twelve, the earned ones in gold, and the chosen one's hint underneath. */

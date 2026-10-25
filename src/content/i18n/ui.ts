@@ -116,6 +116,55 @@ export const UI = {
   title_load: { en: 'Load a saved game', sv: 'Ladda ett sparat spel' },
   title_import: { en: 'Import a save file', sv: 'Importera en sparfil' },
   title_export: { en: 'Export the autosave', sv: 'Exportera autosparningen' },
+  title_cloud: { en: 'Cloud saves', sv: 'Molnsparningar' },
+  cloud_off: {
+    en: 'Keep a copy of your saves in your own Dropbox or Google Drive.',
+    sv: 'Spara en kopia av dina sparningar i din egen Dropbox eller Google Drive.',
+  },
+  cloud_on: {
+    en: 'Your saves are copied to your {service}.',
+    sv: 'Dina sparningar kopieras till din {service}.',
+  },
+  cloud_reconnect: {
+    en: '{service} wants you to connect again.',
+    sv: '{service} vill att du ansluter igen.',
+  },
+  cloud_connect: { en: 'Connect {service}', sv: 'Anslut {service}' },
+  cloud_reconnect_row: { en: 'Connect {service} again', sv: 'Anslut {service} igen' },
+  cloud_sync: { en: 'Sync now', sv: 'Synka nu' },
+  cloud_disconnect: { en: 'Disconnect {service}', sv: 'Koppla från {service}' },
+  cloud_waiting: {
+    en: 'Sign in in the {service} window.   Esc: stop waiting',
+    sv: 'Logga in i {service}-fönstret.   Esc: sluta vänta',
+  },
+  cloud_waiting_pad: {
+    en: 'Sign in in the {service} window.   {cancel}: stop waiting',
+    sv: 'Logga in i {service}-fönstret.   {cancel}: sluta vänta',
+  },
+  cloud_syncing: { en: 'Syncing with {service}…', sv: 'Synkar med {service} …' },
+  cloud_connected: { en: 'Connected to {service}.', sv: 'Ansluten till {service}.' },
+  cloud_synced: {
+    en: 'Synced: {pulled} fetched, {pushed} sent.',
+    sv: 'Synkat: {pulled} hämtade, {pushed} skickade.',
+  },
+  cloud_fetched: {
+    en: 'Fetched newer saves from {service}.',
+    sv: 'Hämtade nyare sparningar från {service}.',
+  },
+  cloud_cancelled: { en: 'Signing in was cancelled.', sv: 'Inloggningen avbröts.' },
+  cloud_failed: {
+    en: '{service} could not be reached. Your saves are safe here.',
+    sv: '{service} gick inte att nå. Dina sparningar är säkra här.',
+  },
+  cloud_disconnected: {
+    en: 'Disconnected. Your saves stay here and in {service}.',
+    sv: 'Frånkopplad. Dina sparningar finns kvar här och i {service}.',
+  },
+  cloud_hint: { en: '↑↓: choose   Enter: take   Esc: back', sv: '↑↓: välj   Enter: ta   Esc: tillbaka' },
+  cloud_hint_pad: {
+    en: '↑↓: choose   {confirm}: take   {cancel}: back',
+    sv: '↑↓: välj   {confirm}: ta   {cancel}: tillbaka',
+  },
   title_confirm_new: {
     en: 'A new game replaces the autosave; your saved slots stay. Enter: begin   Esc: back',
     sv: 'Ett nytt spel ersätter autosparningen; dina sparplatser finns kvar. Enter: börja   Esc: tillbaka',

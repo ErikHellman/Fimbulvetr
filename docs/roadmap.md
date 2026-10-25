@@ -333,3 +333,13 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Fixtures, props, critters, pickups
   - [x] Effects, icons, UI (`art-src/ui`)
   - [ ] Per-region atlas loading
+
+## Cloud saves (after 1.0.0)
+
+Analysis: Dropbox, OneDrive and Google Drive work from a static site (browser-only OAuth); iCloud is left out (paid, old CloudKit JS).
+
+- [x] Dropbox: PKCE sign-in (popup, or a full-tab redirect where popups are blocked), App folder, sync on the title screen, pushes after saves
+- [ ] Dropbox "Apply for production" (needed past 500 linked users)
+- [ ] OneDrive
+- [x] Google Drive: token flow (an hour per sign-in), hidden `appDataFolder`
+- [ ] Google brand verification (publish the OAuth app; until then only listed test users can sign in)

@@ -20,6 +20,7 @@ const info = (...filled: SlotId[]): TitleInfo => ({
     s2: filled.includes('s2'),
     s3: filled.includes('s3'),
   },
+  cloud: false,
 });
 
 function run(i: TitleInfo, ...inputs: readonly (Action[] | 'any')[]) {
@@ -40,6 +41,20 @@ describe('title menu', () => {
   it('waits for any key first', () => {
     expect(run(info(), ['down']).state.page).toBe('press');
     expect(run(info(), 'any').state).toEqual({ page: 'main', cursor: 0 });
+  });
+
+  it('offers Cloud saves where saves are stored, and takes it', () => {
+    const withCloud = { ...info('auto'), cloud: true };
+    expect(titleRows(withCloud)).toEqual([
+      'continue',
+      'new',
+      'import',
+      'export',
+      'cloud',
+      'settings',
+      'achievements',
+    ]);
+    expect(run(withCloud, 'any', ['up'], ['up'], ['up'], ['confirm']).actions).toEqual([{ k: 'cloud' }]);
   });
 
   it('offers Continue and Export only with an autosave, and Load only with something to load', () => {
