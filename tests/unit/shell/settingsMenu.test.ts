@@ -19,6 +19,7 @@ function run(settings: Settings, ...inputs: Input[]) {
   let s = settings;
   let changes = 0;
   let fullscreen = 0;
+  let feedback = 0;
   for (const i of inputs) {
     if (state === null) break;
     const r: SettingsStep = Array.isArray(i)
@@ -28,8 +29,9 @@ function run(settings: Settings, ...inputs: Input[]) {
     s = r.settings;
     if (r.changed) changes += 1;
     if (r.fullscreen) fullscreen += 1;
+    if (r.feedback) feedback += 1;
   }
-  return { state, settings: s, changes, fullscreen };
+  return { state, settings: s, changes, fullscreen, feedback };
 }
 
 const down = (n: number): Action[][] => Array.from({ length: n }, () => ['down']);
@@ -102,5 +104,18 @@ describe('settings menu', () => {
       expect(r.settings).toEqual(DEFAULT_SETTINGS);
     }
     expect(run(DEFAULT_SETTINGS, ...at).fullscreen).toBe(0);
+  });
+
+  it('asks for the feedback form from its row, on confirm only', () => {
+    const at = down(rowOf('feedback'));
+    for (const press of [['confirm'], ['interact']] as Action[][]) {
+      const r = run(DEFAULT_SETTINGS, ...at, press);
+      expect(r.feedback).toBe(1);
+      expect(r.changes).toBe(0);
+      expect(r.state).toEqual({ page: 'main', cursor: rowOf('feedback'), listening: null });
+    }
+    for (const press of [['left'], ['right']] as Action[][])
+      expect(run(DEFAULT_SETTINGS, ...at, press).feedback).toBe(0);
+    expect(run(DEFAULT_SETTINGS, ...at).feedback).toBe(0);
   });
 });

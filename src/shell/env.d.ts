@@ -5,3 +5,6 @@ declare const __BUILD_ID__: string;
 
 /** The game's version, from package.json; shown on the title screen. */
 declare const __APP_VERSION__: string;
+
+/** `<version>+<build id>`: the release that error reports and uploaded source maps are filed under. */
+declare const __RELEASE__: string;

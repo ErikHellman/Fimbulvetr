@@ -28,6 +28,7 @@ const ROW_LABEL = {
   colourBlind: UI.set_colour_blind,
   showIntro: UI.set_show_intro,
   controls: UI.set_controls,
+  feedback: UI.set_feedback,
   back: UI.set_back,
 } as const;
 
@@ -69,6 +70,7 @@ function value(row: SettingRow, s: Settings, lang: Lang, fullscreen: FullscreenS
     case 'showIntro':
       return onOff(s[row]);
     case 'controls':
+    case 'feedback':
     case 'back':
       return '';
   }

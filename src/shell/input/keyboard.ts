@@ -2,6 +2,8 @@ export interface KeyEventLike {
   readonly code: string;
   readonly target: EventTarget | null;
   preventDefault(): void;
+  /** The event's path through shadow roots; `target` is only the shadow host. */
+  composedPath?(): readonly unknown[];
 }
 
 /** Keys the browser would otherwise use to scroll or move focus. */
@@ -14,6 +16,22 @@ export function isTextInput(target: unknown): boolean {
   return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable === true;
 }
 
+/** Marks a page element (a dialog over the game) whose keys the game leaves alone. */
+export const IGNORE_KEYS_ATTR = 'data-game-ignore-keys';
+
+function marked(node: unknown): boolean {
+  const el = node as { hasAttribute?: unknown } | null;
+  return (
+    typeof el?.hasAttribute === 'function' && (el.hasAttribute as (a: string) => boolean)(IGNORE_KEYS_ATTR)
+  );
+}
+
+/** True when the key goes to a text field (also inside a shadow root) or to an element marked to be left alone. */
+function forThePage(e: KeyEventLike): boolean {
+  const path = e.composedPath?.() ?? [];
+  return isTextInput(path[0] ?? e.target) || isTextInput(e.target) || path.some(marked) || marked(e.target);
+}
+
 /** Physical keys currently held, by KeyboardEvent.code, so WASD works on every keyboard layout. */
 export class KeyboardState {
   private readonly held = new Set<string>();
@@ -21,7 +39,7 @@ export class KeyboardState {
   private readonly tapped = new Set<string>();
 
   down(e: KeyEventLike): void {
-    if (isTextInput(e.target)) return;
+    if (forThePage(e)) return;
     this.held.add(e.code);
     this.tapped.add(e.code);
     if (CAPTURED.has(e.code)) e.preventDefault();

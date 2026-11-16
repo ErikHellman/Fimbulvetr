@@ -59,6 +59,20 @@ describe('KeyboardState', () => {
     expect(isTextInput({ tagName: 'CANVAS' })).toBe(false);
   });
 
+  it('ignores keys aimed into a page dialog in a shadow root (the feedback form)', () => {
+    const keys = new KeyboardState();
+    const host = { tagName: 'DIV', hasAttribute: (a: string) => a === 'data-game-ignore-keys' };
+    // Typed into the form's text box: the window sees the shadow host as the target.
+    const typed = { ...key('Space', host), composedPath: () => [{ tagName: 'TEXTAREA' }, host] };
+    keys.down(typed);
+    expect(typed.prevented).toBe(false);
+    // On one of the form's buttons: the host is on the event's path.
+    keys.down({ ...key('Escape', host), composedPath: () => [{ tagName: 'BUTTON' }, host] });
+    expect(keys.codes().size).toBe(0);
+    keys.down({ ...key('KeyW'), composedPath: () => [{ tagName: 'CANVAS' }] });
+    expect([...keys.codes()]).toEqual(['KeyW']);
+  });
+
   it('keeps a tap that starts and ends between two takeCodes() samples', () => {
     const keys = new KeyboardState();
     keys.down(key('KeyJ'));

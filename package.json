@@ -25,10 +25,12 @@
     "promo": "node scripts/promo.mjs"
   },
   "dependencies": {
+    "@hellsoft/vaka-browser": "^0.4.0",
     "phaser": "4.2.1"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@hellsoft/vaka-bundler-plugin": "^0.4.0",
     "@playwright/test": "1.63.0",
     "@types/node": "22.20.4",
     "eslint": "10.11.0",
