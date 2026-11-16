@@ -23,6 +23,7 @@ export const SETTING_ROWS = [
   'colourBlind',
   'showIntro',
   'controls',
+  'feedback',
   'back',
 ] as const;
 export type SettingRow = (typeof SETTING_ROWS)[number];
@@ -47,6 +48,8 @@ export interface SettingsStep {
   readonly moved: boolean;
   /** The full screen row was pressed: the caller toggles it (full screen is the browser's, not a setting). */
   readonly fullscreen: boolean;
+  /** The feedback row was pressed: the caller opens the feedback form (a page dialog, not a setting). */
+  readonly feedback: boolean;
 }
 
 export function openSettings(): SettingsMenuState {
@@ -85,6 +88,7 @@ function nudge(s: Settings, row: SettingRow, dir: 1 | -1): Settings {
       return { ...s, [row]: !s[row] };
     case 'fullscreen':
     case 'controls':
+    case 'feedback':
     case 'back':
       return s;
   }
@@ -100,7 +104,7 @@ export function stepSettings(
   settings: Settings,
   code: string | null,
 ): SettingsStep {
-  const same = { state, settings, changed: false, moved: false, fullscreen: false };
+  const same = { state, settings, changed: false, moved: false, fullscreen: false, feedback: false };
   if (state.listening !== null) {
     if (code === null) return same;
     const listening = null;
@@ -126,6 +130,7 @@ export function stepSettings(
   if (row === 'back' && confirm) return { ...same, state: null };
   if (row === 'controls' && confirm)
     return { ...same, state: { page: 'controls', cursor: 0, listening: null }, moved: true };
+  if (row === 'feedback') return confirm ? { ...same, moved: true, feedback: true } : same;
   const dir = wasPressed(frame, 'left') ? -1 : wasPressed(frame, 'right') || confirm ? 1 : 0;
   if (dir === 0 || row === 'controls' || row === 'back') return same;
   if (row === 'fullscreen') return { ...same, moved: true, fullscreen: true };
@@ -134,7 +139,7 @@ export function stepSettings(
 }
 
 function stepControls(state: SettingsMenuState, frame: InputFrame, settings: Settings): SettingsStep {
-  const same = { state, settings, changed: false, moved: false, fullscreen: false };
+  const same = { state, settings, changed: false, moved: false, fullscreen: false, feedback: false };
   const back = {
     ...same,
     state: { page: 'main', cursor: SETTING_ROWS.indexOf('controls'), listening: null } as const,

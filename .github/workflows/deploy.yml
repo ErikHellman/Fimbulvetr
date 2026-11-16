@@ -33,6 +33,8 @@ jobs:
       - run: pnpm build
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # Uploads source maps to Vaka for readable error stacks; without the secret the upload is skipped.
+          VAKA_TOKEN: ${{ secrets.VAKA_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

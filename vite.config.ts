@@ -1,21 +1,40 @@
 import { readFileSync } from 'node:fs';
-import { defineConfig } from 'vite';
+import { defineConfig, type PluginOption } from 'vite';
+import { vakaVite } from '@hellsoft/vaka-bundler-plugin';
 import { VitePWA } from 'vite-plugin-pwa';
 import { aliases } from './aliases.config';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')) as {
   version: string;
 };
+const buildId = process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev';
+const release = `${pkg.version}+${buildId}`;
+// Source maps are built and uploaded to Vaka only when a token is set (the deploy job); they are deleted
+// after the upload, so they are never deployed.
+const vakaToken = process.env.VAKA_TOKEN;
 
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
   resolve: { alias: aliases },
-  build: { target: 'es2022', chunkSizeWarningLimit: 2000 },
+  build: { target: 'es2022', chunkSizeWarningLimit: 2000, sourcemap: vakaToken ? 'hidden' : false },
   define: {
-    __BUILD_ID__: JSON.stringify(process.env.GITHUB_SHA?.slice(0, 7) ?? 'dev'),
+    __BUILD_ID__: JSON.stringify(buildId),
     __APP_VERSION__: JSON.stringify(pkg.version),
+    __RELEASE__: JSON.stringify(release),
   },
   plugins: [
+    ...(vakaToken
+      ? [
+          vakaVite({
+            url: 'https://vaka.fly.dev',
+            token: vakaToken,
+            project: 'fimbulvetr',
+            release,
+            deleteAfterUpload: true,
+            defineRelease: false,
+          }) as PluginOption,
+        ]
+      : []),
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,

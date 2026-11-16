@@ -63,13 +63,14 @@
 
       <article id="en" lang="en">
         <h1>Fimbulvetr privacy policy</h1>
-        <p class="muted">Last updated 25 October 2026</p>
+        <p class="muted">Last updated 16 November 2026</p>
 
         <p>
           Fimbulvetr is a game that runs entirely in your web browser, at
           <a href="https://fimbulvetr.hellman.cloud/">fimbulvetr.hellman.cloud</a>. It has no accounts, no game
-          server, no ads, no analytics and no tracking. The short version: your game stays on your device, unless you
-          choose to keep a copy in your own cloud storage.
+          server, no ads and no tracking. It sends anonymous error reports and visit counts so we can fix bugs and see
+          whether people play, and you can send us feedback if you want to. The short version: your game stays on your
+          device, unless you choose to keep a copy in your own cloud storage.
         </p>
 
         <h2>Who is responsible</h2>
@@ -88,6 +89,10 @@
           </li>
           <li><strong>Achievements</strong> (localStorage, <code>fimbulvetr.achievements.v1</code>).</li>
           <li>
+            <strong>Visit id</strong> (sessionStorage, <code>vaka_sid</code>): a random id that ties the error reports
+            of one visit together. It is forgotten when you close the tab, or after 30 minutes without play.
+          </li>
+          <li>
             <strong>Game files</strong> (service worker cache), so the game loads quickly and works offline.
           </li>
         </ul>
@@ -101,8 +106,26 @@
 
         <h2>What the game sends over the internet</h2>
         <p>
-          Nothing, apart from downloading the game itself. Your saves, settings and play are not sent to us or to anyone
-          else. There are no analytics, crash reports, ads or third-party scripts.
+          Your saves and settings are never sent to us. Apart from downloading the game itself, the game sends a little
+          anonymous data to <a href="https://vaka.hellsoft.se/">Vaka</a>, an error-reporting and analytics service
+          that we run ourselves:
+        </p>
+        <ul>
+          <li>
+            <strong>Error reports</strong>, when something in the game breaks: the error message, where in the code it
+            happened, the game version, your browser and the last few warnings the game logged before it.
+          </li>
+          <li>
+            <strong>Visit counts</strong>: that the game was opened, from which page you came, and the game version.
+          </li>
+          <li>
+            <strong>Feedback</strong>, only when you write some under Settings → Send feedback. It is sent without
+            your name or email address, so we cannot answer it. Please don't write personal details in it.
+          </li>
+        </ul>
+        <p>
+          None of this identifies you. There is no user id, no cookie and nothing that follows you between visits, and
+          web addresses are cut down to the page itself before they are sent. Vaka runs on Fly.io and keeps the data for 90 days. There are no ads and no third-party scripts.
         </p>
 
         <h2>Hosting</h2>
@@ -178,13 +201,14 @@
 
       <article id="sv" lang="sv">
         <h1>Integritetspolicy för Fimbulvetr</h1>
-        <p class="muted">Senast uppdaterad 25 oktober 2026</p>
+        <p class="muted">Senast uppdaterad 16 november 2026</p>
 
         <p>
           Fimbulvetr är ett spel som körs helt i din webbläsare, på
           <a href="https://fimbulvetr.hellman.cloud/">fimbulvetr.hellman.cloud</a>. Det har inga konton, ingen
-          spelserver, ingen reklam, ingen analys och ingen spårning. Kort sagt: ditt spel stannar på din enhet, om du
-          inte själv väljer att spara en kopia i din egen molnlagring.
+          spelserver, ingen reklam och ingen spårning. Det skickar anonyma felrapporter och besöksräkning så att vi kan
+          rätta buggar och se om folk spelar, och du kan skicka synpunkter till oss om du vill. Kort sagt: ditt spel
+          stannar på din enhet, om du inte själv väljer att spara en kopia i din egen molnlagring.
         </p>
 
         <h2>Vem som är ansvarig</h2>
@@ -203,6 +227,10 @@
           </li>
           <li><strong>Prestationer</strong> (localStorage, <code>fimbulvetr.achievements.v1</code>).</li>
           <li>
+            <strong>Besöks-id</strong> (sessionStorage, <code>vaka_sid</code>): ett slumpat id som håller ihop
+            felrapporterna från ett besök. Det glöms bort när du stänger fliken, eller efter 30 minuter utan spel.
+          </li>
+          <li>
             <strong>Spelets filer</strong> (service workerns cache), så att spelet laddar snabbt och fungerar utan
             nätverk.
           </li>
@@ -217,9 +245,27 @@
 
         <h2>Vad spelet skickar över internet</h2>
         <p>
-          Ingenting, förutom att själva spelet laddas ner. Dina sparningar, inställningar och ditt spelande skickas
-          inte till oss eller till någon annan. Det finns ingen analys, inga kraschrapporter, ingen reklam och inga
-          skript från tredje part.
+          Dina sparningar och inställningar skickas aldrig till oss. Förutom att själva spelet laddas ner skickar
+          spelet lite anonym data till <a href="https://vaka.hellsoft.se/">Vaka</a>, en tjänst för felrapporter och
+          analys som vi driver själva:
+        </p>
+        <ul>
+          <li>
+            <strong>Felrapporter</strong>, när något i spelet går sönder: felmeddelandet, var i koden det hände,
+            spelets version, din webbläsare och de senaste varningarna spelet loggade innan.
+          </li>
+          <li>
+            <strong>Besöksräkning</strong>: att spelet öppnades, från vilken sida du kom och spelets version.
+          </li>
+          <li>
+            <strong>Synpunkter</strong>, bara när du skriver några under Inställningar → Skicka synpunkter. De
+            skickas utan ditt namn eller din e-postadress, så vi kan inte svara på dem. Skriv inga personuppgifter i
+            dem.
+          </li>
+        </ul>
+        <p>
+          Inget av detta identifierar dig. Det finns inget användar-id, ingen kaka och inget som följer dig mellan
+          besök, och webbadresser kortas ner till själva sidan innan de skickas. Vaka körs hos Fly.io och sparar uppgifterna i 90 dagar. Det finns ingen reklam och inga skript från tredje part.
         </p>
 
         <h2>Webbhotell</h2>

@@ -15,6 +15,7 @@ import { SaveService } from '@shell/platform/saveService';
 import { registerServiceWorker } from '@shell/platform/pwa';
 import { openSaveStoreSafely } from '@shell/platform/saveStore';
 import { browserStorage, loadSettings, preferredLang } from '@shell/platform/settings';
+import { startTelemetry } from '@shell/platform/telemetry';
 import { acquireTabLock } from '@shell/platform/tabLock';
 import { GAME_H, GAME_W, attachZoom } from '@shell/scale';
 import { attachFullscreenHotkey } from '@shell/platform/fullscreen';
@@ -62,6 +63,7 @@ function startGame(services: Services, extra: readonly Phaser.Scene[]): void {
 
 async function main(): Promise<void> {
   document.title = GAME_TITLE;
+  startTelemetry(!DEV_TOOLS);
   const query = DEV_TOOLS
     ? parseDevQuery(window.location.search, new Set<string>(SCREEN_IDS), new Set(Object.keys(DEV_PRESETS)))
     : null;

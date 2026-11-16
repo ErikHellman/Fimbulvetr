@@ -334,6 +334,13 @@ Analysis and plan: the "Graphics overhaul analysis" doc in the project (hybrid d
   - [x] Effects, icons, UI (`art-src/ui`)
   - [ ] Per-region atlas loading
 
+## Telemetry (after 1.0.0)
+
+- [x] Anonymous error reports and pageviews with Vaka (no user id, URLs scrubbed, production builds only)
+- [x] "Send feedback…" in the settings menu (anonymous, en + sv)
+- [x] Source-map upload from the deploy job (needs the `VAKA_TOKEN` secret)
+- [ ] Custom gameplay events (e.g. dungeon cleared, deaths per screen)
+
 ## Cloud saves (after 1.0.0)
 
 Analysis: Dropbox, OneDrive and Google Drive work from a static site (browser-only OAuth); iCloud is left out (paid, old CloudKit JS).
